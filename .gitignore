@@ -1,0 +1,6 @@
+vi_hd.img
+build/*
+build_support/logs/*
+*.o
+*.bin
+*.d

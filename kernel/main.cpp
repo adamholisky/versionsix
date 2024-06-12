@@ -103,7 +103,7 @@ extern "C" void kernel_main( void ) {
     //pci_initalize();
     //task_initalize();
 
-    do_divide_by_zero();
+    //do_divide_by_zero();
 
     //kshell();
 

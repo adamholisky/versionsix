@@ -4,6 +4,15 @@
 extern "C" {
 #endif
 
+#define PCI_CONFIG_ADDRESS 0xCF8
+#define PCI_CONFIG_DATA 0xCFC
+
+#define PCI_VENDOR_ID 0x0
+#define PCI_DEVICE_ID 0x2
+#define PCI_COMMAND_REGISTER 0x4
+#define PCI_STATUS_REGISTER 0x6
+#define PCI_BAR_0 0x10
+
 typedef struct {
     uint16_t 	vendor_id;
     uint16_t 	device_id;
@@ -56,6 +65,13 @@ void pci_initalize( void );
 uint16_t pci_config_read( uint8_t bus, uint8_t device, uint8_t function, uint8_t offset );
 void pci_read_header( pci_header *header, uint8_t bus, uint8_t device, uint8_t function );
 pci_header * pci_get_header_by_device_id( uint32_t _device_id );
+
+uint32_t pci_read_long( const uint16_t bus, const uint16_t device, const uint16_t func, const uint32_t field );
+uint16_t pci_read_short( const uint16_t bus, const uint16_t device, const uint16_t func, const uint32_t field );
+
+void pci_write( const uint16_t bus, const uint16_t device, const uint16_t func, const uint32_t field, uint32_t data );
+
+void pci_dump_header( pci_header *header );
 
 #ifdef __cplusplus
 }

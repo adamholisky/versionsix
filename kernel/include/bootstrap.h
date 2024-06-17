@@ -10,16 +10,6 @@ extern "C" {
 typedef uint8_t byte;
 typedef uint16_t word;
 
-/* Outputs a byte to the specified hardware port */
-static inline void outportb( uint32_t port, uint8_t value ) {
-    __asm__ __volatile__ ("outb %%al,%%dx"::"d" (port), "a" (value));
-}
-
-/* Outputs a word to a port */
-static inline void outportw( uint32_t port, uint32_t value ) {
-    __asm__ __volatile__ ("outw %%ax,%%dx"::"d" (port), "a" (value));
-}
-
 /* gets a byte from a port */
 static inline uint8_t inportb( uint32_t port ) {
     uint8_t value;
@@ -27,14 +17,20 @@ static inline uint8_t inportb( uint32_t port ) {
     return value;
 }
 
-static inline uint8_t inportw( uint32_t port ) {
-    uint8_t value;
+/* Outputs a byte to the specified hardware port */
+static inline void outportb( uint32_t port, uint8_t value ) {
+    __asm__ __volatile__ ("outb %%al,%%dx"::"d" (port), "a" (value));
+}
+
+static inline uint16_t in_port_short( uint32_t port ) {
+    uint16_t value;
     __asm__ __volatile__ ("inw %%dx,%%ax" : "=a"(value) : "d"(port));
     return value;
 }
 
-static inline void out_port_long( uint16_t port, uint32_t value) {
-    __asm__ __volatile__ ( "outl %%eax, %%dx" : : "d" (port), "a" (value) );
+/* Outputs a word to a port */
+static inline void outportw( uint32_t port, uint32_t value ) {
+    __asm__ __volatile__ ("outw %%ax,%%dx"::"d" (port), "a" (value));
 }
 
 static inline uint32_t in_port_long( uint16_t port ) {
@@ -43,11 +39,17 @@ static inline uint32_t in_port_long( uint16_t port ) {
     return value;
 }
 
+static inline void out_port_long( uint16_t port, uint32_t value) {
+    __asm__ __volatile__ ( "outl %%eax, %%dx" : : "d" (port), "a" (value) );
+}
+
 #define set_bit(x,b) x | 1<<b
 #define clear_bit(x,b) x ~ 1<<b 
 #define flip_bit(x,b) x ^ 1<<b
 #define test_bit(x,b) x & 1<<b
 #define do_immediate_shutdown() outportb( 0xF4, 0x00 )
+
+void delay( uint32_t count );
 
 /* #define debugf( ... ) printf( __VA_ARGS__ )
 #define log_entry_enter() debugf( "Enter\n" )

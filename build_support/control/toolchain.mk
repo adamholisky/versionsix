@@ -26,6 +26,7 @@ AFLAGS = $(CFLAGS)
 
 # -serial file:$(ROOT_DIR)/build_support/logs/serial_out.txt 
 # -serial telnet:127.0.0.1:99,server=on,wait=off 
+#pci_cfg_read pci_cfg_write
 QEMU = /usr/bin/qemu-system-x86_64
 QEMU_COMMON = 	-drive format=raw,if=ide,file=$(ROOT_DIR)/vi_hd.img \
 				-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
@@ -39,4 +40,4 @@ QEMU_COMMON = 	-drive format=raw,if=ide,file=$(ROOT_DIR)/vi_hd.img \
 QEMU_DISPLAY_NONE =	-display none
 QEMU_DISPLAY_NORMAL = -vga std
 QEMU_DEBUG_COMMON = -S -gdb tcp::5894 
-QEMU_DEBUG_LOGGING = -D $(ROOT_DIR)/build_support/logs/qemu_debug_log.txt -d int,cpu_reset 
+QEMU_DEBUG_LOGGING = -D $(ROOT_DIR)/build_support/logs/qemu_debug_log.txt -d trace:pci_cfg_read,trace:pci_cfg_write

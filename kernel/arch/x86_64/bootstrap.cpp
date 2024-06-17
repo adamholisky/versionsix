@@ -39,3 +39,9 @@ void operator delete[](void *p)
 {
 	kfree((uint64_t *)p);
 }
+
+void delay( uint32_t count ) {
+	for( uint32_t x = 0; x < count; x++ ) {
+		__asm__ __volatile__ ( "nop" );
+	}
+}

@@ -24,6 +24,6 @@ void timer_handler( registers *context ) {
     }
 
     if( timer_counter == 0 ) {
-        debugf( "Timer count hit.\n" );
+        //debugf( "Timer count hit.\n" );
     }
 }

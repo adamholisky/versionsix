@@ -61,6 +61,9 @@ void paging_dump_page_direct( uint64_t page );
 void paging_dump_cr3( paging_cr3 *cr3 );
 void paging_dump_page( paging_page_entry *page );
 uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address );
+void paging_examine_page_for_address( uint64_t virtual_address );
+uint64_t paging_virtual_to_physical( uint64_t virtual_address );
+paging_page_entry *paging_get_page_for_virtual_address( uint64_t virtual_address );
 
 #ifdef __cplusplus
 }

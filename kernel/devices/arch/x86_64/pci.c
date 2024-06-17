@@ -70,14 +70,9 @@ uint16_t pci_config_read( uint8_t bus, uint8_t device, uint8_t function, uint8_t
  
 	address = (uint32_t)((bus32 << 16) | (device32 << 11) | (function32 << 8) | (offset & 0xfc) | ((uint32_t)0x80000000));
  
-	out_port_long(0xCF8, address);
+	out_port_long( PCI_CONFIG_ADDRESS, address );
 
-	result = in_port_long(0xCFC);
-	
-	/* if( result != 0xFFFFFFFF ) {
-		debugf( "result: 0x%08X    move: %d    end: 0x%08X\n", result, (8 * (offset & 0x3)), (uint16_t)((result) >> (8 * (offset & 0x2))));
-	} */
-	
+	result = in_port_long( PCI_CONFIG_DATA );
 	result = (result) >> (8 * (offset & 0x3));
 
 	return (uint16_t)result;
@@ -95,9 +90,9 @@ void pci_read_header( pci_header *header, uint8_t bus, uint8_t device, uint8_t f
 	for( int i = 0; i < 0xF; i++ ) {
 		address = (uint32_t)((bus32 << 16) | (device32 << 11) | (function32 << 8) | ((uint8_t)(i * 4) & 0xfc) | ((uint32_t)0x80000000));
  
-		out_port_long(0xCF8, address);
+		out_port_long( PCI_CONFIG_ADDRESS, address );
 
-		result = in_port_long(0xCFC);
+		result = in_port_long( PCI_CONFIG_DATA );
 		*head = result;
 		head++;
 	}
@@ -121,4 +116,60 @@ pci_header * pci_get_header_by_device_id( uint32_t _device_id ) {
 	}
 
 	return return_val;
+}
+
+uint32_t pci_read_long( const uint16_t bus, const uint16_t device, const uint16_t func, const uint32_t field ) {
+	//out_port_long( PCI_CONFIG_ADDRESS, 0x80000000L | ((uint32_t)bus << 16) |((uint32_t)dev << 11) | ((uint32_t)func << 8) | (reg & ~3) );
+
+	out_port_long( PCI_CONFIG_ADDRESS, 0x80000000 | ((uint8_t)bus << 16) | ((uint8_t)device << 11) | ((uint8_t)func << 8) | ((field) & 0xFC) );
+
+	//return in_port_long( ( PCI_CONFIG_DATA )  >> ((field & 2) * 8) & 0xFFFF );
+	return in_port_long( PCI_CONFIG_DATA );
+}
+
+uint16_t pci_read_short( const uint16_t bus, const uint16_t device, const uint16_t func, const uint32_t field ) {
+	//out_port_long( PCI_CONFIG_ADDRESS, 0x80000000L | ((uint32_t)bus << 16) |((uint32_t)dev << 11) | ((uint32_t)func << 8) | (reg & ~3) );
+
+	out_port_long( PCI_CONFIG_ADDRESS, 0x80000000 | ((uint8_t)bus << 16) | ((uint8_t)device << 11) | ((uint8_t)func << 8) | ((field) & 0xFC) );
+
+	//return in_port_long( ( PCI_CONFIG_DATA )  >> ((field & 2) * 8) & 0xFFFF );
+	return in_port_short( PCI_CONFIG_DATA + (field & 2) );
+}
+
+/* void pci_write( const uint16_t bus, const uint16_t device, const uint16_t func, const uint32_t field, unsigned data ) {
+	out_port_long( PCI_CONFIG_ADDRESS, 0x80000000L | ((uint32_t)bus << 16) |((uint32_t)device << 11) |
+	((uint32_t)func << 8) | (field & ~3) );
+
+	out_port_long( PCI_CONFIG_DATA + (field & 3), data );
+} */
+
+void pci_write( const uint16_t bus, const uint16_t device, const uint16_t func, const uint32_t field, uint32_t data ) {
+	out_port_long( PCI_CONFIG_ADDRESS, 0x80000000 | ((uint8_t)bus << 16) | ((uint8_t)device << 11) | ((uint8_t)func << 8) | ((field) & 0xFC) );
+
+	out_port_long( PCI_CONFIG_DATA, data );
+}
+
+void pci_dump_header( pci_header *header ) {
+	debugf( "PCI Header Dump:\n" );
+	debugf( "    Revision ID: %X\n", header->revision_id );
+	debugf( "    Prog IF: %X\n", header->prog_if );
+	debugf( "    Subclass: %X\n", header->subclass );
+	debugf( "    Class Code: %X\n", header->class_code );
+	debugf( "    Cache Line Size: %X\n", header->cache_line_size );
+	debugf( "    Latency Timer: %X\n", header->latency_timer );
+	debugf( "    Header Type: %X\n", header->header_type );
+	debugf( "    BIST: %X\n", header->bist );
+	debugf( "    BAR0: %X\n", header->bar0 );
+	debugf( "    BAR1: %X\n", header->bar1 );
+	debugf( "    BAR2: %X\n", header->bar2 );
+	debugf( "    BAR3: %X\n", header->bar3 );
+	debugf( "    BAR4: %X\n", header->bar4 );
+	debugf( "    BAR5: %X\n", header->bar5 );
+	debugf( "    Subsystem Vendor ID: %X\n", header->subsystem_vendor_id );
+	debugf( "    Subsystem ID: %X\n", header->subsystem_id );
+	debugf( "    Expansion ROM Address: %X\n", header->expansion_rom_base_address );
+	debugf( "    Interrupt Line: %X\n", header->interrupt_line );
+	debugf( "    Interrupt Pin: %X\n", header->interrupt_pin );
+	debugf( "    Min Grant: %X\n", header->min_grant );
+	debugf( "    Max Latency: %X\n", header->max_latency );
 }

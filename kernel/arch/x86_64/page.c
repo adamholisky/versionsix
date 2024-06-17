@@ -86,7 +86,6 @@ void paging_initalize( void ) {
                 }
             }
         }
-        
     }
 
     #ifdef DEBUG_PAGING_INITALIZE
@@ -115,7 +114,6 @@ void paging_initalize( void ) {
 
     // Let's do a paging test, fail hard if it fails
     kernel_info.in_paging_sanity_test = true;
-    debugf( "Paging sanity check: start\n" );
     uint64_t *paging_sanity_check = page_allocate_kernel(1);
     *paging_sanity_check = 0x00001111BADAB000;
     if( *paging_sanity_check != 0x00001111BADAB000 ) {
@@ -124,6 +122,19 @@ void paging_initalize( void ) {
     } else {
         debugf( "Paging sanity check: pass\n" );
     }
+
+    uint64_t *paging_sanity_check_2 = page_map( 0x00001122BADA0000, 0x0000000090000000 );
+
+    *paging_sanity_check_2 = 30;
+    *(paging_sanity_check_2 + 1) = 40;
+    
+    if( *paging_sanity_check_2 != 30 ) {
+        debugf( "Paging sanity check 2: fail\n" );
+        do_immediate_shutdown();
+    } else {
+        debugf( "Paging sanity check 2: pass\n" );
+    }
+
     kernel_info.in_paging_sanity_test = false;
 
     #ifdef DEBUG_PAGING_INITALIZE
@@ -154,6 +165,13 @@ void paging_initalize( void ) {
     debugf( "*page_test_2: %d\n", *page_test_2 );
     debugf( "*(page_test_2 + 1): %d\n", *(page_test_2 + 1) );
     #endif
+
+    // TODO: Fix this, gross, related to e1000 driver
+    paging_page_entry *fix_this = paging_get_page_for_virtual_address( 0x00000000FEB80000 );
+    fix_this->cache_disabled = 1;
+    fix_this->write_through = 1;
+    
+    asm_refresh_cr3();
 }
 
 #undef DEBUG_PAGE_ALLOCATE
@@ -202,6 +220,10 @@ uint64_t *page_allocate_kernel( uint8_t number ) {
 
 #undef DEBUG_PAGE_MAP
 uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
+    #ifdef DEBUG_PAGE_MAP
+        debugf( "page_map( virtual_address = 0x%016llX, physical_address = 0x%016llx )\n", virtual_address, physical_address );
+    #endif
+
     // Find indexes
     uint64_t index_pml4 = (virtual_address >> 39) & 0x1FF;
     uint64_t index_pdpt = (virtual_address >> 30) & 0x1FF;
@@ -244,9 +266,9 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
                 pt = pd[index_pd].address << 12;
 
                 if( pt[index_pt].present == 0 ) {
-                    // Already assigned, do something?
-                } else {
                     setup_pt = true;
+                } else {
+                   // Already assigned, do something?
                 }
             }
         }
@@ -319,8 +341,20 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
     pt[index_pt].address = physical_address >> 12;
     pt[index_pt].rw = 1;
     pt[index_pt].present = 1;
+    pt[index_pt].cache_disabled = 1;
+    pt[index_pt].write_through = 1;
 
-    uint64_t pt_physical_addr = (uint64_t)pt - virtual_base + physical_base;
+    uint64_t physical_base_modifier = 0;
+    uint64_t virtual_base_modifier = 0;
+    if( virtual_address > virtual_base ) {
+        physical_base_modifier = physical_base;
+        virtual_base_modifier = virtual_base;
+    } else {
+        physical_base_modifier = kernel_info.kernel_allocate_memory_start;
+        virtual_base_modifier = kernel_info.kernel_end;
+    }
+
+    uint64_t pt_physical_addr = (uint64_t)pt - virtual_base_modifier + physical_base_modifier;
 
     if( setup_pd ) {
         pd[index_pd].address = pt_physical_addr >> 12;
@@ -328,15 +362,17 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
         pd[index_pd].present = 1;
     }
 
-    uint64_t pd_physical_addr = (uint64_t)pd - virtual_base + physical_base;
+    uint64_t pd_physical_addr = (uint64_t)pd - virtual_base_modifier + physical_base_modifier;
 
     if( setup_pdpt ) {
         pdpt[index_pdpt].address = pd_physical_addr >> 12;
         pdpt[index_pdpt].rw = 1;
         pdpt[index_pdpt].present = 1;
+    } else if( setup_pd ) {
+        pdpt[index_pdpt].address = pd_physical_addr >> 12;
     }
 
-    uint64_t pdpt_physical_addr = (uint64_t)pdpt - virtual_base + physical_base;
+    uint64_t pdpt_physical_addr = (uint64_t)pdpt - virtual_base_modifier + physical_base_modifier;
 
     if( setup_pml4 ) { 
         limine_pml4[index_pml4].address = pdpt_physical_addr >> 12;
@@ -402,4 +438,132 @@ void paging_dump_page( paging_page_entry *page ) {
     debugf_raw( "    Available_2: %d\n", page->available_2 );
 
     debugf_raw( "    Execute Disable: %d\n", page->execute_disable );
+}
+
+void paging_examine_page_for_address( uint64_t virtual_address ) {
+    uint64_t index_pml4 = (virtual_address >> 39) & 0x1FF;
+    uint64_t index_pdpt = (virtual_address >> 30) & 0x1FF;
+    uint64_t index_pd = (virtual_address >> 21) & 0x1FF;
+    uint64_t index_pt = (virtual_address >> 12) & 0x1FF;
+    paging_page_entry *pdpt = NULL;
+    paging_page_entry *pd = NULL;
+    paging_page_entry *pt = NULL;
+
+    debugf( "Examining page for address 0x%016llx:\n", virtual_address );
+    if( limine_pml4[index_pml4].present == 0 ) {
+        debugf( "PML4 index no present.\n" );
+    } else {
+
+        paging_dump_page( &limine_pml4[index_pml4] );
+        pdpt = limine_pml4[index_pml4].address << 12;
+        
+        if( pdpt[index_pdpt].present == 0 ) {
+            debugf( "PDPT index not present.\n" );
+        } else {
+            paging_dump_page( &pdpt[index_pdpt] );
+            pd = pdpt[index_pdpt].address << 12;
+
+            if( pd[index_pd].present == 0 ) {
+                debugf( "PD index not present.\n" );
+            } else {
+                paging_dump_page( &pd[index_pd] );
+                pt = pd[index_pd].address << 12;
+
+                if( pt[index_pt].present == 0 ) {
+                    debugf( "PT index not present.\n" );
+                } else {
+                    paging_dump_page( &pt[index_pt] );
+                }
+            }
+        }
+    }
+}
+
+uint64_t paging_virtual_to_physical( uint64_t virtual_address ) {
+    uint64_t index_pml4 = (virtual_address >> 39) & 0x1FF;
+    uint64_t index_pdpt = (virtual_address >> 30) & 0x1FF;
+    uint64_t index_pd = (virtual_address >> 21) & 0x1FF;
+    uint64_t index_pt = (virtual_address >> 12) & 0x1FF;
+    paging_page_entry *pdpt = NULL;
+    paging_page_entry *pd = NULL;
+    paging_page_entry *pt = NULL;
+    uint64_t physical_address = 0;
+
+    //debugf( "Examining page for address 0x%016llx:\n", virtual_address );
+    if( limine_pml4[index_pml4].present == 0 ) {
+        debugf( "PML4 index no present.\n" );
+    } else {
+
+        //paging_dump_page( &limine_pml4[index_pml4] );
+        pdpt = limine_pml4[index_pml4].address << 12;
+        
+        if( pdpt[index_pdpt].present == 0 ) {
+            debugf( "PDPT index not present.\n" );
+        } else {
+            //paging_dump_page( &pdpt[index_pdpt] );
+            pd = pdpt[index_pdpt].address << 12;
+
+            if( pd[index_pd].present == 0 ) {
+                debugf( "PD index not present.\n" );
+            } else {
+                //paging_dump_page( &pd[index_pd] );
+                pt = pd[index_pd].address << 12;
+
+                if( pt[index_pt].present == 0 ) {
+                    debugf( "PT index not present.\n" );
+                } else {
+                    //paging_dump_page( &pt[index_pt] );
+                    physical_address = pt[index_pt].address << 12;
+                }
+            }
+        }
+    }
+
+    return physical_address;
+}
+
+paging_page_entry *paging_get_page_for_virtual_address( uint64_t virtual_address ) {
+    uint64_t index_pml4 = (virtual_address >> 39) & 0x1FF;
+    uint64_t index_pdpt = (virtual_address >> 30) & 0x1FF;
+    uint64_t index_pd = (virtual_address >> 21) & 0x1FF;
+    uint64_t index_pt = (virtual_address >> 12) & 0x1FF;
+    paging_page_entry *pdpt = NULL;
+    paging_page_entry *pd = NULL;
+    paging_page_entry *pt = NULL;
+    paging_page_entry *ret_val = NULL;
+
+    //debugf( "Examining page for address 0x%016llx:\n", virtual_address );
+    if( limine_pml4[index_pml4].present == 0 ) {
+        debugf( "PML4 index no present.\n" );
+    } else {
+
+        pdpt = limine_pml4[index_pml4].address << 12;
+        
+        if( pdpt[index_pdpt].present == 0 ) {
+            debugf( "PDPT index not present.\n" );
+        } else {
+            //paging_dump_page( &pdpt[index_pdpt] );
+            pd = pdpt[index_pdpt].address << 12;
+
+            if( pd[index_pd].present == 0 ) {
+                debugf( "PD index not present.\n" );
+            } else {
+                //paging_dump_page( &pd[index_pd] );
+                if( pd[index_pd].page_size == 1 ) {
+                    //paging_examine_page_for_address( &pd[index_pd] );
+                    return &pd[index_pd];
+                }
+
+                pt = pd[index_pd].address << 12;
+
+                if( pt[index_pt].present == 0 ) {
+                    //debugf( "PT index not present.\n" );
+                } else {
+                    ret_val = &pt[index_pt];
+                }
+            }
+        }
+    }
+
+    return ret_val;
 }

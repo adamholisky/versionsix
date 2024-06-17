@@ -1,16 +1,17 @@
-#include "kernel_common.h"
-#include "limine.h"
-#include "serial.h"
-#include "file.h"
-#include "interrupt.h"
-#include "timer.h"
-#include "page.h"
-#include "kmemory.h"
-#include "kshell.h"
-#include "ksymbols.h"
-#include "pci.h"
-#include "task.h"
-#include "elf.h"
+#include <kernel_common.h>
+#include <limine.h>
+#include <serial.h>
+#include <file.h>
+#include <interrupt.h>
+#include <timer.h>
+#include <page.h>
+#include <kmemory.h>
+#include <kshell.h>
+#include <ksymbols.h>
+#include <pci.h>
+#include <e1000.h>
+#include <task.h>
+#include <elf.h>
 
 #define LIMINE_KERNEL_ADDRESS_REQUEST { LIMINE_COMMON_MAGIC, 0x71ba76863cc55f63, 0xb2644a48c516a487 }
 static volatile struct limine_kernel_address_request kaddr_request = {
@@ -100,12 +101,16 @@ extern "C" void kernel_main( void ) {
     paging_initalize();
     memory_initalize();
     kernel_symbols_initalize();
-    //pci_initalize();
+    pci_initalize();
+    e1000_initalize();
+
     //task_initalize();
 
     //do_divide_by_zero();
 
     //kshell();
 
+    debugf( "Ending happy.\n" );
+    printf( "Ending happy.\n" );
     do_immediate_shutdown();
 }

@@ -1,7 +1,8 @@
 {
     "files.associations": {
         "serial.h": "c",
-        "kernel_common.h": "c"
+        "kernel_common.h": "c",
+        "stdint.h": "c"
     },
     "editor.wordWrap":"on" 
 }

@@ -4,6 +4,9 @@
 extern "C" {
 #endif
 
+#include <mmio.h>
+#include <pci.h>
+
 void e1000_initalize( void );
 
 #define REG_CTRL        0x0000
@@ -26,6 +29,23 @@ void e1000_initalize( void );
 #define REG_TXDESCTAIL  0x3818
 
 #define E1000_REG_RXADDR 0x5400
+
+class E1000 {
+    private:
+        pci_header *pci_info;
+        MMIO *mmio;
+        uint16_t io_port;
+
+        uint8_t mac_address[8];
+    public:
+        bool has_eeprom;
+
+        bool detect_eeprom( void );
+        uint16_t read_eeprom( uint8_t offset );
+        uint8_t *get_mac_address( void );
+
+        E1000( pci_header *pci_header_info );
+};
 
 
 #ifdef __cplusplus

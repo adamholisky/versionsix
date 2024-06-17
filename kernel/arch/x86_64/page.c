@@ -165,13 +165,6 @@ void paging_initalize( void ) {
     debugf( "*page_test_2: %d\n", *page_test_2 );
     debugf( "*(page_test_2 + 1): %d\n", *(page_test_2 + 1) );
     #endif
-
-    // TODO: Fix this, gross, related to e1000 driver
-    paging_page_entry *fix_this = paging_get_page_for_virtual_address( 0x00000000FEB80000 );
-    fix_this->cache_disabled = 1;
-    fix_this->write_through = 1;
-    
-    asm_refresh_cr3();
 }
 
 #undef DEBUG_PAGE_ALLOCATE

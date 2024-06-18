@@ -175,9 +175,17 @@ uint64_t *page_allocate( uint8_t number ) {
     log_entry_enter();
     #endif
 
-    for( int i = 0; i < number; i++ ) {
-        return_val = page_map( kernel_heap_virtual_memory_next, kernel_heap_physical_memory_next );   
+    if( number < 1 ) {
+        return NULL;
+    }
 
+    for( int i = 0; i < number; i++ ) {
+        if( i == 0 ) {
+            return_val = page_map( kernel_heap_virtual_memory_next, kernel_heap_physical_memory_next );   
+        } else {
+            page_map( kernel_heap_virtual_memory_next, kernel_heap_physical_memory_next );   
+        }
+        
         kernel_heap_virtual_memory_next = kernel_heap_virtual_memory_next + 0x1000;
         kernel_heap_physical_memory_next = kernel_heap_physical_memory_next + 0x1000;
     }
@@ -197,9 +205,17 @@ uint64_t *page_allocate_kernel( uint8_t number ) {
     log_entry_enter();
     #endif
 
-    for( int i = 0; i < number; i++ ) {
-        return_val = page_map( kernel_virtual_memory_next, kernel_physical_memory_next );   
+    if( number < 1 ) {
+        return NULL;
+    }
 
+    for( int i = 0; i < number; i++ ) {
+        if( i == 0 ) {
+            return_val = page_map( kernel_virtual_memory_next, kernel_physical_memory_next );
+        } else {
+            page_map( kernel_virtual_memory_next, kernel_physical_memory_next );
+        }
+        
         kernel_virtual_memory_next = kernel_virtual_memory_next + 0x1000;
         kernel_physical_memory_next = kernel_physical_memory_next + 0x1000;
     }
@@ -207,6 +223,32 @@ uint64_t *page_allocate_kernel( uint8_t number ) {
     #ifdef DEBUG_PAGE_ALLOCATE_KERNEL
     log_entry_exit();
     #endif
+
+    return return_val;
+}
+
+uint64_t *page_allocate_kernel_mmio( uint8_t number ) {
+    uint64_t *return_val = NULL;
+    uint64_t *next_memory = NULL;
+
+    return_val = page_allocate_kernel( number );
+
+    next_memory = return_val;
+
+    if( return_val == NULL ) {
+        df( "return_val is null\n" );
+    }
+
+    for( int i = 0; i < number; i++ ) {
+        paging_page_entry *page = paging_get_page_for_virtual_address( (uint64_t)next_memory );
+        
+        page->cache_disabled = 1;
+        page->write_through = 1;
+
+        next_memory = (uint64_t *)((uint64_t)next_memory + PAGE_SIZE);
+    }
+
+    asm_refresh_cr3();
 
     return return_val;
 }
@@ -550,7 +592,7 @@ paging_page_entry *paging_get_page_for_virtual_address( uint64_t virtual_address
                 pt = pd[index_pd].address << 12;
 
                 if( pt[index_pt].present == 0 ) {
-                    //debugf( "PT index not present.\n" );
+                    debugf( "PT index not present.\n" );
                 } else {
                     ret_val = &pt[index_pt];
                 }

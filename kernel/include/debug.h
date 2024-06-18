@@ -13,6 +13,9 @@ static const char * bit_array[16] = {
 
 #define debugf( ... ) debugf_stage2( "[%s:%d] ", __PRETTY_FUNCTION__, __LINE__ ); debugf_stage2( __VA_ARGS__ )
 #define debugf_raw( ... ) debugf_stage2( __VA_ARGS__ )
+#define debugf_val( v ) debugf( "" #v " = 0x%016llX\n", v )
+#define df( ... ) debugf( __VA_ARGS__ )
+#define dfv( v ) debugf_val( v )
 
 #define log_entry_enter() debugf( "Enter\n" )
 #define log_entry_exit() debugf( "Exit\n" );

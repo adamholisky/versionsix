@@ -35,11 +35,35 @@ void e1000_interrupt_handler( registers *context );
 #define CTRL_RST 0x4000000
 #define CTRL_SLU 0x40
 
+#define E100_QUEUE_LENGTH 512
+
+typedef struct {
+	uint64_t address;
+	uint16_t length;
+	uint16_t checksum;
+	uint8_t  status;
+	uint8_t  errors;
+	uint16_t special;
+} __attribute__((packed)) e1000_rx_desc;
+
+typedef struct {
+	uint64_t address;
+	uint16_t length;
+	uint8_t  cso;
+	uint8_t  cmd;
+	uint8_t  status;
+	uint8_t  css;
+	uint16_t special;
+}  __attribute__((packed)) e1000_tx_desc;
+
 class E1000 {
     private:
         pci_header *pci_info;
         MMIO *mmio;
         uint16_t io_port;
+
+        e1000_rx_desc *rx_desc_queue;
+        e1000_tx_desc *tx_desc_queue;
 
         irq_handler_func interrupt_handler;
 

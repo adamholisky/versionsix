@@ -1,5 +1,6 @@
 #include <kernel_common.h>
 #include <page.h>
+#include <kmemory.h>
 #include <pci.h>
 #include <mmio.h>
 #include <e1000.h>
@@ -124,7 +125,7 @@ E1000::E1000( pci_header *pci_header_info ) {
 	debugf( "io_port addr: 0x%016llx\n", io_port );
 	debugf( "mmio_addr: 0x%016llx\n", this->mmio->addr );
 	debugf( "status: 0x%X\n", status );
-	pci_dump_header( pci_header_info );
+	//pci_dump_header( pci_header_info );
 	#endif
 
 	// Reset the device
@@ -152,9 +153,13 @@ E1000::E1000( pci_header *pci_header_info ) {
 }
 
 void E1000::rx_init( void ) {
+	this->rx_desc_queue = (e1000_rx_desc *)page_allocate_kernel_mmio(2);
 
+	
 }
 
 void E1000::tx_init( void ) {
+	this->tx_desc_queue = (e1000_tx_desc *)page_allocate_kernel_mmio(2);
+
 
 }

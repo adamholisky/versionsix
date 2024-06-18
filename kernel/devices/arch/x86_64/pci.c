@@ -147,6 +147,8 @@ void pci_write( const uint16_t bus, const uint16_t device, const uint16_t func, 
 
 void pci_dump_header( pci_header *header ) {
 	debugf( "PCI Header Dump:\n" );
+	debugf( "    Vendor ID: %X\n", header->vendor_id );
+	debugf( "    Device ID: %X\n", header->device_id );
 	debugf( "    Revision ID: %X\n", header->revision_id );
 	debugf( "    Prog IF: %X\n", header->prog_if );
 	debugf( "    Subclass: %X\n", header->subclass );

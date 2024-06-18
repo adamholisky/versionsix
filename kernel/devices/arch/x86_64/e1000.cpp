@@ -22,6 +22,10 @@ extern "C" void e1000_initalize(void) {
 	#endif
 }
 
+extern "C" void e1000_interrupt_handler( registers *context ) {
+
+}
+
 uint16_t E1000::read_eeprom( uint8_t offset ) {
 	mmio->write_command( REG_EEPROM, 1 | ((uint32_t)(offset) << 8) );
 
@@ -97,6 +101,10 @@ E1000::E1000( pci_header *pci_header_info ) {
 		mac_address[i] = 0;
 	}
 
+	for( int x = 0; x < 0x40; x = x+4 ) {
+		debugf( "XXXX x: %X  : 0x%08X\n", x, pci_read_long( 0, 3, 0, x) );
+	}
+
 	// Enable bus mastering
 	// 0x7 == Set io space, memory space, bus mastering to active
 	uint16_t command_register = pci_read_short( 0, 3, 0, PCI_COMMAND_REGISTER );
@@ -112,7 +120,6 @@ E1000::E1000( pci_header *pci_header_info ) {
 	//uint64_t *mmio_addr = page_map( (uint64_t)pci_header_info->bar0, (uint64_t)pci_header_info->bar0 );
 	this->mmio = new MMIO( (uint64_t *)0x00000000FEB80000 );
 	this->mmio->configure_mmu_page();
-
 	this->io_port = (uint16_t)pci_info->bar1;
 
 	uint32_t status = mmio->read_command( REG_STATUS );
@@ -123,4 +130,35 @@ E1000::E1000( pci_header *pci_header_info ) {
 	debugf( "status: 0x%X\n", status );
 	pci_dump_header( pci_header_info );
 	#endif
+
+	// Reset the device
+	uint32_t ctrl = mmio->read_command( REG_CTRL );
+	ctrl = ctrl | CTRL_RST;
+	mmio->write_command( REG_CTRL, ctrl );
+	delay( 10000 );
+
+	// Set the link to up
+	ctrl = mmio->read_command( REG_CTRL );
+	ctrl = ctrl | CTRL_SLU;
+	mmio->write_command( REG_CTRL, ctrl );
+	delay( 10000 );
+
+	ctrl = mmio->read_command( REG_CTRL );
+	debugf( "Control Reg: 0x%X\n", ctrl );
+
+	// TODO: Setup Interrupt Handler
+	this->interrupt_handler = e1000_interrupt_handler;
+	interrupt_add_irq_handler( pci_info->interrupt_line, interrupt_handler );
+
+	// Initalize transmit and recieve buffers
+	this->rx_init();
+	this->tx_init();
+}
+
+void E1000::rx_init( void ) {
+
+}
+
+void E1000::tx_init( void ) {
+
 }

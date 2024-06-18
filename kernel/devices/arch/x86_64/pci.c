@@ -87,12 +87,8 @@ void pci_read_header( pci_header *header, uint8_t bus, uint8_t device, uint8_t f
 	uint32_t * head = (uint32_t *)header;
 	uint8_t offset;
 
-	for( int i = 0; i < 0xF; i++ ) {
-		address = (uint32_t)((bus32 << 16) | (device32 << 11) | (function32 << 8) | ((uint8_t)(i * 4) & 0xfc) | ((uint32_t)0x80000000));
- 
-		out_port_long( PCI_CONFIG_ADDRESS, address );
-
-		result = in_port_long( PCI_CONFIG_DATA );
+	for( int x = 0; x < 0x40; x = x+4 ) {
+		result = pci_read_long( bus, device, function, x );
 		*head = result;
 		head++;
 	}

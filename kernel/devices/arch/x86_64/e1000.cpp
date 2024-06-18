@@ -101,10 +101,6 @@ E1000::E1000( pci_header *pci_header_info ) {
 		mac_address[i] = 0;
 	}
 
-	for( int x = 0; x < 0x40; x = x+4 ) {
-		debugf( "XXXX x: %X  : 0x%08X\n", x, pci_read_long( 0, 3, 0, x) );
-	}
-
 	// Enable bus mastering
 	// 0x7 == Set io space, memory space, bus mastering to active
 	uint16_t command_register = pci_read_short( 0, 3, 0, PCI_COMMAND_REGISTER );

@@ -80,8 +80,8 @@ uint8_t *E1000::get_mac_address( void ) {
 	} else {
 		// TODO: write this
 
-		uint32_t mac_addr_low  = mmio->read32((uint64_t *)((uint64_t)mmio->addr + E1000_REG_RXADDR));
-		uint32_t mac_addr_high = mmio->read32((uint64_t *)((uint64_t)mmio->addr + E1000_REG_RXADDR + 4));
+		uint32_t mac_addr_low  = mmio->read32((uint64_t *)((uint64_t)mmio->addr + REG_RXADDR));
+		uint32_t mac_addr_high = mmio->read32((uint64_t *)((uint64_t)mmio->addr + REG_RXADDR + 4));
 
 		debugf( "RXADDR 1: %X\n", mac_addr_high );
 		debugf( "RXADDR 2: %x\n", mac_addr_low );
@@ -154,12 +154,44 @@ E1000::E1000( pci_header *pci_header_info ) {
 
 void E1000::rx_init( void ) {
 	this->rx_desc_queue = (e1000_rx_desc *)page_allocate_kernel_mmio(2);
+	this->rx_desc_queue_physical_address = paging_virtual_to_physical( (uint64_t)this->rx_desc_queue );
 
-	
+	dfv( this->rx_desc_queue_physical_address );
+
+	for( int i = 0; i < E1000_QUEUE_LENGTH; i++ ) {
+		this->rx_data[i] = page_allocate_kernel_mmio(1);
+		this->rx_desc_queue[i].address = paging_virtual_to_physical( (uint64_t)this->rx_data[i] );
+	}
+
+	rx_index = 0;
+
+	mmio->write_command( REG_RXDESCHI, 0 );
+	mmio->write_command( REG_RXDESCLO, this->rx_desc_queue_physical_address );
+	mmio->write_command( REG_RXDESCLEN, E1000_QUEUE_LENGTH * sizeof(e1000_rx_desc) );
+	mmio->write_command( REG_RXDESCHEAD, 0 );
+	mmio->write_command( REG_RXDESCTAIL, E1000_QUEUE_LENGTH - 1 );
+
+	mmio->write_command( REG_RCTRL, RCTL_EN | RCTL_SBP | RCTL_MPE | RCTL_BAM | RCTL_BSIZE_4096 | RCTL_SECRC );
 }
 
 void E1000::tx_init( void ) {
 	this->tx_desc_queue = (e1000_tx_desc *)page_allocate_kernel_mmio(2);
+	this->tx_desc_queue_physical_address = paging_virtual_to_physical( (uint64_t)this->tx_desc_queue );
 
+	dfv( this->tx_desc_queue_physical_address );
 
+	for( int i = 0; i < E1000_QUEUE_LENGTH; i++ ) {
+		this->tx_data[i]= page_allocate_kernel_mmio(1);
+		this->tx_desc_queue[i].address = paging_virtual_to_physical( (uint64_t)this->tx_data[i] );
+	}
+
+	tx_index = 0;
+
+	mmio->write_command( REG_TXDESCHI, 0 );
+	mmio->write_command( REG_TXDESCLO, this->tx_desc_queue_physical_address );
+	mmio->write_command( REG_TXDESCLEN, E1000_QUEUE_LENGTH * sizeof(e1000_tx_desc) );
+	mmio->write_command( REG_TXDESCHEAD, 0 );
+	mmio->write_command( REG_TXDESCTAIL, 0 );
+
+	mmio->write_command( REG_TCTRL, TCTL_EN | TCTL_PSP );
 }

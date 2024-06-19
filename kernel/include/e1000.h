@@ -17,6 +17,7 @@ void e1000_interrupt_handler( registers *context );
 #define REG_CTRL_EXT 0x0018
 #define REG_IMASK 0x00D0
 #define REG_RCTRL 0x0100
+
 #define REG_RXDESCLO 0x2800
 #define REG_RXDESCHI 0x2804
 #define REG_RXDESCLEN 0x2808
@@ -30,12 +31,22 @@ void e1000_interrupt_handler( registers *context );
 #define REG_TXDESCHEAD 0x3810
 #define REG_TXDESCTAIL 0x3818
 
-#define E1000_REG_RXADDR 0x5400
+#define REG_RXADDR 0x5400
 
 #define CTRL_RST 0x4000000
 #define CTRL_SLU 0x40
 
-#define E100_QUEUE_LENGTH 512
+#define RCTL_EN	(1 << 1)
+#define RCTL_SBP (1 << 2)
+#define RCTL_MPE (1 << 4)
+#define RCTL_BAM (1 << 15)
+#define RCTL_BSIZE_4096	( (3 << 16) | (1 << 25) ) // Flag for 4096 byte size, plus extended size
+#define RCTL_SECRC (1 << 26)
+
+#define TCTL_EN 0x2
+#define TCTL_PSP 0x8
+
+#define E1000_QUEUE_LENGTH 64
 
 typedef struct {
 	uint64_t address;
@@ -63,7 +74,15 @@ class E1000 {
         uint16_t io_port;
 
         e1000_rx_desc *rx_desc_queue;
+        uint64_t *rx_data[E1000_QUEUE_LENGTH];
+        uint64_t rx_index;
+
         e1000_tx_desc *tx_desc_queue;
+        uint64_t *tx_data[E1000_QUEUE_LENGTH];
+        uint64_t tx_index;
+        
+        uint32_t rx_desc_queue_physical_address;
+        uint32_t tx_desc_queue_physical_address;
 
         irq_handler_func interrupt_handler;
 

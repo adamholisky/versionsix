@@ -14,6 +14,7 @@ extern "C" {
 #include <bootstrap.h>
 #include <syscall.h>
 #include <debug.h>
+#include <framebuffer.h>
 
 // From helper_asm.S
 extern uint64_t get_cr0( void );
@@ -33,6 +34,8 @@ typedef struct {
     uint64_t kernel_end;
     uint64_t kernel_file_address;
     uint64_t kernel_file_size;
+
+    framebuffer_information framebuffer_info;
 
     bool in_paging_sanity_test;
     bool in_page_fault_test;

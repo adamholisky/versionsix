@@ -30,7 +30,8 @@ AFLAGS = $(CFLAGS)
 QEMU = /usr/bin/qemu-system-x86_64
 QEMU_COMMON = 	-drive format=raw,if=ide,file=$(ROOT_DIR)/vi_hd.img \
 				-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
-				-nic user,ipv6=off,model=e1000,mac=12:34:56:78:9A:BC \
+				-netdev socket,id=privatenet,connect=:1234 \
+				-device e1000,netdev=privatenet,mac=12:34:56:78:9A:BC \
 				-m 8G \
 				-serial stdio \
 				-serial null \

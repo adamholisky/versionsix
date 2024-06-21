@@ -46,6 +46,14 @@ void e1000_interrupt_handler( registers *context );
 #define TCTL_EN 0x2
 #define TCTL_PSP 0x8
 
+#define CMD_EOP (1 << 0)
+#define CMD_IFCS (1 << 1)
+#define CMD_IC (1 << 2)
+#define CMD_RS (1 << 3)
+#define CMD_RPS (1 << 4)
+#define CMD_VLE (1 << 6)
+#define CMD_IDE (1 << 7)
+
 #define E1000_QUEUE_LENGTH 64
 
 typedef struct {
@@ -96,6 +104,8 @@ class E1000 {
 
         void rx_init( void );
         void tx_init( void );
+
+        void send( uint8_t *data, size_t length );
 
         E1000( pci_header *pci_header_info );
 };

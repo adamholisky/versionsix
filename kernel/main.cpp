@@ -115,7 +115,7 @@ extern "C" void kernel_main( void ) {
 	kernel_symbols_initalize();
 	pci_initalize();
 	e1000_initalize();
-	framebuffer_initalize();
+	//framebuffer_initalize();
 
 	//task_initalize();
 
@@ -125,5 +125,5 @@ extern "C" void kernel_main( void ) {
 
 	debugf( "Ending happy.\n" );
 	printf( "Ending happy.\n" );
-	//do_immediate_shutdown();
+	do_immediate_shutdown();
 }

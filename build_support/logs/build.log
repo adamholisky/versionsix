@@ -31,3 +31,5 @@ make[1]: Entering directory '/usr/local/osdev/versions/vi'
 /usr/local/osdev/bin/x86_64-elf-objdump -x -D -S build/versionvi.bin > build_support/logs/objdump.txt
 readelf -W -a build/versionvi.bin > build_support/logs/elfdump.txt
 make[1]: Leaving directory '/usr/local/osdev/versions/vi'
+make[1]: Entering directory '/usr/local/osdev/versions/vi'
+make[1]: Leaving directory '/usr/local/osdev/versions/vi'

@@ -150,6 +150,9 @@ E1000::E1000( pci_header *pci_header_info ) {
 	// Initalize transmit and recieve buffers
 	this->rx_init();
 	this->tx_init();
+
+	// Send a packet? lol
+	send( "Hello, world?", strlen( "Hello, world?" ) );
 }
 
 void E1000::rx_init( void ) {
@@ -194,4 +197,19 @@ void E1000::tx_init( void ) {
 	mmio->write_command( REG_TXDESCTAIL, 0 );
 
 	mmio->write_command( REG_TCTRL, TCTL_EN | TCTL_PSP );
+}
+
+void E1000::send(uint8_t *data, size_t length) {
+	uint16_t tail = mmio->read_command( REG_TXDESCTAIL );
+	uint16_t head = mmio->read_command( REG_TXDESCHEAD );
+
+	memcpy( tx_data[tx_index], data, length );
+	tx_desc_queue[tx_index].length = length;
+	tx_desc_queue[tx_index].cmd = CMD_EOP | CMD_IFCS | CMD_RS;
+	tx_desc_queue[tx_index].status = 0;
+
+	tx_index++;
+
+	mmio->write_command( REG_TXDESCTAIL, tx_index );
+	mmio->read_command( REG_STATUS );
 }

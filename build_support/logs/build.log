@@ -6,6 +6,30 @@ rm -rf build_support/logs/elfdump.txt
 rm -rf build_support/logs/qemu_debug_log.txt
 make[1]: Leaving directory '/usr/local/osdev/versions/vi'
 make[1]: Entering directory '/usr/local/osdev/versions/vi'
+Start Debug Dump
+----------
+vpath: :.git:.git/hooks:.git/logs:.git/logs/refs:.git/logs/refs/remotes:.git/logs/refs/remotes/origin:.git/logs/refs/heads:.git/info:.git/branches:.git/refs:.git/refs/remotes:.git/refs/remotes/origin:.git/refs/tags:.git/refs/heads:.git/objects:.git/objects/85:.git/objects/cd:.git/objects/8d:.git/objects/30:.git/objects/aa:.git/objects/94:.git/objects/ab:.git/objects/41:.git/objects/09:.git/objects/cb:.git/objects/29:.git/objects/1e:.git/objects/3b:.git/objects/a4:.git/objects/b1:.git/objects/92:.git/objects/2b:.git/objects/9e:.git/objects/ff:.git/objects/pack:.git/objects/cc:.git/objects/26:.git/objects/ae:.git/objects/c6:.git/objects/65:.git/objects/e9:.git/objects/a1:.git/objects/6d:.git/objects/a0:.git/objects/e7:.git/objects/97:.git/objects/e8:.git/objects/98:.git/objects/0a:.git/objects/4f:.git/objects/c4:.git/objects/2c:.git/objects/51:.git/objects/6c:.git/objects/0d:.git/objects/7c:.git/objects/03:.git/objects/3e:.git/objects/4a:.git/objects/4d:.git/objects/ca:.git/objects/0c:.git/objects/6a:.git/objects/5d:.git/objects/52:.git/objects/16:.git/objects/02:.git/objects/78:.git/objects/62:.git/objects/1b:.git/objects/ce:.git/objects/54:.git/objects/c7:.git/objects/73:.git/objects/ed:.git/objects/be:.git/objects/ad:.git/objects/38:.git/objects/58:.git/objects/57:.git/objects/37:.git/objects/3f:.git/objects/32:.git/objects/04:.git/objects/25:.git/objects/5c:.git/objects/c1:.git/objects/87:.git/objects/99:.git/objects/1f:.git/objects/14:.git/objects/fe:.git/objects/17:.git/objects/69:.git/objects/11:.git/objects/eb:.git/objects/35:.git/objects/0b:.git/objects/76:.git/objects/68:.git/objects/80:.git/objects/c0:.git/objects/f3:.git/objects/93:.git/objects/b0:.git/objects/59:.git/objects/10:.git/objects/ba:.git/objects/f5:.git/objects/7b:.git/objects/f0:.git/objects/0e:.git/objects/5a:.git/objects/b2:.git/objects/7a:.git/objects/e2:.git/objects/3c:.git/objects/4b:.git/objects/79:.git/objects/7f:.git/objects/08:.git/objects/74:.git/objects/00:.git/objects/a8:.git/objects/2e:.git/objects/77:.git/objects/05:.git/objects/1c:.git/objects/e1:.git/objects/5b:.git/objects/e4:.git/objects/34:.git/objects/3d:.git/objects/7d:.git/objects/8c:.git/objects/c9:.git/objects/43:.git/objects/39:.git/objects/91:.git/objects/4c:.git/objects/ee:.git/objects/2d:.git/objects/19:.git/objects/b3:.git/objects/d5:.git/objects/07:.git/objects/45:.git/objects/d6:.git/objects/f7:.git/objects/56:.git/objects/b4:.git/objects/24:.git/objects/b8:.git/objects/8f:.git/objects/d4:.git/objects/12:.git/objects/a7:.git/objects/ec:.git/objects/18:.git/objects/a9:.git/objects/db:.git/objects/e6:.git/objects/55:.git/objects/a3:.git/objects/3a:.git/objects/81:.git/objects/b5:.git/objects/1a:.git/objects/af:.git/objects/d9:.git/objects/21:.git/objects/c3:.git/objects/49:.git/objects/ea:.git/objects/83:.git/objects/bc:.git/objects/7e:.git/objects/9f:.git/objects/95:.git/objects/b7:.git/objects/86:.git/objects/fb:.git/objects/f8:.git/objects/bd:.git/objects/61:.git/objects/06:.git/objects/2a:.git/objects/info:.git/objects/96:.git/objects/c5:.git/objects/70:.git/objects/42:.git/objects/b6:.git/objects/22:.git/objects/d0:.git/objects/36:.git/objects/6b:.git/objects/a5:.git/objects/88:.git/objects/9c:.git/objects/01:.git/objects/df:.git/objects/a2:.git/objects/f2:.git/objects/20:.git/objects/53:.git/objects/8b:.git/objects/9b:.git/objects/84:.git/objects/b9:.git/objects/50:.git/objects/de:.git/objects/15:.git/objects/82:.git/objects/dd:.git/objects/4e:.git/objects/33:.git/objects/8e:.git/objects/f9:.git/objects/da:.git/objects/e0:.git/objects/60:.git/objects/27:.git/objects/fd:.git/objects/cf:.git/objects/fa:.git/objects/46:.git/objects/f1:.git/objects/f6:.git/objects/a6:.git/objects/48:.git/objects/d8:.git/objects/d7:.git/objects/67:.git/objects/66:.git/objects/1d:.git/objects/5e:.git/objects/9a:.git/objects/64:.git/objects/f4:.git/objects/89:.git/objects/dc:.git/objects/d2:.git/objects/bb:.git/objects/d1:.git/objects/6e:.git/objects/9d:.git/objects/75:.git/objects/8a:.git/objects/40:.git/objects/72:.git/objects/bf:.git/objects/d3:.git/objects/90:.git/objects/71:.git/objects/ef:.git/objects/e5:.git/objects/2f:.git/objects/31:.git/objects/e3:.git/objects/fc:.git/objects/47:build:.vscode:kernel:kernel/syscalls:kernel/devices:kernel/devices/arch:kernel/devices/arch/x86_64:kernel/support:kernel/include:kernel/arch:kernel/arch/x86_64:build_support:build_support/img_mount_point:build_support/control:build_support/boot_files:build_support/boot_files/limine:build_support/logs:build_support/gdb_control:build_support/klibc:
+----------
+*.s:
+ 
+*.o:
+----------
+*.S: kernel/arch/x86_64/helper_asm.S kernel/arch/x86_64/interrupt_asm.S
+ 
+*.o: build/helper_asm.o build/interrupt_asm.o
+----------
+*.c: kernel/arch/x86_64/debug.c kernel/arch/x86_64/interrupt.c kernel/arch/x86_64/page.c kernel/devices/arch/x86_64/framebuffer.c kernel/devices/arch/x86_64/pci.c kernel/devices/arch/x86_64/serial.c kernel/devices/arch/x86_64/timer.c kernel/kmemory.c kernel/kshell.c kernel/syscalls/read.c kernel/syscalls/write.c
+ 
+*.o: build/debug.o build/interrupt.o build/page.o build/framebuffer.o build/pci.o build/serial.o build/timer.o build/kmemory.o build/kshell.o build/read.o build/write.o
+----------
+*.cpp: kernel/arch/x86_64/bootstrap.cpp kernel/device.cpp kernel/devices/arch/x86_64/e1000.cpp kernel/elf.cpp kernel/main.cpp kernel/support/ksymbols.cpp kernel/support/mmio.cpp kernel/task.cpp
+ 
+*.o: build/bootstrap.o build/device.o build/e1000.o build/elf.o build/main.o build/ksymbols.o build/mmio.o build/task.o
+----------
+End Debug Dump
+ 
+make[1]: Leaving directory '/usr/local/osdev/versions/vi'
+make[1]: Entering directory '/usr/local/osdev/versions/vi'
 /usr/local/osdev/bin/x86_64-elf-gcc -DPAGING_PAE -DGRAPHICS_OFF -DBITS_64  -Wno-write-strings -ffreestanding -fno-omit-frame-pointer -O0 -g -I/usr/local/osdev/versions/vi/kernel/include -I/usr/local/osdev/versions/vi/../libcvv/libc/include -ffreestanding -fno-stack-protector -fno-stack-check -fno-lto -m64 -march=x86-64 -mabi=sysv -mno-red-zone -mcmodel=kernel       -nostdlib -lgcc -std=c11 -c kernel/arch/x86_64/debug.c -o build/debug.o >> /usr/local/osdev/versions/vi/build_support/logs/build.log
 /usr/local/osdev/bin/x86_64-elf-gcc -DPAGING_PAE -DGRAPHICS_OFF -DBITS_64  -Wno-write-strings -ffreestanding -fno-omit-frame-pointer -O0 -g -I/usr/local/osdev/versions/vi/kernel/include -I/usr/local/osdev/versions/vi/../libcvv/libc/include -ffreestanding -fno-stack-protector -fno-stack-check -fno-lto -m64 -march=x86-64 -mabi=sysv -mno-red-zone -mcmodel=kernel       -nostdlib -lgcc -std=c11 -c kernel/arch/x86_64/interrupt.c -o build/interrupt.o >> /usr/local/osdev/versions/vi/build_support/logs/build.log
 /usr/local/osdev/bin/x86_64-elf-gcc -DPAGING_PAE -DGRAPHICS_OFF -DBITS_64  -Wno-write-strings -ffreestanding -fno-omit-frame-pointer -O0 -g -I/usr/local/osdev/versions/vi/kernel/include -I/usr/local/osdev/versions/vi/../libcvv/libc/include -ffreestanding -fno-stack-protector -fno-stack-check -fno-lto -m64 -march=x86-64 -mabi=sysv -mno-red-zone -mcmodel=kernel       -nostdlib -lgcc -std=c11 -c kernel/arch/x86_64/page.c -o build/page.o >> /usr/local/osdev/versions/vi/build_support/logs/build.log
@@ -30,24 +54,6 @@ make[1]: Entering directory '/usr/local/osdev/versions/vi'
 /usr/local/osdev/bin/x86_64-elf-ld -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/control/linker.ld -o build/versionvi.bin build_support/klibc/vvlibc.o  build/debug.o  build/interrupt.o  build/page.o  build/framebuffer.o  build/pci.o  build/serial.o  build/timer.o  build/kmemory.o  build/kshell.o  build/read.o  build/write.o  build/bootstrap.o  build/device.o  build/e1000.o  build/elf.o  build/main.o  build/ksymbols.o  build/mmio.o  build/task.o  build/helper_asm.o  build/interrupt_asm.o
 /usr/local/osdev/bin/x86_64-elf-objdump -x -D -S build/versionvi.bin > build_support/logs/objdump.txt
 readelf -W -a build/versionvi.bin > build_support/logs/elfdump.txt
-make[1]: Leaving directory '/usr/local/osdev/versions/vi'
-make[1]: Entering directory '/usr/local/osdev/versions/vi'
-/usr/local/osdev/bin/x86_64-elf-g++ -DPAGING_PAE -DGRAPHICS_OFF -DBITS_64  -Wno-write-strings -ffreestanding -fno-omit-frame-pointer -O0 -g -I/usr/local/osdev/versions/vi/kernel/include -I/usr/local/osdev/versions/vi/../libcvv/libc/include -ffreestanding -fno-stack-protector -fno-stack-check -fno-lto -m64 -march=x86-64 -mabi=sysv -mno-red-zone -mcmodel=kernel       -nostdlib -lgcc -fno-exceptions -fno-rtti -fpermissive -c kernel/devices/arch/x86_64/e1000.cpp -o build/e1000.o >> /usr/local/osdev/versions/vi/build_support/logs/build.log
-/usr/local/osdev/bin/x86_64-elf-ld -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/control/linker.ld -o build/versionvi.bin build_support/klibc/vvlibc.o  build/debug.o  build/interrupt.o  build/page.o  build/framebuffer.o  build/pci.o  build/serial.o  build/timer.o  build/kmemory.o  build/kshell.o  build/read.o  build/write.o  build/bootstrap.o  build/device.o  build/e1000.o  build/elf.o  build/main.o  build/ksymbols.o  build/mmio.o  build/task.o  build/helper_asm.o  build/interrupt_asm.o
-/usr/local/osdev/bin/x86_64-elf-objdump -x -D -S build/versionvi.bin > build_support/logs/objdump.txt
-readelf -W -a build/versionvi.bin > build_support/logs/elfdump.txt
-make[1]: Leaving directory '/usr/local/osdev/versions/vi'
-make[1]: Entering directory '/usr/local/osdev/versions/vi'
-make[1]: Leaving directory '/usr/local/osdev/versions/vi'
-make[1]: Entering directory '/usr/local/osdev/versions/vi'
-make[1]: Leaving directory '/usr/local/osdev/versions/vi'
-make[1]: Entering directory '/usr/local/osdev/versions/vi'
-make[1]: Leaving directory '/usr/local/osdev/versions/vi'
-make[1]: Entering directory '/usr/local/osdev/versions/vi'
-make[1]: Leaving directory '/usr/local/osdev/versions/vi'
-make[1]: Entering directory '/usr/local/osdev/versions/vi'
-make[1]: Leaving directory '/usr/local/osdev/versions/vi'
-make[1]: Entering directory '/usr/local/osdev/versions/vi'
 make[1]: Leaving directory '/usr/local/osdev/versions/vi'
 make[1]: Entering directory '/usr/local/osdev/versions/vi'
 make[1]: Leaving directory '/usr/local/osdev/versions/vi'

@@ -131,5 +131,5 @@ extern "C" void kernel_main( void ) {
 }
 
 extern "C" void do_test_send( void ) {
-	e1000_send( "Test Data", strlen( "Test Data" ) );
+	e1000_send( (uint8_t *)"Test Data", strlen( "Test Data" ) );
 }

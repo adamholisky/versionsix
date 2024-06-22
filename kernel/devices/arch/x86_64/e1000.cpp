@@ -173,7 +173,7 @@ E1000::E1000( pci_header *pci_header_info ) {
 
 	// Send a packet? lol
 	debugf( "Sending test packet\n" );
-	send( "Hello, world?", strlen( "Hello, world?" ) );
+	send( (uint8_t *)"Hello, world?", strlen( "Hello, world?" ) );
 }
 
 void E1000::rx_init( void ) {

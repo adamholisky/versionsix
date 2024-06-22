@@ -4,9 +4,9 @@
 extern "C" {
 #endif
 
-#define PIC_PRIMARY			0x20
+#define PIC_PRIMARY_COMMAND	0x20
 #define PIC_PRIMARY_DATA	0x21
-#define PIC_SECONDARY		0xA0
+#define PIC_SECONDARY_COMMAND 0xA0
 #define PIC_SECONDARY_DATA	0xA1
 #define PIC_EOI				0x20
 #define ICW1_INIT           0x10
@@ -18,6 +18,9 @@ extern "C" {
 #define ICW4_MASTER         0x04
 #define ICW4_AEOI           0x02
 #define ICW4_8086           0x01
+
+#define PIC_PRIMARY_OFFSET 0x20
+#define PIC_SECONDARY_OFFSET 0x28
 
 static const char * intel_exceptions[21] = {
     [0] = "Divide by Zero",
@@ -118,6 +121,22 @@ extern void isr_19( void );
 extern void isr_20( void );
 
 extern void isr_32( void );
+extern void isr_33( void );
+extern void isr_34( void );
+extern void isr_35( void );
+extern void isr_36( void );
+extern void isr_37( void );
+extern void isr_38( void );
+extern void isr_39( void );
+extern void isr_40( void );
+extern void isr_41( void );
+extern void isr_42( void );
+extern void isr_43( void );
+extern void isr_44( void );
+extern void isr_45( void );
+extern void isr_46( void );
+extern void isr_47( void );
+
 
 extern uint64_t get_cr0( void );
 extern uint64_t get_cr2( void );
@@ -128,6 +147,8 @@ void interrupt_initalize( void );
 void interrupt_handler_stage_2( registers *reg );
 void interrupt_setup_exception_handler( int num, uint64_t handler );
 void interrupt_add_irq_handler( uint8_t irq_num, irq_handler_func handler_func );
+void interrupts_disable( void );
+void interrupts_enable( void );
 
 #ifdef __cplusplus
 }

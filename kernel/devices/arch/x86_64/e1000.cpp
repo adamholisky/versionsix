@@ -13,10 +13,14 @@ extern "C" void e1000_initalize(void) {
 	log_entry_enter();
 	#endif
 
+	interrupts_disable();
+
 	e1000_device = new E1000( pci_get_header_by_device_id(0x100E) );
 
 	uint8_t *MAC = e1000_device->get_mac_address();
 	debugf( "MAC Address: %X:%X:%X:%X:%X:%X\n", MAC[0], MAC[1], MAC[2], MAC[3], MAC[4], MAC[5] );
+
+	interrupts_enable();
 
 	#ifdef DEBUG_E1000_INITALIZE
 	log_entry_exit();
@@ -24,7 +28,16 @@ extern "C" void e1000_initalize(void) {
 }
 
 extern "C" void e1000_interrupt_handler( registers *context ) {
+	dpf( "In handler\n" );
 
+	uint32_t icr = e1000_device->mmio->read_command( REG_ICR );
+	dpf( "ICR: 0x%X\n", icr );
+
+	//e1000_device->mmio->write_command( REG_ICR, icr );
+}
+
+extern "C" void e1000_send( uint8_t *data, size_t length ) {
+	e1000_device->send( data, length );
 }
 
 uint16_t E1000::read_eeprom( uint8_t offset ) {
@@ -125,7 +138,7 @@ E1000::E1000( pci_header *pci_header_info ) {
 	debugf( "io_port addr: 0x%016llx\n", io_port );
 	debugf( "mmio_addr: 0x%016llx\n", this->mmio->addr );
 	debugf( "status: 0x%X\n", status );
-	//pci_dump_header( pci_header_info );
+	pci_dump_header( pci_header_info );
 	#endif
 
 	// Reset the device
@@ -148,10 +161,18 @@ E1000::E1000( pci_header *pci_header_info ) {
 	interrupt_add_irq_handler( pci_info->interrupt_line, interrupt_handler );
 
 	// Initalize transmit and recieve buffers
+	debugf( "Initalize rx and tx systems\n" );
 	this->rx_init();
 	this->tx_init();
 
+	// Enable interrupts
+	//mmio->write_command( REG_IMS, (ICR_LSC | ICR_RXO | ICR_RXT0 | ICR_TXQE | ICR_TXDW | ICR_ACK | ICR_RXDMT0 | ICR_SRPD) ); 
+	mmio->write_command( REG_IMS, 0x1F6DC );
+	mmio->write_command( REG_IMS, 0xFF & ~4 );
+	mmio->read_command( REG_ICR );
+
 	// Send a packet? lol
+	debugf( "Sending test packet\n" );
 	send( "Hello, world?", strlen( "Hello, world?" ) );
 }
 

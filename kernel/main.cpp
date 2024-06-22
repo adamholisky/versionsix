@@ -121,9 +121,15 @@ extern "C" void kernel_main( void ) {
 
 	//do_divide_by_zero();
 
-	//kshell();
+	//__asm__ __volatile__ ("int $43");
+
+	kshell();
 
 	debugf( "Ending happy.\n" );
 	printf( "Ending happy.\n" );
 	do_immediate_shutdown();
+}
+
+extern "C" void do_test_send( void ) {
+	e1000_send( "Test Data", strlen( "Test Data" ) );
 }

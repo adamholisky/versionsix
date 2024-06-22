@@ -16,13 +16,13 @@ void interrupt_initalize( void ) {
 	primary_data = inportb( PIC_PRIMARY_DATA );
 	secondary_data = inportb( PIC_SECONDARY_DATA );
 
-	outportb( PIC_PRIMARY, PIC_EOI );
+	outportb( PIC_PRIMARY_COMMAND, PIC_EOI );
 
-	outportb( PIC_PRIMARY, ICW1_INIT + ICW1_ICW4 );
-	outportb( PIC_SECONDARY, ICW1_INIT + ICW1_ICW4 );
+	outportb( PIC_PRIMARY_COMMAND, ICW1_INIT + ICW1_ICW4 );
+	outportb( PIC_SECONDARY_COMMAND, ICW1_INIT + ICW1_ICW4 );
 
-	outportb( PIC_PRIMARY_DATA, 0x20 );
-	outportb( PIC_SECONDARY_DATA, 0x20 );
+	outportb( PIC_PRIMARY_DATA, PIC_PRIMARY_OFFSET );
+	outportb( PIC_SECONDARY_DATA, PIC_SECONDARY_OFFSET );
 
 	outportb( PIC_PRIMARY_DATA, 0x04 );
 	outportb( PIC_SECONDARY_DATA, 0x02 );
@@ -57,6 +57,22 @@ void interrupt_initalize( void ) {
 	interrupt_setup_exception_handler( 20, (uint64_t)isr_20 );
 	
 	interrupt_setup_exception_handler( 32, (uint64_t)isr_32 );
+	interrupt_setup_exception_handler( 33, (uint64_t)isr_33 );
+	interrupt_setup_exception_handler( 34, (uint64_t)isr_34 );
+	interrupt_setup_exception_handler( 35, (uint64_t)isr_35 );
+	interrupt_setup_exception_handler( 36, (uint64_t)isr_36 );
+	interrupt_setup_exception_handler( 37, (uint64_t)isr_37 );
+	interrupt_setup_exception_handler( 38, (uint64_t)isr_38 );
+	interrupt_setup_exception_handler( 39, (uint64_t)isr_39 );
+	interrupt_setup_exception_handler( 40, (uint64_t)isr_40 );
+	interrupt_setup_exception_handler( 41, (uint64_t)isr_41 );
+	interrupt_setup_exception_handler( 42, (uint64_t)isr_42 );
+	interrupt_setup_exception_handler( 43, (uint64_t)isr_43 );
+	interrupt_setup_exception_handler( 44, (uint64_t)isr_44 );
+	interrupt_setup_exception_handler( 45, (uint64_t)isr_45 );
+	interrupt_setup_exception_handler( 46, (uint64_t)isr_46 );
+	interrupt_setup_exception_handler( 47, (uint64_t)isr_47 );
+
 
 	for( int i = 0; i < 255; i++ ) {
 		irq_handlers[i].in_use = false;
@@ -73,10 +89,10 @@ void interrupt_initalize( void ) {
                      :"cc");
 
 	// Fourth: Mask other interrupts
-	pic1_irq_mask = 0xFF;
-	pic2_irq_mask = 0xFF;
-	outportb( 0x21, pic1_irq_mask );
-	outportb( 0xA1, pic2_irq_mask );
+	pic1_irq_mask = 0x00;
+	pic2_irq_mask = 0x00;
+	outportb( PIC_PRIMARY_DATA, pic1_irq_mask );
+	outportb( PIC_SECONDARY_DATA, pic2_irq_mask );
 
 	// Fifth: Enable interrupts
 	__asm__ volatile("sti");
@@ -100,10 +116,12 @@ void interrupt_setup_exception_handler( int num, uint64_t handler ) {
 	#endif
 }
 
-#undef DEBUG_INTERRUPT_HANDLER_STAGE_2
+#define DEBUG_INTERRUPT_HANDLER_STAGE_2
 void interrupt_handler_stage_2( registers *reg ) {
 	#ifdef DEBUG_INTERRUPT_HANDLER_STAGE_2
-	debugf( "Interrupt( num = 0x%X )\n", reg->interrupt_no );
+	if( reg->interrupt_no != 0x20 ) {
+		debugf( "Interrupt( num = 0x%X )\n", reg->interrupt_no );
+	}
 	#endif
 
 	if( reg->interrupt_no < 21 ) {
@@ -137,15 +155,17 @@ void interrupt_handler_stage_2( registers *reg ) {
 		} else {
 			debugf_raw( "Unknown interrupt: %d\n", reg->interrupt_no - 0x20 );
 
-			while( 1 ) {
+			/* while( 1 ) {
 				__asm__ volatile( "nop" );
-			}
+			} */
 		}
-
-		outportb( 0xA0, 0x20 );
 	}
 
-	outportb( 0x20, 0x20 );
+	if( reg->interrupt_no - 0x20 >= 8 ) {
+			outportb( PIC_SECONDARY_COMMAND, PIC_EOI );
+	} 
+
+	outportb( PIC_PRIMARY_COMMAND, PIC_EOI );
 }
 
 #define INTERRUPT_ADD_IRQ_HANDLER_DEBUG
@@ -157,13 +177,26 @@ void interrupt_add_irq_handler( uint8_t irq_num, irq_handler_func handler_func )
 	irq_handlers[irq_num].in_use = true;
 	irq_handlers[irq_num].handler = handler_func;
 
-	uint8_t irq = irq_num & (1 << irq_num);
-
-	if( irq < 8 ) {
+	/* if( irq_num < 8 ) {
+		uint8_t irq = irq_num & (1 << irq_num);
+		dfv( irq );
 		pic1_irq_mask = pic1_irq_mask ^ (1 << irq);
-		outportb( PIC_PRIMARY_DATA, pic1_irq_mask );
+		//outportb( PIC_PRIMARY_DATA, pic1_irq_mask );
 	} else {
-		pic2_irq_mask = pic2_irq_mask ^ (1 << irq);
-		outportb( PIC_SECONDARY_DATA, pic2_irq_mask );
-	}
+		//uint8_t irq = irq_num & (1 << (irq_num - 8));
+		//dfv( irq );
+		pic2_irq_mask = pic2_irq_mask & ~(1 << (irq_num - 8));
+		dfv( pic2_irq_mask );
+		//outportb( PIC_SECONDARY_DATA, pic2_irq_mask );
+	} */
+
+	debugf( "IRQ Handler Assigned. IRQ Num: %d, handler address: %p\n", irq_num, handler_func );
+}
+
+void interrupts_disable( void ) {
+	__asm__ __volatile__ ( "cli" );
+}
+
+void interrupts_enable( void ) {
+	__asm__ __volatile__ ( "sti" );
 }

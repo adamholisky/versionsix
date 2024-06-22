@@ -82,3 +82,18 @@ isr_without_error_code 19	# SIMD Floating Point Exception
 isr_without_error_code 20	# Virtulization Exception
 
 isr_without_error_code 32	# Timer
+isr_without_error_code 33
+isr_without_error_code 34
+isr_without_error_code 35   # Ethernet?
+isr_without_error_code 36
+isr_without_error_code 37
+isr_without_error_code 38
+isr_without_error_code 39
+isr_without_error_code 40
+isr_without_error_code 41
+isr_without_error_code 42
+isr_without_error_code 43
+isr_without_error_code 44
+isr_without_error_code 45
+isr_without_error_code 46
+isr_without_error_code 47

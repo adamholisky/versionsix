@@ -54,7 +54,7 @@ install_stage2: build/versionvi.bin
 	@sudo losetup -d $(LOOP_DRIVE)
 
 run: install
-	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING)
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NONE) $(QEMU_DEBUG_LOGGING)
 
 run_debug: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_COMMON)

@@ -27,11 +27,12 @@ AFLAGS = $(CFLAGS)
 # -serial file:$(ROOT_DIR)/build_support/logs/serial_out.txt 
 # -serial telnet:127.0.0.1:99,server=on,wait=off 
 #pci_cfg_read pci_cfg_write
+# -d trace:"e1000*",trace:"pic_interrupt"
+# -netdev socket,id=privatenet,listen=:1234
 QEMU = /usr/bin/qemu-system-x86_64
 QEMU_COMMON = 	-drive format=raw,if=ide,file=$(ROOT_DIR)/vi_hd.img \
 				-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
-				-netdev socket,id=privatenet,connect=:1234 \
-				-device e1000,netdev=privatenet,mac=12:34:56:78:9A:BC \
+				-nic user,model=e1000,ipv6=off,ipv4=on,net=10.10.0.1,dhcpstart=10.10.0.15,mac=12:34:56:78:9A:BC \
 				-m 8G \
 				-serial stdio \
 				-serial null \
@@ -41,4 +42,4 @@ QEMU_COMMON = 	-drive format=raw,if=ide,file=$(ROOT_DIR)/vi_hd.img \
 QEMU_DISPLAY_NONE =	-display none
 QEMU_DISPLAY_NORMAL = -vga std
 QEMU_DEBUG_COMMON = -S -gdb tcp::5894 
-QEMU_DEBUG_LOGGING = -D $(ROOT_DIR)/build_support/logs/qemu_debug_log.txt -d trace:"e1000*"
+QEMU_DEBUG_LOGGING = -D $(ROOT_DIR)/build_support/logs/qemu_debug_log.txt 

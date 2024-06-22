@@ -10,6 +10,7 @@ extern "C" {
 
 void e1000_initalize( void );
 void e1000_interrupt_handler( registers *context );
+void e1000_send( uint8_t *data, size_t length );
 
 #define REG_CTRL 0x0000
 #define REG_STATUS 0x0008
@@ -17,6 +18,8 @@ void e1000_interrupt_handler( registers *context );
 #define REG_CTRL_EXT 0x0018
 #define REG_IMASK 0x00D0
 #define REG_RCTRL 0x0100
+#define REG_IMS 0x00d0
+#define REG_ICR 0x00C0
 
 #define REG_RXDESCLO 0x2800
 #define REG_RXDESCHI 0x2804
@@ -54,6 +57,16 @@ void e1000_interrupt_handler( registers *context );
 #define CMD_VLE (1 << 6)
 #define CMD_IDE (1 << 7)
 
+#define ICR_TXDW (1 << 0)
+#define ICR_TXQE (1 << 1)
+#define ICR_LSC (1 << 2)
+#define ICR_RXSEQ (1 << 3)
+#define ICR_RXDMT0 (1 << 4)
+#define ICR_RXO (1 << 6)
+#define ICR_RXT0 (1 << 7)
+#define ICR_ACK (1 << 17)
+#define ICR_SRPD (1 << 16)
+
 #define E1000_QUEUE_LENGTH 64
 
 typedef struct {
@@ -78,7 +91,6 @@ typedef struct {
 class E1000 {
     private:
         pci_header *pci_info;
-        MMIO *mmio;
         uint16_t io_port;
 
         e1000_rx_desc *rx_desc_queue;
@@ -96,6 +108,7 @@ class E1000 {
 
         uint8_t mac_address[8];
     public:
+        MMIO *mmio;
         bool has_eeprom;
 
         bool detect_eeprom( void );
@@ -109,7 +122,6 @@ class E1000 {
 
         E1000( pci_header *pci_header_info );
 };
-
 
 #ifdef __cplusplus
 }

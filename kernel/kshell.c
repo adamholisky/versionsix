@@ -2,6 +2,8 @@
 #include <serial.h>
 #include <kshell.h>
 
+extern void do_test_send( void );
+
 void kshell( void ) {
     bool    keep_going = true;
     char    read_char = 0;
@@ -12,8 +14,13 @@ void kshell( void ) {
 
         printf( "%c", read_char );
 
-        if( read_char == 'q' ) {
-            keep_going = false;
+        switch( read_char ) {
+            case 'q':
+                keep_going = false;
+                break;
+            case 't':
+                do_test_send();
+                break;
         }
 
         printf( "\n" );

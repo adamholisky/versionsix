@@ -12,6 +12,7 @@
 #include <e1000.h>
 #include <task.h>
 #include <elf.h>
+#include <gui/console.h>
 
 #define LIMINE_KERNEL_ADDRESS_REQUEST { LIMINE_COMMON_MAGIC, 0x71ba76863cc55f63, 0xb2644a48c516a487 }
 static volatile struct limine_kernel_address_request kaddr_request = {
@@ -115,13 +116,18 @@ extern "C" void kernel_main( void ) {
 	kernel_symbols_initalize();
 	pci_initalize();
 	e1000_initalize();
-	//framebuffer_initalize();
+	framebuffer_initalize();
 
 	//task_initalize();
 
 	//do_divide_by_zero();
 
 	//__asm__ __volatile__ ("int $43");
+
+	Console *main_console = new Console( 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );
+	main_console->put_string( "Hello, world!\n" );
+	main_console->put_string( "This is another" );
+	main_console->put_string( " line!" );
 
 	kshell();
 

@@ -4,10 +4,6 @@
 extern "C" {
 #endif
 
-#define COLOR_RGB_WHITE 0x00FFFFFF
-#define COLOR_RGB_BLACK 0x00000000
-#define COLOR_RGB_BLUE 0x000000FF
-
 typedef struct {
 	uint8_t * address;
 	uint64_t pitch;

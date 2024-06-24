@@ -28,11 +28,13 @@ AFLAGS = $(CFLAGS)
 # -serial telnet:127.0.0.1:99,server=on,wait=off 
 #pci_cfg_read pci_cfg_write
 # -d trace:"e1000*",trace:"pic_interrupt"
+# -nic user,model=e1000,ipv6=off,ipv4=on,mac=12:34:56:78:9A:BC \
 # -netdev socket,id=privatenet,listen=:1234
 QEMU = /usr/bin/qemu-system-x86_64
 QEMU_COMMON = 	-drive format=raw,if=ide,file=$(ROOT_DIR)/vi_hd.img \
 				-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
-				-nic user,model=e1000,ipv6=off,ipv4=on,net=10.10.0.1,dhcpstart=10.10.0.15,mac=12:34:56:78:9A:BC \
+				-netdev tap,helper=/usr/lib/qemu/qemu-bridge-helper,id=private_net \
+				-device e1000,netdev=private_net,mac=12:34:56:78:9A:BC \
 				-m 8G \
 				-serial stdio \
 				-serial null \

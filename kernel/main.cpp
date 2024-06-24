@@ -13,6 +13,8 @@
 #include <task.h>
 #include <elf.h>
 #include <gui/console.h>
+#include <net/arp.h>
+#include <net/ethernet.h>
 
 #define LIMINE_KERNEL_ADDRESS_REQUEST { LIMINE_COMMON_MAGIC, 0x71ba76863cc55f63, 0xb2644a48c516a487 }
 static volatile struct limine_kernel_address_request kaddr_request = {
@@ -136,77 +138,8 @@ extern "C" void kernel_main( void ) {
 	do_immediate_shutdown();
 }
 
-typedef struct {
-	uint8_t destination[6];
-	uint8_t source[6];
-	uint16_t type;
-} __attribute__((packed)) ethernet_packet;
-
-typedef struct {
-    uint16_t htype; // Hardware type
-    uint16_t ptype; // Protocol type
-    uint8_t  hlen; // Hardware address length (Ethernet = 6)
-    uint8_t   plen; // Protocol address length (IPv4 = 4)
-    uint16_t opcode; // ARP Operation Code
-    uint8_t   src_hardware_addr[6]; // Source hardware address - hlen bytes (see above)
-    uint8_t   src_protocol_addr[4]; // Source protocol address - plen bytes (see above). If IPv4 can just be a "u32" type.
-    uint8_t   dst_hardware_addr[6]; // Destination hardware address - hlen bytes (see above)
-    uint8_t   dst_protocol_addr[4]; // Destination protocol address - plen bytes (see above). If IPv4 can just be a "u32" type.
-} __attribute__((packed)) arp_packet;
-
-#define htons(s)  ( (((s) & 0xFF) << 8) | (((s) & 0xFF00) >> 8) )
-
 extern "C" void do_test_send( void ) {
-	arp_packet packet;
+	uint8_t dest[] = {10,0,2,1};
 
-	packet.htype = 0x1;
-	packet.ptype = htons(0x0800);
-	packet.hlen = 0x6;
-	packet.plen = 0x4;
-	packet.opcode = htons(0x001);
-
-	packet.src_hardware_addr[0] = 0x12;
-	packet.src_hardware_addr[1] = 0x34;
-	packet.src_hardware_addr[2] = 0x56;
-	packet.src_hardware_addr[3] = 0x78;
-	packet.src_hardware_addr[4] = 0x9A;
-	packet.src_hardware_addr[5] = 0xBC;
-
-	packet.src_protocol_addr[0] = 10;
-	packet.src_protocol_addr[1] = 0;
-	packet.src_protocol_addr[2] = 2;
-	packet.src_protocol_addr[3] = 14;
-
-	for( int i = 0; i < 6; i++ ) {
-		packet.dst_hardware_addr[i] = 0xFF;
-	}
-
-	for( int i = 0; i < 4; i++ ) {
-		packet.dst_protocol_addr[i] = 0xFF;
-	}
-
-	ethernet_packet epacket;
-
-	epacket.source[0] = 0x12;
-	epacket.source[1] = 0x34;
-	epacket.source[2] = 0x56;
-	epacket.source[3] = 0x78;
-	epacket.source[4] = 0x9A;
-	epacket.source[5] = 0xBC;
-
-	epacket.type = htons( 0x0806 );
-
-	for( int i = 0; i < 6; i++ ) {
-		epacket.destination[i] = 0xFF;
-	}
-
-	uint32_t total_size = sizeof( ethernet_packet ) + sizeof( arp_packet );
-	uint8_t *to_send = kmalloc( total_size );
-
-	memcpy( to_send, (void *)&epacket, sizeof( ethernet_packet ) );
-	memcpy( to_send + sizeof( ethernet_packet ), (void *)&packet, sizeof( arp_packet) );
-
-	kdebug_peek_at( (uint64_t)to_send );
-
-	e1000_send( to_send, total_size );
+	arp_send( (uint8_t *)&dest );
 }

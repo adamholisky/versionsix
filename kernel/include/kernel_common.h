@@ -41,6 +41,8 @@ typedef struct {
     bool in_page_fault_test;
 } kinfo;
 
+#define htons(s)  ( (((s) & 0xFF) << 8) | (((s) & 0xFF00) >> 8) )
+
 #ifdef __cplusplus
 }
 #endif

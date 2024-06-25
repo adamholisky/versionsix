@@ -4,6 +4,7 @@
 #include <pci.h>
 #include <mmio.h>
 #include <e1000.h>
+#include <net/ethernet.h>
 
 E1000 *e1000_device;
 
@@ -32,6 +33,39 @@ extern "C" void e1000_interrupt_handler( registers *context ) {
 
 	uint32_t icr = e1000_device->mmio->read_command( REG_ICR );
 	dpf( "ICR: 0x%X\n", icr );
+
+	// we've got a pending packet
+	if( icr == 0x80 ) {
+		uint32_t head = e1000_device->mmio->read_command( REG_RXDESCHEAD );
+		dfv( head );
+
+		// head should not equal the index
+		if( head != e1000_device->rx_index ) {
+			// process pending packets
+			while( e1000_device->rx_desc_queue[e1000_device->rx_index].status & 0x01 ) {
+				dpf( "Will process packet at head\n" );
+				dfv( e1000_device->rx_desc_queue[e1000_device->rx_index].length );
+
+				// Process packet up the network stack here
+				uint64_t *addr_of_data = e1000_device->rx_data[e1000_device->rx_index];
+				ethernet_process_packet( addr_of_data );
+
+				// we've proceessed this packet
+				e1000_device->rx_desc_queue[e1000_device->rx_index].status = 0;
+
+				// Update the rx index spot
+				e1000_device->rx_index++;
+				if( e1000_device->rx_index == E1000_QUEUE_LENGTH ) {
+					e1000_device->rx_index = 0;
+				}
+
+				// Update tail to the new rx index
+				e1000_device->mmio->write_command( REG_RXDESCTAIL, e1000_device->rx_index );
+			}
+		} else {
+			dpf( "Head == index, aborting\n" );
+		}
+	}
 
 	//e1000_device->mmio->write_command( REG_ICR, icr );
 }
@@ -171,9 +205,9 @@ E1000::E1000( pci_header *pci_header_info ) {
 	mmio->write_command( REG_IMS, 0xFF & ~4 );
 	mmio->read_command( REG_ICR );
 
-	// Send a packet? lol
+	/* 	// Send a packet? lol
 	debugf( "Sending test packet\n" );
-	send( (uint8_t *)"Hello, world?", strlen( "Hello, world?" ) );
+	send( (uint8_t *)"Hello, world?", strlen( "Hello, world?" ) ); */
 }
 
 void E1000::rx_init( void ) {

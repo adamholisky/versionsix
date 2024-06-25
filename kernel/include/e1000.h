@@ -89,7 +89,7 @@ typedef struct {
 }  __attribute__((packed)) e1000_tx_desc;
 
 class E1000 {
-    private:
+    public:
         pci_header *pci_info;
         uint16_t io_port;
 
@@ -107,7 +107,7 @@ class E1000 {
         irq_handler_func interrupt_handler;
 
         uint8_t mac_address[8];
-    public:
+
         MMIO *mmio;
         bool has_eeprom;
 

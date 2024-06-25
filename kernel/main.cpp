@@ -16,7 +16,7 @@
 #include <net/arp.h>
 #include <net/ethernet.h>
 
-#undef ENABLE_NETWORKING
+#define ENABLE_NETWORKING
 
 #define LIMINE_KERNEL_ADDRESS_REQUEST { LIMINE_COMMON_MAGIC, 0x71ba76863cc55f63, 0xb2644a48c516a487 }
 static volatile struct limine_kernel_address_request kaddr_request = {
@@ -144,6 +144,7 @@ extern "C" void kernel_main( void ) {
 	main_console->put_string( "Another line...\n" );
 	main_console->put_string( "1234567890                                                                                                                  56\n" );
 	main_console->put_string( "\t123456\t9ABC\t" );
+	main_console->put_char( 0xDA );
 	/* main_console->put_string( "Hello, world!\n" );
 	main_console->put_string( "This is another" );
 	main_console->put_string( " line!" ); */
@@ -156,7 +157,7 @@ extern "C" void kernel_main( void ) {
 }
 
 extern "C" void do_test_send( void ) {
-	uint8_t dest[] = {10,0,2,1};
+	uint8_t dest[] = {127,0,0,2};
 
 	arp_send( (uint8_t *)&dest );
 }

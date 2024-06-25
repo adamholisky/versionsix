@@ -30,11 +30,12 @@ AFLAGS = $(CFLAGS)
 # -d trace:"e1000*",trace:"pic_interrupt"
 # -nic user,model=e1000,ipv6=off,ipv4=on,mac=12:34:56:78:9A:BC \
 # -netdev socket,id=privatenet,listen=:1234
+# 
+# -netdev tap,helper=/usr/lib/qemu/qemu-bridge-helper,id=private_net \
+				-device e1000,netdev=private_net,mac=12:34:56:78:9A:BC
 QEMU = /usr/bin/qemu-system-x86_64
 QEMU_COMMON = 	-drive format=raw,if=ide,file=$(ROOT_DIR)/vi_hd.img \
 				-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
-				-netdev tap,helper=/usr/lib/qemu/qemu-bridge-helper,id=private_net \
-				-device e1000,netdev=private_net,mac=12:34:56:78:9A:BC \
 				-m 8G \
 				-serial stdio \
 				-serial null \

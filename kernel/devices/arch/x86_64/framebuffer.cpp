@@ -32,3 +32,19 @@ void fb_primative_fill_rect( uint8_t * buffer, uint32_t color, unsigned int x, u
 		where += fb_state.fb_info->pitch;
 	}
 } 
+
+void fb_move_rect( uint8_t *buff, uint32_t dest_x, uint32_t dest_y, uint32_t dest_w, uint32_t dest_h, uint32_t src_x, uint32_t src_y, uint32_t src_w, uint32_t src_h ) {
+	unsigned int i = 0;
+	uint8_t * mem_dest;
+	uint8_t * mem_src;
+	unsigned int mem_size;
+
+	for( i = 0; i < src_h; i++ ) {
+		mem_dest = buff + (dest_x * fb_state.fb_info->pixel_width) + ((dest_y + i) * fb_state.fb_info->pitch );
+		mem_src = buff + (src_x * fb_state.fb_info->pixel_width) + ((src_y + i) * fb_state.fb_info->pitch );
+		mem_size = (fb_state.fb_info->pixel_width * src_w);
+
+
+		for(; mem_size != 0; mem_size--) *mem_dest++ = *mem_src++;
+	}
+}

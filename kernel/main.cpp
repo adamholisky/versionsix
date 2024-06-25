@@ -16,6 +16,8 @@
 #include <net/arp.h>
 #include <net/ethernet.h>
 
+#undef ENABLE_NETWORKING
+
 #define LIMINE_KERNEL_ADDRESS_REQUEST { LIMINE_COMMON_MAGIC, 0x71ba76863cc55f63, 0xb2644a48c516a487 }
 static volatile struct limine_kernel_address_request kaddr_request = {
 	.id = LIMINE_KERNEL_ADDRESS_REQUEST,
@@ -117,7 +119,11 @@ extern "C" void kernel_main( void ) {
 	memory_initalize();
 	kernel_symbols_initalize();
 	pci_initalize();
+
+	#ifdef ENABLE_NETWORKING
 	e1000_initalize();
+	#endif
+
 	framebuffer_initalize();
 
 	//task_initalize();
@@ -127,9 +133,20 @@ extern "C" void kernel_main( void ) {
 	//__asm__ __volatile__ ("int $43");
 
 	Console *main_console = new Console( 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );
-	main_console->put_string( "Hello, world!\n" );
+
+	char string_buffer[256];
+	for( int i = 0; i < 50; i++ ) {
+		memset( string_buffer, 0, 255 );
+		sprintf( string_buffer, "Line %d\n", i );
+		main_console->put_string( string_buffer );
+	}
+
+	main_console->put_string( "Another line...\n" );
+	main_console->put_string( "1234567890                                                                                                                  56\n" );
+	main_console->put_string( "\t123456\t9ABC\t" );
+	/* main_console->put_string( "Hello, world!\n" );
 	main_console->put_string( "This is another" );
-	main_console->put_string( " line!" );
+	main_console->put_string( " line!" ); */
 
 	kshell();
 

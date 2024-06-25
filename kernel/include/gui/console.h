@@ -36,12 +36,18 @@ class Console {
 		uint32_t fg_color;
 		uint32_t bg_color;
 
+		uint32_t tab_size;
+
 		Text *text_area;
 		char *buffer;
 	public:
 		void set_color( uint32_t foreground_color, uint32_t background_color );
 		uint32_t get_foreground_color( void );
 		uint32_t get_background_color( void );
+
+		void scroll_up( bool set_current_row_col );
+		void do_tab( void );
+		void do_new_line( void );
 
 		void put_char( char c );
 		void put_char( char c, uint16_t row, uint16_t col );

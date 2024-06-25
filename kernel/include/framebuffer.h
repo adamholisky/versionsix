@@ -21,6 +21,7 @@ typedef struct {
 
 void framebuffer_initalize( void );
 void fb_primative_fill_rect( uint8_t * buffer, uint32_t color, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
+void fb_move_rect( uint8_t *buff, uint32_t dest_x, uint32_t dest_y, uint32_t dest_w, uint32_t dest_h, uint32_t src_x, uint32_t src_y, uint32_t src_w, uint32_t src_h );
 
 #ifdef __cplusplus
 }

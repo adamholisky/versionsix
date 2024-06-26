@@ -19,6 +19,7 @@ typedef struct {
 } __attribute__((packed)) arp_packet;
 
 void arp_send( uint8_t *dest_protocol_addr );
+void arp_process_packet( arp_packet *packet );
 
 #ifdef __cplusplus
 }

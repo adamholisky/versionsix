@@ -34,6 +34,12 @@ extern "C" void e1000_interrupt_handler( registers *context ) {
 	uint32_t icr = e1000_device->mmio->read_command( REG_ICR );
 	dpf( "ICR: 0x%X\n", icr );
 
+	if( icr & 0x03 ) {
+		debugf( "Successful send.\n" );
+	}
+
+	icr = icr & ~(0x03);
+
 	// we've got a pending packet
 	if( icr == 0x80 ) {
 		uint32_t head = e1000_device->mmio->read_command( REG_RXDESCHEAD );
@@ -61,13 +67,14 @@ extern "C" void e1000_interrupt_handler( registers *context ) {
 
 				// Update tail to the new rx index
 				e1000_device->mmio->write_command( REG_RXDESCTAIL, e1000_device->rx_index );
+				e1000_device->mmio->read_command( REG_STATUS );
 			}
 		} else {
 			dpf( "Head == index, aborting\n" );
 		}
 	}
 
-	//e1000_device->mmio->write_command( REG_ICR, icr );
+	e1000_device->mmio->read_command( REG_ICR );
 }
 
 extern "C" void e1000_send( uint8_t *data, size_t length ) {

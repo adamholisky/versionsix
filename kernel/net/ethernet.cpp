@@ -1,6 +1,7 @@
 #include <kernel_common.h>
 #include <net/ethernet.h>
 #include <e1000.h>
+#include <net/arp.h>
 
 uint8_t packet_data[2048];
 
@@ -36,7 +37,17 @@ extern "C" void ethernet_process_packet( uint64_t *data ) {
 	ethernet_packet *packet = (ethernet_packet *)data;
 
 	debugf( "Got Ethernet Packet:\n" );
-	debugf( "    Type:        0x%04X\n", packet->type );
-	debugf( "    Source:      %X:%X:%X:%X:%X:%X\n", packet->source[0], packet->source[1], packet->source[2], packet->source[3], packet->source[4], packet->source[5] );
-	debugf( "    Destination: %X:%X:%X:%X:%X:%X\n", packet->destination[0], packet->destination[1], packet->destination[2], packet->destination[3], packet->destination[4], packet->destination[5] );
+	debugf( "    Type:           0x%04X\n", htons(packet->type) );
+	debugf( "    Source:         %X:%X:%X:%X:%X:%X\n", packet->source[0], packet->source[1], packet->source[2], packet->source[3], packet->source[4], packet->source[5] );
+	debugf( "    Destination:    %X:%X:%X:%X:%X:%X\n", packet->destination[0], packet->destination[1], packet->destination[2], packet->destination[3], packet->destination[4], packet->destination[5] );
+
+	uint8_t *next_data = (uint8_t *)packet + sizeof( ethernet_packet );
+
+	switch( htons(packet->type) ) {
+		case ETHERNET_TYPE_ARP:
+			arp_process_packet( (arp_packet *)next_data );
+			break;
+		default:
+			debugf( "Unsuppoprted ethernet packet type: 0x%04X\n", htons(packet->type) );
+	}
 }

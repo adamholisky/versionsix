@@ -2,6 +2,7 @@
 #include <net/ethernet.h>
 #include <e1000.h>
 #include <net/arp.h>
+#include <net/ipv4.h>
 
 uint8_t packet_data[2048];
 
@@ -46,6 +47,9 @@ extern "C" void ethernet_process_packet( uint64_t *data ) {
 	switch( htons(packet->type) ) {
 		case ETHERNET_TYPE_ARP:
 			arp_process_packet( (arp_packet *)next_data );
+			break;
+		case ETHERNET_TYPE_IPV4:
+			ipv4_process_packet( next_data );
 			break;
 		default:
 			debugf( "Unsuppoprted ethernet packet type: 0x%04X\n", htons(packet->type) );

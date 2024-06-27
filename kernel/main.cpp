@@ -15,6 +15,7 @@
 #include <gui/console.h>
 #include <net/arp.h>
 #include <net/ethernet.h>
+#include <net/dhcp.h>
 
 #define ENABLE_NETWORKING
 
@@ -148,6 +149,8 @@ extern "C" void kernel_main( void ) {
 	/* main_console->put_string( "Hello, world!\n" );
 	main_console->put_string( "This is another" );
 	main_console->put_string( " line!" ); */
+
+	dhcp_start();
 
 	kshell();
 

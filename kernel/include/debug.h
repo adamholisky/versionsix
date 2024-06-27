@@ -11,7 +11,7 @@ static const char * bit_array[16] = {
     [12] = "1100", [13] = "1101", [14] = "1110", [15] = "1111",
 };
 
-#define debugf( ... ) debugf_stage2( "[%s:%d %s] ", __FILE_NAME__, __LINE__, __FUNCTION__ ); debugf_stage2( __VA_ARGS__ )
+#define debugf( ... ) debugf_stage2( "[%s:%d %s] ", __FILE__, __LINE__, __FUNCTION__ ); debugf_stage2( __VA_ARGS__ )
 #define debugf_raw( ... ) debugf_stage2( __VA_ARGS__ )
 #define debugf_val( v ) debugf( "" #v " = 0x%llX (%d)\n", v, v )
 #define df( ... ) debugf( __VA_ARGS__ )

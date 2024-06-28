@@ -21,7 +21,7 @@ extern "C" void arp_send( uint8_t *dest_protocol_addr ) {
 	packet.src_protocol_addr[0] = 10;
 	packet.src_protocol_addr[1] = 0;
 	packet.src_protocol_addr[2] = 2;
-	packet.src_protocol_addr[3] = 14;
+	packet.src_protocol_addr[3] = 15;
 
 	for( int i = 0; i < 6; i++ ) {
 		packet.dst_hardware_addr[i] = 0xFF;

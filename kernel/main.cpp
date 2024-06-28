@@ -16,6 +16,7 @@
 #include <net/arp.h>
 #include <net/ethernet.h>
 #include <net/dhcp.h>
+#include <net/network.h>
 
 #define ENABLE_NETWORKING
 
@@ -56,6 +57,7 @@ extern uint64_t _kernel_start;
 extern uint64_t _kernel_end;
 
 kinfo kernel_info;
+net_info networking_info;
 
 extern "C" void kernel_main( void ) {
 	serial_initalize();

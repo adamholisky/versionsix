@@ -29,13 +29,13 @@ extern "C" void e1000_initalize(void) {
 }
 
 extern "C" void e1000_interrupt_handler( registers *context ) {
-	dpf( "In handler\n" );
+	//dpf( "In handler\n" );
 
 	uint32_t icr = e1000_device->mmio->read_command( REG_ICR );
-	dpf( "ICR: 0x%X\n", icr );
+	//dpf( "ICR: 0x%X\n", icr );
 
 	if( icr & 0x03 ) {
-		debugf( "Successful send.\n" );
+		//debugf( "Successful send.\n" );
 	}
 
 	icr = icr & ~(0x03);
@@ -43,14 +43,20 @@ extern "C" void e1000_interrupt_handler( registers *context ) {
 	// we've got a pending packet
 	if( icr == 0x80 ) {
 		uint32_t head = e1000_device->mmio->read_command( REG_RXDESCHEAD );
-		dfv( head );
+		//dfv( head );
+
+		if( head == e1000_device->rx_index ) {
+			e1000_device->mmio->read_command( REG_RXDESCHEAD );
+		}
 
 		// head should not equal the index
 		if( head != e1000_device->rx_index ) {
+			int i = 1;
+			
 			// process pending packets
 			while( e1000_device->rx_desc_queue[e1000_device->rx_index].status & 0x01 ) {
-				dpf( "Will process packet at head\n" );
-				dfv( e1000_device->rx_desc_queue[e1000_device->rx_index].length );
+				// dpf( "Will process packet at head\n" );
+				//dfv( e1000_device->rx_desc_queue[e1000_device->rx_index].length );
 
 				// Process packet up the network stack here
 				uint64_t *addr_of_data = e1000_device->rx_data[e1000_device->rx_index];
@@ -65,6 +71,14 @@ extern "C" void e1000_interrupt_handler( registers *context ) {
 					e1000_device->rx_index = 0;
 				}
 
+				if( e1000_device->rx_index == head ) {
+					head = e1000_device->mmio->read_command( REG_RXDESCHEAD );
+				
+					if( head == e1000_device->rx_index ) {
+						break;
+					}
+				}
+
 				// Update tail to the new rx index
 				e1000_device->mmio->write_command( REG_RXDESCTAIL, e1000_device->rx_index );
 				e1000_device->mmio->read_command( REG_STATUS );
@@ -73,8 +87,6 @@ extern "C" void e1000_interrupt_handler( registers *context ) {
 			dpf( "Head == index, aborting\n" );
 		}
 	}
-
-	e1000_device->mmio->read_command( REG_ICR );
 }
 
 extern "C" void e1000_send( uint8_t *data, size_t length ) {

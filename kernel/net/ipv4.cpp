@@ -51,9 +51,9 @@ void ipv4_process_packet( uint8_t *unprocessed_data ) {
 	uint8_t *data = (uint8_t *)unprocessed_data + sizeof( ipv4_packet );
 	char ip_string[16];
 
-	debugf( "Got IPv4 Packet:\n" );
+	/* debugf( "Got IPv4 Packet:\n" );
 	debugf( "    Protocol: 0x%X (%d)\n", packet->protocol, packet->protocol );
-	debugf( "    Source:   %s\n", ip_nota( htonl(packet->source), ip_string) );
+	debugf( "    Source:   %s\n", ip_nota( htonl(packet->source), ip_string) ); */
 
 	switch( packet->protocol ) {
 		case IPV4_PROTOCOL_TCP:

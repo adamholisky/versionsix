@@ -18,7 +18,7 @@ void udp_send( uint32_t dest_ip, uint16_t dest_port, uint16_t src_port, uint8_t 
     memcpy( payload, &packet, sizeof( udp_packet ) );
     memcpy( (payload + sizeof( udp_packet )), data, length );
 
-    kdebug_peek_at( (uint64_t)payload );
+    //kdebug_peek_at( (uint64_t)payload );
 
     ipv4_send( dest_ip, IPV4_PROTOCOL_UDP, payload, sizeof( udp_packet ) + length );
 }
@@ -27,9 +27,9 @@ void udp_process_packet( uint8_t *unprocessed_data ) {
     udp_packet *packet = (udp_packet *)unprocessed_data;
     uint8_t *data = (uint8_t *)unprocessed_data + sizeof( udp_packet );
 
-    debugf( "Got UDP Packet:\n" );
+    /* debugf( "Got UDP Packet:\n" );
     debugf( "    Src port:  0x%X (%d)\n", htons(packet->source_port), htons(packet->source_port) );
-    debugf( "    Dest Port: 0x%X (%d)\n", htons(packet->destination_port), htons(packet->destination_port) );
+    debugf( "    Dest Port: 0x%X (%d)\n", htons(packet->destination_port), htons(packet->destination_port) ); */
 
     switch( htons(packet->destination_port) ) {
         case 68:

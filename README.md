@@ -27,10 +27,12 @@ The "Big Goal" for right now is to laser focus on getting a Telnet connection es
 | Basic interrupts | 🟡 | Enough to handle exceptions, timer, etc... |
 | I/O via Serial | 🟢 | Debug out and stdio via QEMU's serial ports works |
 | In-OS sanity checks | 🟡 | Some sanity checks run regardless, more run when debugging is enabled for specific code blocks |
+| Basic console on framebuffer  | 🟡 | Good enough, maybe | 
 | PCI | 🟡 | Good enough to get basic info for devices |
-| Ethernet | 🟡 | In-progress |
-| ARP | 🔴 | Not started |
-| IP | 🔴 | Not started |
+| Ethernet | 🟡 | Good enough, maybe |
+| ARP | 🟡 | Protocol works, need to do dictionary |
+| IP | 🟡 | Good enough, maybe |
+| DHCP | 🟡 | Good enough, maybe |
 | TCP | 🔴 | Not started |
 | Telnet | 🔴 | Possible to hack together now via serial i/o and QEMU pipes |
 | HTTP/Json | 🔴 | Not started |

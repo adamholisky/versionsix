@@ -59,6 +59,8 @@ extern uint64_t _kernel_end;
 kinfo kernel_info;
 net_info networking_info;
 
+extern void tcp_test( void );
+
 extern "C" void kernel_main( void ) {
 	serial_initalize();
 
@@ -124,6 +126,8 @@ extern "C" void kernel_main( void ) {
 	pci_initalize();
 
 	#ifdef ENABLE_NETWORKING
+	memset( &networking_info, 0, sizeof( net_info ) );
+
 	e1000_initalize();
 	#endif
 
@@ -153,6 +157,10 @@ extern "C" void kernel_main( void ) {
 	main_console->put_string( " line!" ); */
 
 	dhcp_start();
+	uint8_t dest[] = {10,0,2,2};
+	arp_send( dest );
+
+	tcp_test();
 
 	kshell();
 
@@ -168,3 +176,4 @@ extern "C" void do_test_send( void ) {
 
 	arp_send( (uint8_t *)&dest );
 }
+

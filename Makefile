@@ -53,8 +53,9 @@ install_stage2: build/versionvi.bin
 	@sudo umount $(MOUNT_DIR) 
 	@sudo losetup -d $(LOOP_DRIVE)
 
+#& /mnt/c/"Program Files"/TightVNC/tvnviewer.exe :0
 run: install
-	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING)
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING) 
 
 run_debug: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_COMMON)

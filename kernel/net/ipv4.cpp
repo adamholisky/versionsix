@@ -3,6 +3,10 @@
 #include <net/ipv4.h>
 #include <net/ethernet.h>
 #include <net/dhcp.h>
+#include <net/tcp.h>
+#include <net/network.h>
+
+extern net_info networking_info;
 
 void ipv4_send( uint32_t dest, uint8_t protocol, uint8_t *data, uint16_t length ) {
 	ipv4_packet packet;
@@ -15,9 +19,9 @@ void ipv4_send( uint32_t dest, uint8_t protocol, uint8_t *data, uint16_t length 
 	packet.ident = htons(1);
 	packet.flags_fragment = 0;
 	packet.ttl = 0x40;
-	packet.protocol = IPV4_PROTOCOL_UDP;
+	packet.protocol = protocol;
 	packet.checksum = 0;
-	packet.source = htonl(0);
+	packet.source = networking_info.ipv4_address;
 	packet.destination = htonl(dest);
 
 	packet.checksum = htons( calculate_ipv4_checksum(&packet) );
@@ -41,12 +45,19 @@ void ipv4_send( uint32_t dest, uint8_t protocol, uint8_t *data, uint16_t length 
 		dest_mac[3] = 0x00;
 		dest_mac[4] = 0x02;
 		dest_mac[5] = 0x02;
+	} else {
+		dest_mac[0] = 0x52;
+		dest_mac[1] = 0x55;
+		dest_mac[2] = 0x0A;
+		dest_mac[3] = 0x00;
+		dest_mac[4] = 0x02;
+		dest_mac[5] = 0x02;
 	}
 
 	ethernet_send_packet( dest_mac, ETHERNET_TYPE_IPV4, payload, sizeof( ipv4_packet ) + length );
 }
 
-void ipv4_process_packet( uint8_t *unprocessed_data ) {
+void ipv4_process_packet( uint8_t *unprocessed_data, uint16_t length ) {
 	ipv4_packet *packet = (ipv4_packet *)unprocessed_data;
 	uint8_t *data = (uint8_t *)unprocessed_data + sizeof( ipv4_packet );
 	char ip_string[16];
@@ -57,7 +68,7 @@ void ipv4_process_packet( uint8_t *unprocessed_data ) {
 
 	switch( packet->protocol ) {
 		case IPV4_PROTOCOL_TCP:
-			debugf( "IPV4: TCP not implemented.\n" );
+			tcp_process_packet( data, length - sizeof(ipv4_packet) );
 			break;
 		case IPV4_PROTOCOL_UDP:
 			udp_process_packet( data );
@@ -92,4 +103,8 @@ char * ip_nota( uint32_t ip, char * s ) {
 			(ip & 0xFF) );
 	
 	return s;
+}
+
+uint32_t ip_to_uint( uint8_t part_a, uint8_t part_b, uint8_t part_c, uint8_t part_d ) {
+	return part_a << 24 | part_b << 16 | part_c << 8 | part_d;
 }

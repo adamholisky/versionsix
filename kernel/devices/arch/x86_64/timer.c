@@ -3,6 +3,7 @@
 #include "timer.h"
 
 uint32_t timer_counter;
+bool done_waiting;
 
 void timer_initalize( void ) {
     irq_handler_func timer_func = timer_handler;
@@ -14,6 +15,7 @@ void timer_initalize( void ) {
     outportb( 0x40, divisor >> 8 );     // Set high byte of divisor
 
     timer_counter = 0;
+    done_waiting = false;
 }
 
 void timer_handler( registers *context ) {
@@ -24,6 +26,20 @@ void timer_handler( registers *context ) {
     }
 
     if( timer_counter == 0 ) {
-        //debugf( "Timer count hit.\n" );
+        done_waiting = true;
+    }
+}
+
+void timer_wait( uint8_t n ) {
+    uint8_t wait_count = 0;
+
+    done_waiting = false;
+
+    while( wait_count != n ) {
+        if( done_waiting ) {
+            wait_count++;
+            done_waiting = false;
+            dfv( wait_count );
+        }
     }
 }

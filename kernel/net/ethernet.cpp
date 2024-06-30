@@ -34,7 +34,7 @@ extern "C" void ethernet_send_packet( uint8_t *dest, uint16_t type, uint8_t *dat
 	e1000_send( (uint8_t *)&packet_data, total_size );
 }
 
-extern "C" void ethernet_process_packet( uint64_t *data ) {
+extern "C" void ethernet_process_packet( uint64_t *data, uint16_t length ) {
 	ethernet_packet *packet = (ethernet_packet *)data;
 
 	/* debugf( "Got Ethernet Packet:\n" );
@@ -43,13 +43,14 @@ extern "C" void ethernet_process_packet( uint64_t *data ) {
 	debugf( "    Destination:    %X:%X:%X:%X:%X:%X\n", packet->destination[0], packet->destination[1], packet->destination[2], packet->destination[3], packet->destination[4], packet->destination[5] ); */
 
 	uint8_t *next_data = (uint8_t *)packet + sizeof( ethernet_packet );
+	uint16_t next_size = length - sizeof( ethernet_packet );
 
 	switch( htons(packet->type) ) {
 		case ETHERNET_TYPE_ARP:
 			arp_process_packet( (arp_packet *)next_data );
 			break;
 		case ETHERNET_TYPE_IPV4:
-			ipv4_process_packet( next_data );
+			ipv4_process_packet( next_data, next_size );
 			break;
 		default:
 			debugf( "Unsuppoprted ethernet packet type: 0x%04X\n", htons(packet->type) );

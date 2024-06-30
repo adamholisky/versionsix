@@ -24,9 +24,10 @@ typedef struct {
 } __attribute__((aligned(2))) __attribute__ ((packed)) ipv4_packet;
 
 void ipv4_send( uint32_t dest, uint8_t protocol, uint8_t *data, uint16_t length );
-void ipv4_process_packet( uint8_t *unprocessed_data );
+void ipv4_process_packet( uint8_t *unprocessed_data, uint16_t length );
 uint16_t calculate_ipv4_checksum( ipv4_packet * packet );
 char * ip_nota( uint32_t ip, char * s );
+uint32_t ip_to_uint( uint8_t part_a, uint8_t part_b, uint8_t part_c, uint8_t part_d );
 
 #ifdef __cplusplus
 }

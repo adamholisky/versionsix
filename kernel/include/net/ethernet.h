@@ -18,7 +18,7 @@ typedef struct {
 } __attribute__((packed)) ethernet_packet;
 
 void ethernet_send_packet( uint8_t *dest, uint16_t type, uint8_t *data, uint32_t length );
-void ethernet_process_packet( uint64_t *data );
+void ethernet_process_packet( uint64_t *data, uint16_t length );
 
 #ifdef __cplusplus
 }

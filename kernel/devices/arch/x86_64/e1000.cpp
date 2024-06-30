@@ -60,7 +60,7 @@ extern "C" void e1000_interrupt_handler( registers *context ) {
 
 				// Process packet up the network stack here
 				uint64_t *addr_of_data = e1000_device->rx_data[e1000_device->rx_index];
-				ethernet_process_packet( addr_of_data );
+				ethernet_process_packet( addr_of_data, e1000_device->rx_desc_queue[e1000_device->rx_index].length );
 
 				// we've proceessed this packet
 				e1000_device->rx_desc_queue[e1000_device->rx_index].status = 0;

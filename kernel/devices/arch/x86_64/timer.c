@@ -39,7 +39,7 @@ void timer_wait( uint8_t n ) {
         if( done_waiting ) {
             wait_count++;
             done_waiting = false;
-            dfv( wait_count );
+            //dfv( wait_count );
         }
     }
 }

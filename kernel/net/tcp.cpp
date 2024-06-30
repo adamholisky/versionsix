@@ -26,7 +26,9 @@ void tcp_test( void ) {
 
 	test_connection->connect();
 	timer_wait( 1 );
-	test_connection->send_data( (uint8_t *)"Hello, world!\n", strlen("Hello, world!\n" ) );
+
+	char data_to_send[] = "Hello, world!";
+	test_connection->send_data( (uint8_t *)data_to_send, sizeof( data_to_send ) );
 	timer_wait( 1 );
 
 	do_immediate_shutdown();

@@ -62,6 +62,7 @@ net_info networking_info;
 extern void tcp_test( void );
 
 extern "C" void kernel_main( void ) {
+	// Begin with boostrap services
 	serial_initalize();
 
 	printf( "Versions OS VI\n" );
@@ -118,22 +119,29 @@ extern "C" void kernel_main( void ) {
 	debugf( "kfile->size: 0x%X\n", kfile_request.response->kernel_file->size );
 	debugf( "hhdm offset: 0x%016llX\n", hhdm_request.response->offset );
 
+	// Continue with core services, all of these need to boot in this order
 	interrupt_initalize();
 	timer_initalize();
 	paging_initalize();
 	memory_initalize();
+	framebuffer_initalize();
 	kernel_symbols_initalize();
+	task_initalize();
+
+	do_immediate_shutdown();
+	
+	// Service startup order from here onwards really shouldn't matter too much
 	pci_initalize();
 
 	#ifdef ENABLE_NETWORKING
 	memset( &networking_info, 0, sizeof( net_info ) );
 
 	e1000_initalize();
+
+	dhcp_start();
+	uint8_t dest[] = {10,0,2,2};
+	arp_send( dest );
 	#endif
-
-	framebuffer_initalize();
-
-	//task_initalize();
 
 	//do_divide_by_zero();
 
@@ -156,11 +164,7 @@ extern "C" void kernel_main( void ) {
 	main_console->put_string( "This is another" );
 	main_console->put_string( " line!" ); */
 
-	dhcp_start();
-	uint8_t dest[] = {10,0,2,2};
-	arp_send( dest );
-
-	tcp_test();
+	//tcp_test();
 
 	kshell();
 

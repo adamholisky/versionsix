@@ -97,3 +97,5 @@ isr_without_error_code 44
 isr_without_error_code 45
 isr_without_error_code 46
 isr_without_error_code 47
+
+isr_without_error_code 254  # Syscall

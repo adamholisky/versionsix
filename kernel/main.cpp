@@ -121,6 +121,7 @@ extern "C" void kernel_main( void ) {
 
 	// Continue with core services, all of these need to boot in this order
 	interrupt_initalize();
+	syscall_initalize();
 	timer_initalize();
 	paging_initalize();
 	memory_initalize();
@@ -128,6 +129,15 @@ extern "C" void kernel_main( void ) {
 	kernel_symbols_initalize();
 	task_initalize();
 
+	//__asm__ __volatile__ ( "int $230" );
+	
+	while( true ) {
+		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+	}
+	
+	//__asm__ __volatile__ ("int $254");
+
+	debugf( "Ending happy.\n" );
 	do_immediate_shutdown();
 	
 	// Service startup order from here onwards really shouldn't matter too much
@@ -144,8 +154,6 @@ extern "C" void kernel_main( void ) {
 	#endif
 
 	//do_divide_by_zero();
-
-	//__asm__ __volatile__ ("int $43");
 
 	Console *main_console = new Console( 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );
 

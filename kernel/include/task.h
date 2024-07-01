@@ -5,6 +5,8 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <interrupt.h>
 
 #define TASKS_MAX 20
 
@@ -33,6 +35,7 @@ class Task {
 	protected:
 		char display_name[25];
 		char file_name[25];
+		registers task_context;
 		
 		uint8_t type;
 		task_entry_func entry;
@@ -46,9 +49,12 @@ class Task {
 		void write( void );
 
 		void start( void );
+		void save_context( registers *context );
+		registers *Task::get_context( void );
 };
 
 void task_initalize( void );
+void task_sched_yield( registers *context );
 void task_test_thread_a( void );
 void task_test_thread_b( void );
 

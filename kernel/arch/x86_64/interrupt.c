@@ -72,6 +72,7 @@ void interrupt_initalize( void ) {
 	interrupt_setup_exception_handler( 45, (uint64_t)isr_45 );
 	interrupt_setup_exception_handler( 46, (uint64_t)isr_46 );
 	interrupt_setup_exception_handler( 47, (uint64_t)isr_47 );
+	interrupt_setup_exception_handler( 254, (uint64_t)isr_254 );
 
 
 	for( int i = 0; i < 255; i++ ) {

@@ -4,6 +4,8 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+
 #define PIC_PRIMARY_COMMAND	0x20
 #define PIC_PRIMARY_DATA	0x21
 #define PIC_SECONDARY_COMMAND 0xA0
@@ -136,6 +138,8 @@ extern void isr_44( void );
 extern void isr_45( void );
 extern void isr_46( void );
 extern void isr_47( void );
+
+extern void isr_254( void );
 
 
 extern uint64_t get_cr0( void );

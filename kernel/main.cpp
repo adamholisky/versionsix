@@ -17,8 +17,9 @@
 #include <net/ethernet.h>
 #include <net/dhcp.h>
 #include <net/network.h>
+#include <keyboard.h>
 
-#define ENABLE_NETWORKING
+#undef ENABLE_NETWORKING
 
 #define LIMINE_KERNEL_ADDRESS_REQUEST { LIMINE_COMMON_MAGIC, 0x71ba76863cc55f63, 0xb2644a48c516a487 }
 static volatile struct limine_kernel_address_request kaddr_request = {
@@ -59,13 +60,14 @@ extern uint64_t _kernel_end;
 kinfo kernel_info;
 net_info networking_info;
 
+Console *main_console;
+
 extern void tcp_test( void );
 
 extern "C" void kernel_main( void ) {
 	// Begin with boostrap services
 	serial_initalize();
 
-	printf( "Versions OS VI\n" );
 	debugf( "Versions OS VI Debug Out\n" );
 	debugf( "kernel_main:          0x%p\n", kernel_main );
 	debugf( "Physical kernel base: 0x%016llx\n", kaddr_request.response->physical_base );
@@ -128,17 +130,11 @@ extern "C" void kernel_main( void ) {
 	framebuffer_initalize();
 	kernel_symbols_initalize();
 	task_initalize();
+	keyboard_initalize();
 
-	//__asm__ __volatile__ ( "int $230" );
-	
-	while( true ) {
-		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
-	}
-	
-	//__asm__ __volatile__ ("int $254");
-
-	debugf( "Ending happy.\n" );
-	do_immediate_shutdown();
+	// Next setup the main console for use. From here on out, printf is okay.
+	main_console = new Console( 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );
+	printf( "Versions OS VI\n" );
 	
 	// Service startup order from here onwards really shouldn't matter too much
 	pci_initalize();
@@ -152,25 +148,6 @@ extern "C" void kernel_main( void ) {
 	uint8_t dest[] = {10,0,2,2};
 	arp_send( dest );
 	#endif
-
-	//do_divide_by_zero();
-
-	Console *main_console = new Console( 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );
-
-	char string_buffer[256];
-	for( int i = 0; i < 50; i++ ) {
-		memset( string_buffer, 0, 255 );
-		sprintf( string_buffer, "Line %d\n", i );
-		main_console->put_string( string_buffer );
-	}
-
-	main_console->put_string( "Another line...\n" );
-	main_console->put_string( "1234567890                                                                                                                  56\n" );
-	main_console->put_string( "\t123456\t9ABC\t" );
-	main_console->put_char( 0xDA );
-	/* main_console->put_string( "Hello, world!\n" );
-	main_console->put_string( "This is another" );
-	main_console->put_string( " line!" ); */
 
 	//tcp_test();
 
@@ -189,3 +166,6 @@ extern "C" void do_test_send( void ) {
 	arp_send( (uint8_t *)&dest );
 }
 
+extern "C" void main_console_putc( char c ) {
+	main_console->put_char( c );
+}

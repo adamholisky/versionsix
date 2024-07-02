@@ -54,6 +54,8 @@ QEMU_COMMON = 	-drive format=raw,if=ide,file=$(ROOT_DIR)/vi_hd.img \
 				-serial file:$(ROOT_DIR)/build_support/logs/serial_out.txt \
 				-no-reboot
 QEMU_DISPLAY_NONE =	-display none
-QEMU_DISPLAY_NORMAL = -vga std -vnc :1
+
+#  -vnc :1
+QEMU_DISPLAY_NORMAL = -vga std
 QEMU_DEBUG_COMMON = -S -gdb tcp::5894 
 QEMU_DEBUG_LOGGING = -D $(ROOT_DIR)/build_support/logs/qemu_debug_log.txt 

@@ -4,7 +4,8 @@
         "kernel_common.h": "c",
         "stdint.h": "c",
         "kshell.h": "c",
-        "timer.h": "c"
+        "timer.h": "c",
+        "stddef.h": "c"
     },
     "editor.wordWrap":"on" 
 }

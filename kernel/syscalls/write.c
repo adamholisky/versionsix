@@ -4,18 +4,25 @@
 #include "file.h"
 #include "serial.h"
 
-size_t write( int fd, void *buff, size_t count ) {
-    uint32_t com_port = COM1;
+extern void main_console_putc( char c );
 
-    if( fd == FD_STDERR ) {
-        com_port = COM4;
-    }
-    
-    char *char_buff = (char *)buff;
-    char *char_buff_end = (char *)buff + count;
-    
-    while( char_buff != char_buff_end ) {
-        serial_write_port( *char_buff, com_port );
-        char_buff++;
-    }
+size_t write(int fd, void *buff, size_t count) {
+	char *char_buff = (char *)buff;
+	char *char_buff_end = (char *)buff + count;
+
+	if (fd == FD_STDOUT) {
+		while (char_buff != char_buff_end) {
+			main_console_putc( *char_buff );
+			char_buff++;
+		}
+	}
+
+	if (fd == FD_STDERR) {
+		int com_port = COM4;
+
+		while (char_buff != char_buff_end) {
+			serial_write_port(*char_buff, com_port);
+			char_buff++;
+		}
+	}
 }

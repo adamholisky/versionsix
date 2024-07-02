@@ -1,6 +1,8 @@
 #include <kernel_common.h>
 #include <serial.h>
 #include <kshell.h>
+#include <keyboard.h>
+#include <net/arp.h>
 
 extern void do_test_send( void );
 
@@ -10,7 +12,7 @@ void kshell( void ) {
 
     while( keep_going ) {
         printf( "Version VI: " );
-        read_char = serial_read_port( COM1 );
+        read_char = keyboard_get_char();;
 
         printf( "%c", read_char );
 
@@ -19,7 +21,9 @@ void kshell( void ) {
                 keep_going = false;
                 break;
             case 't':
-                do_test_send();
+                uint8_t dest[] = {10,0,2,2};
+
+	            arp_send( (uint8_t *)&dest );
                 break;
         }
 

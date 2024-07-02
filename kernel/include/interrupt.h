@@ -93,7 +93,7 @@ typedef struct {
     uint64_t    ss;
 } __attribute__ ((packed)) registers;
 
-typedef void (*irq_handler_func)( registers *context );
+typedef void (*irq_handler_func)( registers **_context );
 
 typedef struct {
     bool in_use;
@@ -148,7 +148,7 @@ extern uint64_t get_cr3( void );
 extern uint64_t get_cr4( void );
 
 void interrupt_initalize( void );
-void interrupt_handler_stage_2( registers *reg );
+void interrupt_handler_stage_2( registers **_reg );
 void interrupt_setup_exception_handler( int num, uint64_t handler );
 void interrupt_add_irq_handler( uint8_t irq_num, irq_handler_func handler_func );
 void interrupts_disable( void );

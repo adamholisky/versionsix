@@ -73,10 +73,11 @@ uint64_t syscall( uint64_t call_num, uint8_t num_args, syscall_args *args ) {
 	return ret;
 }
 
-void syscall_handler( registers *context ) {
+void syscall_handler( registers **_context ) {
+	registers *context = *_context;
     switch( context->rax ) {
         case SYSCALL_SCHED_YIELD:
-            task_sched_yield( context );
+            task_sched_yield( _context );
             break;
         default:
             debugf( "Unhandled syscall number: %d\n", context->rax );

@@ -25,7 +25,7 @@ typedef struct {
 
 void syscall_initalize( void );
 uint64_t syscall( uint64_t call_num, uint8_t num_args, syscall_args *args );
-void syscall_handler( registers *context );
+void syscall_handler( registers **_context );
 
 size_t write( int fd, void *buff, size_t count );
 

@@ -18,7 +18,7 @@ void timer_initalize( void ) {
     done_waiting = false;
 }
 
-void timer_handler( registers *context ) {
+void timer_handler( registers **context ) {
     if( timer_counter < 101 ) { 
         timer_counter++;
     } else {

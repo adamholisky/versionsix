@@ -118,7 +118,9 @@ void interrupt_setup_exception_handler( int num, uint64_t handler ) {
 }
 
 #define DEBUG_INTERRUPT_HANDLER_STAGE_2
-void interrupt_handler_stage_2( registers *reg ) {
+void interrupt_handler_stage_2( registers **_reg ) {
+	registers *reg = *_reg;
+
 	#ifdef DEBUG_INTERRUPT_HANDLER_STAGE_2
 	if( reg->interrupt_no != 0x20 ) {
 		debugf( "Interrupt( num = 0x%X )\n", reg->interrupt_no );
@@ -152,7 +154,7 @@ void interrupt_handler_stage_2( registers *reg ) {
 		if( irq_handlers[reg->interrupt_no - 0x20].in_use == true ) {
 			irq_handler_func handler_func = (irq_handler_func)(irq_handlers[reg->interrupt_no - 0x20].handler);
 
-			handler_func( reg );
+			handler_func( _reg );
 		} else {
 			debugf_raw( "Unknown interrupt: %d\n", reg->interrupt_no - 0x20 );
 

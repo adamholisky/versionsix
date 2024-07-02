@@ -19,10 +19,11 @@ push %r8
 		push %rcx
 		push %rbx
 		push %rax
-
+			push %rsp
 			mov %rsp, %rdi
-			call interrupt_handler_stage_2
 
+			call interrupt_handler_stage_2
+			pop %rsp
 		pop %rax
 		pop %rbx
 		pop %rcx

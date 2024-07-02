@@ -35,13 +35,14 @@ class Task {
 	protected:
 		char display_name[25];
 		char file_name[25];
-		registers task_context;
+		
 		
 		uint8_t type;
 		task_entry_func entry;
 	public:
 		uint16_t id;
 		uint8_t status;
+		registers task_context;
 
 		Task( uint16_t task_id, uint8_t task_type, char *task_name, uint64_t *task_entry );
 
@@ -49,14 +50,15 @@ class Task {
 		void write( void );
 
 		void start( void );
-		void save_context( registers *context );
+		void save_context( registers **_context );
 		registers *Task::get_context( void );
 };
 
 void task_initalize( void );
-void task_sched_yield( registers *context );
+void task_sched_yield( registers **context );
 void task_test_thread_a( void );
 void task_test_thread_b( void );
+void task_dump_context( registers *context );
 
 #ifdef __cplusplus
 }

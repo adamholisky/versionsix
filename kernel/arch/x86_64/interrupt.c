@@ -117,7 +117,7 @@ void interrupt_setup_exception_handler( int num, uint64_t handler ) {
 	#endif
 }
 
-#define DEBUG_INTERRUPT_HANDLER_STAGE_2
+#undef DEBUG_INTERRUPT_HANDLER_STAGE_2
 void interrupt_handler_stage_2( registers **_reg ) {
 	registers *reg = *_reg;
 

@@ -1,9 +1,11 @@
 #include <kernel_common.h>
 #include <kmemory.h>
 #include <task.h>
+#include <timer.h>
 
 Task * tasks[ TASKS_MAX ];
 uint16_t current_task;
+registers task_contexts[ TASKS_MAX ];
 
 Task::Task( uint16_t task_id, uint8_t task_type, char *task_name, uint64_t *task_entry ) {
 	log_entry_enter();
@@ -14,13 +16,13 @@ Task::Task( uint16_t task_id, uint8_t task_type, char *task_name, uint64_t *task
 	entry = (task_entry_func)task_entry;
 	status = TASK_STATUS_READY;
 
-	memset( &task_context, 0, sizeof( registers ) );
+	memset( &task_contexts[task_id], 0, sizeof( registers ) );
 
-	task_context.rip = (uint64_t)entry;
-	task_context.cs = 0x28;
-	task_context.rflags = 0x200;
-	task_context.rsp = (uint64_t)kmalloc( 4 * 1024 );
-	task_context.rax = 0xAAAAAAAAAAAAAAAA;
+	task_contexts[task_id].rip = (uint64_t)entry;
+	task_contexts[task_id].cs = 0x28;
+	task_contexts[task_id].rflags = 0x200;
+	task_contexts[task_id].rsp = (uint64_t)kmalloc( 4 * 1024 );
+	task_contexts[task_id].rax = 0xAAAAAAAAAAAAAAAA;
 
 	if( type == TASK_TYPE_KERNEL ) {
 		status = TASK_STATUS_ACTIVE;
@@ -42,11 +44,11 @@ void Task::start( void ) {
 void Task::save_context( registers **_context ) {
 	registers *context = *_context;
 	debugf( "save reg rbp: %X\n", context->rbp );
-	memcpy( &task_context, context, sizeof( registers ) );
+	memcpy( &task_contexts[id], context, sizeof( registers ) );
 }
 
 registers *Task::get_context( void ) {
-	return &task_context;
+	return &task_contexts[id];
 }
 
 void Task::read( void ) {
@@ -93,8 +95,11 @@ Task *task_create( uint8_t task_type, char *name, uint64_t *entry ) {
 	return tasks[free_id];
 }
 
+#undef DEBUG_TASK_SCHED_YIELD
 void task_sched_yield( registers **context ) {
+	#ifdef DEBUG_TASK_SCHED_YIELD
 	log_entry_enter();
+	#endif
 
 	uint32_t old_task_number = current_task;
 	uint32_t new_task_number = current_task + 1;
@@ -103,40 +108,39 @@ void task_sched_yield( registers **context ) {
 		new_task_number = 0;
 	}
 	
+	#ifdef DEBUG_TASK_SCHED_YIELD
 	debugf( "Old task number: \t\t%d\n", old_task_number );
 	debugf( "New task number: \t\t%d\n", new_task_number );
 
 	debugf( "Old task saved context:\n" );
-	registers *old_task_context = &tasks[old_task_number]->task_context;
+	registers *old_task_context = &task_contexts[old_task_number];
 	task_dump_context( old_task_context );
+	#endif
 
-	memcpy( &tasks[old_task_number]->task_context, &(**context), sizeof(registers) );
-	tasks[old_task_number]->task_context.rax = 0xBBBBBBBBBBBBBBBB;
-	tasks[old_task_number]->task_context.rbp = (**context).rbp;
+	memcpy( &task_contexts[old_task_number], &(**context), sizeof(registers) );
+	task_contexts[old_task_number].rax = 0xBBBBBBBBBBBBBBBB;
+	task_contexts[old_task_number].rbp = (**context).rbp;
 
+	#ifdef DEBUG_TASK_SCHED_YIELD
 	debugf( "Old task saved :\n" );
-	//kdebug_peek_at( (uint64_t)&tasks[current_task]->task_context );
 	task_dump_context( old_task_context );
 
-	
-
-
-	//kdebug_peek_at( (uint64_t)tasks[current_task]->get_context() );
 	debugf( "saved context for task %d:\n", new_task_number );
-	task_dump_context( &tasks[new_task_number]->task_context );
+	task_dump_context( &task_contexts[new_task_number] );
+	#endif
 
-	memcpy( *context, &tasks[new_task_number]->task_context, sizeof(registers) );
+	memcpy( *context, &task_contexts[new_task_number], sizeof(registers) );
 
-	(*context)->rax = tasks[new_task_number]->task_context.rax;
-	(*context)->rip = tasks[new_task_number]->task_context.rip;
-	(*context)->rbp = tasks[new_task_number]->task_context.rbp;
-
+	#ifdef DEBUG_TASK_SCHED_YIELD
 	debugf( "New context to use:\n" );
 	task_dump_context( *context );
+	#endif
 
 	current_task = new_task_number;
 
+	#ifdef DEBUG_TASK_SCHED_YIELD
 	log_entry_exit();
+	#endif
 }
 
 void task_initalize( void ) {
@@ -155,7 +159,8 @@ void task_test_thread_a( void ) {
 	debugf( "Test Thread A\n" );
 
 	while( true ) {
-		debugf( "A\n" );
+		debugf_raw( "A" );
+		timer_wait(1);
 		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 	}
 }
@@ -164,7 +169,8 @@ void task_test_thread_b( void ) {
 	debugf( "Test Thread B\n" );
 
 	while( true ) {
-		debugf( "B\n" );
+		debugf_raw( "B" );
+		timer_wait(1);
 		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 	}
 }

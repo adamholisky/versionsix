@@ -4,10 +4,13 @@
 #include <keyboard.h>
 #include <net/arp.h>
 #include <kmemory.h>
+#include <ksymbols.h>
 
 extern void do_test_send( void );
 
 KShell *main_shell;
+
+kshell_command_list kshell_commands;
 
 KShell::KShell( void ) {
 	for( int i = 0; i < KSHELL_MAX_HISTORY; i++ ) {
@@ -32,6 +35,7 @@ void KShell::main_loop( void ) {
 		uint8_t scancode = 0;
 		char c = 0;
 		bool get_next_key = true;
+		line_index = 0;
 
 		memset( current_line, 0, KSHELL_MAX_LINESIZE );
 		printf( "Version VI: " );
@@ -60,12 +64,22 @@ void KShell::main_loop( void ) {
 		
 		printf( "\n" );
 
-		if( strcmp(current_line, "q") == 0 ) {
-			keep_going = false;
-		} else if( strcmp(current_line, "a") ) {
-			uint8_t dest[] = {10,0,2,2};
+		kshell_command_list *head = &kshell_commands;
+		kshell_command *to_run = NULL;
 
-			arp_send( (uint8_t *)&dest );
+		while( head != NULL ) {
+			if( strcmp( current_line, head->cmd->name ) == 0 ) {
+				to_run = head->cmd;
+				head = NULL;
+			} else {
+				head = (kshell_command_list *)head->next;
+			}
+		}
+
+		if( to_run != NULL ) {
+			kshell_command_run( to_run, 0, NULL );
+		} else {
+			printf( "Command not found.\n" );
 		}
 	}
 }
@@ -91,8 +105,62 @@ bool KShell::handle_special_keypress( uint8_t scancode ) {
 	}
 }
 
+kshell_command *kshell_command_create( char *command_name, void *main_function ) {
+	kshell_command *cmd = (kshell_command *)kmalloc( sizeof( kshell_command ) );
+	strcpy( cmd->name, command_name );
+	cmd->entry = main_function;
+}
+
+int kshell_command_run( kshell_command *cmd, int argc, char *argv[] ) {
+	kshell_main_func_to_call func = (kshell_main_func_to_call)cmd->entry;
+
+	return func( 0, NULL );
+}
+
+int kshell_command_hello_world( int argc, char *argv[] ) {
+	printf( "Hello, world!\n" );
+}
+
 void kshell_initalize( void ) {
 	main_shell = new KShell();
+	
+	// Setup first command
+	kshell_commands.cmd = kshell_command_create( "hw", (void *)kshell_command_hello_world );
+	kshell_commands.next = NULL;
+
+	// Find all symbols that start wtih "kshell_app_add_command" and call them each
+	KernelSymbols *ksym = get_ksyms_object();
+	KernelSymbol *symbol_array = ksym->get_symbol_array();
+	uint64_t max_symbols = ksym->get_total_symbols();
+
+	for( int i = 0; i < max_symbols; i++ ) {
+		if( strncmp( symbol_array[i].name, "kshell_app_add_command_", sizeof("kshell_app_add_command_") - 1 ) == 0 ) {
+			void (*func)(void) = (void(*)(void))symbol_array[i].addr;
+			func();
+		}
+	}
 
 	main_shell->run();
+}
+
+void kshell_add_command( char *command_name, void *main_function ) {
+	kshell_command_list *head = &kshell_commands;
+	kshell_command_list *entry = NULL;
+
+	do {
+		if( head->next == NULL ) {
+			head->next = (kshell_command_list *)kmalloc( sizeof(kshell_command_list) );
+			entry = (kshell_command_list *)head->next;
+		} else {
+			head = (kshell_command_list *)head->next;
+		}
+	} while( entry == NULL );
+
+	if( entry == NULL ) {
+		debugf( "Entry is null. Bailing.\n" );
+		return;
+	}
+
+	entry->cmd = kshell_command_create( command_name, main_function );
+	entry->next = NULL;
 }

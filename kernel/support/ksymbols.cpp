@@ -37,6 +37,10 @@ char * kernel_symbols_get_function_at( uint64_t addr ) {
 	return ksyms->get_function_at( addr );
 }
 
+KernelSymbols *get_ksyms_object( void ) {
+	return ksyms;
+}
+
 void KernelSymbols::initalize( void ) {
 	this->kernel_symbol_top = 0;
 }

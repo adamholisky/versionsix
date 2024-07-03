@@ -31,6 +31,7 @@ class KernelSymbols {
 };
 
 void kernel_symbols_initalize( void );
+KernelSymbols *get_ksyms_object( void );
 
 #ifdef __cplusplus
 }

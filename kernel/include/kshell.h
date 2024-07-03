@@ -10,6 +10,8 @@ extern "C" {
 #define KSHELL_MAX_HISTORY 25
 #define KSHELL_MAX_LINESIZE 255
 
+typedef int (*kshell_main_func_to_call)( int num_args, char *arg_list[] );
+
 class KShell {
 	private:
 		bool keep_going;
@@ -24,7 +26,37 @@ class KShell {
 		bool handle_special_keypress( uint8_t scancode );
 };
 
+/* class KShell_Command {
+	public:
+		char name[64];
+		void *entry;
+
+		KShell_Command( char *command_name, void *main_function );
+		~KShell_Command();
+		KShell_Command& operator=(const KShell_Command orig);
+		int run( int argc, char *argv[] );
+};*/
+
+typedef struct {
+	char name[64];
+	void *entry;
+} kshell_command;
+
+typedef struct {
+	void *next;
+	kshell_command *cmd;
+} kshell_command_list;
+
 void kshell_initalize( void );
+void kshell_add_command( char *command_name, void *main_function );
+kshell_command *kshell_command_create( char *command_name, void *main_function );
+int kshell_command_run( kshell_command *cmd, int argc, char *argv[] );
+
+#define KSHELL_COMMAND( name, main_function ) \
+	extern "C" int kshell_app_ ##name## _main( int c, char *argv[] ); \
+	extern "C" void kshell_app_add_command_ ##name ( void ) { \
+		kshell_add_command( #name, (void *)main_function ); \
+	}
 
 #ifdef __cplusplus
 }

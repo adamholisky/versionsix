@@ -12,7 +12,19 @@ void kshell( void ) {
 
     while( keep_going ) {
         printf( "Version VI: " );
-        read_char = keyboard_get_char();;
+        read_char = keyboard_get_char_or_special();
+
+        switch( read_char ) {
+            case SCANCODE_ESC:
+                read_char = 'q';
+                break;
+            case SCANCODE_F1:
+                read_char = 't';
+                break;
+            case SCANCODE_F2:
+                read_char = 0;
+                break;
+        }
 
         printf( "%c", read_char );
 

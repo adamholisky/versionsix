@@ -86,6 +86,7 @@ unsigned char keyboard_map_shift[128] = {
 Keyboard::Keyboard( void ) {
     is_waiting = false;
     is_shift = false;
+	in_E0 = false;
     current_scancode = 0;
 	char_ready = false;
 
@@ -101,34 +102,18 @@ Keyboard::Keyboard( void ) {
 
 void Keyboard::interrupt_handler( void ) {
     uint8_t status;
-	int scancode;
+	uint8_t scancode;
 
 	#ifdef KDEBUG_KEYBOARD_INTERRUPT_HANDLER
 	log_entry_enter();
 	#endif
-
-	debugf( "called\n" );
 
 	status = inportb(0x64);
 
 	if( status & 0x01 ) {
 		scancode = inportb(0x60);
 
-		if( scancode == 42 || scancode == 54 ) {
-			is_shift = true;
-		} else if( scancode == -86 || scancode == -74 )	{
-			is_shift = false;
-		}
-		
-		if( scancode > 0 && scancode < 0x81) {
-			if( is_shift ) {
-				debugf( "shift %d\n", scancode );
-				add_scancode_to_queue( keyboard_map_shift[scancode] );
-			} else {
-				debugf( "noshift 0x%X\n", scancode );
-				add_scancode_to_queue( keyboard_map[scancode] );
-			}
-		}
+		add_scancode_to_queue( scancode );
 	}
 
 	#ifdef KDEBUG_KEYBOARD_INTERRUPT_HANDLER
@@ -149,29 +134,117 @@ void Keyboard::add_scancode_to_queue( uint8_t code ) {
 		scancode_queue_tail = 0;
 	}
 
-	debugf( "added %d %c\n", code, code );
-
-	char_ready = true;
+	//debugf( "added 0x%X\n", code );
 }
 
 uint8_t Keyboard::get_next_scancode( void ) {
-    return 0;
-}
-
-char Keyboard::get_next_char( void ) {
-    char ret_val = scancode_queue[scancode_queue_head];
-
-    scancode_queue[scancode_queue_head] = 0;
-
-    scancode_queue_head++;
-
-    if( scancode_queue_head > 254 ) {
-        scancode_queue_head = 0;
-    }
+	uint8_t scancode = 0;
 
 	if( scancode_queue_head == scancode_queue_tail ) {
-		char_ready = false;
+		return 0;
 	}
+
+	scancode = scancode_queue[ scancode_queue_head ];
+
+	scancode_queue_head++;
+
+	if( scancode_queue_head > 254 ) {
+		scancode_queue_head = 0;
+	}
+
+    return scancode;
+}
+
+char Keyboard::get_next_char( bool return_special ) {
+	uint8_t scancode = 0;
+	char ret_val = 0;
+
+	if( scancode_queue_head == scancode_queue_tail ) {
+		return 0;
+	}
+
+	scancode = scancode_queue[ scancode_queue_head ];
+	
+	bool continue_in_queue;
+
+	// Loop until we find a valid character
+	do {
+		if( scancode == 0xE0 ) {
+			in_E0 = true;
+			
+			scancode_queue[scancode_queue_head] = 0;
+			scancode_queue_head++;
+
+			if( scancode_queue_head > 254 ) {
+				scancode_queue_head = 0;
+			}
+
+			ret_val = get_next_char( return_special );
+		} else {
+			if( in_E0 ) {
+				switch( scancode ) {
+					case 0x35:
+						ret_val = '/';
+						break;
+				}
+
+				in_E0 = false;
+			} else {
+				// 0x2A Left Sh, 0x36 Right Sh Press
+				// 0xAA Left Sh, 0xB6 Right Sh Release
+				if( scancode == 0x2A || scancode == 0x36 ) {
+					is_shift = true;
+				} else if( scancode == 0xAA || scancode == 0xB6 ) {
+					is_shift = false;
+				} else {
+					if( scancode < 0x81 ) {
+						if( is_shift ) {
+							ret_val = keyboard_map_shift[scancode];
+						} else {
+							ret_val = keyboard_map[scancode];
+						}
+
+						if( return_special ) {
+							switch( scancode ) {
+								case SCANCODE_ESC:
+								case SCANCODE_F1:
+								case SCANCODE_F2:
+									ret_val = scancode;
+									break;
+								default:
+									break;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// if we find a character, end
+		if( ret_val != 0 ) {
+			continue_in_queue = false;
+
+			scancode_queue[scancode_queue_head] = 0;
+
+			scancode_queue_head++;
+
+			if( scancode_queue_head > 254 ) {
+				scancode_queue_head = 0;
+			}
+		} else {
+			// otherwise increrase queue and continue
+			scancode_queue_head++;
+
+			// fail if we've reached the end
+			// otherwise process the next scancode
+			if( scancode_queue_head == scancode_queue_tail ) {
+				continue_in_queue = false;
+			} else {
+				scancode = scancode_queue[scancode_queue_head];
+			}
+		}
+	} while( continue_in_queue );
+
 
     return ret_val;
 }
@@ -187,9 +260,27 @@ void keyboard_interrupt_handler( registers **reg ) {
 }
 
 char keyboard_get_char( void ) {
-	while( main_keyboard->char_ready == false ) {
-		;
+	return keyboard_get_char_stage_2( false );
+}
+
+char keyboard_get_char_or_special( void ) {
+	return keyboard_get_char_stage_2( true );
+}
+
+char keyboard_get_char_stage_2( bool return_special ) {
+	char c = 0;
+
+	do {
+		c = main_keyboard->get_next_char( return_special );
+	} while( c == 0 );
+
+	return c;
+}
+
+char scancode_to_char( uint8_t scancode ) {
+	if( scancode < 0x81 ) {
+		return keyboard_map[ scancode ];
 	}
 
-	return main_keyboard->get_next_char();
+	return 0;
 }

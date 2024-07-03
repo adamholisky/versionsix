@@ -19,7 +19,7 @@
 #include <net/network.h>
 #include <keyboard.h>
 
-#undef ENABLE_NETWORKING
+#define ENABLE_NETWORKING
 
 #define LIMINE_KERNEL_ADDRESS_REQUEST { LIMINE_COMMON_MAGIC, 0x71ba76863cc55f63, 0xb2644a48c516a487 }
 static volatile struct limine_kernel_address_request kaddr_request = {

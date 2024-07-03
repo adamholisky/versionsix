@@ -42,7 +42,8 @@ void keyboard_interrupt_handler( registers **reg );
 char keyboard_get_char( void );
 char keyboard_get_char_or_special( void );
 char keyboard_get_char_stage_2( bool return_special );
-char scancode_to_char( uint8_t scancode );
+uint8_t keyboard_get_scancode( void );
+char keyboard_scancode_to_char( uint8_t scancode );
 
 #ifdef __cplusplus
 }

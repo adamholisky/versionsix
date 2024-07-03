@@ -5,7 +5,7 @@
 Keyboard *main_keyboard;
 
 unsigned char keyboard_map[128] = {
-	0, 27, '1', '2', '3', '4', '5', '6', '7', '8',	  /* 9 */
+	0, 0, '1', '2', '3', '4', '5', '6', '7', '8',	  /* 9 */
 	'9', '0', '-', '=', '\b',						  /* Backspace */
 	'\t',											  /* Tab */
 	'q', 'w', 'e', 'r',								  /* 19 */
@@ -44,7 +44,7 @@ unsigned char keyboard_map[128] = {
 };
 
 unsigned char keyboard_map_shift[128] = {
-	0, 27, '!', '@', '#', '$', '%', '^', '&', '*',	  /* 9 */
+	0, 0, '!', '@', '#', '$', '%', '^', '&', '*',	  /* 9 */
 	'(', ')', '_', '+', '\b',						  /* Backspace */
 	'\t',											  /* Tab */
 	'Q', 'W', 'E', 'R',								  /* 19 */
@@ -277,7 +277,17 @@ char keyboard_get_char_stage_2( bool return_special ) {
 	return c;
 }
 
-char scancode_to_char( uint8_t scancode ) {
+uint8_t keyboard_get_scancode( void ) {
+	uint8_t ret_value = 0;
+
+	do {
+		ret_value = main_keyboard->get_next_scancode();
+	} while( ret_value == 0 );
+
+	return ret_value;
+}
+
+char keyboard_scancode_to_char( uint8_t scancode ) {
 	if( scancode < 0x81 ) {
 		return keyboard_map[ scancode ];
 	}

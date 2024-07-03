@@ -151,7 +151,7 @@ extern "C" void kernel_main( void ) {
 
 	//tcp_test();
 
-	kshell();
+	kshell_initalize();
 
 	debugf( "Ending happy.\n" );
 	printf( "Ending happy.\n" );

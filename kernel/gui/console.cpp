@@ -116,7 +116,7 @@ void Console::do_tab( void ) {
 	if( current_col + tab_size < num_cols ) {
 		if( current_col == 1 ) {
 			for( int i = 0; i < tab_size; i++ ) {
-				put_char('.');
+				put_char(' ');
 			}
 		} else {
 			int num_spaces = (current_col - 1) % tab_size;
@@ -126,7 +126,7 @@ void Console::do_tab( void ) {
 			}
 
 			for( int i = 0; i < num_spaces; i++ ) {
-				put_char('.');
+				put_char(' ');
 			}
 		}
 	}

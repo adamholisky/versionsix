@@ -45,3 +45,13 @@ void delay( uint32_t count ) {
 		__asm__ __volatile__ ( "nop" );
 	}
 }
+
+int kstrlen( char *s ) {
+	int len = 0;
+
+	while( *(s++) ) {
+		len++;
+	}
+
+	return len;
+}

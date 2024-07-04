@@ -50,6 +50,7 @@ static inline void out_port_long( uint16_t port, uint32_t value) {
 #define do_immediate_shutdown() outportb( 0xF4, 0x00 )
 
 void delay( uint32_t count );
+int kstrlen( char *s );
 
 /* #define debugf( ... ) printf( __VA_ARGS__ )
 #define log_entry_enter() debugf( "Enter\n" )

@@ -3,26 +3,25 @@
 #include <task.h>
 #include <timer.h>
 
-Task * tasks[ TASKS_MAX ];
-uint16_t current_task;
-registers task_contexts[ TASKS_MAX ];
+kernel_process_data process_data;
 
 Task::Task( uint16_t task_id, uint8_t task_type, char *task_name, uint64_t *task_entry ) {
 	log_entry_enter();
 
 	id = task_id;
 	type = task_type;
+	memset( display_name, 0, TASKS_NAME_MAX );
 	strcpy( display_name, task_name );
 	entry = (task_entry_func)task_entry;
 	status = TASK_STATUS_READY;
 
-	memset( &task_contexts[task_id], 0, sizeof( registers ) );
+	memset( &process_data.task_contexts[task_id], 0, sizeof( registers ) );
 
-	task_contexts[task_id].rip = (uint64_t)entry;
-	task_contexts[task_id].cs = 0x28;
-	task_contexts[task_id].rflags = 0x200;
-	task_contexts[task_id].rsp = (uint64_t)kmalloc( 4 * 1024 );
-	task_contexts[task_id].rax = 0xAAAAAAAAAAAAAAAA;
+	process_data.task_contexts[task_id].rip = (uint64_t)entry;
+	process_data.task_contexts[task_id].cs = 0x28;
+	process_data.task_contexts[task_id].rflags = 0x200;
+	process_data.task_contexts[task_id].rsp = (uint64_t)kmalloc( 4 * 1024 );
+	process_data.task_contexts[task_id].rax = 0xAAAAAAAAAAAAAAAA;
 
 	if( type == TASK_TYPE_KERNEL ) {
 		status = TASK_STATUS_ACTIVE;
@@ -44,11 +43,11 @@ void Task::start( void ) {
 void Task::save_context( registers **_context ) {
 	registers *context = *_context;
 	debugf( "save reg rbp: %X\n", context->rbp );
-	memcpy( &task_contexts[id], context, sizeof( registers ) );
+	memcpy( &process_data.task_contexts[id], context, sizeof( registers ) );
 }
 
 registers *Task::get_context( void ) {
-	return &task_contexts[id];
+	return &process_data.task_contexts[id];
 }
 
 void Task::read( void ) {
@@ -78,7 +77,7 @@ Task *task_create( uint8_t task_type, char *name, uint64_t *entry ) {
 
 	if( task_type != TASK_TYPE_KERNEL ) {
 		for( int i = 0; i < TASKS_MAX; i++ ) {
-			if( tasks[i] == NULL ) {
+			if( process_data.tasks[i] == NULL ) {
 				free_id = i;
 				i = TASKS_MAX;
 			}
@@ -90,9 +89,9 @@ Task *task_create( uint8_t task_type, char *name, uint64_t *entry ) {
 		}
 	}
 
-	tasks[free_id] = new Task( free_id, task_type, name, entry );
+	process_data.tasks[free_id] = new Task( free_id, task_type, name, entry );
 
-	return tasks[free_id];
+	return process_data.tasks[free_id];
 }
 
 #undef DEBUG_TASK_SCHED_YIELD
@@ -101,8 +100,8 @@ void task_sched_yield( registers **context ) {
 	log_entry_enter();
 	#endif
 
-	uint32_t old_task_number = current_task;
-	uint32_t new_task_number = current_task + 1;
+	uint32_t old_task_number = process_data.current_task;
+	uint32_t new_task_number = process_data.current_task + 1;
 
 	if( new_task_number == 3 ) {
 		new_task_number = 0;
@@ -117,9 +116,9 @@ void task_sched_yield( registers **context ) {
 	task_dump_context( old_task_context );
 	#endif
 
-	memcpy( &task_contexts[old_task_number], &(**context), sizeof(registers) );
-	task_contexts[old_task_number].rax = 0xBBBBBBBBBBBBBBBB;
-	task_contexts[old_task_number].rbp = (**context).rbp;
+	memcpy( &process_data.task_contexts[old_task_number], &(**context), sizeof(registers) );
+	process_data.task_contexts[old_task_number].rax = 0xBBBBBBBBBBBBBBBB;
+	process_data.task_contexts[old_task_number].rbp = (**context).rbp;
 
 	#ifdef DEBUG_TASK_SCHED_YIELD
 	debugf( "Old task saved :\n" );
@@ -129,14 +128,14 @@ void task_sched_yield( registers **context ) {
 	task_dump_context( &task_contexts[new_task_number] );
 	#endif
 
-	memcpy( *context, &task_contexts[new_task_number], sizeof(registers) );
+	memcpy( *context, &process_data.task_contexts[new_task_number], sizeof(registers) );
 
 	#ifdef DEBUG_TASK_SCHED_YIELD
 	debugf( "New context to use:\n" );
 	task_dump_context( *context );
 	#endif
 
-	current_task = new_task_number;
+	process_data.current_task = new_task_number;
 
 	#ifdef DEBUG_TASK_SCHED_YIELD
 	log_entry_exit();
@@ -145,14 +144,14 @@ void task_sched_yield( registers **context ) {
 
 void task_initalize( void ) {
 	for( int i = 0; i < TASKS_MAX; i++ ) {
-		tasks[i] = NULL;
+		process_data.tasks[i] = NULL;
 	}
 
 	Task *kernel_task = task_create( TASK_TYPE_KERNEL, "Kernel", NULL );
 	Task *kernel_thread_a = task_create( TASK_TYPE_KERNEL_THREAD, "Thread A", (uint64_t *)task_test_thread_a );
-	Task *kernel_thread_b = task_create( TASK_TYPE_KERNEL_THREAD, "Thread B", (uint64_t *)task_test_thread_b ); 
+	Task *kernel_thread_b = task_create( TASK_TYPE_KERNEL_THREAD, "Thread B", (uint64_t *)task_test_thread_b );
 
-	current_task = 0;
+	process_data.current_task = 0;
 }
 
 void task_test_thread_a( void ) {
@@ -173,4 +172,8 @@ void task_test_thread_b( void ) {
 		timer_wait(1);
 		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 	}
+}
+
+kernel_process_data *task_get_kernel_process_data( void ) {
+	return &process_data;
 }

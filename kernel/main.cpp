@@ -151,6 +151,8 @@ extern "C" void kernel_main( void ) {
 
 	//tcp_test();
 
+	// syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+
 	kshell_initalize();
 
 	debugf( "Ending happy.\n" );

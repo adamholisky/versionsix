@@ -32,6 +32,12 @@ static volatile struct limine_framebuffer_request fb_request {
 	.revision = 0
 };
 
+#define LIMINE_RSDP_REQUEST { LIMINE_COMMON_MAGIC, 0xc5e77b6b397e7b43, 0x27637845accdcf3c }
+static volatile struct limine_rsdp_request rsdp_request {
+	.id = LIMINE_RSDP_REQUEST,
+	.revision = 0
+};
+
 extern kinfo kernel_info;
 extern uint64_t _kernel_start;
 extern uint64_t _kernel_end;
@@ -78,6 +84,8 @@ void load_limine_info( void ) {
 		}
 	}
 
+    debugf( "RSDP table address: 0x%016llx\n", rsdp_request.response->address );
+
 	kernel_info.kernel_start = (uint64_t)&_kernel_start;
 	kernel_info.kernel_end = (uint64_t)&_kernel_end;
 	kernel_info.kernel_physical_base = kaddr_request.response->physical_base;
@@ -92,4 +100,5 @@ void load_limine_info( void ) {
 	kernel_info.framebuffer_info.width = fb_request.response->framebuffers[0]->width;
 	kernel_info.framebuffer_info.pitch = fb_request.response->framebuffers[0]->pitch;
 	kernel_info.framebuffer_info.pixel_width = kernel_info.framebuffer_info.pitch / kernel_info.framebuffer_info.width;
+    kernel_info.rsdp_table_address = (uint64_t)rsdp_request.response->address;
 }

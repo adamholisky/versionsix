@@ -34,6 +34,7 @@ typedef struct {
     uint64_t kernel_end;
     uint64_t kernel_file_address;
     uint64_t kernel_file_size;
+    uint64_t rsdp_table_address;
 
     framebuffer_information framebuffer_info;
 

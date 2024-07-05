@@ -52,7 +52,7 @@ class Task {
 
 		void start( void );
 		void save_context( registers **_context );
-		registers *Task::get_context( void );
+		registers *get_context( void );
 };
 
 typedef struct {

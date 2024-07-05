@@ -2,6 +2,7 @@
 #include <limine_bootstrap.h>
 #include <limine.h>
 #include <serial.h>
+#include <acpi.h>
 #include <file.h>
 #include <interrupt.h>
 #include <timer.h>
@@ -34,6 +35,7 @@ extern "C" void kernel_main( void ) {
 	serial_initalize();
 	debugf( "Versions OS VI Debug Out\n" );
 	load_limine_info();
+	acpi_initalize();
 
 	// Continue with core services, all of these need to boot in this order
 	interrupt_initalize();

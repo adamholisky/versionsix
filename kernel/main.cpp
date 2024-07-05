@@ -20,6 +20,7 @@
 #include <net/dhcp.h>
 #include <net/network.h>
 #include <keyboard.h>
+#include <rtc.h>
 
 #undef ENABLE_NETWORKING
 
@@ -35,11 +36,12 @@ extern "C" void kernel_main( void ) {
 	serial_initalize();
 	debugf( "Versions OS VI Debug Out\n" );
 	load_limine_info();
-	acpi_initalize();
-
+	rtc_initalize();
+	
 	// Continue with core services, all of these need to boot in this order
 	interrupt_initalize();
 	syscall_initalize();
+	acpi_initalize();
 	timer_initalize();
 	paging_initalize();
 	memory_initalize();

@@ -40,6 +40,7 @@ void KShell::main_loop( void ) {
 		memset( current_line, 0, KSHELL_MAX_LINESIZE );
 		printf( "Version VI: " );
 
+		/* Step 1: Get the line, put it into current_line */
 		do {
 			scancode = keyboard_get_scancode();
 			c = keyboard_scancode_to_char( scancode );	// this checks for scancode under 0x81, otherwise returns 0
@@ -64,11 +65,52 @@ void KShell::main_loop( void ) {
 		
 		printf( "\n" );
 
+		/* Step 2: Split it up into arguments, create argc and argv */
+
+		bool keep_processing_line = true;
+		char args[KSHELL_MAX_ARGS][KSHELL_MAX_LINESIZE];
+		char *argv_builder[KSHELL_MAX_ARGS];
+		char *char_to_process = current_line;
+		int num_args = 0;
+		int i = 0;
+		int j = 0;
+
+		do {
+			if( *char_to_process != ' ' && *char_to_process != 0 ) {
+				args[i][j] = *char_to_process; 
+				j++;
+			} else {
+				if( j != 0 ) {
+					num_args++;
+				}
+
+				args[i][j] = 0;
+				i++;
+				j = 0;
+
+				if( i > 3 ) {
+					keep_processing_line = false;
+				}
+			}
+
+			char_to_process++;
+		} while( keep_processing_line );
+
+		debugf( "num_args = %d\n", num_args );
+	
+		for( int z = 0; z < num_args; z++ ) {
+			debugf( "args[%d] = \"%s\"\n", z, args[z] );
+
+			argv_builder[z] = args[z];
+		} 
+
+		/* Step 3: See if we have the command in our special kernel list */
+
 		kshell_command_list *head = &kshell_commands;
 		kshell_command *to_run = NULL;
 
 		while( head != NULL ) {
-			if( strcmp( current_line, head->cmd->name ) == 0 ) {
+			if( strcmp( argv_builder[0], head->cmd->name ) == 0 ) {
 				to_run = head->cmd;
 				head = NULL;
 			} else {
@@ -76,10 +118,20 @@ void KShell::main_loop( void ) {
 			}
 		}
 
+		/* Step 4: TODO! Query the file system for the command */
+
+		/* Step 5: Run the command, or fail*/
+
+		int cmd_return_value = 0;
+
 		if( to_run != NULL ) {
-			kshell_command_run( to_run, 0, NULL );
+			cmd_return_value = kshell_command_run( to_run, num_args, argv_builder );
 		} else {
-			printf( "Command not found.\n" );
+			printf( "%s: command not found\n", argv_builder[0] );
+		}
+
+		if( cmd_return_value != 0 ) {
+			printf( "%s: Error %d\n", argv_builder[0], cmd_return_value );
 		}
 	}
 }
@@ -114,7 +166,7 @@ kshell_command *kshell_command_create( char *command_name, void *main_function )
 int kshell_command_run( kshell_command *cmd, int argc, char *argv[] ) {
 	kshell_main_func_to_call func = (kshell_main_func_to_call)cmd->entry;
 
-	return func( 0, NULL );
+	return func( argc, argv );
 }
 
 int kshell_command_hello_world( int argc, char *argv[] ) {

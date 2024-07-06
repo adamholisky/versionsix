@@ -9,6 +9,10 @@ extern "C" {
 
 #define KSHELL_MAX_HISTORY 25
 #define KSHELL_MAX_LINESIZE 255
+#define KSHELL_MAX_ARGS 10
+
+#define KSHELL_EXIT_CODE_SUCCESS 0
+#define KSHELL_EXIT_CODE_FAILURE 1
 
 typedef int (*kshell_main_func_to_call)( int num_args, char *arg_list[] );
 

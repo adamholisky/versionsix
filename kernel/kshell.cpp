@@ -38,7 +38,7 @@ void KShell::main_loop( void ) {
 		line_index = 0;
 
 		memset( current_line, 0, KSHELL_MAX_LINESIZE );
-		printf( "Version VI: " );
+		printf( "Version VI:/$ " );
 
 		/* Step 1: Get the line, put it into current_line */
 		do {
@@ -129,6 +129,8 @@ void KShell::main_loop( void ) {
 		} else {
 			printf( "%s: command not found\n", argv_builder[0] );
 		}
+
+		/* Step 6: For now display any non-zero return code */
 
 		if( cmd_return_value != 0 ) {
 			printf( "%s: Error %d\n", argv_builder[0], cmd_return_value );

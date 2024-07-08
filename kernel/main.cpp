@@ -22,7 +22,7 @@
 #include <keyboard.h>
 #include <rtc.h>
 
-#undef ENABLE_NETWORKING
+#define ENABLE_NETWORKING
 
 kinfo kernel_info;
 net_info networking_info;

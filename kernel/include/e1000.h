@@ -8,10 +8,6 @@ extern "C" {
 #include <mmio.h>
 #include <pci.h>
 
-void e1000_initalize( void );
-void e1000_interrupt_handler( registers *context );
-void e1000_send( uint8_t *data, size_t length );
-
 #define REG_CTRL 0x0000
 #define REG_STATUS 0x0008
 #define REG_EEPROM 0x0014
@@ -88,40 +84,43 @@ typedef struct {
 	uint16_t special;
 }  __attribute__((packed)) e1000_tx_desc;
 
-class E1000 {
-    public:
-        pci_header *pci_info;
-        uint16_t io_port;
+typedef struct {
+	pci_header *pci_info;
+	uint16_t io_port;
 
-        e1000_rx_desc *rx_desc_queue;
-        uint64_t *rx_data[E1000_QUEUE_LENGTH];
-        uint64_t rx_index;
+	e1000_rx_desc *rx_desc_queue;
+	uint64_t *rx_data[E1000_QUEUE_LENGTH];
+	uint64_t rx_index;
 
-        e1000_tx_desc *tx_desc_queue;
-        uint64_t *tx_data[E1000_QUEUE_LENGTH];
-        uint64_t tx_index;
-        
-        uint32_t rx_desc_queue_physical_address;
-        uint32_t tx_desc_queue_physical_address;
+	e1000_tx_desc *tx_desc_queue;
+	uint64_t *tx_data[E1000_QUEUE_LENGTH];
+	uint64_t tx_index;
+	
+	uint32_t rx_desc_queue_physical_address;
+	uint32_t tx_desc_queue_physical_address;
 
-        irq_handler_func interrupt_handler;
+	irq_handler_func interrupt_handler;
 
-        uint8_t mac_address[8];
+	uint8_t mac_address[8];
 
-        MMIO *mmio;
-        bool has_eeprom;
+	mmio_config *mmio;
+	bool has_eeprom;
+} e1000_device;
 
-        bool detect_eeprom( void );
-        uint16_t read_eeprom( uint8_t offset );
-        uint8_t *get_mac_address( void );
+void e1000_initalize( void );
+void e1000_interrupt_handler( registers *context );
+void e1000_send( uint8_t *data, size_t length );
 
-        void rx_init( void );
-        void tx_init( void );
+bool e1000_detect_eeprom( e1000_device *dev );
+uint16_t e1000_read_eeprom( e1000_device *dev, uint8_t offset );
+uint8_t *e1000_get_mac_address( e1000_device *dev );
 
-        void send( uint8_t *data, size_t length );
+void e1000_rx_init( e1000_device *dev );
+void e1000_tx_init( e1000_device *dev );
 
-        E1000( pci_header *pci_header_info );
-};
+void e1000_send_phase2( e1000_device *dev, uint8_t *data, size_t length );
+
+void e1000_configure( e1000_device *dev, pci_header *pci_header_info );
 
 #ifdef __cplusplus
 }

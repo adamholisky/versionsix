@@ -7,20 +7,15 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-class MMIO {
-    public:
-        uint64_t *addr;
+typedef struct {
+	uint64_t *addr;
+} mmio_config;
 
-        uint32_t read32( uint64_t *address );
-        void write32( uint64_t *address, uint32_t value );
-
-        uint32_t read_command( uint32_t reg );
-        void write_command( uint32_t reg, uint32_t value );
-
-        void configure_mmu_page( void );
-
-        MMIO( uint64_t *address );
-};
+void mmio_initalize( mmio_config *config, uint64_t *addr );
+void mmio_write32( mmio_config *config, uint64_t *address, uint32_t value );
+uint32_t mmio_read32( mmio_config *config, uint64_t *address );
+void mmio_write_command( mmio_config *config, uint32_t reg, uint32_t value );
+uint32_t mmio_read_command( mmio_config *config, uint32_t reg );
 
 #ifdef __cplusplus
 }

@@ -1,12 +1,13 @@
 #include <kernel_common.h>
 #include <net/ethernet.h>
-#include <e1000.h>
 #include <net/arp.h>
 #include <net/ipv4.h>
 
 uint8_t packet_data[2048];
 
-extern "C" void ethernet_send_packet( uint8_t *dest, uint16_t type, uint8_t *data, uint32_t length ) {
+extern void e1000_send( uint8_t *data, size_t length );
+
+void ethernet_send_packet( uint8_t *dest, uint16_t type, uint8_t *data, uint32_t length ) {
     ethernet_packet packet;
 
 	packet.source[0] = 0x12;
@@ -34,7 +35,7 @@ extern "C" void ethernet_send_packet( uint8_t *dest, uint16_t type, uint8_t *dat
 	e1000_send( (uint8_t *)&packet_data, total_size );
 }
 
-extern "C" void ethernet_process_packet( uint64_t *data, uint16_t length ) {
+void ethernet_process_packet( uint64_t *data, uint16_t length ) {
 	ethernet_packet *packet = (ethernet_packet *)data;
 
 	/* debugf( "Got Ethernet Packet:\n" );

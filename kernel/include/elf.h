@@ -7,9 +7,9 @@ extern "C" {
 #include <stdint.h>
 
 /* elf.h
- * 
- * Most structs are from the ELF/Linux Kernel docs
- */
+* 
+* Most structs are from the ELF/Linux Kernel docs
+*/
 
 #define Elf32_Half uint16_t
 #define Elf32_Word uint32_t
@@ -131,34 +131,13 @@ typedef struct {
 
 typedef struct {
 	uint64_t* file_base;
-		
+
 	Elf64_Ehdr* elf_header;
 	Elf64_Shdr* section_headers;
 	char* string_table;
 	Elf64_Sym* symbol_table;
 	uint64_t num_symbols;
 } elf_file;
-
-/* class ELF_File {
-	private:
-		uint64_t* file_base;
-		
-		Elf64_Ehdr* elf_header;
-		Elf64_Shdr* section_headers;
-		char* string_table;
-		Elf64_Sym* symbol_table;
-		
-	public:
-		uint64_t num_symbols;
-		
-		ELF_File( uint64_t* file_start );
-
-		Elf64_Shdr* get_section_header( char* name );
-		Elf64_Shdr* get_section_header( int type );
-		Elf64_Sym* get_symtab( void );
-		char* get_strtab( void );
-		char* get_str_at_offset( uint64_t offset );
-}; */
 
 void elf_file_initalize( elf_file *elf, uint64_t *file_start );
 Elf64_Shdr* elf_get_section_header_by_name( elf_file *elf, char* name );

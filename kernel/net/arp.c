@@ -4,7 +4,7 @@
 
 arp_packet packet;
 
-extern "C" void arp_send( uint8_t *dest_protocol_addr ) {
+void arp_send( uint8_t *dest_protocol_addr ) {
 	packet.htype = htons(0x0001);
 	packet.ptype = htons(0x0800);
 	packet.hlen = 0x6;
@@ -45,7 +45,7 @@ extern "C" void arp_send( uint8_t *dest_protocol_addr ) {
 	ethernet_send_packet( (uint8_t *)&dest, ETHERNET_TYPE_ARP, final_arp_packet, sizeof( arp_packet ) );
 }
 
-extern "C" void arp_process_packet( arp_packet *packet ) {
+void arp_process_packet( arp_packet *packet ) {
 	debugf( "Got ARP Packet:\n" );
 	debugf( "    Opcode:            0x%04X\n", htons(packet->opcode) );
 	debugf( "    Source HW:         %X:%X:%X:%X:%X:%X\n", packet->src_hardware_addr[0], packet->src_hardware_addr[1], packet->src_hardware_addr[2], packet->src_hardware_addr[3], packet->src_hardware_addr[4], packet->src_hardware_addr[5] );

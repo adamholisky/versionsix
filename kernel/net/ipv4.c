@@ -3,10 +3,11 @@
 #include <net/ipv4.h>
 #include <net/ethernet.h>
 #include <net/dhcp.h>
-#include <net/tcp.h>
 #include <net/network.h>
 
 extern net_info networking_info;
+
+extern void tcp_process_packet( uint8_t *data, uint16_t length );
 
 void ipv4_send( uint32_t dest, uint8_t protocol, uint8_t *data, uint16_t length ) {
 	ipv4_packet packet;

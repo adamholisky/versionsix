@@ -6,7 +6,8 @@
         "kshell.h": "c",
         "timer.h": "c",
         "stddef.h": "c",
-        "limine.h": "c"
+        "limine.h": "c",
+        "arp.h": "c"
     },
     "editor.wordWrap":"on" 
 }

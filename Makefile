@@ -8,18 +8,16 @@ include $(ROOT_DIR)/build_support/control/paths.mk
 include $(ROOT_DIR)/build_support/control/toolchain.mk 
 
 SOURCES_C = $(shell ls **/*.c)
-SOURCES_CPP = $(shell ls **/*.cpp)
 SOURCES_ASMS = $(shell ls **/*.S)
 OBJECTS_C = $(patsubst %.c, build/%.o, $(shell ls **/*.c | xargs -n 1 basename))
-OBJECTS_CPP = $(patsubst %.cpp, build/%.o, $(shell ls **/*.cpp | xargs -n 1 basename))
 OBJECTS_ASMS = $(patsubst %.S, build/%.o, $(shell ls **/*.S | xargs -n 1 basename))
 
 all: debug_dump install
 
 #$(CC) -T build_support/linker.ld -o build/versionvi.bin $(CFLAGS) ../libcvv/libc/vvlibc.o $(OBJECTS_C) $(OBJECTS_ASMS) $(CFLAGS_END)
 
-build/versionvi.bin: $(OBJECTS_C) $(OBJECTS_CPP) $(OBJECTS_ASMS)
-	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/control/linker.ld -o build/versionvi.bin build_support/klibc/vvlibc.o $(OBJECTS_C) $(OBJECTS_CPP) $(OBJECTS_ASMS)
+build/versionvi.bin: $(OBJECTS_C) $(OBJECTS_ASMS)
+	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/control/linker.ld -o build/versionvi.bin build_support/klibc/vvlibc.o $(OBJECTS_C) $(OBJECTS_ASMS)
 	$(OBJDUMP) -x -D -S build/versionvi.bin > build_support/logs/objdump.txt
 	readelf -W -a build/versionvi.bin > build_support/logs/elfdump.txt
 	@>&2 printf "[Build] Done\n"
@@ -28,11 +26,6 @@ build/%.o: %.c
 	@>&2 printf "[Build] $<\n"
 	$(eval OBJNAME := $(shell basename $@))
 	$(CC) $(CFLAGS) $(CFLAGS_END) -std=c11 -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
-
-build/%.o: %.cpp
-	@>&2 printf "[Build] $<\n"
-	$(eval OBJNAME := $(shell basename $@))
-	$(CPP) $(CFLAGS) $(CFLAGS_END) -fno-exceptions -fno-rtti -fpermissive -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
 
 build/%.o: %.S
 	@>&2 printf "[Build] $<\n"
@@ -86,10 +79,6 @@ debug_dump_stage2:
 	@echo "*.c:" $(SOURCES_C)
 	@echo " "
 	@echo "*.o:" $(OBJECTS_C)
-	@echo "----------"
-	@echo "*.cpp:" $(SOURCES_CPP)
-	@echo " "
-	@echo "*.o:" $(OBJECTS_CPP)
 	@echo "----------"
 	@echo "End Debug Dump"
 	@echo " "

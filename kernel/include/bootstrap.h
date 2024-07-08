@@ -70,13 +70,6 @@ int kstrlen( char *s );
 /* extern void sse_initalize( void ); */
 
 #ifdef __cplusplus
-void *operator new(size_t size);
-void *operator new[](size_t size);
-void operator delete(void *p);
-void operator delete[](void *p);
-#endif
-
-#ifdef __cplusplus
 }
 
 #endif

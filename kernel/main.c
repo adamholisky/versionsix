@@ -27,11 +27,11 @@
 kinfo kernel_info;
 net_info networking_info;
 
-Console *main_console;
+vui_console main_console;
 
 extern void tcp_test( void );
 
-extern "C" void kernel_main( void ) {
+void kernel_main( void ) {
 	// Begin with boostrap services
 	serial_initalize();
 	debugf( "Versions OS VI Debug Out\n" );
@@ -52,7 +52,7 @@ extern "C" void kernel_main( void ) {
 	keyboard_initalize();
 
 	// Next setup the main console for use. From here on out, printf is okay.
-	main_console = new Console( 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );
+	vui_console_initalize( &main_console, 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );
 	printf( "Versions OS VI\n" );
 	
 	// Service startup order from here onwards really shouldn't matter too much
@@ -78,6 +78,6 @@ extern "C" void kernel_main( void ) {
 	do_immediate_shutdown();
 }
 
-extern "C" void main_console_putc( char c ) {
-	main_console->put_char( c );
+void main_console_putc( char c ) {
+	vui_console_put_char( &main_console, c );
 }

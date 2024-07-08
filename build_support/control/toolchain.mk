@@ -1,5 +1,4 @@
 CC = /usr/local/osdev/bin/x86_64-elf-gcc
-CPP = /usr/local/osdev/bin/x86_64-elf-g++
 ASM = /usr/local/osdev/bin/x86_64-elf-as
 LD = /usr/local/osdev/bin/x86_64-elf-ld
 OBJDUMP = /usr/local/osdev/bin/x86_64-elf-objdump

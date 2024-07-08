@@ -9,19 +9,11 @@ extern char *u_vga16;
 #define SSFN_CONSOLEBITMAP_TRUECOLOR        /* use the special renderer for 32 bit truecolor packed pixels */
 #include <gui/ssfn.h>
 
-Text *t;
-
-void text_test( void ) {
-	/* t = new Text();
-
-	t->put_string( "Version VI" ); */
-}
-
-Text::Text( uint16_t top, uint16_t left, uint16_t width, uint16_t height ) {
-	pixel_top = top;
-	pixel_left = left;
-	pixel_width = width;
-	pixel_height = height;
+void vui_text_initalize( vui_text *txt, uint16_t top, uint16_t left, uint16_t width, uint16_t height ) {
+	txt->pixel_top = top;
+	txt->pixel_left = left;
+	txt->pixel_width = width;
+	txt->pixel_height = height;
 
 	ssfn_src = (ssfn_font_t *)&u_vga16;      /* the bitmap font to use */
 
@@ -34,17 +26,17 @@ Text::Text( uint16_t top, uint16_t left, uint16_t width, uint16_t height ) {
 	ssfn_dst.fg = 0x00FF0000;                     /* foreground color */
 }
 
-void Text::put_char( char c ) {
+void vui_text_put_char( vui_text *txt, char c ) {
 	ssfn_putc( c );
 }
 
-void Text::put_char( char c, uint16_t x, uint16_t y ) {
+void vui_text_put_char_at( vui_text *txt, char c, uint16_t x, uint16_t y ) {
 	ssfn_dst.x = x;
 	ssfn_dst.y = y;
 	ssfn_putc( c );
 }
 
-void Text::put_char( char c, uint16_t x, uint16_t y, uint32_t foreground_color, uint32_t background_color ) {
+void vui_text_put_char_at_with_color( vui_text *txt, char c, uint16_t x, uint16_t y, uint32_t foreground_color, uint32_t background_color ) {
 	ssfn_dst.fg = foreground_color;
 	ssfn_dst.bg = background_color;
 	ssfn_dst.x = x;
@@ -52,7 +44,7 @@ void Text::put_char( char c, uint16_t x, uint16_t y, uint32_t foreground_color, 
 	ssfn_putc( c );
 }
 
-void Text::put_string( char *str ) {
+void vui_text_put_string( vui_text *txt, char *str ) {
 	for( ; *str; *str++ ) {
 		ssfn_putc( *str );
 	}

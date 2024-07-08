@@ -183,7 +183,7 @@ void e1000_configure( e1000_device *dev, pci_header *pci_header_info ) {
 
 	// TODO: Fix this once limine gets replaced
 	//uint64_t *mmio_addr = page_map( (uint64_t)pci_header_info->bar0, (uint64_t)pci_header_info->bar0 );
-	dev->mmio = (mmio_config *)kmalloc( sizeof(mmio_config) );
+	dev->mmio = kmalloc( sizeof(mmio_config) );
 	mmio_initalize( dev->mmio, (uint64_t *)0x00000000FEB80000 );
 	dev->io_port = (uint16_t)dev->pci_info->bar1;
 

@@ -6,42 +6,57 @@
 #include <kmemory.h>
 #include <ksymbols.h>
 
-extern void do_test_send( void );
-
-KShell *main_shell;
-
+kshell_config main_shell;
 kshell_command_list kshell_commands;
 
-KShell::KShell( void ) {
-	for( int i = 0; i < KSHELL_MAX_HISTORY; i++ ) {
-		lines[i] = (char *)kmalloc( KSHELL_MAX_LINESIZE );
+void kshell_initalize( void ) {
+	// Setup first command
+	kshell_commands.cmd = kshell_command_create( "hw", (void *)kshell_command_hello_world );
+	kshell_commands.next = NULL;
+
+	// Find all symbols that start wtih "kshell_app_add_command" and call them each
+	symbol_collection *ksym = get_ksyms_object();
+	symbol *symbol_array = symbols_get_symbol_array( ksym );
+	uint64_t max_symbols = symbols_get_total_symbols( ksym );
+
+	for( int i = 0; i < max_symbols; i++ ) {
+		if( strncmp( symbol_array[i].name, "kshell_app_add_command_", sizeof("kshell_app_add_command_") - 1 ) == 0 ) {
+			void (*func)(void) = (void(*)(void))symbol_array[i].addr;
+			func();
+		}
 	}
 
-	current_line = (char *)kmalloc( KSHELL_MAX_LINESIZE );
+	for( int i = 0; i < KSHELL_MAX_HISTORY; i++ ) {
+		main_shell.lines[i] = (char *)kmalloc( KSHELL_MAX_LINESIZE );
+	}
+
+	main_shell.current_line = (char *)kmalloc( KSHELL_MAX_LINESIZE );
+
+	kshell_run();
 }
 
-void KShell::run( void ) { 
-	keep_going = true;
+void kshell_run( void ) { 
+	main_shell.keep_going = true;
 
-	main_loop();
+	kshell_main_loop();
 
 	do_immediate_shutdown();
 }
 
-void KShell::stop( void ) {
-	keep_going = false;
+void kshell_stop( void ) {
+	main_shell.keep_going = false;
 
 	do_immediate_shutdown();
 }
 
-void KShell::main_loop( void ) {
-	while( keep_going ) {
+void kshell_main_loop( void ) {
+	while( main_shell.keep_going ) {
 		uint8_t scancode = 0;
 		char c = 0;
 		bool get_next_key = true;
-		line_index = 0;
+		main_shell.line_index = 0;
 
-		memset( current_line, 0, KSHELL_MAX_LINESIZE );
+		memset( main_shell.current_line, 0, KSHELL_MAX_LINESIZE );
 		printf( "Version VI:/$ " );
 
 		/* Step 1: Get the line, put it into current_line */
@@ -55,15 +70,15 @@ void KShell::main_loop( void ) {
 				} else {
 					printf( "%c", c );
 
-					current_line[line_index] = c;
-					line_index++;
+					main_shell.current_line[main_shell.line_index] = c;
+					main_shell.line_index++;
 
-					if( line_index > KSHELL_MAX_LINESIZE - 1 ) {
+					if( main_shell.line_index > KSHELL_MAX_LINESIZE - 1 ) {
 						get_next_key = false;
 					}
 				}
 			} else {
-				get_next_key = handle_special_keypress( scancode );
+				get_next_key = kshell_handle_special_keypress( scancode );
 			}
 		} while( get_next_key );
 		
@@ -74,7 +89,7 @@ void KShell::main_loop( void ) {
 		bool keep_processing_line = true;
 		char args[KSHELL_MAX_ARGS][KSHELL_MAX_LINESIZE];
 		char *argv_builder[KSHELL_MAX_ARGS];
-		char *char_to_process = current_line;
+		char *char_to_process = main_shell.current_line;
 		int num_args = 0;
 		int i = 0;
 		int j = 0;
@@ -151,10 +166,10 @@ void KShell::main_loop( void ) {
  * @return true continue with current line
  * @return false start over at a new line 
  */
-bool KShell::handle_special_keypress( uint8_t scancode ) {
+bool kshell_handle_special_keypress( uint8_t scancode ) {
 	switch( scancode ) {
 		case SCANCODE_ESC:
-			this->stop();
+			kshell_stop();
 			return false;
 		case SCANCODE_F1:
 			return true;
@@ -179,27 +194,6 @@ int kshell_command_hello_world( int argc, char *argv[] ) {
 	printf( "Hello, world!\n" );
 }
 
-void kshell_initalize( void ) {
-	main_shell = new KShell();
-	
-	// Setup first command
-	kshell_commands.cmd = kshell_command_create( "hw", (void *)kshell_command_hello_world );
-	kshell_commands.next = NULL;
-
-	// Find all symbols that start wtih "kshell_app_add_command" and call them each
-	symbol_collection *ksym = get_ksyms_object();
-	symbol *symbol_array = symbols_get_symbol_array( ksym );
-	uint64_t max_symbols = symbols_get_total_symbols( ksym );
-
-	for( int i = 0; i < max_symbols; i++ ) {
-		if( strncmp( symbol_array[i].name, "kshell_app_add_command_", sizeof("kshell_app_add_command_") - 1 ) == 0 ) {
-			void (*func)(void) = (void(*)(void))symbol_array[i].addr;
-			func();
-		}
-	}
-
-	main_shell->run();
-}
 
 void kshell_add_command( char *command_name, void *main_function ) {
 	kshell_command_list *head = &kshell_commands;

@@ -16,30 +16,12 @@ extern "C" {
 
 typedef int (*kshell_main_func_to_call)( int num_args, char *arg_list[] );
 
-class KShell {
-	private:
-		bool keep_going;
-		char *lines[KSHELL_MAX_HISTORY];
-		char *current_line;
-		uint8_t line_index;
-	public:
-		KShell( void );
-		void run( void );
-		void stop( void );
-		void main_loop( void );
-		bool handle_special_keypress( uint8_t scancode );
-};
-
-/* class KShell_Command {
-	public:
-		char name[64];
-		void *entry;
-
-		KShell_Command( char *command_name, void *main_function );
-		~KShell_Command();
-		KShell_Command& operator=(const KShell_Command orig);
-		int run( int argc, char *argv[] );
-};*/
+typedef struct {
+	bool keep_going;
+	char *lines[KSHELL_MAX_HISTORY];
+	char *current_line;
+	uint8_t line_index;
+} kshell_config;
 
 typedef struct {
 	char name[64];
@@ -55,6 +37,12 @@ void kshell_initalize( void );
 void kshell_add_command( char *command_name, void *main_function );
 kshell_command *kshell_command_create( char *command_name, void *main_function );
 int kshell_command_run( kshell_command *cmd, int argc, char *argv[] );
+void kshell_run( void );
+void kshell_stop( void );
+void kshell_main_loop( void );
+bool kshell_handle_special_keypress( uint8_t scancode );
+
+int kshell_command_hello_world( int argc, char *argv[] );
 
 #ifdef __cplusplus
 }

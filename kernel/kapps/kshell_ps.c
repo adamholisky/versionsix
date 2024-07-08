@@ -1,5 +1,5 @@
 #include <kernel_common.h>
-#include <kshell.h>
+#include <kshell_app.h>
 #include <task.h>
 
 KSHELL_COMMAND( ps, kshell_app_ps_main )
@@ -15,11 +15,11 @@ int kshell_app_ps_main( int argc, char *argv[] ) {
 	printf( "    ID Name         Status       RIP\n" );
 
 	for( int i = 0; i < TASKS_MAX; i++ ) {
-		if( process_data->tasks[i] == NULL ) {
+		if( process_data->tasks[i].status == TASK_STATUS_NOT_CREATED ) {
 			continue;
 		}
 		
-		printf( "%6d %-12s %-12s 0x%016llx\n", i, process_data->tasks[i]->display_name, status_to_string( process_data->tasks[i]->status), process_data->task_contexts[i].rip );
+		printf( "%6d %-12s %-12s 0x%016llx\n", i, process_data->tasks[i].display_name, status_to_string( process_data->tasks[i].status), process_data->task_contexts[i].rip );
 	}
 
 	return 0;

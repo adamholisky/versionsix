@@ -24,10 +24,14 @@ void KShell::run( void ) {
 	keep_going = true;
 
 	main_loop();
+
+	do_immediate_shutdown();
 }
 
 void KShell::stop( void ) {
 	keep_going = false;
+
+	do_immediate_shutdown();
 }
 
 void KShell::main_loop( void ) {
@@ -135,6 +139,8 @@ void KShell::main_loop( void ) {
 		if( cmd_return_value != 0 ) {
 			printf( "%s: Error %d\n", argv_builder[0], cmd_return_value );
 		}
+
+		//syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 	}
 }
 
@@ -148,12 +154,10 @@ void KShell::main_loop( void ) {
 bool KShell::handle_special_keypress( uint8_t scancode ) {
 	switch( scancode ) {
 		case SCANCODE_ESC:
-			keep_going = false;
+			this->stop();
 			return false;
 		case SCANCODE_F1:
-			current_line[line_index] = 'a';
-			printf( "a\n" );
-			return false;
+			return true;
 		default:
 			return true;
 	}
@@ -183,9 +187,9 @@ void kshell_initalize( void ) {
 	kshell_commands.next = NULL;
 
 	// Find all symbols that start wtih "kshell_app_add_command" and call them each
-	KernelSymbols *ksym = get_ksyms_object();
-	KernelSymbol *symbol_array = ksym->get_symbol_array();
-	uint64_t max_symbols = ksym->get_total_symbols();
+	symbol_collection *ksym = get_ksyms_object();
+	symbol *symbol_array = symbols_get_symbol_array( ksym );
+	uint64_t max_symbols = symbols_get_total_symbols( ksym );
 
 	for( int i = 0; i < max_symbols; i++ ) {
 		if( strncmp( symbol_array[i].name, "kshell_app_add_command_", sizeof("kshell_app_add_command_") - 1 ) == 0 ) {

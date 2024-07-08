@@ -62,19 +62,20 @@ extern "C" void kernel_main( void ) {
 	dhcp_start();
 	#endif
 
-	kshell_initalize();
+	task_create( TASK_TYPE_KERNEL_THREAD, "KShell", (uint64_t *)kshell_initalize );
+	syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+
+	/* int i = 0;
+	do {
+		i++;
+		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+	} while( 1 );
+
+	//kshell_initalize(); */
 
 	debugf( "Ending happy.\n" );
 	printf( "Ending happy.\n" );
 	do_immediate_shutdown();
-}
-
-extern "C" void do_test_send( void ) {
-	//uint8_t dest[] = {127,0,0,2};
-	//uint8_t dest[] = {192,168,12,1};
-	uint8_t dest[] = {10,0,2,2};
-
-	arp_send( (uint8_t *)&dest );
 }
 
 extern "C" void main_console_putc( char c ) {

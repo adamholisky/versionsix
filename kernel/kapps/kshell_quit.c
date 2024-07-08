@@ -1,5 +1,5 @@
 #include <kernel_common.h>
-#include <kshell.h>
+#include <kshell_app.h>
 
 KSHELL_COMMAND( quit, kshell_app_quit_main )
 

@@ -56,12 +56,6 @@ void kshell_add_command( char *command_name, void *main_function );
 kshell_command *kshell_command_create( char *command_name, void *main_function );
 int kshell_command_run( kshell_command *cmd, int argc, char *argv[] );
 
-#define KSHELL_COMMAND( name, main_function ) \
-	extern "C" int kshell_app_ ##name## _main( int c, char *argv[] ); \
-	extern "C" void kshell_app_add_command_ ##name ( void ) { \
-		kshell_add_command( #name, (void *)main_function ); \
-	}
-
 #ifdef __cplusplus
 }
 #endif

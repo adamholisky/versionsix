@@ -1,7 +1,5 @@
 #include <kernel_common.h>
 #include <framebuffer.h>
-#include <gui/gui.h>
-#include <gui/text.h>
 
 extern kinfo kernel_info;
 framebuffer_state fb_state;

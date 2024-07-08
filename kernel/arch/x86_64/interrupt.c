@@ -132,7 +132,7 @@ void interrupt_handler_stage_2( registers **_reg ) {
 
 		debugf_raw( "================================================================================\n" );
 		debugf_raw( "Exception %d: %s \n", reg->interrupt_no, intel_exceptions[reg->interrupt_no] );
-		debugf_raw( "    rip:  0x%016llX (%s)\n", reg->rip, kernel_symbols_get_function_at(reg->rip) );
+		debugf_raw( "    rip:  0x%016llX (%s)\n", reg->rip, kernel_symbols_get_function_name_at(reg->rip) );
 		debugf_raw( "    rax:  0x%016llX  rbx:  0x%016llX  rcx:  0x%016llX\n", reg->rax, reg->rbx, reg->rcx );
 		debugf_raw( "    rdx:  0x%016llX  rsi:  0x%016llX  rdi:  0x%016llX\n", reg->rdx, reg->rsi, reg->rdi );
 		debugf_raw( "    rsp:  0x%016llX  rbp:  0x%016llX  cr0:  0x%016llX \n", reg->rsp, reg->rbp, get_cr0() );

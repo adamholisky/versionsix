@@ -25,6 +25,7 @@ extern "C" {
 #define TASK_TYPE_KERNEL 3
 #define TASK_TYPE_KERNEL_THREAD 4
 
+#define TASK_STATUS_NOT_CREATED 0
 #define TASK_STATUS_READY 1
 #define TASK_STATUS_ACTIVE 2
 #define TASK_STATUS_WAIT 3
@@ -33,35 +34,26 @@ extern "C" {
 
 typedef void (*task_entry_func)( void );
 
-class Task {
-	protected:
-		uint8_t type;
-		task_entry_func entry;
-	public:
-		char display_name[TASKS_NAME_MAX];
-		char file_name[TASKS_NAME_MAX];
-		
-		uint16_t id;
-		uint8_t status;
-		registers task_context;
+typedef struct {
+	uint8_t type;
+	task_entry_func entry;
 
-		Task( uint16_t task_id, uint8_t task_type, char *task_name, uint64_t *task_entry );
+	char display_name[ TASKS_NAME_MAX ];
+	char file_name[ TASKS_NAME_MAX ];
 
-		void read( void );
-		void write( void );
-
-		void start( void );
-		void save_context( registers **_context );
-		registers *get_context( void );
-};
+	uint16_t id;
+	uint8_t status;
+	registers task_context;
+} task;
 
 typedef struct {
-	Task *tasks[ TASKS_MAX ];
+	task tasks[ TASKS_MAX ];
 	uint16_t current_task;
 	registers task_contexts[ TASKS_MAX ]; 
 } kernel_process_data;
 
 void task_initalize( void );
+uint16_t task_create( uint8_t task_type, char *name, uint64_t *entry );
 void task_sched_yield( registers **context );
 void task_test_thread_a( void );
 void task_test_thread_b( void );

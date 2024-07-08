@@ -67,88 +67,105 @@ extern "C" {
 #define ELF32_ST_TYPE(INFO)	((INFO) & 0x0F)
 
 typedef struct {
-  unsigned char	e_ident[EI_NIDENT];
-  Elf64_Half e_type;
-  Elf64_Half e_machine;
-  Elf64_Word e_version;
-  Elf64_Addr e_entry;
-  Elf64_Off e_phoff;
-  Elf64_Off e_shoff;
-  Elf64_Word e_flags;
-  Elf64_Half e_ehsize;
-  Elf64_Half e_phentsize;
-  Elf64_Half e_phnum;
-  Elf64_Half e_shentsize;
-  Elf64_Half e_shnum;
-  Elf64_Half e_shstrndx;
+	unsigned char	e_ident[EI_NIDENT];
+	Elf64_Half e_type;
+	Elf64_Half e_machine;
+	Elf64_Word e_version;
+	Elf64_Addr e_entry;
+	Elf64_Off e_phoff;
+	Elf64_Off e_shoff;
+	Elf64_Word e_flags;
+	Elf64_Half e_ehsize;
+	Elf64_Half e_phentsize;
+	Elf64_Half e_phnum;
+	Elf64_Half e_shentsize;
+	Elf64_Half e_shnum;
+	Elf64_Half e_shstrndx;
 } Elf64_Ehdr;
 
 
 typedef struct {
-  Elf64_Word p_type;
-  Elf64_Word p_flags;
-  Elf64_Off p_offset;	
-  Elf64_Addr p_vaddr;	
-  Elf64_Addr p_paddr;	
-  Elf64_Xword p_filesz;	
-  Elf64_Xword p_memsz;	
-  Elf64_Xword p_align;
+	Elf64_Word p_type;
+	Elf64_Word p_flags;
+	Elf64_Off p_offset;	
+	Elf64_Addr p_vaddr;	
+	Elf64_Addr p_paddr;	
+	Elf64_Xword p_filesz;	
+	Elf64_Xword p_memsz;	
+	Elf64_Xword p_align;
 } Elf64_Phdr;
 
 
 typedef struct {
-  Elf64_Word sh_name;
-  Elf64_Word sh_type;
-  Elf64_Xword sh_flags;	
-  Elf64_Addr sh_addr;	
-  Elf64_Off sh_offset;
-  Elf64_Xword sh_size;	
-  Elf64_Word sh_link;	
-  Elf64_Word sh_info;		
-  Elf64_Xword sh_addralign;	
-  Elf64_Xword sh_entsize;
+	Elf64_Word sh_name;
+	Elf64_Word sh_type;
+	Elf64_Xword sh_flags;	
+	Elf64_Addr sh_addr;	
+	Elf64_Off sh_offset;
+	Elf64_Xword sh_size;	
+	Elf64_Word sh_link;	
+	Elf64_Word sh_info;		
+	Elf64_Xword sh_addralign;	
+	Elf64_Xword sh_entsize;
 } Elf64_Shdr;
 
 typedef struct {
-  Elf64_Word st_name;		
-  unsigned char	st_info;
-  unsigned char	st_other;	
-  Elf64_Half st_shndx;
-  Elf64_Addr st_value;
-  Elf64_Xword st_size;
+	Elf64_Word st_name;		
+	unsigned char	st_info;
+	unsigned char	st_other;	
+	Elf64_Half st_shndx;
+	Elf64_Addr st_value;
+	Elf64_Xword st_size;
 } Elf64_Sym;
 
 typedef struct {
-  Elf64_Addr r_offset;
-  Elf64_Xword r_info;
+	Elf64_Addr r_offset;
+	Elf64_Xword r_info;
 } Elf64_Rel;
 
 typedef struct {
-  Elf64_Addr r_offset;
-  Elf64_Xword r_info;	
-  Elf64_Sxword r_addend;
+	Elf64_Addr r_offset;
+	Elf64_Xword r_info;	
+	Elf64_Sxword r_addend;
 } Elf64_Rela;
 
-class ELF_File {
+typedef struct {
+	uint64_t* file_base;
+		
+	Elf64_Ehdr* elf_header;
+	Elf64_Shdr* section_headers;
+	char* string_table;
+	Elf64_Sym* symbol_table;
+	uint64_t num_symbols;
+} elf_file;
+
+/* class ELF_File {
 	private:
 		uint64_t* file_base;
-    
-    Elf64_Ehdr* elf_header;
-    Elf64_Shdr* section_headers;
-    char* string_table;
-    Elf64_Sym* symbol_table;
-    
-	public:
-    uint64_t num_symbols;
 		
-    ELF_File( uint64_t* file_start );
+		Elf64_Ehdr* elf_header;
+		Elf64_Shdr* section_headers;
+		char* string_table;
+		Elf64_Sym* symbol_table;
+		
+	public:
+		uint64_t num_symbols;
+		
+		ELF_File( uint64_t* file_start );
 
-    Elf64_Shdr* get_section_header( char* name );
-    Elf64_Shdr* get_section_header( int type );
-    Elf64_Sym* get_symtab( void );
-    char* get_strtab( void );
-    char* get_str_at_offset( uint64_t offset );
-};
+		Elf64_Shdr* get_section_header( char* name );
+		Elf64_Shdr* get_section_header( int type );
+		Elf64_Sym* get_symtab( void );
+		char* get_strtab( void );
+		char* get_str_at_offset( uint64_t offset );
+}; */
+
+void elf_file_initalize( elf_file *elf, uint64_t *file_start );
+Elf64_Shdr* elf_get_section_header_by_name( elf_file *elf, char* name );
+Elf64_Shdr* elf_get_section_header( elf_file *elf, int type );
+Elf64_Sym* elf_get_symtab( elf_file *elf );
+char* elf_get_strtab( elf_file *elf );
+char* elf_get_str_at_offset( elf_file *elf, uint64_t offset );
 
 #ifdef __cplusplus
 }

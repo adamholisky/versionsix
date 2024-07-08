@@ -41,26 +41,23 @@ typedef struct {
 	uint8_t options[32];
 } __attribute__((packed)) tcp_header_payload;
 
-class TCP_Connection {
-    public:
-        uint16_t source_port;
-        uint16_t dest_port;
-        uint32_t dest_ip;
-		bool connected;
-	
-        void connect( void );
 
-		//make these private later?
-		uint32_t seq;
-		uint32_t ack;
-		uint8_t connection_state;
-		void send_header_and_options( tcp_header_payload *payload, uint16_t options_size );
-		void send_header( tcp_header *header );
-		void handle_recv( uint8_t *data, uint16_t length );
-		void send_ack( void );
-		void send_data( uint8_t *data, uint16_t length );
-};
+typedef struct {
+	uint16_t source_port;
+	uint16_t dest_port;
+	uint32_t dest_ip;
+	bool connected;	
+	uint32_t seq;
+	uint32_t ack;
+	uint8_t connection_state;
+} tcp_connection;
 
+void tcp_connection_connect( tcp_connection *con );
+void tcp_connection_send_header_and_options( tcp_connection *con, tcp_header_payload *payload, uint16_t options_size );
+void tcp_connection_send_header( tcp_connection *con , tcp_header *header );
+void tcp_connection_handle_recv( tcp_connection *con , uint8_t *data, uint16_t length );
+void tcp_connection_send_ack( tcp_connection *con  );
+void tcp_connection_send_data( tcp_connection *con , uint8_t *data, uint16_t length );
 void tcp_process_packet( uint8_t *data, uint16_t length );
 void tcp_send_header( uint32_t dest, uint16_t dest_port, uint16_t src_port, tcp_header *header );
 void tcp_send_header_and_options( uint32_t dest, uint16_t dest_port, uint16_t src_port, tcp_header_payload *payload, uint16_t options_size );

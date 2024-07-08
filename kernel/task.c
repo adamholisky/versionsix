@@ -28,7 +28,7 @@ uint16_t task_create( uint8_t task_type, char *name, uint64_t *entry ) {
 
 		if( task_id == 0 ) {
 			debugf( "Cannot find free task id.\n" );
-			return NULL;
+			return 0;
 		}
 	}
 

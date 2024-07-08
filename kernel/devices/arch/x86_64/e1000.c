@@ -30,7 +30,7 @@ void e1000_initalize(void) {
 	#endif
 }
 
-void e1000_interrupt_handler( registers *context ) {
+void e1000_interrupt_handler( registers **context ) {
 	//dpf( "In handler\n" );
 
 	uint32_t icr = mmio_read_command( main_e1000->mmio, REG_ICR );

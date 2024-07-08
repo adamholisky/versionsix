@@ -18,7 +18,7 @@ void acpi_initalize( void ) {
 		return;
 	}
 
-	apic_rsdt *rsdt = (apic_rsdt *)system_description_pointer->rsdt_address;
+	apic_rsdt *rsdt = (apic_rsdt *)(uint64_t)system_description_pointer->rsdt_address;
 
 	#ifdef DEBUG_ACPI_INIT
 	debugf( "sdt signature: %c%c%c%c\n", rsdt->header.signature[0], rsdt->header.signature[1], rsdt->header.signature[2], rsdt->header.signature[3] );
@@ -77,7 +77,7 @@ void acpi_initalize( void ) {
 			debugf( "got local apic addr override\n" );
 			debugf( "entry size: %d\n", entry_length );
 			#endif
-			uint64_t *addr_override = (uint64_t *)madt->b[i + 10];
+			uint64_t *addr_override = (uint64_t *)(uint64_t)madt->b[i + 10];
 
 			#ifdef DEBUG_ACPI_INIT
 			debugf( "addr override: %X\n", addr_override );
@@ -94,7 +94,7 @@ apic_sdt_header *acpi_find_sdt_header( apic_rsdt *rsdt, char *header_sig ) {
 
 	for( int i = 0; i < num_entries; i++ ) {
 		uint32_t entry_addr = rsdt->sdt[i];
-		apic_sdt_header *entry = (apic_sdt_header *)entry_addr;
+		apic_sdt_header *entry = (apic_sdt_header *)(uint64_t)entry_addr;
 		
 		// debugf( "sdt signature: %c%c%c%c\n", entry->signature[0], entry->signature[1], entry->signature[2], entry->signature[3] );
 

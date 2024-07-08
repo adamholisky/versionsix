@@ -24,7 +24,7 @@ typedef struct {
 	uint64_t xsdt_address;
 	uint8_t extended_checksum;
 	uint8_t reserved[3];
-} __attribute__ ((packed)) apic_xsdp;
+} apic_xsdp;
 
 typedef struct {
 	char signature[4];
@@ -36,7 +36,7 @@ typedef struct {
 	uint32_t oem_revision;
 	uint32_t creator_id;
 	uint32_t creator_revision;
-} __attribute__ ((packed)) apic_sdt_header;
+} apic_sdt_header;
 
 typedef struct {
     apic_sdt_header header;

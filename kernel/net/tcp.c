@@ -4,6 +4,13 @@
 #include <net/ipv4.h>
 #include <timer.h>
 
+/*
+This is to disable GCC complaining about using packed member variables in typecasts. 
+It's possible this causes a nasty alignment/memory issue on non-x86_64 systems, but 
+this seems to work fine given current considerations. 
+*/
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+
 extern net_info networking_info;
 
 tcp_connection test_connection;

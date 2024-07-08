@@ -108,7 +108,7 @@ typedef struct {
 } e1000_device;
 
 void e1000_initalize( void );
-void e1000_interrupt_handler( registers *context );
+void e1000_interrupt_handler( registers **context );
 void e1000_send( uint8_t *data, size_t length );
 
 bool e1000_detect_eeprom( e1000_device *dev );

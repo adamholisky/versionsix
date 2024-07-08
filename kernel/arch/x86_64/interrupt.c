@@ -1,6 +1,7 @@
-#include "kernel_common.h"
-#include "interrupt.h"
-#include "timer.h"
+#include <kernel_common.h>
+#include <interrupt.h>
+#include <timer.h>
+#include <ksymbols.h>
 
 interrupt_descriptor_table main_idtr;
 interrupt_gate_descriptor IDT[256];

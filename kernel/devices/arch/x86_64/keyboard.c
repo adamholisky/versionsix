@@ -2,7 +2,7 @@
 #include <interrupt.h>
 #include <keyboard.h>
 
-Keyboard *main_keyboard;
+keyboard_config main_keyboard;
 
 unsigned char keyboard_map[128] = {
 	0, 0, '1', '2', '3', '4', '5', '6', '7', '8',	  /* 9 */
@@ -82,26 +82,27 @@ unsigned char keyboard_map_shift[128] = {
 	0, /* All other keys are undefined */
 };
 
+void keyboard_initalize( void ) {
+	main_keyboard.is_waiting = false;
+	main_keyboard.is_shift = false;
+	main_keyboard.in_E0 = false;
+	main_keyboard.current_scancode = 0;
+	main_keyboard.char_ready = false;
 
-Keyboard::Keyboard( void ) {
-    is_waiting = false;
-    is_shift = false;
-	in_E0 = false;
-    current_scancode = 0;
-	char_ready = false;
+	memset( main_keyboard.scancode_queue, 0, 255 );
+	main_keyboard.scancode_queue_head = 0;
+	main_keyboard.scancode_queue_tail = 0;
 
-	memset( scancode_queue, 0, 255 );
-    scancode_queue_head = 0;
-	scancode_queue_tail = 0;
-
-    // Clear the buffer
+	// Clear the buffer
 	while( inportb(0x64) & 1 ) {
 		inportb(0x60);
 	}
+
+	interrupt_add_irq_handler( 1, keyboard_interrupt_handler );
 }
 
-void Keyboard::interrupt_handler( void ) {
-    uint8_t status;
+void keyboard_interrupt_handler( registers **reg ) {
+	uint8_t status;
 	uint8_t scancode;
 
 	#ifdef KDEBUG_KEYBOARD_INTERRUPT_HANDLER
@@ -113,7 +114,7 @@ void Keyboard::interrupt_handler( void ) {
 	if( status & 0x01 ) {
 		scancode = inportb(0x60);
 
-		add_scancode_to_queue( scancode );
+		keyboard_add_scancode_to_queue( scancode );
 	}
 
 	#ifdef KDEBUG_KEYBOARD_INTERRUPT_HANDLER
@@ -121,84 +122,84 @@ void Keyboard::interrupt_handler( void ) {
 	#endif
 }
 
-void Keyboard::add_scancode_to_queue( uint8_t code ) {
+void keyboard_add_scancode_to_queue( uint8_t code ) {
 	if( code == 0 ) {
 		return;
 	}
-    
-	scancode_queue[scancode_queue_tail] = code;
+	
+	main_keyboard.scancode_queue[main_keyboard.scancode_queue_tail] = code;
 
-	scancode_queue_tail++;
+	main_keyboard.scancode_queue_tail++;
 
-	if( scancode_queue_tail > 254 ) {
-		scancode_queue_tail = 0;
+	if( main_keyboard.scancode_queue_tail > 254 ) {
+		main_keyboard.scancode_queue_tail = 0;
 	}
 
 	//debugf( "added 0x%X\n", code );
 }
 
-uint8_t Keyboard::get_next_scancode( void ) {
+uint8_t keyboard_get_next_scancode( void ) {
 	uint8_t scancode = 0;
 
-	if( scancode_queue_head == scancode_queue_tail ) {
+	if( main_keyboard.scancode_queue_head == main_keyboard.scancode_queue_tail ) {
 		return 0;
 	}
 
-	scancode = scancode_queue[ scancode_queue_head ];
+	scancode = main_keyboard.scancode_queue[ main_keyboard.scancode_queue_head ];
 
-	scancode_queue_head++;
+	main_keyboard.scancode_queue_head++;
 
-	if( scancode_queue_head > 254 ) {
-		scancode_queue_head = 0;
+	if( main_keyboard.scancode_queue_head > 254 ) {
+		main_keyboard.scancode_queue_head = 0;
 	}
 
-    return scancode;
+	return scancode;
 }
 
-char Keyboard::get_next_char( bool return_special ) {
+char keyboard_get_next_char( bool return_special ) {
 	uint8_t scancode = 0;
 	char ret_val = 0;
 
-	if( scancode_queue_head == scancode_queue_tail ) {
+	if( main_keyboard.scancode_queue_head == main_keyboard.scancode_queue_tail ) {
 		return 0;
 	}
 
-	scancode = scancode_queue[ scancode_queue_head ];
+	scancode = main_keyboard.scancode_queue[ main_keyboard.scancode_queue_head ];
 	
 	bool continue_in_queue;
 
 	// Loop until we find a valid character
 	do {
 		if( scancode == 0xE0 ) {
-			in_E0 = true;
+			main_keyboard.in_E0 = true;
 			
-			scancode_queue[scancode_queue_head] = 0;
-			scancode_queue_head++;
+			main_keyboard.scancode_queue[main_keyboard.scancode_queue_head] = 0;
+			main_keyboard.scancode_queue_head++;
 
-			if( scancode_queue_head > 254 ) {
-				scancode_queue_head = 0;
+			if( main_keyboard.scancode_queue_head > 254 ) {
+				main_keyboard.scancode_queue_head = 0;
 			}
 
-			ret_val = get_next_char( return_special );
+			ret_val = keyboard_get_next_char( return_special );
 		} else {
-			if( in_E0 ) {
+			if( main_keyboard.in_E0 ) {
 				switch( scancode ) {
 					case 0x35:
 						ret_val = '/';
 						break;
 				}
 
-				in_E0 = false;
+				main_keyboard.in_E0 = false;
 			} else {
 				// 0x2A Left Sh, 0x36 Right Sh Press
 				// 0xAA Left Sh, 0xB6 Right Sh Release
 				if( scancode == 0x2A || scancode == 0x36 ) {
-					is_shift = true;
+					main_keyboard.is_shift = true;
 				} else if( scancode == 0xAA || scancode == 0xB6 ) {
-					is_shift = false;
+					main_keyboard.is_shift = false;
 				} else {
 					if( scancode < 0x81 ) {
-						if( is_shift ) {
+						if( main_keyboard.is_shift ) {
 							ret_val = keyboard_map_shift[scancode];
 						} else {
 							ret_val = keyboard_map[scancode];
@@ -224,40 +225,31 @@ char Keyboard::get_next_char( bool return_special ) {
 		if( ret_val != 0 ) {
 			continue_in_queue = false;
 
-			scancode_queue[scancode_queue_head] = 0;
+			main_keyboard.scancode_queue[main_keyboard.scancode_queue_head] = 0;
 
-			scancode_queue_head++;
+			main_keyboard.scancode_queue_head++;
 
-			if( scancode_queue_head > 254 ) {
-				scancode_queue_head = 0;
+			if( main_keyboard.scancode_queue_head > 254 ) {
+				main_keyboard.scancode_queue_head = 0;
 			}
 		} else {
 			// otherwise increrase queue and continue
-			scancode_queue_head++;
+			main_keyboard.scancode_queue_head++;
 
 			// fail if we've reached the end
 			// otherwise process the next scancode
-			if( scancode_queue_head == scancode_queue_tail ) {
+			if( main_keyboard.scancode_queue_head == main_keyboard.scancode_queue_tail ) {
 				continue_in_queue = false;
 			} else {
-				scancode = scancode_queue[scancode_queue_head];
+				scancode = main_keyboard.scancode_queue[main_keyboard.scancode_queue_head];
 			}
 		}
 	} while( continue_in_queue );
 
 
-    return ret_val;
+	return ret_val;
 }
 
-void keyboard_initalize( void ) {
-    main_keyboard = new Keyboard();
-
-	interrupt_add_irq_handler( 1, keyboard_interrupt_handler );
-}
-
-void keyboard_interrupt_handler( registers **reg ) {
-    main_keyboard->interrupt_handler();
-}
 
 char keyboard_get_char( void ) {
 	return keyboard_get_char_stage_2( false );
@@ -271,7 +263,7 @@ char keyboard_get_char_stage_2( bool return_special ) {
 	char c = 0;
 
 	do {
-		c = main_keyboard->get_next_char( return_special );
+		c = keyboard_get_next_char( return_special );
 	} while( c == 0 );
 
 	return c;
@@ -281,7 +273,7 @@ uint8_t keyboard_get_scancode( void ) {
 	uint8_t ret_value = 0;
 
 	do {
-		ret_value = main_keyboard->get_next_scancode();
+		ret_value = keyboard_get_next_scancode();
 	} while( ret_value == 0 );
 
 	return ret_value;

@@ -17,25 +17,16 @@ extern "C" {
 #define SCANCODE_PAGE_UP 0x49
 #define SCANCODE_PAGE_DOWN 0x51
 
-class Keyboard {
-	private:
-		bool is_waiting;
-		bool is_shift;
-		bool in_E0;
-		uint8_t current_scancode;
-		uint8_t scancode_queue[255];
-		uint8_t scancode_queue_head;
-		uint8_t scancode_queue_tail;
-	public:
-		bool char_ready;
-
-		Keyboard( void );
-		void interrupt_handler( void );
-		
-		void add_scancode_to_queue( uint8_t code );
-		uint8_t get_next_scancode( void );
-		char get_next_char( bool return_special = false );
-};
+typedef struct {
+	bool is_waiting;
+	bool is_shift;
+	bool in_E0;
+	uint8_t current_scancode;
+	uint8_t scancode_queue[255];
+	uint8_t scancode_queue_head;
+	uint8_t scancode_queue_tail;
+	bool char_ready;
+} keyboard_config;
 
 void keyboard_initalize( void );
 void keyboard_interrupt_handler( registers **reg );
@@ -44,6 +35,8 @@ char keyboard_get_char_or_special( void );
 char keyboard_get_char_stage_2( bool return_special );
 uint8_t keyboard_get_scancode( void );
 char keyboard_scancode_to_char( uint8_t scancode );
+void keyboard_add_scancode_to_queue( uint8_t code );
+char keyboard_get_next_char( bool return_special );
 
 #ifdef __cplusplus
 }

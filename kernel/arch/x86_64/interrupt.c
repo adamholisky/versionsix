@@ -140,10 +140,13 @@ void interrupt_handler_stage_2( registers **_reg ) {
 		debugf_raw( "    cr2:  0x%016llX  cr3:  0x%016llX  cr4:  0x%016llX\n", get_cr2(), get_cr3(), get_cr4() );
 		debugf_raw( "    cs:   0x%04X  num:  0x%08X  err:  0x%08X  flag: 0x%08X\n", reg->cs, reg->interrupt_no, reg->error_no, reg->rflags);
 		debugf_raw( "\n" );
-		debugf_raw( "    Stack Dump:\n" );
-
+		debugf_raw( "    Stack Trace:\n" );
+		
+		struct stackframe *sf = reg->rbp;
+		
 		for( int i = 0; i < 10; i++ ) {
-			debugf_raw( "    [%d] 0x%016llX\n", i, *(stack - i) );
+			debugf_raw( "    [%d] 0x%016llX %s\n", i, sf->rip, kernel_symbols_get_function_name_at(sf->rip) );
+			sf = sf->rbx;
 		}
 
 		debugf_raw( "================================================================================\n" );

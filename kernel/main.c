@@ -62,8 +62,8 @@ void kernel_main( void ) {
 	dhcp_start();
 	#endif
 
-	/* task_create( TASK_TYPE_KERNEL_THREAD, "KShell", (uint64_t *)kshell_initalize );
-	syscall( SYSCALL_SCHED_YIELD, 0, NULL ); */
+	task_create( TASK_TYPE_KERNEL_THREAD, "KShell", (uint64_t *)kshell_initalize );
+	syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 
 	/* int i = 0;
 	do {
@@ -72,7 +72,7 @@ void kernel_main( void ) {
 	} while( 1 );
 	*/
 
-	kshell_initalize();
+	//kshell_initalize();
 
 	debugf( "Ending happy.\n" );
 	printf( "Ending happy.\n" );

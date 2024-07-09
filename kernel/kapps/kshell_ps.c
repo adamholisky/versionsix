@@ -11,16 +11,15 @@ char *status_to_string( int status );
 
 int kshell_app_ps_main( int argc, char *argv[] ) {
 	kernel_process_data *process_data = task_get_kernel_process_data();
+	task *task_next = process_data->tasks;
 
 	printf( "    ID Name         Status       RIP\n" );
 
-	for( int i = 0; i < TASKS_MAX; i++ ) {
-		if( process_data->tasks[i].status == TASK_STATUS_NOT_CREATED ) {
-			continue;
-		}
-		
-		printf( "%6d %-12s %-12s 0x%016llx\n", i, process_data->tasks[i].display_name, status_to_string( process_data->tasks[i].status), process_data->task_contexts[i].rip );
-	}
+	do {	
+		printf( "%6d %-12s %-12s 0x%016llx\n", task_next->id, task_next->display_name, status_to_string( task_next->status), task_next->task_context.rip );
+
+		task_next = task_next->next;
+	} while( task_next != NULL );
 
 	return 0;
 }

@@ -4,54 +4,66 @@
 #include <timer.h>
 
 kernel_process_data process_data;
+uint16_t task_id_top;
 
 void task_initalize( void ) {
-	memset( &process_data.tasks, 0, sizeof( task ) * TASKS_MAX );
+	task_id_top = 1000;
 
-	task_create( TASK_TYPE_KERNEL, "Kernel", NULL );
-	/* Task *kernel_thread_a = task_create( TASK_TYPE_KERNEL_THREAD, "Thread A", (uint64_t *)task_test_thread_a );
-	Task *kernel_thread_b = task_create( TASK_TYPE_KERNEL_THREAD, "Thread B", (uint64_t *)task_test_thread_b ); */
+	// Setup the kernel task
+	process_data.tasks = kmalloc( sizeof(task) );
+	process_data.tasks->id = 0;
+	strcpy( process_data.tasks->display_name, "Kernel" );
+	strcpy( process_data.tasks->file_name, "kernel.bin" );
+	process_data.tasks->status = TASK_STATUS_ACTIVE;
+	memset( &process_data.tasks->task_context, 0, sizeof(registers) );
+	process_data.tasks->next = NULL;
+	process_data.tasks->type = TASK_TYPE_KERNEL;
 
-	process_data.current_task = 0;
+	process_data.current_task_id = 0;
 }
 
+/**
+ * @brief Creates a task, sets status to READY
+ * 
+ * @param task_type Type of task
+ * @param name Dispaly name of task
+ * @param entry Entry point
+ * @return uint16_t task id
+ */
 uint16_t task_create( uint8_t task_type, char *name, uint64_t *entry ) {
 	uint16_t task_id = 0;
 
-	if( task_type != TASK_TYPE_KERNEL ) {
-		for( int i = 0; i < TASKS_MAX; i++ ) {
-			if( process_data.tasks[i].status == TASK_STATUS_NOT_CREATED ) {
-				task_id = i;
-				i = TASKS_MAX;
-			}
-		}
-
-		if( task_id == 0 ) {
-			debugf( "Cannot find free task id.\n" );
-			return 0;
-		}
-	}
-
-	process_data.tasks[task_id].id = task_id;
-	process_data.tasks[task_id].type = task_type;
-	memset( process_data.tasks[task_id].display_name, 0, TASKS_NAME_MAX );
-	strcpy( process_data.tasks[task_id].display_name, name );
-
-	debugf( "\"%s\"", process_data.tasks[task_id].display_name );
-	process_data.tasks[task_id].entry = (task_entry_func)entry;
-	process_data.tasks[task_id].status = TASK_STATUS_READY;
-
-	memset( &process_data.task_contexts[task_id], 0, sizeof( registers ) );
-
-	process_data.task_contexts[task_id].rip = (uint64_t)entry;
-	process_data.task_contexts[task_id].cs = 0x28;
-	process_data.task_contexts[task_id].rflags = 0x200;
-	process_data.task_contexts[task_id].rsp = (uint64_t)kmalloc( 4 * 1024 ) + 4*1024;
-	//process_data.task_contexts[task_id].rax = 0xAAAAAAAAAAAAAAAA;
-
 	if( task_type == TASK_TYPE_KERNEL ) {
-		process_data.tasks[task_id].status = TASK_STATUS_ACTIVE;
+		return 0;
 	}
+
+	task_id = task_id_top++;
+	
+	task *new_task = process_data.tasks;
+	task *old_last_task = NULL;
+	do {
+		old_last_task = new_task;
+		new_task = new_task->next;
+	} while( new_task != NULL );
+
+	new_task = kmalloc( sizeof(task) );
+	old_last_task->next = new_task;
+
+	new_task->id = task_id;
+	new_task->status = TASK_STATUS_READY;
+	new_task->type = task_type;
+	new_task->next = NULL;
+	new_task->entry = (task_entry_func)entry;
+	strcpy( new_task->display_name, name );
+	strcpy( new_task->file_name, "something.bin" );
+
+	memset( &new_task->task_context, 0, sizeof(registers) );
+	new_task->task_context.rip = (uint64_t)entry;
+	new_task->task_context.cs = 0x28;
+	new_task->task_context.rflags = 0x200;
+	new_task->task_context.rsp = (uint64_t)kmalloc( 4 * 1024 ) + 4*1024;
+
+	debugf( "Task created: \"%s\"\n", new_task->display_name );
 
 	return task_id;
 }
@@ -62,42 +74,32 @@ void task_sched_yield( registers **context ) {
 	log_entry_enter();
 	#endif
 
-	uint32_t old_task_number = process_data.current_task;
-	uint32_t new_task_number = process_data.current_task + 1;
+	task *old_task = get_task_data( process_data.current_task_id );
+	task *new_task = NULL;
 
-	if( new_task_number == 3 ) {
-		new_task_number = 0;
+	dfv( old_task->id );
+
+	if( old_task->next == NULL ) {
+		new_task = process_data.tasks;
+	} else {
+		new_task = old_task->next;
 	}
-	
-	#ifdef DEBUG_TASK_SCHED_YIELD
-	debugf( "Old task number: \t\t%d\n", old_task_number );
-	debugf( "New task number: \t\t%d\n", new_task_number );
 
+	memcpy( &old_task->task_context, &(**context), sizeof(registers) );
+	#ifdef DEBUG_TASK_SCHED_YIELD
+	debugf( "Old task id: %d\n", old_task->id );
 	debugf( "Old task saved context:\n" );
-	registers *old_task_context = &task_contexts[old_task_number];
-	task_dump_context( old_task_context );
+	task_dump_context( &old_task->task_context );
 	#endif
 
-	memcpy( &process_data.task_contexts[old_task_number], &(**context), sizeof(registers) );
-	//process_data.task_contexts[old_task_number].rax = 0xBBBBBBBBBBBBBBBB;
-	//process_data.task_contexts[old_task_number].rbp = (**context).rbp;
-
+	memcpy( &(**context), &new_task->task_context, sizeof(registers) );
 	#ifdef DEBUG_TASK_SCHED_YIELD
-	debugf( "Old task saved :\n" );
-	task_dump_context( old_task_context );
-
-	debugf( "saved context for task %d:\n", new_task_number );
-	task_dump_context( &task_contexts[new_task_number] );
-	#endif
-
-	memcpy( &(**context), &process_data.task_contexts[new_task_number], sizeof(registers) );
-
-	#ifdef DEBUG_TASK_SCHED_YIELD
+	debugf( "New task id: %d\n", new_task->id );
 	debugf( "New context to use:\n" );
 	task_dump_context( *context );
 	#endif
 
-	process_data.current_task = new_task_number;
+	process_data.current_task_id = new_task->id;
 
 	#ifdef DEBUG_TASK_SCHED_YIELD
 	log_entry_exit();
@@ -140,4 +142,29 @@ void task_test_thread_b( void ) {
 		timer_wait(1);
 		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 	}
+}
+
+task *get_task_data( uint16_t task_id ) {
+	task *head = process_data.tasks;
+	task *ret_val = NULL;
+
+	do {
+		dfv( head->id );
+		if( head->id == task_id ) {
+			ret_val = head;
+			head = NULL;
+		} else {
+			head = head->next;
+		}
+	} while( head != NULL );
+
+	return ret_val;
+}
+
+void task_set_task_status( uint16_t task_id, uint8_t status ) {
+
+}
+
+void task_launch_kernel_thread( uint64_t *entry, char *name, int argc, char *argv[] ) {
+
 }

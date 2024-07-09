@@ -93,7 +93,6 @@ void e1000_interrupt_handler( registers **context ) {
 
 void e1000_send( uint8_t *data, size_t length ) {
 	interrupts_disable();
-	debugf( "main_e1000: %016llx\n", main_e1000 );
 	e1000_send_phase2( main_e1000, data, length );
 	interrupts_enable();
 }
@@ -278,11 +277,9 @@ void e1000_tx_init( e1000_device *dev ) {
 }
 
 void e1000_send_phase2( e1000_device *dev, uint8_t *data, size_t length) {
-	db1();
 	uint16_t tail = mmio_read_command( &dev->mmio, REG_TXDESCTAIL );
 	uint16_t head = mmio_read_command( &dev->mmio, REG_TXDESCHEAD );
 
-	db2();
 	memcpy( dev->tx_data[dev->tx_index], data, length );
 	dev->tx_desc_queue[dev->tx_index].length = length;
 	dev->tx_desc_queue[dev->tx_index].cmd = CMD_EOP | CMD_IFCS | CMD_RS;
@@ -290,10 +287,6 @@ void e1000_send_phase2( e1000_device *dev, uint8_t *data, size_t length) {
 
 	dev->tx_index++;
 
-
-	db3();
 	mmio_write_command( &dev->mmio, REG_TXDESCTAIL, dev->tx_index );
-	db4();
 	uint32_t status = mmio_read_command( &dev->mmio, REG_STATUS );
-	db5();
 }

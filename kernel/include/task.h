@@ -25,6 +25,27 @@ extern "C" {
 #define TASK_TYPE_KERNEL 3
 #define TASK_TYPE_KERNEL_THREAD 4
 
+/*
+
+Task lifetime:
+
+1. Kernel: Created task
+    1a. Sets task status to READY
+2. Kernel: activates task
+	2a. Sets task status to ACTIVE
+3. Task: Does stuff
+4. Task: Takes a break with:
+	4a. Yield -- sets status to INACTIVE
+	4b. Wait -- sets status to WAIT
+5. Kernel: sets other tasks active
+6. Kernel: gets something that should wake up task
+    6a. Sets task status to READY
+7. Kernel: actives task
+    7a. Sets task status to ACTIVE
+8. Task: Does stuff (go to step 3)
+
+*/
+
 #define TASK_STATUS_NOT_CREATED 0
 #define TASK_STATUS_READY 1
 #define TASK_STATUS_ACTIVE 2
@@ -34,7 +55,9 @@ extern "C" {
 
 typedef void (*task_entry_func)( void );
 
-typedef struct {
+typedef struct _task task;
+
+struct _task {
 	uint8_t type;
 	task_entry_func entry;
 
@@ -44,12 +67,14 @@ typedef struct {
 	uint16_t id;
 	uint8_t status;
 	registers task_context;
-} task;
+
+	task *next;
+};
 
 typedef struct {
-	task tasks[ TASKS_MAX ];
-	uint16_t current_task;
-	registers task_contexts[ TASKS_MAX ]; 
+	task *tasks;
+	uint16_t current_task_id;
+	registers *task_contexts; 
 } kernel_process_data;
 
 void task_initalize( void );
@@ -59,6 +84,9 @@ void task_test_thread_a( void );
 void task_test_thread_b( void );
 void task_dump_context( registers *context );
 kernel_process_data *task_get_kernel_process_data( void );
+task *get_task_data( uint16_t task_id );
+
+void task_launch_kernel_thread( uint64_t *entry, char *name, int argc, char *argv[] );
 
 #ifdef __cplusplus
 }

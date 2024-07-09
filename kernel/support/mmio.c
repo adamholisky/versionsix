@@ -7,7 +7,6 @@ void mmio_write32( mmio_config *config, uint64_t *address, uint32_t value ) {
 }
 
 uint32_t mmio_read32( mmio_config *config, uint64_t *address ) {
-	debugf( "Addr: %016llX\n", address );
 	return *((volatile uint32_t *)address);
 }
 
@@ -16,7 +15,6 @@ void mmio_write_command( mmio_config *config, uint32_t reg, uint32_t value ) {
 }
 
 uint32_t mmio_read_command( mmio_config *config, uint32_t reg ) {
-	debugf( "mmio_config: %016llx\n", config );
 	return mmio_read32( config, (uint64_t *)((uint64_t)config->addr + reg) );
 }
 

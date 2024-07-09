@@ -142,7 +142,7 @@ void interrupt_handler_stage_2( registers **_reg ) {
 		debugf_raw( "\n" );
 		debugf_raw( "    Stack Trace:\n" );
 		
-		struct stackframe *sf = reg->rbp;
+		struct stackframe *sf = (struct stackframe *)reg->rbp;
 		
 		for( int i = 0; i < 10; i++ ) {
 			debugf_raw( "    [%d] 0x%016llX %s\n", i, sf->rip, kernel_symbols_get_function_name_at(sf->rip) );

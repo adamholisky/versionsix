@@ -26,11 +26,11 @@ static const char * bit_array[16] = {
 #define dbC() debugf( "C" )
 #define dbD() debugf( "D" )
 #define dbE() debugf( "E" )
-#define db1() debugf( "1" )
-#define db2() debugf( "2" )
-#define db3() debugf( "3" )
-#define db4() debugf( "4" )
-#define db5() debugf( "5" )
+#define db1() debugf( "1\n" )
+#define db2() debugf( "2\n" )
+#define db3() debugf( "3\n" )
+#define db4() debugf( "4\n" )
+#define db5() debugf( "5\n" )
 
 #define debugf_bit_array( x ) debugf_raw( "flags: %s %s %s %s %s %s %s %s -- 0x%08X\n", \
         bit_array[ 0xF & (x >> 28) ], \

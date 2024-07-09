@@ -4,21 +4,22 @@ LD = /usr/local/osdev/bin/x86_64-elf-ld
 OBJDUMP = /usr/local/osdev/bin/x86_64-elf-objdump
 
 #CFLAGS = $(DEFINES) -Wno-write-strings -fcompare-debug-second -ffreestanding -fno-omit-frame-pointer -O0 -g -I$(ROOT_DIR)/kernel/include -I$(ROOT_DIR)/../libcvv/libc/include
+
+
 CFLAGS = $(DEFINES) -Wno-write-strings \
 	-ffreestanding \
 	-fno-omit-frame-pointer \
+	-fno-lto             \
+	-fno-stack-protector \
+    -fno-stack-check     \
+	-mno-red-zone        \
 	-O0 \
 	-g \
 	-I$(ROOT_DIR)/kernel/include \
 	-I$(ROOT_DIR)/../libcvv/libc/include \
-    -ffreestanding       \
-    -fno-stack-protector \
-    -fno-stack-check     \
-    -fno-lto             \
     -m64                 \
     -march=x86-64        \
     -mabi=sysv           \
-    -mno-red-zone        \
 	-mno-sse \
     -mcmodel=kernel      
 CFLAGS_END = -nostdlib -lgcc

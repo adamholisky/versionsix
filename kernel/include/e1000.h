@@ -103,7 +103,7 @@ typedef struct {
 
 	uint8_t mac_address[8];
 
-	mmio_config *mmio;
+	mmio_config mmio;
 	bool has_eeprom;
 } e1000_device;
 

@@ -94,7 +94,7 @@ typedef struct {
 } __attribute__ ((packed)) registers;
 
 struct stackframe {
-	struct stackframe *rbx;
+	struct stackframe *rbp;
 	uint64_t rip;
 };
 

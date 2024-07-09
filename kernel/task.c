@@ -46,8 +46,8 @@ uint16_t task_create( uint8_t task_type, char *name, uint64_t *entry ) {
 	process_data.task_contexts[task_id].rip = (uint64_t)entry;
 	process_data.task_contexts[task_id].cs = 0x28;
 	process_data.task_contexts[task_id].rflags = 0x200;
-	process_data.task_contexts[task_id].rsp = (uint64_t)kmalloc( 4 * 1024 );
-	process_data.task_contexts[task_id].rax = 0xAAAAAAAAAAAAAAAA;
+	process_data.task_contexts[task_id].rsp = (uint64_t)kmalloc( 4 * 1024 ) + 4*1024;
+	//process_data.task_contexts[task_id].rax = 0xAAAAAAAAAAAAAAAA;
 
 	if( task_type == TASK_TYPE_KERNEL ) {
 		process_data.tasks[task_id].status = TASK_STATUS_ACTIVE;
@@ -80,7 +80,7 @@ void task_sched_yield( registers **context ) {
 
 	memcpy( &process_data.task_contexts[old_task_number], &(**context), sizeof(registers) );
 	//process_data.task_contexts[old_task_number].rax = 0xBBBBBBBBBBBBBBBB;
-	process_data.task_contexts[old_task_number].rbp = (**context).rbp;
+	//process_data.task_contexts[old_task_number].rbp = (**context).rbp;
 
 	#ifdef DEBUG_TASK_SCHED_YIELD
 	debugf( "Old task saved :\n" );
@@ -90,7 +90,7 @@ void task_sched_yield( registers **context ) {
 	task_dump_context( &task_contexts[new_task_number] );
 	#endif
 
-	memcpy( *context, &process_data.task_contexts[new_task_number], sizeof(registers) );
+	memcpy( &(**context), &process_data.task_contexts[new_task_number], sizeof(registers) );
 
 	#ifdef DEBUG_TASK_SCHED_YIELD
 	debugf( "New context to use:\n" );

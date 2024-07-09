@@ -144,9 +144,12 @@ void interrupt_handler_stage_2( registers **_reg ) {
 		
 		struct stackframe *sf = (struct stackframe *)reg->rbp;
 		
-		for( int i = 0; i < 10; i++ ) {
+		for( int i = 0; i < 15; i++ ) {
 			debugf_raw( "    [%d] 0x%016llX %s\n", i, sf->rip, kernel_symbols_get_function_name_at(sf->rip) );
-			sf = sf->rbx;
+			if( sf->rbp == 0 ) {
+				i = 15;
+			}
+			sf = sf->rbp;
 		}
 
 		debugf_raw( "================================================================================\n" );

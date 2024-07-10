@@ -79,6 +79,9 @@ void syscall_handler( registers **_context ) {
         case SYSCALL_SCHED_YIELD:
             task_sched_yield( _context );
             break;
+		case SYSCALL_EXEC:
+			task_exec( (uint64_t *)context->rax, context->rdi, (uint64_t *)context->rsi );
+			break;
         default:
             debugf( "Unhandled syscall number: %d\n", context->rax );
     }

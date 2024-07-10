@@ -93,11 +93,6 @@ typedef struct {
 	uint64_t    ss;
 } __attribute__ ((packed)) registers;
 
-struct stackframe {
-	struct stackframe *rbp;
-	uint64_t rip;
-};
-
 typedef void (*irq_handler_func)( registers **_context );
 
 typedef struct {

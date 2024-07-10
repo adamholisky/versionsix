@@ -2,6 +2,7 @@
 #include <kmemory.h>
 #include <task.h>
 #include <timer.h>
+#include <kshell.h>
 
 kernel_process_data process_data;
 uint16_t task_id_top;
@@ -12,14 +13,16 @@ void task_initalize( void ) {
 	// Setup the kernel task
 	process_data.tasks = kmalloc( sizeof(task) );
 	process_data.tasks->id = 0;
-	strcpy( process_data.tasks->display_name, "Kernel" );
-	strcpy( process_data.tasks->file_name, "kernel.bin" );
 	process_data.tasks->status = TASK_STATUS_ACTIVE;
-	memset( &process_data.tasks->task_context, 0, sizeof(registers) );
 	process_data.tasks->next = NULL;
 	process_data.tasks->type = TASK_TYPE_KERNEL;
+	process_data.tasks->has_data_ready = false;
+	strcpy( process_data.tasks->display_name, "Kernel" );
+	strcpy( process_data.tasks->file_name, "kernel.bin" );
+	memset( &process_data.tasks->task_context, 0, sizeof(registers) );
 
 	process_data.current_task_id = 0;
+	process_data.yield_to_next = 0;
 }
 
 /**
@@ -54,6 +57,7 @@ uint16_t task_create( uint8_t task_type, char *name, uint64_t *entry ) {
 	new_task->type = task_type;
 	new_task->next = NULL;
 	new_task->entry = (task_entry_func)entry;
+	new_task->has_data_ready = false;
 	strcpy( new_task->display_name, name );
 	strcpy( new_task->file_name, "something.bin" );
 
@@ -63,7 +67,7 @@ uint16_t task_create( uint8_t task_type, char *name, uint64_t *entry ) {
 	new_task->task_context.rflags = 0x200;
 	new_task->task_context.rsp = (uint64_t)kmalloc( 4 * 1024 ) + 4*1024;
 
-	debugf( "Task created: \"%s\"\n", new_task->display_name );
+	debugf( "Task created: ID: %d, Name: \"%s\"\n", new_task->id, new_task->display_name );
 
 	return task_id;
 }
@@ -77,19 +81,22 @@ void task_sched_yield( registers **context ) {
 	task *old_task = get_task_data( process_data.current_task_id );
 	task *new_task = NULL;
 
-	dfv( old_task->id );
-
-	if( old_task->next == NULL ) {
-		new_task = process_data.tasks;
+	if( process_data.yield_to_next == 0 ) {
+		if( old_task->next == NULL ) {
+			new_task = process_data.tasks;
+		} else {
+			new_task = old_task->next;
+		}
 	} else {
-		new_task = old_task->next;
+		new_task = get_task_data( process_data.yield_to_next );
+		process_data.yield_to_next = 0;
 	}
 
 	memcpy( &old_task->task_context, &(**context), sizeof(registers) );
 	#ifdef DEBUG_TASK_SCHED_YIELD
 	debugf( "Old task id: %d\n", old_task->id );
 	debugf( "Old task saved context:\n" );
-	task_dump_context( &old_task->task_context );
+	//task_dump_context( &old_task->task_context );
 	#endif
 
 	memcpy( &(**context), &new_task->task_context, sizeof(registers) );
@@ -100,6 +107,9 @@ void task_sched_yield( registers **context ) {
 	#endif
 
 	process_data.current_task_id = new_task->id;
+	old_task->status = TASK_STATUS_INACTIVE;
+	new_task->status = TASK_STATUS_ACTIVE;
+	
 
 	#ifdef DEBUG_TASK_SCHED_YIELD
 	log_entry_exit();
@@ -149,7 +159,6 @@ task *get_task_data( uint16_t task_id ) {
 	task *ret_val = NULL;
 
 	do {
-		dfv( head->id );
 		if( head->id == task_id ) {
 			ret_val = head;
 			head = NULL;
@@ -161,10 +170,47 @@ task *get_task_data( uint16_t task_id ) {
 	return ret_val;
 }
 
-void task_set_task_status( uint16_t task_id, uint8_t status ) {
+void task_set_has_data_ready( uint16_t task_id, bool ready ) {
+	task *t = get_task_data( task_id );
 
+	if( t == NULL ) {
+		debugf( "Setting task ready for non-existant task: %d\n", task_id );
+		return;
+	}
+
+	t->has_data_ready = ready;
+}
+
+uint16_t task_get_current_task_id( void ) {
+	return process_data.current_task_id;
+}
+
+void task_set_task_status( uint16_t task_id, uint8_t status ) {
+	task *t = get_task_data( task_id );
+
+	if( t == NULL ) {
+		debugf( "Setting task status for non-existant task: %d\n", task_id );
+		return;
+	}
+
+	t->status = status;
+}
+
+/**
+ * @brief On next yield, the given task id will be switched to
+ * 
+ * @param task_id ID of task to run next
+ */
+void task_set_yield_to_next( uint16_t task_id ) {
+	process_data.yield_to_next = task_id;
 }
 
 void task_launch_kernel_thread( uint64_t *entry, char *name, int argc, char *argv[] ) {
 
+}
+
+void task_exec( uint64_t *entry, int argc, char *argv[] ) {
+	kshell_main_func_to_call main_func = (kshell_main_func_to_call)entry;
+
+	main_func( argc, argv );
 }

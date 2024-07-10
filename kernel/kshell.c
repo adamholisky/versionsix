@@ -5,6 +5,7 @@
 #include <net/arp.h>
 #include <kmemory.h>
 #include <ksymbols.h>
+#include <task.h>
 
 kshell_config main_shell;
 kshell_command_list kshell_commands;
@@ -115,10 +116,10 @@ void kshell_main_loop( void ) {
 			char_to_process++;
 		} while( keep_processing_line );
 
-		debugf( "num_args = %d\n", num_args );
+		//debugf( "num_args = %d\n", num_args );
 	
 		for( int z = 0; z < num_args; z++ ) {
-			debugf( "args[%d] = \"%s\"\n", z, args[z] );
+			//debugf( "args[%d] = \"%s\"\n", z, args[z] );
 
 			argv_builder[z] = args[z];
 		} 
@@ -187,7 +188,11 @@ kshell_command *kshell_command_create( char *command_name, void *main_function )
 int kshell_command_run( kshell_command *cmd, int argc, char *argv[] ) {
 	kshell_main_func_to_call func = (kshell_main_func_to_call)cmd->entry;
 
-	return func( argc, argv );
+	uint16_t cmd_task_id = task_create( TASK_TYPE_KERNEL_THREAD, cmd->name, cmd->entry );
+	task_set_yield_to_next( cmd_task_id );
+	uint64_t ret_val = syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+
+	return ret_val;
 }
 
 int kshell_command_hello_world( int argc, char *argv[] ) {

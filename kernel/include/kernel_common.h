@@ -47,6 +47,12 @@ typedef struct {
 #define ntohl(l)  htonl((l))
 #define ntohs(s)  htons((s))
 
+uint64_t get_i( void );
+void kernel_idle_loop( void );
+void task_chain_a( void );
+void task_chain_b( void );
+void task_chain_c( void );
+void task_chain_d( void );
 
 #ifdef __cplusplus
 }

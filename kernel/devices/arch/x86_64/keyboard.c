@@ -1,6 +1,7 @@
 #include <kernel_common.h>
 #include <interrupt.h>
 #include <keyboard.h>
+#include <task.h>
 
 keyboard_config main_keyboard;
 
@@ -133,6 +134,10 @@ void keyboard_add_scancode_to_queue( uint8_t code ) {
 
 	if( main_keyboard.scancode_queue_tail > 254 ) {
 		main_keyboard.scancode_queue_tail = 0;
+	}
+
+	if( main_keyboard.is_waiting == true ) {
+		task_set_has_data_ready( main_keyboard.waiting_task_id, true );
 	}
 
 	//debugf( "added 0x%X\n", code );
@@ -272,9 +277,22 @@ char keyboard_get_char_stage_2( bool return_special ) {
 uint8_t keyboard_get_scancode( void ) {
 	uint8_t ret_value = 0;
 
+	main_keyboard.is_waiting = true;
+	main_keyboard.waiting_task_id = task_get_current_task_id();
+	
 	do {
 		ret_value = keyboard_get_next_scancode();
+
+		// Yield if we don't have a scancode available
+		if( ret_value == 0 ) {
+			task_set_task_status( task_get_current_task_id(), TASK_STATUS_WAIT );
+			syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+		}
 	} while( ret_value == 0 );
+
+	task_set_has_data_ready( main_keyboard.waiting_task_id, false );
+	main_keyboard.is_waiting = false;
+	main_keyboard.waiting_task_id = 0;
 
 	return ret_value;
 }

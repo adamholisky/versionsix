@@ -62,17 +62,12 @@ void kernel_main( void ) {
 	dhcp_start();
 	#endif
 
+	task_create( TASK_TYPE_KERNEL_THREAD, "Task Chain", (uint64_t *)task_chain_a );
 	task_create( TASK_TYPE_KERNEL_THREAD, "KShell", (uint64_t *)kshell_initalize );
 	syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 
-	/* int i = 0;
-	do {
-		i++;
-		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
-	} while( 1 );
-	*/
-
-	//kshell_initalize();
+	// This is the "kernel idle task". We want to just check if someone has data ready, and if so, activate the task
+	kernel_idle_loop();	
 
 	debugf( "Ending happy.\n" );
 	printf( "Ending happy.\n" );
@@ -81,4 +76,22 @@ void kernel_main( void ) {
 
 void main_console_putc( char c ) {
 	vui_console_put_char( &main_console, c );
+}
+
+void task_chain_a( void ) {
+	task_chain_b();
+}
+
+void task_chain_b( void ) {
+	task_chain_c();
+}
+
+void task_chain_c( void ) {
+	task_chain_d();
+}
+
+void task_chain_d( void ) {
+	do {
+		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+	} while (1);
 }

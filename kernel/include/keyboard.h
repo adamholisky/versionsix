@@ -19,6 +19,8 @@ extern "C" {
 
 typedef struct {
 	bool is_waiting;
+	uint16_t waiting_task_id;
+	
 	bool is_shift;
 	bool in_E0;
 	uint8_t current_scancode;

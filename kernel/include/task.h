@@ -68,6 +68,8 @@ struct _task {
 	uint8_t status;
 	registers task_context;
 
+	bool has_data_ready;
+
 	task *next;
 };
 
@@ -75,6 +77,7 @@ typedef struct {
 	task *tasks;
 	uint16_t current_task_id;
 	registers *task_contexts; 
+	uint16_t yield_to_next;
 } kernel_process_data;
 
 void task_initalize( void );
@@ -85,6 +88,11 @@ void task_test_thread_b( void );
 void task_dump_context( registers *context );
 kernel_process_data *task_get_kernel_process_data( void );
 task *get_task_data( uint16_t task_id );
+uint16_t task_get_current_task_id( void );
+void task_set_has_data_ready( uint16_t task_id, bool ready );
+void task_set_task_status( uint16_t task_id, uint8_t status );
+void task_set_yield_to_next( uint16_t task_id );
+void task_exec( uint64_t *entry, int argc, char *argv[] );
 
 void task_launch_kernel_thread( uint64_t *entry, char *name, int argc, char *argv[] );
 

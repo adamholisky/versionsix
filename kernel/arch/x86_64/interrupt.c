@@ -2,6 +2,7 @@
 #include <interrupt.h>
 #include <timer.h>
 #include <ksymbols.h>
+#include <stacktrace.h>
 
 interrupt_descriptor_table main_idtr;
 interrupt_gate_descriptor IDT[256];
@@ -142,15 +143,7 @@ void interrupt_handler_stage_2( registers **_reg ) {
 		debugf_raw( "\n" );
 		debugf_raw( "    Stack Trace:\n" );
 		
-		struct stackframe *sf = (struct stackframe *)reg->rbp;
-		
-		for( int i = 0; i < 15; i++ ) {
-			debugf_raw( "    [%d] 0x%016llX %s\n", i, sf->rip, kernel_symbols_get_function_name_at(sf->rip) );
-			if( sf->rbp == 0 ) {
-				i = 15;
-			}
-			sf = sf->rbp;
-		}
+		stacktrace_out_for_rbp( reg->rbp, false, true, 4 );
 
 		debugf_raw( "================================================================================\n" );
 

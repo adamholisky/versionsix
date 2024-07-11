@@ -179,13 +179,33 @@ bool kshell_handle_special_keypress( uint8_t scancode ) {
 	}
 }
 
+/**
+ * @brief Create a kshell_command and return a pointer to it
+ * 
+ * @param command_name display name AND command name
+ * @param main_function pointer to the function address to run
+ * @return kshell_command* pointer to a new kshell_command
+ */
 kshell_command *kshell_command_create( char *command_name, void *main_function ) {
 	kshell_command *cmd = (kshell_command *)kmalloc( sizeof( kshell_command ) );
 	strcpy( cmd->name, command_name );
 	cmd->entry = main_function;
 }
 
+/**
+ * @brief Create and run a kshell_command
+ * 
+ * @param cmd Pointer to a kshell_command object to run
+ * @param argc number of arguments
+ * @param argv pointer array to list of null terminated strings
+ * @return int exit code as given by command
+ */
+#undef DEBUG_KSHELL_COMMAND_RUN
 int kshell_command_run( kshell_command *cmd, int argc, char *argv[] ) {
+	#ifdef DEBUG_KSHELL_COMMAND_RUN
+	log_entry_enter();
+	#endif
+
 	kshell_main_func_to_call func = (kshell_main_func_to_call)cmd->entry;
 
 	uint16_t cmd_task_id = task_create( TASK_TYPE_KERNEL_PROCESS, cmd->name, cmd->entry );
@@ -195,10 +215,20 @@ int kshell_command_run( kshell_command *cmd, int argc, char *argv[] ) {
 	exec_args.arg_2 = argc;
 	exec_args.arg_3 = (uint64_t)argv;
 
+	#ifdef DEBUG_KSHELL_COMMAND_RUN
+	debugf( "Name: %s\n", cmd->name );
+	debugf( "Entry: 0x%016llx\n", cmd->entry );
+	debugf( "Task I: %d\n", cmd_task_id );
+	#endif
+
 	syscall( SYSCALL_EXEC, 3, &exec_args );
 
 	uint64_t exit_code = task_get_exit_code( cmd_task_id );
 
+	#ifdef DEBUG_KSHELL_COMMAND_RUN
+	debugf( "Exit code: %d\n", exit_code );
+	log_entry_exit();
+	#endif
 	return (int)exit_code;
 }
 

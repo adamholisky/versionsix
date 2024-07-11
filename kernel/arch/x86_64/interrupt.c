@@ -3,6 +3,7 @@
 #include <timer.h>
 #include <ksymbols.h>
 #include <stacktrace.h>
+#include <task.h>
 
 interrupt_descriptor_table main_idtr;
 interrupt_gate_descriptor IDT[256];
@@ -123,6 +124,8 @@ void interrupt_setup_exception_handler( int num, uint64_t handler ) {
 void interrupt_handler_stage_2( registers **_reg ) {
 	registers *reg = *_reg;
 
+	uint64_t interrupt_number_at_entry = reg->interrupt_no;
+
 	#ifdef DEBUG_INTERRUPT_HANDLER_STAGE_2
 	if( reg->interrupt_no != 0x20 ) {
 		debugf( "Interrupt( num = 0x%X )\n", reg->interrupt_no );
@@ -131,10 +134,11 @@ void interrupt_handler_stage_2( registers **_reg ) {
 
 	if( reg->interrupt_no < 21 ) {
 		uint64_t *stack = (uint64_t *)reg->rsp;
+		uint16_t current_task_id = task_get_current_task_id();
 
 		debugf_raw( "================================================================================\n" );
 		debugf_raw( "Exception %d: %s \n", reg->interrupt_no, intel_exceptions[reg->interrupt_no] );
-		debugf_raw( "    task: %d\n", task_get_current_task_id() );
+		debugf_raw( "    task: %d\n", current_task_id );
 		debugf_raw( "    rip:  0x%016llX (%s)\n", reg->rip, kernel_symbols_get_function_name_at(reg->rip) );
 		debugf_raw( "    rax:  0x%016llX  rbx:  0x%016llX  rcx:  0x%016llX\n", reg->rax, reg->rbx, reg->rcx );
 		debugf_raw( "    rdx:  0x%016llX  rsi:  0x%016llX  rdi:  0x%016llX\n", reg->rdx, reg->rsi, reg->rdi );
@@ -148,8 +152,19 @@ void interrupt_handler_stage_2( registers **_reg ) {
 
 		debugf_raw( "================================================================================\n" );
 
-		while( 1 ) {
-			__asm__ volatile( "nop" );
+		if( current_task_id == 0 ) {
+			debugf_raw( "\nKernel task generated exception. Halting.\n" );
+
+			while( 1 ) {
+				__asm__ volatile( "nop" );
+			}
+		} else {
+			task *t = get_task_data( current_task_id );
+			t->exit_code = 1;
+			debugf_raw( "Ending task %d, switching to parent id %d\n", current_task_id, t->parent_task_id );
+			task_set_task_status( current_task_id, TASK_STATUS_DEAD );
+			task_set_yield_to_next( t->parent_task_id );
+			task_sched_yield( _reg );
 		}
 	} else {
 		if( irq_handlers[reg->interrupt_no - 0x20].in_use == true ) {
@@ -165,7 +180,7 @@ void interrupt_handler_stage_2( registers **_reg ) {
 		}
 	}
 
-	if( reg->interrupt_no - 0x20 >= 8 ) {
+	if( interrupt_number_at_entry - 0x20 >= 8 ) {
 			outportb( PIC_SECONDARY_COMMAND, PIC_EOI );
 	} 
 

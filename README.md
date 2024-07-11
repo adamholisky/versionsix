@@ -33,8 +33,9 @@ The "Big Goal" for right now is to laser focus on getting a Telnet connection es
 | ARP | 🟡 | Protocol works, need to do dictionary |
 | IP | 🟡 | Good enough, maybe |
 | DHCP | 🟡 | Good enough, maybe |
-| TCP | 🔴 | Not started |
-| Telnet | 🔴 | Possible to hack together now via serial i/o and QEMU pipes |
+| TCP | 🟡 | Working in a PoC stage |
+| Task Management | 🟡 | Yielding-based, handles crashes |
+| Telnet | 🟠 | Working in a very basic way |
 | HTTP/Json | 🔴 | Not started |
 
 ### Future Goals

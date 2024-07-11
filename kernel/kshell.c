@@ -188,11 +188,18 @@ kshell_command *kshell_command_create( char *command_name, void *main_function )
 int kshell_command_run( kshell_command *cmd, int argc, char *argv[] ) {
 	kshell_main_func_to_call func = (kshell_main_func_to_call)cmd->entry;
 
-	uint16_t cmd_task_id = task_create( TASK_TYPE_KERNEL_THREAD, cmd->name, cmd->entry );
-	task_set_yield_to_next( cmd_task_id );
-	uint64_t ret_val = syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+	uint16_t cmd_task_id = task_create( TASK_TYPE_KERNEL_PROCESS, cmd->name, cmd->entry );
 
-	return ret_val;
+	syscall_args exec_args;
+	exec_args.arg_1 = cmd_task_id;
+	exec_args.arg_2 = argc;
+	exec_args.arg_3 = (uint64_t)argv;
+
+	syscall( SYSCALL_EXEC, 3, &exec_args );
+
+	uint64_t exit_code = task_get_exit_code( cmd_task_id );
+
+	return (int)exit_code;
 }
 
 int kshell_command_hello_world( int argc, char *argv[] ) {

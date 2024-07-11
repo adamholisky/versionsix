@@ -53,6 +53,7 @@ uint16_t task_create( uint8_t task_type, char *name, uint64_t *entry ) {
 	old_last_task->next = new_task;
 
 	new_task->id = task_id;
+	new_task->parent_task_id = process_data.current_task_id;
 	new_task->status = TASK_STATUS_READY;
 	new_task->type = task_type;
 	new_task->next = NULL;
@@ -62,10 +63,10 @@ uint16_t task_create( uint8_t task_type, char *name, uint64_t *entry ) {
 	strcpy( new_task->file_name, "something.bin" );
 
 	memset( &new_task->task_context, 0, sizeof(registers) );
-	new_task->task_context.rip = (uint64_t)entry;
 	new_task->task_context.cs = 0x28;
 	new_task->task_context.rflags = 0x200;
 	new_task->task_context.rsp = (uint64_t)kmalloc( 4 * 1024 ) + 4*1024;
+	new_task->task_context.rip = (uint64_t)entry;
 
 	debugf( "Task created: ID: %d, Name: \"%s\"\n", new_task->id, new_task->display_name );
 
@@ -75,18 +76,42 @@ uint16_t task_create( uint8_t task_type, char *name, uint64_t *entry ) {
 #undef DEBUG_TASK_SCHED_YIELD
 void task_sched_yield( registers **context ) {
 	#ifdef DEBUG_TASK_SCHED_YIELD
+	debugf_raw( "\n================================================================================\n" );
 	log_entry_enter();
 	#endif
 
 	task *old_task = get_task_data( process_data.current_task_id );
 	task *new_task = NULL;
 
+	// If we don't have a next task set, round robin
 	if( process_data.yield_to_next == 0 ) {
-		if( old_task->next == NULL ) {
-			new_task = process_data.tasks;
-		} else {
-			new_task = old_task->next;
+		bool task_found = false;
+		task *task_head = old_task;
+
+		// after this loop, task_head will always contain a good task to switch to
+		while( task_found == false ) {
+			if( task_head->next == NULL ) {
+				task_head = process_data.tasks;
+			} else {
+				task_head = task_head->next;
+			}
+
+			// there's a better way to do this...
+			switch( task_head->status ) {
+				case TASK_STATUS_READY:
+				case TASK_STATUS_ACTIVE:
+				case TASK_STATUS_WAIT:
+				case TASK_STATUS_INACTIVE:
+					task_found = true;
+					break;
+				case TASK_STATUS_DEAD:
+					task_found = false;
+					break;
+			}
 		}
+		
+		// go to the new task
+		new_task = task_head;
 	} else {
 		new_task = get_task_data( process_data.yield_to_next );
 		process_data.yield_to_next = 0;
@@ -107,12 +132,16 @@ void task_sched_yield( registers **context ) {
 	#endif
 
 	process_data.current_task_id = new_task->id;
-	old_task->status = TASK_STATUS_INACTIVE;
+
+	if( old_task->status != TASK_STATUS_DEAD ) {
+		old_task->status = TASK_STATUS_INACTIVE;
+	}
 	new_task->status = TASK_STATUS_ACTIVE;
 	
 
 	#ifdef DEBUG_TASK_SCHED_YIELD
 	log_entry_exit();
+	debugf_raw( "================================================================================\n" );
 	#endif
 }
 
@@ -205,12 +234,57 @@ void task_set_yield_to_next( uint16_t task_id ) {
 	process_data.yield_to_next = task_id;
 }
 
+/**
+ * @brief Exit the task cleanly.
+ * 
+ * Set the task type to dead (can be cleaned up later).
+ * Yield next to the kernel
+ * Yield
+ * 
+ * @param task_id 
+ */
+void task_exit( uint16_t task_id, uint16_t parent_task_id ) {
+	task_set_task_status( task_id, TASK_STATUS_DEAD );
+	
+	task_set_yield_to_next( parent_task_id );
+	
+	//debugf( "Yielding to task id: %d\n", parent_task_id );
+	
+	syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+}
+
 void task_launch_kernel_thread( uint64_t *entry, char *name, int argc, char *argv[] ) {
 
 }
 
-void task_exec( uint64_t *entry, int argc, char *argv[] ) {
-	kshell_main_func_to_call main_func = (kshell_main_func_to_call)entry;
+void task_exec_syscall_handler( registers **context, uint16_t task_id, int argc, char *argv[] ) {
+	task *t = get_task_data( task_id );
+	t->task_context.rip = (uint64_t)task_environment_preamble;
+	t->argc = argc;
+	t->argv = argv;
 
-	main_func( argc, argv );
+	task_set_yield_to_next( task_id );
+
+	task_sched_yield( context );
+}
+
+void task_environment_preamble( void ) {
+	uint16_t task_id = process_data.current_task_id;
+	
+	task *t = get_task_data( task_id );
+
+	kshell_main_func_to_call main_func = (kshell_main_func_to_call)t->entry;
+	uint16_t parent_task_id = t->parent_task_id;
+
+	t->exit_code = main_func( t->argc, t->argv );
+
+	//dfv( task_id );
+
+	task_exit( task_id, t->parent_task_id );
+}
+
+uint64_t task_get_exit_code( uint16_t task_id ) {
+	task *t = get_task_data( task_id );
+
+	return t->exit_code;
 }

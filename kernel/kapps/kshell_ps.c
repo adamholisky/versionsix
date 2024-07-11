@@ -2,6 +2,7 @@
 #include <kshell_app.h>
 #include <task.h>
 #include <stacktrace.h>
+#include <ksymbols.h>
 
 KSHELL_COMMAND( ps, kshell_app_ps_main )
 
@@ -44,14 +45,26 @@ int kshell_app_ps_main( int argc, char *argv[] ) {
 	if( show_main ) {
 		printf( "    ID Name         Status       RIP\n" );
 
-		do {	
-			printf( "%6d %-12s %-12s 0x%016llx\n", task_next->id, task_next->display_name, status_to_string( task_next->status), task_next->task_context.rip );
+		do {
+			uint64_t rip = task_next->task_context.rip;
+
+			if( task_next->status == TASK_STATUS_ACTIVE ) {
+				__asm__	__volatile__ ( "lea 0(%%rip), %0" : "=r"(rip) );
+			}
+
+			printf( "%6d %-12s %-12s 0x%016llx %s\n", 
+				task_next->id, 
+				task_next->display_name, 
+				status_to_string( task_next->status), 
+				rip, 
+				kernel_symbols_get_function_name_at( rip ) 
+				);
 
 			if( show_bt ) {
 				uint64_t rbp = task_next->task_context.rbp;
 
 				if( task_next->status == TASK_STATUS_ACTIVE ) {
-					__asm__	__volatile__ ( "movq %%rbp, %0"	:"=r"(rbp) );
+					__asm__	__volatile__ ( "movq %%rbp, %0"	: "=r"(rbp) );
 				}
 
 				stacktrace_out_for_rbp( rbp, true, false, 33 );

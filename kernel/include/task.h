@@ -24,6 +24,7 @@ extern "C" {
 #define TASK_TYPE_THREAD 2
 #define TASK_TYPE_KERNEL 3
 #define TASK_TYPE_KERNEL_THREAD 4
+#define TASK_TYPE_KERNEL_PROCESS 5
 
 /*
 
@@ -43,6 +44,25 @@ Task lifetime:
 7. Kernel: actives task
     7a. Sets task status to ACTIVE
 8. Task: Does stuff (go to step 3)
+
+Task Exec:
+
+1. Syscall task_exec gets passed with task id, argc, and argv
+2. task_exec sets up the environment such that:
+	2a. entry point is task_envrionment_preamble 
+	2b. argc and argv are stored in the task record
+3. task_exec sets next task to run equal to the id of the new task
+4. task_exec calls a sched_yield
+5. kernel returns with a new task running
+6. new task enters preamble
+7. calls main function, task executes
+8. after main returns, task_exit is called
+9. task_exit returns control to the parent process
+
+Task End of Life:
+
+1. Task: exit main with return <int>;
+2. 
 
 */
 
@@ -70,6 +90,12 @@ struct _task {
 
 	bool has_data_ready;
 
+	uint64_t argc;
+	char **argv;
+	uint64_t exit_code;
+
+	uint16_t parent_task_id;
+
 	task *next;
 };
 
@@ -92,9 +118,11 @@ uint16_t task_get_current_task_id( void );
 void task_set_has_data_ready( uint16_t task_id, bool ready );
 void task_set_task_status( uint16_t task_id, uint8_t status );
 void task_set_yield_to_next( uint16_t task_id );
-void task_exec( uint64_t *entry, int argc, char *argv[] );
-
+void task_exec_syscall_handler( registers **context, uint16_t task_id, int argc, char *argv[] );
+void task_exit( uint16_t task_id, uint16_t parent_task_id );
 void task_launch_kernel_thread( uint64_t *entry, char *name, int argc, char *argv[] );
+void task_environment_preamble( void );
+uint64_t task_get_exit_code( uint16_t task_id );
 
 #ifdef __cplusplus
 }

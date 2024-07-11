@@ -56,18 +56,29 @@ void kshell_main_loop( void ) {
 		char c = 0;
 		bool get_next_key = true;
 		main_shell.line_index = 0;
+		bool do_extra_newline = true;
 
 		memset( main_shell.current_line, 0, KSHELL_MAX_LINESIZE );
 		printf( "Version VI:/$ " );
 
 		/* Step 1: Get the line, put it into current_line */
 		do {
+			main_console_set_cursor_visiblity( true );
 			scancode = keyboard_get_scancode();
 			c = keyboard_scancode_to_char( scancode );	// this checks for scancode under 0x81, otherwise returns 0
 			
 			if( c != 0 ) {
 				if( c == '\n' ) {
 					get_next_key = false;
+					do_extra_newline = false;
+					printf( "\n" );
+				} else if( c == '\b' ) {
+					if( main_shell.line_index != 0 ) {
+						main_shell.line_index--;
+						main_shell.current_line[main_shell.line_index] = 0;
+
+						printf( "\b" );
+					}					
 				} else {
 					printf( "%c", c );
 
@@ -83,7 +94,17 @@ void kshell_main_loop( void ) {
 			}
 		} while( get_next_key );
 		
-		printf( "\n" );
+		main_console_set_cursor_visiblity( false );
+
+		// don't do a double newline if enter key was pressed
+		if( do_extra_newline == true ) {
+			printf( "\n" );
+		}
+
+		/* Step 1.a: Prevent a blank line */
+		if( strcmp( main_shell.current_line, "" ) == 0 ) {
+			continue;
+		}
 
 		/* Step 2: Split it up into arguments, create argc and argv */
 

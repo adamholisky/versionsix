@@ -43,6 +43,9 @@ void vui_console_initalize( vui_console *con, uint16_t top, uint16_t left, uint1
 	con->current_row = 1;
 	con->current_col = 1;
 	con->tab_size = 4;
+
+	con->show_cursor = false;
+	con->blink_hidden = false;
 }
 
 void vui_console_put_char( vui_console *con, char c ) { 
@@ -50,12 +53,18 @@ void vui_console_put_char( vui_console *con, char c ) {
 }
 
 void vui_console_put_char_at( vui_console *con, char c, uint16_t row, uint16_t col ) {
+	uint16_t cursor_x = con->current_pixel_x;
+	uint16_t cursor_y = con->current_pixel_y;
+
 	switch( c ) {
 		case '\t':
 			vui_console_do_tab( con );
 			break;
 		case '\n':
 			vui_console_do_new_line( con );
+			break;
+		case '\b':
+			vui_console_do_backspace( con );
 			break;
 		default:
 			if( con->current_col == con->num_cols + 1 ) {
@@ -67,6 +76,15 @@ void vui_console_put_char_at( vui_console *con, char c, uint16_t row, uint16_t c
 
 			con->current_col++;
 			con->current_pixel_x = con->current_pixel_x + con->char_width;
+	}
+
+	if( con->show_cursor == true ) {
+		// Clear the previous cursor if a new line
+		if( c == '\n' ) {
+			vui_text_put_char_at_with_color( &con->text_area, ' ', cursor_x, cursor_y, con->fg_color, con->bg_color );
+		}
+
+		vui_console_update_cursor( con );
 	}
 }
 
@@ -143,4 +161,51 @@ void vui_console_do_new_line( vui_console *con ) {
 	}
 
 	con->current_pixel_x = con->text_area_left;
+}
+
+void vui_console_do_backspace( vui_console *con ) {
+	bool cursor_visibility = con->show_cursor;
+
+	// set to false while we're backspacing so a timer tick doesn't mess up the drawn cursor position
+	con->show_cursor = false; 
+
+	con->current_col--;
+	con->current_pixel_x = con->current_pixel_x - con->char_width;
+	vui_text_put_char_at_with_color( &con->text_area, ' ', con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color );
+
+	if( cursor_visibility == true ) {
+		vui_text_put_char_at_with_color( &con->text_area, ' ', con->current_pixel_x + con->char_width, con->current_pixel_y, con->fg_color, con->bg_color );
+	}
+
+	// restore cursor visiblity
+	con->show_cursor = cursor_visibility;
+}
+
+/**
+ * @brief Move the cursor its correct position.
+ * 
+ * @todo Redo this to keep track of the cursor position independently
+ * 
+ * @param con vui console to operate on
+ */
+void vui_console_update_cursor( vui_console *con ) {
+	if( con->show_cursor == true ) {
+		vui_text_put_char_at_with_color( &con->text_area, '|', con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color );
+	}
+}
+
+void vui_console_blink_cursor( vui_console *con ) {
+	char c = 0;
+
+	if( con->show_cursor == true ) {
+		if( con->blink_hidden == true ) {
+			c = '|';
+			con->blink_hidden = false;
+		} else {
+			c = ' ';
+			con->blink_hidden = true;
+		}
+
+		vui_text_put_char_at_with_color( &con->text_area, c, con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color );
+	}
 }

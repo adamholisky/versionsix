@@ -7,7 +7,8 @@
         "timer.h": "c",
         "stddef.h": "c",
         "limine.h": "c",
-        "arp.h": "c"
+        "arp.h": "c",
+        "console.h": "c"
     },
     "editor.wordWrap":"on" 
 }

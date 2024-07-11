@@ -78,6 +78,14 @@ void main_console_putc( char c ) {
 	vui_console_put_char( &main_console, c );
 }
 
+void main_console_set_cursor_visiblity( bool visible ) {
+	main_console.show_cursor = visible;
+}
+
+void main_console_blink_cursor( void ) {
+	vui_console_blink_cursor( &main_console );
+}
+
 void task_chain_a( void ) {
 	task_chain_b();
 }

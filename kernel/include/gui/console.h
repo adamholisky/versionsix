@@ -38,6 +38,10 @@ typedef struct {
 	uint32_t tab_size;
 
 	vui_text text_area;
+
+	bool show_cursor;
+	bool blink_hidden;
+
 	char *buffer;
 } vui_console;
 
@@ -52,6 +56,9 @@ void vui_console_put_string_at( vui_console *con, char *str, uint16_t row, uint1
 void vui_console_scroll_up( vui_console *con, bool set_current_row_col );
 void vui_console_do_tab( vui_console *con );
 void vui_console_do_new_line( vui_console *con );
+void vui_console_do_backspace( vui_console *con );
+void vui_console_update_cursor( vui_console *con );
+void vui_console_blink_cursor( vui_console *con );
 
 #ifdef __cplusplus
 }

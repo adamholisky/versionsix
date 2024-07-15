@@ -74,7 +74,7 @@ void kernel_main( void ) {
 	do_immediate_shutdown();
 }
 
-void main_console_putc( char c ) {
+void main_console_putc( uint8_t c ) {
 	vui_console_put_char( &main_console, c );
 }
 

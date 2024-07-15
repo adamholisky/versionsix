@@ -23,7 +23,7 @@ void vui_console_initalize( vui_console *con, uint16_t top, uint16_t left, uint1
 	con->current_pixel_y = con->text_area_top;
 	
 	con->char_width = 8;
-	con->char_height = 16;
+	con->char_height = 18; // adjusted +2 for ssfn thing
 
 	con->num_cols = con->text_area_width / con->char_width;
 	con->num_rows = con->text_area_height / con->char_height;
@@ -48,13 +48,16 @@ void vui_console_initalize( vui_console *con, uint16_t top, uint16_t left, uint1
 	con->blink_hidden = false;
 }
 
-void vui_console_put_char( vui_console *con, char c ) { 
+void vui_console_put_char( vui_console *con, uint8_t c ) { 
 	vui_console_put_char_at( con, c, con->current_row, con->current_col );
 }
 
-void vui_console_put_char_at( vui_console *con, char c, uint16_t row, uint16_t col ) {
+void vui_console_put_char_at( vui_console *con, uint8_t c, uint16_t row, uint16_t col ) {
 	uint16_t cursor_x = con->current_pixel_x;
 	uint16_t cursor_y = con->current_pixel_y;
+
+	bool cursor_visibility = con->show_cursor;
+	con->show_cursor = false;
 
 	switch( c ) {
 		case '\t':
@@ -77,6 +80,8 @@ void vui_console_put_char_at( vui_console *con, char c, uint16_t row, uint16_t c
 			con->current_col++;
 			con->current_pixel_x = con->current_pixel_x + con->char_width;
 	}
+
+	con->show_cursor = cursor_visibility;
 
 	if( con->show_cursor == true ) {
 		// Clear the previous cursor if a new line
@@ -190,16 +195,16 @@ void vui_console_do_backspace( vui_console *con ) {
  */
 void vui_console_update_cursor( vui_console *con ) {
 	if( con->show_cursor == true ) {
-		vui_text_put_char_at_with_color( &con->text_area, '|', con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color );
+		vui_text_put_char_at_with_color( &con->text_area, 0xDB, con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color );
 	}
 }
 
 void vui_console_blink_cursor( vui_console *con ) {
-	char c = 0;
+	uint8_t c = 0;
 
 	if( con->show_cursor == true ) {
 		if( con->blink_hidden == true ) {
-			c = '|';
+			c = 0xDB;
 			con->blink_hidden = false;
 		} else {
 			c = ' ';

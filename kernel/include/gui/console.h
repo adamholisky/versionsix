@@ -46,8 +46,8 @@ typedef struct {
 } vui_console;
 
 void vui_console_initalize( vui_console *con, uint16_t top, uint16_t left, uint16_t width, uint16_t height );
-void vui_console_put_char( vui_console *con, char c );
-void vui_console_put_char_at( vui_console *con, char c, uint16_t row, uint16_t col );
+void vui_console_put_char( vui_console *con, uint8_t c );
+void vui_console_put_char_at( vui_console *con, uint8_t c, uint16_t row, uint16_t col );
 void vui_console_set_color( vui_console *con, uint32_t foreground_color, uint32_t background_color );
 uint32_t vui_console_get_foreground_color( vui_console *con );
 uint32_t vui_console_get_background_color( vui_console *con );

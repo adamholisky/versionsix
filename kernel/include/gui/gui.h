@@ -10,6 +10,8 @@ extern "C" {
 #define COLOR_RGB_GREEN 0x0000FF00
 #define COLOR_RGB_RED   0x00FF0000
 
+#define FULL_ALPHA 0xFF000000
+
 #ifdef __cplusplus
 }
 #endif

@@ -39,6 +39,9 @@ void kshell_initalize( void ) {
 void kshell_run( void ) { 
 	main_shell.keep_going = true;
 
+	printf( "%c%c%c\n", 0xDA, 0xC4, 0xBF );
+	printf( "%c %c\n", 0x7C, 0x7C );
+
 	kshell_main_loop();
 
 	do_immediate_shutdown();
@@ -63,7 +66,7 @@ void kshell_main_loop( void ) {
 
 		/* Step 1: Get the line, put it into current_line */
 		do {
-			main_console_set_cursor_visiblity( true );
+			main_console_set_cursor_visiblity( false );
 			scancode = keyboard_get_scancode();
 			c = keyboard_scancode_to_char( scancode );	// this checks for scancode under 0x81, otherwise returns 0
 			

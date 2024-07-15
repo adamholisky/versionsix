@@ -60,15 +60,7 @@ void load_limine_info( void ) {
 	debugf( "Memory Map:\n" );
 	debugf_raw( "          Base                Length              Type\n" );
 
-
-	debugf( "usable_memory_start: 0x%016llx  size: 0x%016llx\n", usable_memory_start, usable_memory_size );
-	debugf( "kernel_allocate_memory_start: 0x%016llx  size: 0x%016llx\n", kernel_info.kernel_allocate_memory_start, kernel_info.kernel_allocate_memory_size );
-	debugf( "kfile->path: %s\n", kfile_request.response->kernel_file->path );
-	debugf( "kfile->address: 0x%016llX\n", kfile_request.response->kernel_file->address );
-	debugf( "kfile->size: 0x%X\n", kfile_request.response->kernel_file->size );
-	debugf( "hhdm offset: 0x%016llX\n", hhdm_request.response->offset );
-	
-    for( int i = 0; i < memmap_request.response->entry_count; i++ ) {
+	for( int i = 0; i < memmap_request.response->entry_count; i++ ) {
 		debugf_raw( "    0x%02X  0x%016llX  0x%016llX  0x%X\n", i, memmap_request.response->entries[i]->base,  memmap_request.response->entries[i]->length,  memmap_request.response->entries[i]->type );
 
 		if( memmap_request.response->entries[i]->type == 0 ) {
@@ -84,7 +76,19 @@ void load_limine_info( void ) {
 		}
 	}
 
+	debugf( "usable_memory_start: 0x%016llx  size: 0x%016llx\n", usable_memory_start, usable_memory_size );
+	debugf( "kernel_allocate_memory_start: 0x%016llx  size: 0x%016llx\n", kernel_info.kernel_allocate_memory_start, kernel_info.kernel_allocate_memory_size );
+	debugf( "kfile->path: %s\n", kfile_request.response->kernel_file->path );
+	debugf( "kfile->address: 0x%016llX\n", kfile_request.response->kernel_file->address );
+	debugf( "kfile->size: 0x%X\n", kfile_request.response->kernel_file->size );
+	debugf( "hhdm offset: 0x%016llX\n", hhdm_request.response->offset );
+	
+    
     debugf( "RSDP table address: 0x%016llx\n", rsdp_request.response->address );
+
+	debugf( "Size Sanity:\n" );
+	debugf( "    char: %d\n", sizeof(char) );
+	debugf( "    int:  %d\n", sizeof(int) );
 
 	kernel_info.kernel_start = (uint64_t)&_kernel_start;
 	kernel_info.kernel_end = (uint64_t)&_kernel_end;

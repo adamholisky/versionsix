@@ -15,9 +15,12 @@ typedef struct {
 } vui_text;
 
 void vui_text_initalize( vui_text *txt, uint16_t top, uint16_t left, uint16_t width, uint16_t height );
-void vui_text_put_char( vui_text *txt, char c );
-void vui_text_put_char_at( vui_text *txt, char c, uint16_t x, uint16_t y );
-void vui_text_put_char_at_with_color( vui_text *txt, char c, uint16_t x, uint16_t y, uint32_t foreground_color, uint32_t background_color );
+void vui_text_put_char( vui_text *txt, uint8_t c );
+void vui_text_put_char_unicode( vui_text *txt, uint32_t c );
+void vui_text_put_char_at( vui_text *txt, uint8_t c, uint16_t x, uint16_t y );
+void vui_text_put_char_at_unicode( vui_text *txt, uint32_t c, uint16_t x, uint16_t y );
+void vui_text_put_char_at_with_color( vui_text *txt, uint8_t c, uint16_t x, uint16_t y, uint32_t foreground_color, uint32_t background_color );
+void vui_text_put_char_at_with_color_unicode( vui_text *txt, uint32_t c, uint16_t x, uint16_t y, uint32_t foreground_color, uint32_t background_color );
 void vui_text_put_string( vui_text *txt, char *str );
 
 #ifdef __cplusplus

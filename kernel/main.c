@@ -21,8 +21,9 @@
 #include <net/network.h>
 #include <keyboard.h>
 #include <rtc.h>
+#include <ahci.h>
 
-#define ENABLE_NETWORKING
+#undef ENABLE_NETWORKING
 
 kinfo kernel_info;
 net_info networking_info;
@@ -48,6 +49,7 @@ void kernel_main( void ) {
 	framebuffer_initalize();
 	kernel_symbols_initalize();
 	pci_initalize();
+	ahci_initalize();
 	task_initalize();
 	keyboard_initalize();
 

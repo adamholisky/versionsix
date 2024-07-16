@@ -4,3 +4,4 @@ build_support/logs/*
 *.o
 *.bin
 *.d
+afs.img

@@ -42,16 +42,30 @@ AFLAGS = $(CFLAGS)
 				-device e1000,netdev=private_net,mac=12:34:56:78:9A:BC \
 				-object filter-dump,id=f1,netdev=private_net,file=dump.dat 
 QEMU = /usr/bin/qemu-system-x86_64
-QEMU_COMMON = 	-drive format=raw,if=ide,file=$(ROOT_DIR)/vi_hd.img \
+QEMU_COMMON = 	-device ahci,id=ahci \
+				\
+				-drive id=main_drive,format=raw,if=none,file=$(ROOT_DIR)/vi_hd.img \
+				-device ide-hd,drive=main_drive,bus=ahci.0 \
+				\
+				-drive id=secondary_drive,format=raw,if=none,file=$(ROOT_DIR)/afs.img \
+				-device ide-hd,drive=secondary_drive,bus=ahci.1 \
+				\
 				-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
+				\
 				-netdev user,id=private_net,ipv6=off,ipv4=on,restrict=off \
 				-device e1000,netdev=private_net,mac=12:34:56:78:9A:BC \
+				\
 				-object filter-dump,id=f1,netdev=private_net,file=$(ROOT_DIR)/build_support/logs/packets.dat \
+				\
 				-m 8G \
+				\
 				-serial stdio \
 				-serial null \
 				-serial null \
 				-serial file:$(ROOT_DIR)/build_support/logs/serial_out.txt \
+				\
+				-d trace:"ahci*" \
+				\
 				-no-reboot
 QEMU_DISPLAY_NONE =	-display none
 

@@ -8,7 +8,9 @@
         "stddef.h": "c",
         "limine.h": "c",
         "arp.h": "c",
-        "console.h": "c"
+        "console.h": "c",
+        "mmio.h": "c",
+        "ahci.h": "c"
     },
     "editor.wordWrap":"on" 
 }

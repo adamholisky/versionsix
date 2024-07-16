@@ -21,7 +21,7 @@ vv_file * afs_open( vv_file_internal *fs, const char * filename, const char * mo
 	
 	// Bail if not found
 	if( ! f_pointer ) {
-		klog( "afs_open: afs_get_file returned NULL.\n" );
+		debugf( "afs_open: afs_get_file returned NULL.\n" );
 		return NULL;
 	}
 
@@ -31,14 +31,14 @@ vv_file * afs_open( vv_file_internal *fs, const char * filename, const char * mo
 	}
 
 	#ifdef KDEBUG_AFS_OPEN
-	printf( "filename: \"%s\"\n", filename );
+	debugf( "filename: \"%s\"\n", filename );
 	#endif
 
 	uint32_t base = afs_get_file_location( fs, filename );
 
 	#ifdef KDEBUG_AFS_OPEN
-	printf( "base: 0x%X\n", base );
-	klog( "hit\n" );
+	debugf( "base: 0x%X\n", base );
+	debugf( "hit\n" );
 	#endif
 
 	fp = &fs->fd[fs->next_fd];
@@ -69,18 +69,18 @@ uint32_t afs_read( vv_file_internal *fs, void *ptr, uint32_t size, vv_file *fp )
 	uint32_t bytes_read = 0;
 
 	#ifdef KDEBUG_AFS_READ
-	klog( "fs: 0x%X\n", fs );
-	klog( "ptr: 0x%X\n", ptr );
-	klog( "size: %d\n", size );
-	klog( "fp: 0x%X\n", fp );
-	klog( "fp.pos: 0x%X\n", fp->position );
-	klog( "fp.base: 0x%X\n", fp->base );
+	debugf( "fs: 0x%X\n", fs );
+	debugf( "ptr: 0x%X\n", ptr );
+	debugf( "size: %d\n", size );
+	debugf( "fp: 0x%X\n", fp );
+	debugf( "fp.pos: 0x%X\n", fp->position );
+	debugf( "fp.base: 0x%X\n", fp->base );
 	#endif
 
 	bytes_read = ahci_read_at_byte_offset_512_chunks( fp->base + fp->position, size, (uint8_t *)ptr );
 
 	#ifdef KDEBUG_AFS_READ
-	klog( "num bytes read: %d\n", bytes_read );
+	debugf( "num bytes read: %d\n", bytes_read );
 	#endif 
 	
 	return bytes_read;
@@ -118,11 +118,11 @@ uint32_t afs_get_file_location( vv_file_internal *fs, const char *filename ) {
 	dd = afs_get_parent_dir( fs, filename, &d );
 
 	if( ! dd ) {
-		printf( "afs_get_file_location: parent dir is NULL\n" );
+		debugf( "afs_get_file_location: parent dir is NULL\n" );
 		return 0;
 	}
 
-	//printf( "d.next_index = %d\n", d.next_index );
+	//debugf( "d.next_index = %d\n", d.next_index );
 
 	// BUG: Need to get the filename from the given path (in filename). This is what we need to compare in the next code block.
 
@@ -137,10 +137,10 @@ uint32_t afs_get_file_location( vv_file_internal *fs, const char *filename ) {
 	}
 	
 	#ifdef KDEBUG_AFS_GET_FILE_LOCATION
-	printf( "filename: %s\n", filename );
-	printf( "afs_get_file_location: actual file name = %s\n", actual_filename );
-	printf( "dd name: \"%s\"\n", fs->string_table->string[ dd->name_index ] );
-	printf( "dd->next_index: %d\n", dd->next_index );
+	debugf( "filename: %s\n", filename );
+	debugf( "afs_get_file_location: actual file name = %s\n", actual_filename );
+	debugf( "dd name: \"%s\"\n", fs->string_table->string[ dd->name_index ] );
+	debugf( "dd->next_index: %d\n", dd->next_index );
 	#endif
 
 	for( int i = 0; i < dd->next_index; i++ ) {
@@ -149,13 +149,13 @@ uint32_t afs_get_file_location( vv_file_internal *fs, const char *filename ) {
 			i = 1000000;
 			
 			#ifdef KDEBUG_AFS_GET_FILE_LOCATION
-			printf( "hit\n" );
+			debugf( "hit\n" );
 			#endif
 		}
 	}
 
 	#ifdef KDEBUG_AFS_GET_FILE_LOCATION
-	printf( "afs_get_file_location: loc = 0x%X\n", loc );
+	debugf( "afs_get_file_location: loc = 0x%X\n", loc );
 	#endif
 
 	return loc;
@@ -178,7 +178,7 @@ afs_file* afs_get_file( vv_file_internal *fs, const char *filename, afs_file *f 
 
 	if( ! file ) {
 		#ifdef KDEBUG_AFS_GET_FILE
-		klog( "afs_get_file: file is NULL for %s\n", filename );
+		debugf( "afs_get_file: file is NULL for %s\n", filename );
 		dump_stack_trace();
 		#endif
 
@@ -204,58 +204,58 @@ void afs_disply_diagnostic_data( uint8_t * buff ) {
 
 	afs_drive * drive = (afs_drive *)buff;
 
-	printf( "drive.version: %d\n", drive->version );
-	printf( "drive.size: %d\n", drive->size );
-	printf( "drive.name_index: %d\n", drive->name_index );
-	printf( "drive.root_directory: %d\n", drive->root_directory );
-	printf( "drive.next_free: %d\n", drive->next_free );
-	printf( "\n" );
+	debugf( "drive.version: %d\n", drive->version );
+	debugf( "drive.size: %d\n", drive->size );
+	debugf( "drive.name_index: %d\n", drive->name_index );
+	debugf( "drive.root_directory: %d\n", drive->root_directory );
+	debugf( "drive.next_free: %d\n", drive->next_free );
+	debugf( "\n" );
 
 	// Dump string index
 
 	afs_string_table *st = (afs_string_table *)(buff + sizeof(afs_drive));
 
 	for( int i = 0; i < st->next_free; i++ ) {
-		printf( "string_table[%d] = \"%s\"\n", i, st->string[i] );
+		debugf( "string_table[%d] = \"%s\"\n", i, st->string[i] );
 	}
-	printf( "\n" );
+	debugf( "\n" );
 
 	// Dump dir struct
 
 	afs_block_directory * d = (afs_block_directory *)(buff + drive->root_directory);
 
-	printf( "dir.next_index = %d\n", d->next_index );
-	printf( "dir.name_index = %d\n", d->name_index );
+	debugf( "dir.next_index = %d\n", d->next_index );
+	debugf( "dir.name_index = %d\n", d->name_index );
 	
 	for( int i = 0; i < d->next_index; i++ ) {
-		printf( "dir.index[%d].start = 0x%X\n", i, d->index[i].start );
-		printf( "dir.index[%d].name_index = \"%s\"\n", i, st->string[d->index[i].name_index] );
+		debugf( "dir.index[%d].start = 0x%X\n", i, d->index[i].start );
+		debugf( "dir.index[%d].name_index = \"%s\"\n", i, st->string[d->index[i].name_index] );
 	}
-	printf( "\n" );
+	debugf( "\n" );
 
 	// Dump file stucts
 
 	for( int i = 0; i < d->next_index; i++ ) {
 		afs_file *f = (afs_file *)(buff + d->index[i].start );
 
-		printf( "f.block_size: %d\n", f->block_size );
-		printf( "f.file_size: %d\n", f->file_size );
-		printf( "f.name_index = \"%s\"\n", st->string[f->name_index]);
-		printf( "\n" );
+		debugf( "f.block_size: %d\n", f->block_size );
+		debugf( "f.file_size: %d\n", f->file_size );
+		debugf( "f.name_index = \"%s\"\n", st->string[f->name_index]);
+		debugf( "\n" );
 
-		printf( "%s\n\n", (char *)((char *)f + sizeof( afs_file )) );
+		debugf( "%s\n\n", (char *)((char *)f + sizeof( afs_file )) );
 	}
 }
 
 void dump_afs_file( vv_file_internal *fs, afs_file *f ) {
 	afs_string_table *st = fs->string_table;
 
-	printf( "f.block_size: %d\n", f->block_size );
-	printf( "f.file_size: %d\n", f->file_size );
-	printf( "f.name_index = \"%s\"\n", st->string[f->name_index]);
-	printf( "\n" );
+	debugf( "f.block_size: %d\n", f->block_size );
+	debugf( "f.file_size: %d\n", f->file_size );
+	debugf( "f.name_index = \"%s\"\n", st->string[f->name_index]);
+	debugf( "\n" );
 
-	printf( "%s\n\n", (char *)((char *)f + sizeof( afs_file )) );
+	debugf( "%s\n\n", (char *)((char *)f + sizeof( afs_file )) );
 }
 
 #undef KDEBUG_GET_GENERIC_BLOCK
@@ -302,7 +302,7 @@ afs_generic_block* afs_get_generic_block( vv_file_internal *fs, char *filename, 
 	}
 
 	#ifdef KDEBUG_GET_GENERIC_BLOCK
-	printf( "full_filename: \"%s\"\n", full_filename );
+	debugf( "full_filename: \"%s\"\n", full_filename );
 	#endif
 
 	// If first char is /, then it's an absolute path
@@ -333,7 +333,7 @@ afs_generic_block* afs_get_generic_block( vv_file_internal *fs, char *filename, 
 		}
 
 		#ifdef KDEBUG_GET_GENERIC_BLOCK
-		printf( "item_name: \"%s\"\n", item_name );
+		debugf( "item_name: \"%s\"\n", item_name );
 		#endif
 
 		// If item name is /, then continue
@@ -357,12 +357,12 @@ afs_generic_block* afs_get_generic_block( vv_file_internal *fs, char *filename, 
 				found = true;
 				
 				#ifdef KDEBUG_GET_GENERIC_BLOCK
-				printf( "loc: 0x%X\n", loc );
+				debugf( "loc: 0x%X\n", loc );
 				#endif
 
 				// TODO: don't use a hardcoded overflow to make sure that we encompas all block types' sizes
 				if( ! ahci_read_at_byte_offset( loc, sizeof( afs_generic_block), result_block ) ) {
-					printf( "FS GGB: Read of generic block location failed.\n" );
+					debugf( "FS GGB: Read of generic block location failed.\n" );
 					return;
 				}
 
@@ -371,13 +371,13 @@ afs_generic_block* afs_get_generic_block( vv_file_internal *fs, char *filename, 
 				} 
 
 				#ifdef KDEBUG_GET_GENERIC_BLOCK
-				printf( "block type: %d\n", result_block->type );
+				debugf( "block type: %d\n", result_block->type );
 				#endif
 			}
 		}
 		
 		#ifdef KDEBUG_GET_GENERIC_BLOCK
-		printf( "found: %d\n", found );
+		debugf( "found: %d\n", found );
 		#endif
 	}
 
@@ -416,16 +416,16 @@ void afs_ls( vv_file_internal *fs, char *path ) {
 		afs_block_directory *dir_to_list = (afs_block_directory *)block;
 
 		#ifdef KDEBUG_AFS_LS
-		printf( "dir.next_index = %d\n", dir_to_list->next_index );
-		printf( "dir.name_index = %d\n", dir_to_list->name_index );
+		debugf( "dir.next_index = %d\n", dir_to_list->next_index );
+		debugf( "dir.name_index = %d\n", dir_to_list->name_index );
 	
 		for( int i = 0; i < dir_to_list->next_index; i++ ) {
-			printf( "dir.index[%d].start = 0x%X\n", i, dir_to_list->index[i].start );
-			printf( "dir.index[%d].name_index = %d\n", i, dir_to_list->index[i].name_index );
+			debugf( "dir.index[%d].start = 0x%X\n", i, dir_to_list->index[i].start );
+			debugf( "dir.index[%d].name_index = %d\n", i, dir_to_list->index[i].name_index );
 			char * s = fs->string_table->string[dir_to_list->index[i].name_index];
-			printf( "dir.index[%d].name  = \"%s\"\n", i, s );
+			debugf( "dir.index[%d].name  = \"%s\"\n", i, s );
 		}
-		printf( "\n" );
+		debugf( "\n" );
 		#endif
 
 		for( int i = 0; i < dir_to_list->next_index; i++ ) {
@@ -480,7 +480,7 @@ afs_block_directory * afs_get_parent_dir( vv_file_internal *fs, char *name, afs_
 	// handle root dir case(s)
 	if( strchr(name, '/') == NULL ) {
 		#ifdef KDEBUG_AFS_GET_PARENT_DIR
-		printf( "afs_get_parent_dir: did not find /, returning root_dir\n" );
+		debugf( "afs_get_parent_dir: did not find /, returning root_dir\n" );
 		#endif
 
 		return fs->root_dir;
@@ -488,7 +488,7 @@ afs_block_directory * afs_get_parent_dir( vv_file_internal *fs, char *name, afs_
 
 	if( strcmp( name, "/" ) == 0 ) {
 		#ifdef KDEBUG_AFS_GET_PARENT_DIR
-		printf( "/ is only char, returning root_dir\n" );
+		debugf( "/ is only char, returning root_dir\n" );
 		#endif
 
 		return fs->root_dir;
@@ -513,19 +513,19 @@ afs_block_directory * afs_get_parent_dir( vv_file_internal *fs, char *name, afs_
 	}
 
 	#ifdef KDEBUG_AFS_GET_PARENT_DIR
-	printf( "path_to_modify: \"%s\"\n", path_to_modify );
+	debugf( "path_to_modify: \"%s\"\n", path_to_modify );
 	#endif
 
 	if( strcmp( path_to_modify, "" ) == 0 ) {
 		#ifdef KDEBUG_AFS_GET_PARENT_DIR
-		printf( "path_to_modify is empty, returning root_dir\n" );
+		debugf( "path_to_modify is empty, returning root_dir\n" );
 		#endif
 
 		dir_returned = fs->root_dir;
 	} else {
 		if( ! afs_get_generic_block( fs, path_to_modify, &gen_block ) ) {
 			#ifdef KDEBUG_AFS_GET_PARENT_DIR
-			printf( "afs_get_parent_dir: gen block is NULL\n" );
+			debugf( "afs_get_parent_dir: gen block is NULL\n" );
 			#endif
 
 			return NULL;

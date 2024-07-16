@@ -50,6 +50,7 @@ void kernel_main( void ) {
 	kernel_symbols_initalize();
 	pci_initalize();
 	ahci_initalize();
+	fs_initalize();
 	task_initalize();
 	keyboard_initalize();
 

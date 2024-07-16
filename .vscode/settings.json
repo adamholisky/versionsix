@@ -10,7 +10,9 @@
         "arp.h": "c",
         "console.h": "c",
         "mmio.h": "c",
-        "ahci.h": "c"
+        "ahci.h": "c",
+        "afs.h": "c",
+        "stdbool.h": "c"
     },
     "editor.wordWrap":"on" 
 }

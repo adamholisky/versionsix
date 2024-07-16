@@ -2,15 +2,14 @@
 
 ROOT_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 DEFINES = -DPAGING_PAE -DGRAPHICS_OFF -DBITS_64 
-MOUNT_IMG = vi_hd.img
 
 include $(ROOT_DIR)/build_support/control/paths.mk 
 include $(ROOT_DIR)/build_support/control/toolchain.mk 
 
-SOURCES_C = $(shell ls **/*.c)
-SOURCES_ASMS = $(shell ls **/*.S)
-OBJECTS_C = $(patsubst %.c, build/%.o, $(shell ls **/*.c | xargs -n 1 basename))
-OBJECTS_ASMS = $(patsubst %.S, build/%.o, $(shell ls **/*.S | xargs -n 1 basename))
+SOURCES_C = $(shell ls kernel/**/*.c)
+SOURCES_ASMS = $(shell ls kernel/**/*.S)
+OBJECTS_C = $(patsubst %.c, build/%.o, $(shell ls kernel/**/*.c | xargs -n 1 basename))
+OBJECTS_ASMS = $(patsubst %.S, build/%.o, $(shell ls kernel/**/*.S | xargs -n 1 basename))
 
 all: debug_dump install
 
@@ -99,6 +98,11 @@ create_img_stage_2:
 	@sudo umount $(MOUNT_DIR)
 	@sudo /usr/local/osdev/share/limine/limine-deploy $(LOOP_DRIVE)
 	@sudo losetup -d $(LOOP_DRIVE)
+
+drive:
+	rm $(ROOT_DIR)/afs.img
+	touch $(ROOT_DIR)/afs.img
+	$(ROOT_DIR)/scratch/afs/afs
 
 clean:
 	@rm -rf build_support/logs/build.log

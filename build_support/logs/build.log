@@ -6,110 +6,6 @@ rm -rf build_support/logs/elfdump.txt
 rm -rf build_support/logs/qemu_debug_log.txt
 make[1]: Leaving directory '/usr/local/osdev/versions/vi'
 make[1]: Entering directory '/usr/local/osdev/versions/vi'
-
-Welcome to fdisk (util-linux 2.40.2).
-Changes will remain in memory only, until you decide to write them.
-Be careful before using the write command.
-
-Device does not contain a recognized partition table.
-Created a new DOS (MBR) disklabel with disk identifier 0x14a40227.
-
-Command (m for help): Created a new GPT disklabel (GUID: 2D341127-EA79-4410-975A-7713595A7FD3).
-
-Command (m for help): Partition number (1-128, default 1): First sector (2048-409566, default 2048): Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-409566, default 407551): 
-Created a new partition 1 of type 'Linux filesystem' and of size 100 MiB.
-
-Command (m for help): Partition number (2-128, default 2): First sector (206848-409566, default 206848): Last sector, +/-sectors or +/-size{K,M,G,T,P} (206848-409566, default 407551): 
-Created a new partition 2 of type 'Linux filesystem' and of size 98 MiB.
-
-Command (m for help): The partition table has been altered.
-Calling ioctl() to re-read partition table.
-Syncing disks.
-
-Discarding device blocks:      0/102400             done                            
-Creating filesystem with 102400 1k blocks and 25584 inodes
-Filesystem UUID: b8e5cb27-b629-4596-8432-0750a6f76223
-Superblock backups stored on blocks: 
-	8193, 24577, 40961, 57345, 73729
-
-Allocating group tables:  0/13     done                            
-Writing inode tables:  0/13     done                            
-Writing superblocks and filesystem accounting information:  0/13     done
-
-Discarding device blocks:      0/100352             done                            
-Creating filesystem with 100352 1k blocks and 25064 inodes
-Filesystem UUID: f94fa94c-a631-4ed4-926f-81df418d70ba
-Superblock backups stored on blocks: 
-	8193, 24577, 40961, 57345, 73729
-
-Allocating group tables:  0/13     done                            
-Writing inode tables:  0/13     done                            
-Writing superblocks and filesystem accounting information:  0/13     done
-
-make[1]: Leaving directory '/usr/local/osdev/versions/vi'
-make[1]: Entering directory '/usr/local/osdev/versions/vi'
-
-Welcome to fdisk (util-linux 2.40.2).
-Changes will remain in memory only, until you decide to write them.
-Be careful before using the write command.
-
-Device does not contain a recognized partition table.
-Created a new DOS (MBR) disklabel with disk identifier 0x810dfaf1.
-
-Command (m for help): Created a new GPT disklabel (GUID: 8466630D-C7C1-4E7C-A24F-9FFFDDFA85B5).
-
-Command (m for help): Partition number (1-128, default 1): First sector (2048-409566, default 2048): Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-409566, default 407551): 
-Created a new partition 1 of type 'Linux filesystem' and of size 100 MiB.
-
-Command (m for help): Partition number (2-128, default 2): First sector (206848-409566, default 206848): Last sector, +/-sectors or +/-size{K,M,G,T,P} (206848-409566, default 407551): 
-Created a new partition 2 of type 'Linux filesystem' and of size 98 MiB.
-
-Command (m for help): The partition table has been altered.
-Calling ioctl() to re-read partition table.
-Syncing disks.
-
-Discarding device blocks:      0/102400             done                            
-Creating filesystem with 102400 1k blocks and 25584 inodes
-Filesystem UUID: a33905c0-32f9-4d12-af16-9195ca52a825
-Superblock backups stored on blocks: 
-	8193, 24577, 40961, 57345, 73729
-
-Allocating group tables:  0/13     done                            
-Writing inode tables:  0/13     done                            
-Writing superblocks and filesystem accounting information:  0/13     done
-
-Discarding device blocks:      0/100352             done                            
-Creating filesystem with 100352 1k blocks and 25064 inodes
-Filesystem UUID: bf9d7b3a-b312-42c0-8695-f4c4f450f04a
-Superblock backups stored on blocks: 
-	8193, 24577, 40961, 57345, 73729
-
-Allocating group tables:  0/13     done                            
-Writing inode tables:  0/13     done                            
-Writing superblocks and filesystem accounting information:  0/13     done
-
-make[1]: Leaving directory '/usr/local/osdev/versions/vi'
-make[1]: Entering directory '/usr/local/osdev/versions/vi'
-Start Debug Dump
-----------
-vpath: kernel/:kernel/gui:kernel/include:kernel/include/gui:kernel/include/net:kernel/include/kapps:kernel/support:kernel/net:kernel/kapps:kernel/devices:kernel/devices/arch:kernel/devices/arch/x86_64:kernel/arch:kernel/arch/x86_64:kernel/fs:kernel/syscalls:
-----------
-*.s:
- 
-*.o:
-----------
-*.S: kernel/arch/x86_64/helper_asm.S kernel/arch/x86_64/interrupt_asm.S
- 
-*.o: build/helper_asm.o build/interrupt_asm.o
-----------
-*.c: kernel/arch/x86_64/bootstrap.c kernel/arch/x86_64/debug.c kernel/arch/x86_64/interrupt.c kernel/arch/x86_64/limine_boostrap.c kernel/arch/x86_64/page.c kernel/device.c kernel/devices/arch/x86_64/ahci.c kernel/devices/arch/x86_64/e1000.c kernel/devices/arch/x86_64/framebuffer.c kernel/devices/arch/x86_64/keyboard.c kernel/devices/arch/x86_64/pci.c kernel/devices/arch/x86_64/rtc.c kernel/devices/arch/x86_64/serial.c kernel/devices/arch/x86_64/timer.c kernel/fs/afs.c kernel/fs/elf.c kernel/fs/fs.c kernel/gui/console.c kernel/gui/text.c kernel/gui/u_vga16.c kernel/idle_loop.c kernel/kapps/kshell_arp_test.c kernel/kapps/kshell_cat.c kernel/kapps/kshell_dm.c kernel/kapps/kshell_ls.c kernel/kapps/kshell_ps.c kernel/kapps/kshell_quit.c kernel/kapps/kshell_task_tests.c kernel/kmemory.c kernel/kshell.c kernel/main.c kernel/net/arp.c kernel/net/dhcp.c kernel/net/ethernet.c kernel/net/ipv4.c kernel/net/tcp.c kernel/net/udp.c kernel/support/acpi.c kernel/support/kmalloc.c kernel/support/ksymbols.c kernel/support/mmio.c kernel/support/stacktrace.c kernel/syscalls/read.c kernel/syscalls/syscall.c kernel/syscalls/write.c kernel/task.c
- 
-*.o: build/bootstrap.o build/debug.o build/interrupt.o build/limine_boostrap.o build/page.o build/device.o build/ahci.o build/e1000.o build/framebuffer.o build/keyboard.o build/pci.o build/rtc.o build/serial.o build/timer.o build/afs.o build/elf.o build/fs.o build/console.o build/text.o build/u_vga16.o build/idle_loop.o build/kshell_arp_test.o build/kshell_cat.o build/kshell_dm.o build/kshell_ls.o build/kshell_ps.o build/kshell_quit.o build/kshell_task_tests.o build/kmemory.o build/kshell.o build/main.o build/arp.o build/dhcp.o build/ethernet.o build/ipv4.o build/tcp.o build/udp.o build/acpi.o build/kmalloc.o build/ksymbols.o build/mmio.o build/stacktrace.o build/read.o build/syscall.o build/write.o build/task.o
-----------
-End Debug Dump
- 
-make[1]: Leaving directory '/usr/local/osdev/versions/vi'
-make[1]: Entering directory '/usr/local/osdev/versions/vi'
 /usr/local/osdev/bin/x86_64-elf-gcc -DPAGING_PAE -DGRAPHICS_OFF -DBITS_64  -Wno-write-strings -ffreestanding -fno-omit-frame-pointer -fno-lto -fno-stack-protector -fno-stack-check -mno-red-zone -O0 -g -I/usr/local/osdev/versions/vi/kernel/include -I/usr/local/osdev/versions/vi/../libcvv/libc/include -m64 -march=x86-64 -mabi=sysv -mno-sse -mcmodel=kernel       -nostdlib -lgcc -std=c11 -c kernel/arch/x86_64/bootstrap.c -o build/bootstrap.o >> /usr/local/osdev/versions/vi/build_support/logs/build.log
 /usr/local/osdev/bin/x86_64-elf-gcc -DPAGING_PAE -DGRAPHICS_OFF -DBITS_64  -Wno-write-strings -ffreestanding -fno-omit-frame-pointer -fno-lto -fno-stack-protector -fno-stack-check -mno-red-zone -O0 -g -I/usr/local/osdev/versions/vi/kernel/include -I/usr/local/osdev/versions/vi/../libcvv/libc/include -m64 -march=x86-64 -mabi=sysv -mno-sse -mcmodel=kernel       -nostdlib -lgcc -std=c11 -c kernel/arch/x86_64/debug.c -o build/debug.o >> /usr/local/osdev/versions/vi/build_support/logs/build.log
 /usr/local/osdev/bin/x86_64-elf-gcc -DPAGING_PAE -DGRAPHICS_OFF -DBITS_64  -Wno-write-strings -ffreestanding -fno-omit-frame-pointer -fno-lto -fno-stack-protector -fno-stack-check -mno-red-zone -O0 -g -I/usr/local/osdev/versions/vi/kernel/include -I/usr/local/osdev/versions/vi/../libcvv/libc/include -m64 -march=x86-64 -mabi=sysv -mno-sse -mcmodel=kernel       -nostdlib -lgcc -std=c11 -c kernel/arch/x86_64/interrupt.c -o build/interrupt.o >> /usr/local/osdev/versions/vi/build_support/logs/build.log
@@ -161,6 +57,4 @@ make[1]: Entering directory '/usr/local/osdev/versions/vi'
 /usr/local/osdev/bin/x86_64-elf-ld -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/control/linker.ld -o build/versionvi.bin build_support/klibc/vvlibc.o  build/bootstrap.o  build/debug.o  build/interrupt.o  build/limine_boostrap.o  build/page.o  build/device.o  build/ahci.o  build/e1000.o  build/framebuffer.o  build/keyboard.o  build/pci.o  build/rtc.o  build/serial.o  build/timer.o  build/afs.o  build/elf.o  build/fs.o  build/console.o  build/text.o  build/u_vga16.o  build/idle_loop.o  build/kshell_arp_test.o  build/kshell_cat.o  build/kshell_dm.o  build/kshell_ls.o  build/kshell_ps.o  build/kshell_quit.o  build/kshell_task_tests.o  build/kmemory.o  build/kshell.o  build/main.o  build/arp.o  build/dhcp.o  build/ethernet.o  build/ipv4.o  build/tcp.o  build/udp.o  build/acpi.o  build/kmalloc.o  build/ksymbols.o  build/mmio.o  build/stacktrace.o  build/read.o  build/syscall.o  build/write.o  build/task.o  build/helper_asm.o  build/interrupt_asm.o
 /usr/local/osdev/bin/x86_64-elf-objdump -x -D -S build/versionvi.bin > build_support/logs/objdump.txt
 readelf -W -a build/versionvi.bin > build_support/logs/elfdump.txt
-make[1]: Leaving directory '/usr/local/osdev/versions/vi'
-make[1]: Entering directory '/usr/local/osdev/versions/vi'
 make[1]: Leaving directory '/usr/local/osdev/versions/vi'

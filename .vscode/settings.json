@@ -12,7 +12,8 @@
         "mmio.h": "c",
         "ahci.h": "c",
         "afs.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "unistd.h": "c"
     },
     "editor.wordWrap":"on" 
 }

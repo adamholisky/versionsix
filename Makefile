@@ -86,6 +86,8 @@ create_img:
 	@make create_img_stage_2 >> $(BUILD_LOG)
 	@>&2 echo [Create Img] Done
 
+#	This is failing on arch linux? Gives noacl error. Removing.
+# 	@sudo mount -o noacl $(LOOP_DRIVE)p1 $(MOUNT_DIR)
 create_img_stage_2:
 	@dd if=/dev/zero of=$(MOUNT_IMG) bs=100M count=2 >> $(BUILD_LOG)
 	@$(eval LOOP_DRIVE := $(shell sudo losetup -f))
@@ -93,7 +95,7 @@ create_img_stage_2:
 	@echo -e "g\nn\n1\n\n+100M\nn\n2\n\n\nw" | sudo fdisk $(LOOP_DRIVE) >> $(BUILD_LOG)
 	@sudo mke2fs $(LOOP_DRIVE)p1
 	@sudo mke2fs $(LOOP_DRIVE)p2
-	@sudo mount -o noacl $(LOOP_DRIVE)p1 $(MOUNT_DIR)
+	@sudo mount $(LOOP_DRIVE)p1 $(MOUNT_DIR)
 	@sudo cp -r build_support/boot_files/* $(MOUNT_DIR)
 	@sudo umount $(MOUNT_DIR)
 	@sudo /usr/local/osdev/share/limine/limine-deploy $(LOOP_DRIVE)

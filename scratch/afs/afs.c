@@ -191,7 +191,7 @@ int main( void ) {
 		closedir(d);
 	} else {
 		printf( "d is empty.\n" );
-		return;
+		return 0;
 	}
 
 	for( int i = 0; i < drive_item_count; i++ ) {
@@ -248,7 +248,7 @@ int main( void ) {
 	
 	// Step 4 -- Test OS routines and read logic
 
-	file_system.drive = buff;
+	file_system.drive = (afs_drive *)buff;
 	file_system.root_dir = bs_root_dir;
 	file_system.string_table = bs_string_table;
 	file_system.next_fd = 0;
@@ -741,7 +741,7 @@ afs_generic_block* afs_get_generic_block( vv_file_internal *fs, char *filename )
 
 			// If this is it, then just return the root directory
 			if( strcmp(full_filename, "/") == 0 ) {
-				return d;
+				return (afs_generic_block *)d;
 			}
 
 			found = true;

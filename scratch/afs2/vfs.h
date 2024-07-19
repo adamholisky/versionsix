@@ -26,6 +26,9 @@ typedef struct {
     uint8_t type;   // Type of inode
     uint64_t pos;   // Position of read/write head
     uint64_t size;  // Size of inode
+    uint32_t fd;    // File descriptor 
+    void *vfs_object; // Pointer to the vfs struct representing the inode
+    void *fs_object; // Pointer to the underlying file system object representing the inode
 } vfs_inode;
 
 /**

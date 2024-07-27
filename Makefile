@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := all
 
 ROOT_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-DEFINES = -DPAGING_PAE -DGRAPHICS_OFF -DBITS_64 
+DEFINES = -DVIFS_OS_ENV=1
 
 include $(ROOT_DIR)/build_support/control/paths.mk 
 include $(ROOT_DIR)/build_support/control/toolchain.mk 
@@ -11,7 +11,7 @@ SOURCES_ASMS = $(shell ls kernel/**/*.S)
 OBJECTS_C = $(patsubst %.c, build/%.o, $(shell ls kernel/**/*.c | xargs -n 1 basename))
 OBJECTS_ASMS = $(patsubst %.S, build/%.o, $(shell ls kernel/**/*.S | xargs -n 1 basename))
 
-all: debug_dump install
+all: debug_dump cp_fs install
 
 #$(CC) -T build_support/linker.ld -o build/versionvi.bin $(CFLAGS) ../libcvv/libc/vvlibc.o $(OBJECTS_C) $(OBJECTS_ASMS) $(CFLAGS_END)
 
@@ -30,6 +30,14 @@ build/%.o: %.S
 	@>&2 printf "[Build] $<\n"
 	$(eval OBJNAME := $(shell basename $@))
 	$(CC) $(AFLAGS) -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
+
+cp_fs:
+	@cp -f ../vifs/src/vfs.c kernel/fs/vfs.c
+	@cp -f ../vifs/src/rfs.c kernel/fs/rfs.c
+	@cp -f ../vifs/src/afs.c kernel/fs/afs.c
+	@cp -f ../vifs/include/vfs.h kernel/include/vfs.h
+	@cp -f ../vifs/include/rfs.h kernel/include/rfs.h
+	@cp -f ../vifs/include/afs.h kernel/include/afs.h
 
 install:
 	@make install_stage2 >> $(BUILD_LOG)

@@ -167,6 +167,8 @@ static struct liballoc_major *allocate_new_page( unsigned int size )
 	unsigned int st;
 	struct liballoc_major *maj;
 
+	//debugf( "size: %llx\n", size );
+
 	// This is how much space is required.
 	st  = size + sizeof(struct liballoc_major);
 	st += sizeof(struct liballoc_minor);
@@ -181,6 +183,8 @@ static struct liballoc_major *allocate_new_page( unsigned int size )
 		
 	// Make sure it's >= the minimum size.
 	if ( st < l_pageCount ) st = l_pageCount;
+
+	//debugf( "pages: %d\n", st );
 		
 	maj = (struct liballoc_major*)liballoc_alloc( st );
 
@@ -746,6 +750,7 @@ int liballoc_unlock( void ) {
  */
 
 void * liballoc_alloc( size_t n ) {
+	//debugf( "size: %d\n", n );
 	return (void *)page_allocate_kernel( n );
 }
 

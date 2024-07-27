@@ -1,26 +1,60 @@
 #include <kernel_common.h>
 #include <fs.h>
 #include <afs.h>
-
-vv_file_internal file_system;
-afs_drive main_drive;
-afs_block_directory root_dir;
-afs_string_table string_table;
+#include <rfs.h>
 
 char name_stdin[] = "stdin";
 char name_stdout[] = "stdout";
 char name_stderr[] = "srderr";
 
-vv_file *stdin;
-vv_file *stdout;
-vv_file *stderr;
-
-#define KDEBUG_FS_INIT
 /**
  * @brief Initalize the filesystem
  * 
  */
+#define KDEBUG_FS_INIT
 void fs_initalize( void ) {
+	int vfs_init_err = vfs_initalize();
+	if( vfs_init_err != VFS_ERROR_NONE ) {
+		debugf( "VFS Initalization failed: %d\n", vfs_init_err );
+		
+		return;
+	}
+
+	int afs_init_err = afs_initalize();
+	if( afs_init_err != VFS_ERROR_NONE ) {
+		debugf( "AFS Initalization failed: %d\n", afs_init_err );
+		
+		return;
+	}
+
+	int rfs_init_err = rfs_initalize();
+	if( rfs_init_err != VFS_ERROR_NONE ) {
+		debugf( "RFS Initalization failed: %d\n", rfs_init_err );
+		
+		return;
+	}
+
+	int afs_mount_err = vfs_mount( FS_TYPE_AFS, NULL, "/" );
+	if( afs_mount_err != 0 ) {
+		debugf( "Could not mount afs drive.\n" );
+
+		return;
+	}
+	debugf( "Mounted afs on /.\n" );
+
+	// Directory for RFS
+	//vfs_mkdir( 1, "/", "proc" );
+
+	// Mount RFS
+	/* int rfs_mount_err = vfs_mount( FS_TYPE_RFS, NULL, "/proc" );
+	if( rfs_mount_err != 0 ) {
+		debugf( "Could not mount /proc fs.\n" );
+
+		return;
+	}
+	vfs_debugf( "Mounted rfs on /proc.\n" ); */
+
+	/* OLD V Code
 	strcpy( file_system.working_directory, "/" );
 	file_system.drive = &main_drive;
 	file_system.root_dir = &root_dir;
@@ -81,9 +115,10 @@ void fs_initalize( void ) {
 	}
 	debugf( "\n" );
 	#endif
+	*/
 }
 
-void primative_ls( char *path ) {
+/* void primative_ls( char *path ) {
 	afs_ls( &file_system, path );
 }
 
@@ -91,13 +126,13 @@ void primative_pwd( void ) {
 	debugf( "%s\n", file_system.working_directory );
 }
 
-#undef KDEBUG_PRIMATIVE_CAT
+#undef KDEBUG_PRIMATIVE_CAT */
 /**
  * @brief AFS/Low version of cat for testing
  * 
  * @param pathname path + filename of the file to cat
  */
-void primative_cat( char *pathname ) {
+/* void primative_cat( char *pathname ) {
 	vv_file *fp;
 
 	fp = afs_open( &file_system, pathname, "r" );
@@ -122,16 +157,16 @@ void primative_cat( char *pathname ) {
 	printf( "%s\n", data );
 
 	free( data );
-}
+} */
 
 /**
  * @brief Get the fs internal object
  * 
  * @return vv_file_internal* Pointer to the file system internal management object
  */
-vv_file_internal * get_fs_internal( void ) {
+/* vv_file_internal * get_fs_internal( void ) {
 	return &file_system;
-}
+} */
 
 /**
  * @brief Get the file size of the given FD
@@ -139,6 +174,6 @@ vv_file_internal * get_fs_internal( void ) {
  * @param FD file descriptor to get the size of
  * @return uint32_t size of the file, 0 if empty or invalid
  */
-uint32_t get_file_size( int _FD ) {
+/* uint32_t get_file_size( int _FD ) {
 	return file_system.fd[_FD].size;
-}
+} */

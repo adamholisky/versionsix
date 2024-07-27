@@ -194,11 +194,12 @@ uint64_t *page_allocate( uint8_t number ) {
     log_entry_exit();
     #endif
 
+    //debugf( "Page allocated: 0x%016llX\n", return_val );
     return return_val;
 }
 
 #undef DEBUG_PAGE_ALLOCATE_KERNEL
-uint64_t *page_allocate_kernel( uint8_t number ) {
+uint64_t *page_allocate_kernel( uint32_t number ) {
     uint64_t *return_val = NULL;
 
     #ifdef DEBUG_PAGE_ALLOCATE_KERNEL
@@ -209,7 +210,8 @@ uint64_t *page_allocate_kernel( uint8_t number ) {
         return NULL;
     }
 
-    for( int i = 0; i < number; i++ ) {
+    int i;
+    for( i = 0; i < number; i++ ) {
         if( i == 0 ) {
             return_val = page_map( kernel_virtual_memory_next, kernel_physical_memory_next );
         } else {
@@ -224,6 +226,7 @@ uint64_t *page_allocate_kernel( uint8_t number ) {
     log_entry_exit();
     #endif
 
+    //debugf( "Page allocated (kernel): addr=0x%016llX  number=%d  i=%d\n", return_val, number, i );
     return return_val;
 }
 
@@ -395,6 +398,8 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
         pd[index_pd].address = pt_physical_addr >> 12;
         pd[index_pd].rw = 1;
         pd[index_pd].present = 1;
+
+        //debugf( "setup_pd triggered\n" );
     }
 
     uint64_t pd_physical_addr = (uint64_t)pd - virtual_base_modifier + physical_base_modifier;
@@ -403,6 +408,7 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
         pdpt[index_pdpt].address = pd_physical_addr >> 12;
         pdpt[index_pdpt].rw = 1;
         pdpt[index_pdpt].present = 1;
+        //debugf( "setup_pdpt triggered\n" );
     } else if( setup_pd ) {
         pdpt[index_pdpt].address = pd_physical_addr >> 12;
     }

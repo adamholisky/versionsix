@@ -229,7 +229,7 @@ void ahci_stop_cmd( HBA_PORT *port ) {
  
 }
 
-#define KDEBUG_READ_AHCI
+#undef KDEBUG_READ_AHCI
 bool read_ahci( HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint16_t *buf ) {
 	port->is = (uint32_t) -1;		// Clear pending interrupt bits
 	int spin = 0; // Spin lock timeout counter
@@ -285,7 +285,7 @@ bool read_ahci( HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count
 	cmd_tbl->prdt_entry[i].dbc = (count<<9)-1;	// 512 bytes per sector
 	cmd_tbl->prdt_entry[i].i = 1;
  
-	debugf( "cmd_tbl->cfis: %llX\n", cmd_tbl->cfis );
+	//debugf( "cmd_tbl->cfis: %llX\n", cmd_tbl->cfis );
 	// Setup command
 	FIS_REG_H2D *cmdfis = (FIS_REG_H2D*)(&cmd_tbl->cfis);
 	cmdfis->fis_type = FIS_TYPE_REG_H2D;
@@ -322,7 +322,7 @@ bool read_ahci( HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count
 	// Wait for completion
 	while (1)
 	{
-		debugf( "#" );
+		//debugf( "#" );
 		// In some longer duration reads, it may be helpful to spin on the DPS bit 
 		// in the PxIS port field as well (1 << 5)
 		if ((port->ci & (1<<slot)) == 0) 
@@ -361,6 +361,8 @@ bool ahci_read_sector( uint32_t sector, uint32_t *buffer ) {
 
 #undef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
 bool ahci_read_at_byte_offset( uint32_t offset, uint32_t size, uint8_t *buffer ) {
+	debugf( "offset = 0x%08X, size = 0x%08X, buffer=0x%llx\n", offset, size, buffer );
+
 	bool read_result = false;
 	uint32_t sector = 0;
 	uint32_t count = 0;

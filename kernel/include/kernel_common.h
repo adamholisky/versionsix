@@ -16,6 +16,8 @@ extern "C" {
 #include <debug.h>
 #include <framebuffer.h>
 
+#define VIFS_OS
+
 // From helper_asm.S
 extern uint64_t get_cr0( void );
 extern uint64_t get_cr2( void );

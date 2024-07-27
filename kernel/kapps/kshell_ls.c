@@ -1,7 +1,6 @@
 #include <kernel_common.h>
 #include <kshell_app.h>
 #include <fs.h>
-#include <afs.h>
 
 KSHELL_COMMAND( ls, kshell_app_ls_main )
 
@@ -17,8 +16,39 @@ int kshell_app_ls_main( int argc, char *argv[] ) {
 		path = empty_string;
 	}
 
-	primative_ls( path );
+	char type_dir[] = "DIR ";
+	char type_file[] = "FILE";
+	char type_unknown[] = "????";
 
-	printf( "Ending.\n" );
+	printf( "Listing: %s\n", path );
+	vfs_directory_list *dir_list = vfs_malloc( sizeof(vfs_directory_list) );
+	vfs_get_directory_list( vfs_lookup_inode(path), dir_list );
+
+	if( dir_list == NULL ) {
+		printf( "Directory not found.\n" );
+		return 1;
+	}
+
+	for( int i = 0; i < dir_list->count; i++ ) {
+		char *type = NULL;
+
+		vfs_inode *n = vfs_lookup_inode_ptr_by_id( dir_list->entry[i].id );
+		switch( n->type ) {
+			case VFS_INODE_TYPE_DIR:
+				type = type_dir;
+				break;
+			case VFS_INODE_TYPE_FILE:
+				type = type_file;
+				break;
+			default:
+				type = type_unknown;
+		}
+
+		printf( "    %03ld %s %s\n", dir_list->entry[i].id, type, dir_list->entry[i].name );
+	}
+
+	printf( "\n" );
+
+	printf( "Done successfully.\n" );
 	return 0;
 }

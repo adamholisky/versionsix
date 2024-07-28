@@ -22,6 +22,7 @@
 #include <keyboard.h>
 #include <rtc.h>
 #include <ahci.h>
+#include <fs.h>
 
 #undef ENABLE_NETWORKING
 

@@ -15,5 +15,5 @@
         "stdbool.h": "c",
         "unistd.h": "c"
     },
-    "editor.wordWrap":"on" 
+    "editor.wordWrap":"on"
 }

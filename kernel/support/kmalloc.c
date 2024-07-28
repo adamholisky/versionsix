@@ -1,4 +1,5 @@
 #include <kernel_common.h>
+#include <page.h>
 #include <kmemory.h>
 
 /**  Durand's Amazing Super Duper Memory functions.  */

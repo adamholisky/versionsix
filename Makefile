@@ -61,10 +61,13 @@ run_debug: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_COMMON)
 
 gdb:
-	gdbtui -q --command=$(ROOT_DIR)/build_support/gdb_control/commands.gdb
+	gdb -q --command=$(ROOT_DIR)/build_support/gdb_control/commands.gdb
 
 gdbseer:
-	seergdb --connect localhost:5894 /usr/local/osdev/versions/vi/build/versionvi.bin
+	seergdb --connect localhost:5894 /usr/local/osdev/versions/versionsix/build/versionvi.bin
+
+gdbfrontend:
+	gdbfrontend -G "--command=$(ROOT_DIR)/build_support/gdb_control/commands.gdb"
 
 debug_dump:
 	@>&2 echo [Build] Makefile Debug Dump

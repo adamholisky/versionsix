@@ -8,8 +8,8 @@ layout main
 winheight src -5 
 focus cmd
 
-file /usr/local/osdev/versions/vi/build/versionvi.bin
-directory /usr/local/osdev/versions/vi/kernel
+file /usr/local/osdev/versions/versionsix/build/versionvi.bin
+directory /usr/local/osdev/versions/versionsix/kernel
 
 define qq
   set confirm off
@@ -34,13 +34,6 @@ define dm
   eval "x/%d%c %d", $i, 'x', $arg0
 end
 
-#break _asm_kernel_start
-#break stage5
-#break interrupts.c:107 if interrupt_num == 0x30
-#break interrupts.c:107 if interrupt_num == 0x31 
-#break *0x0010aaaa
-#break debug.cpp:30
-#break debug.cpp:39
-break page.c:166
+source /usr/local/osdev/versions/versionsix/build_support/gdb_control/breakpoints.gdb
 
 target remote localhost:5894

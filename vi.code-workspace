@@ -3,5 +3,9 @@
         {
             "path": "."
         }
-    ]
+    ],
+    "settings": {
+        "save-gdb-breakpoints.savePath": "${workspaceFolder}/build_support/gdb_control/breakpoints.gdb",
+        "save-gdb-breakpoints.autoSave": true
+    }
 }

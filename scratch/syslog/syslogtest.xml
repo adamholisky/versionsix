@@ -1,0 +1,9 @@
+<entry>
+    <level>warn</level>
+    <process>kernel</process>
+    <message>
+    some message
+    goes
+    here
+    </message>
+</entry>

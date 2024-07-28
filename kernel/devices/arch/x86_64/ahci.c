@@ -359,7 +359,7 @@ bool ahci_read_sector( uint32_t sector, uint32_t *buffer ) {
 	return true;
 }
 
-#undef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
+#define KDEBUG_AHCI_READ_AT_BYTE_OFFSET
 bool ahci_read_at_byte_offset( uint32_t offset, uint32_t size, uint8_t *buffer ) {
 	debugf( "offset = 0x%08X, size = 0x%08X, buffer=0x%llx\n", offset, size, buffer );
 
@@ -376,7 +376,7 @@ bool ahci_read_at_byte_offset( uint32_t offset, uint32_t size, uint8_t *buffer )
 	debugf( "read: offset -- %X, size %X\n", offset, size );
 	debugf( "read at offset -- sector = %X, count = %X, internal_offset = %X\n", sector, count, internal_offset );
 
-	memset( global_buffer, 0xDD, 2 * 1024 * 1024 );
+	memset( global_buffer, 0xDD, 4096*2 );
 	#endif
 
 	read_result = read_ahci( &abar->ports[1], sector, 0, count, (uint16_t *)global_buffer_phys );
@@ -425,25 +425,63 @@ bool ahci_read_at_byte_offset_512_chunks( uint32_t offset, uint32_t size, uint8_
 
 	sector = offset / 512;
 	internal_offset = offset - (sector * 512);
-	count = (size / 512) + 2;
+
+	if( size < 512 ) {
+		count = 1;
+	} else {
+		count = (size / 512);
+
+		if( ((size + internal_offset) % 512) != 0 ) {
+			count++; 
+		}
+	}
 
 	#ifdef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
 	debugf( "read: offset -- %X, size %X\n", offset, size );
 	debugf( "read at offset -- sector = %X, count = %X, internal_offset = %X\n", sector, count, internal_offset );
 
-	memset( global_buffer, 0xDD, 2 * 1024 * 1024 );
+	memset( global_buffer, 0xDD, 2*4096 );
 	#endif
 
+	uint32_t size_left = size;
+	debugf( "starting size_left: %d\n", size_left );
+
 	for( int i = 0; i < count; i++ ) {
-		read_result = read_ahci( &abar->ports[1], sector + i, 0, 1, (uint16_t *)(global_buffer + (i * 512)) );
+		memset( global_buffer, 0x00, 2*4096 );
+
+		read_result = read_ahci( &abar->ports[1], sector + i, 0, 1, (uint16_t *)(global_buffer_phys) );
 
 		if( !read_result ) {
 			debugf( "Read failed. sector = %X\n", sector );
 			return false;
 		}
-	}
 
-	memcpy( buffer, (uint8_t *)global_buffer + internal_offset, size );
+		if( i == 0 ) {
+			int mem_to_copy = 0;
+
+			// First run is |0 ...... internal_offset .... 512|. total bytes is 512 - internal_offset.
+			if( size_left < 512 ) {
+				mem_to_copy = size_left;
+			} else {
+				size_left = size_left - (512 - internal_offset);
+				mem_to_copy = 512 - internal_offset; 
+			}
+			
+			memcpy( buffer, (uint8_t *)global_buffer + internal_offset, mem_to_copy);
+		} else {
+			debugf( "size_left = %d\n", size_left );
+			
+			int mem_to_copy = 512;
+
+			if( size_left < 512 ) {
+				mem_to_copy = size_left;
+			} else {
+				size_left = size_left - 512;
+			}
+			memcpy( buffer + (i*512) - internal_offset, (uint8_t *)global_buffer, mem_to_copy );
+		}
+		
+	}
 
 	#ifdef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
 	int z = 0;

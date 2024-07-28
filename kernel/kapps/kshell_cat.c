@@ -24,8 +24,8 @@ int kshell_app_cat_main( int argc, char *argv[] ) {
 
 	char *data = vfs_malloc( stats.size );
 	int read_err = vfs_read( vfs_lookup_inode(path), data, stats.size, 0 );
-	if( read_err != VFS_ERROR_NONE ) {
-		printf( "Error when reading.\n" );
+	if( read_err < VFS_ERROR_NONE ) {
+		printf( "Error when reading: %d\n", read_err );
 		return 1;
 	}
 

@@ -359,7 +359,7 @@ bool ahci_read_sector( uint32_t sector, uint32_t *buffer ) {
 	return true;
 }
 
-#define KDEBUG_AHCI_READ_AT_BYTE_OFFSET
+#undef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
 bool ahci_read_at_byte_offset( uint32_t offset, uint32_t size, uint8_t *buffer ) {
 	debugf( "offset = 0x%08X, size = 0x%08X, buffer=0x%llx\n", offset, size, buffer );
 
@@ -444,7 +444,7 @@ bool ahci_read_at_byte_offset_512_chunks( uint32_t offset, uint32_t size, uint8_
 	#endif
 
 	uint32_t size_left = size;
-	debugf( "starting size_left: %d\n", size_left );
+	//debugf( "starting size_left: %d\n", size_left );
 
 	for( int i = 0; i < count; i++ ) {
 		memset( global_buffer, 0x00, 2*4096 );
@@ -469,7 +469,7 @@ bool ahci_read_at_byte_offset_512_chunks( uint32_t offset, uint32_t size, uint8_
 			
 			memcpy( buffer, (uint8_t *)global_buffer + internal_offset, mem_to_copy);
 		} else {
-			debugf( "size_left = %d\n", size_left );
+			//debugf( "size_left = %d\n", size_left );
 			
 			int mem_to_copy = 512;
 

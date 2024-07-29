@@ -33,6 +33,17 @@ typedef struct {
 	kshell_command *cmd;
 } kshell_command_list;
 
+typedef struct {
+	char name[50];
+	char value[255];
+	void *next;
+} kshell_env_var;
+
+typedef struct {
+	uint16_t num_vars;
+	kshell_env_var *top;
+} kshell_env_var_list;
+
 void kshell_initalize( void );
 void kshell_add_command( char *command_name, void *main_function );
 kshell_command *kshell_command_create( char *command_name, void *main_function );
@@ -41,6 +52,9 @@ void kshell_run( void );
 void kshell_stop( void );
 void kshell_main_loop( void );
 bool kshell_handle_special_keypress( uint8_t scancode );
+
+char *kshell_get_env_var( char *name );
+void kshell_set_env_var( char *name, char *value );
 
 int kshell_command_hello_world( int argc, char *argv[] );
 

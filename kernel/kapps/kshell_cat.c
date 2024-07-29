@@ -30,10 +30,7 @@ int kshell_app_cat_main( int argc, char *argv[] ) {
 	}
 
 	data[ stats.size ] = 0;
-
-	printf( "cat %s\n", path );
-	printf( "size: %d\n", stats.size );
-	printf( "%s\n", data );
+	printf( "%s", data );
 	printf( "\n" );
 
 	return 0;

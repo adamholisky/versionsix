@@ -10,6 +10,8 @@
 kshell_config main_shell;
 kshell_command_list kshell_commands;
 
+kshell_env_var_list env_vars;
+
 void kshell_initalize( void ) {
 	// Setup first command
 	kshell_commands.cmd = kshell_command_create( "hw", (void *)kshell_command_hello_world );
@@ -33,6 +35,16 @@ void kshell_initalize( void ) {
 
 	main_shell.current_line = (char *)kmalloc( KSHELL_MAX_LINESIZE );
 
+	env_vars.num_vars = 1;
+	env_vars.top = kmalloc( sizeof(kshell_env_var) );
+	strcpy( env_vars.top->name, "WD" );
+	strcpy( env_vars.top->value, "/" );
+	env_vars.top->next = NULL;
+
+	kshell_set_env_var( "PATH", "/bin" );
+	kshell_set_env_var( "HOST", "qemu1" );
+	kshell_set_env_var( "USER", "root" );
+
 	kshell_run();
 }
 
@@ -54,6 +66,9 @@ void kshell_stop( void ) {
 }
 
 void kshell_main_loop( void ) {
+	char *user_name = kshell_get_env_var( "USER" );
+	char *host = kshell_get_env_var( "HOST" );
+
 	while( main_shell.keep_going ) {
 		uint8_t scancode = 0;
 		char c = 0;
@@ -62,7 +77,7 @@ void kshell_main_loop( void ) {
 		bool do_extra_newline = true;
 
 		memset( main_shell.current_line, 0, KSHELL_MAX_LINESIZE );
-		printf( "Version VI:/$ " );
+		printf( "[VVI %s@%s %s]: ", user_name, host, kshell_get_env_var("WD") );
 
 		/* Step 1: Get the line, put it into current_line */
 		do {
@@ -281,4 +296,35 @@ void kshell_add_command( char *command_name, void *main_function ) {
 
 	entry->cmd = kshell_command_create( command_name, main_function );
 	entry->next = NULL;
+}
+
+char *kshell_get_env_var( char *name ) {
+	kshell_env_var *head = env_vars.top;
+
+	while( head != NULL ) {
+		if( strcmp( head->name, name ) == 0 ) {
+			return head->value;
+		}
+
+		head = head->next;
+	}
+
+	return NULL;
+}
+
+void kshell_set_env_var( char *name, char *value ) {
+	kshell_env_var *head = env_vars.top;
+	kshell_env_var *tail = kmalloc( sizeof(kshell_env_var) );
+	strcpy( tail->name,  name );
+	strcpy( tail->value, value );
+	tail->next = NULL;
+
+	do {
+		if( head->next == NULL ) {
+			head->next = tail;
+			return;
+		}
+
+		head = head->next;
+	} while( head != NULL );
 }

@@ -52,6 +52,12 @@ static inline void out_port_long( uint16_t port, uint32_t value) {
 void delay( uint32_t count );
 int kstrlen( char *s );
 
+#ifdef VIOS_ENABLE_PROFILING
+void profiling_initalize( void );
+void __cyg_profile_func_enter (void *this_fn, void *call_site);
+void __cyg_profile_func_exit  (void *this_fn, void *call_site);
+#endif
+
 /* #define debugf( ... ) printf( __VA_ARGS__ )
 #define log_entry_enter() debugf( "Enter\n" )
 #define log_entry_exit() debugf( "Exit\n" );

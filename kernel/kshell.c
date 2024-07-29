@@ -24,6 +24,7 @@ void kshell_initalize( void ) {
 
 	for( int i = 0; i < max_symbols; i++ ) {
 		if( strncmp( symbol_array[i].name, "kshell_app_add_command_", sizeof("kshell_app_add_command_") - 1 ) == 0 ) {
+			debugf( "found: %s\n", symbol_array[i].name );
 			void (*func)(void) = (void(*)(void))symbol_array[i].addr;
 			func();
 		}
@@ -61,6 +62,18 @@ void kshell_run( void ) {
 
 void kshell_stop( void ) {
 	main_shell.keep_going = false;
+
+	#ifdef VIOS_ENABLE_PROFILING
+	symbol_collection *ksyms = get_ksyms_object();
+	debugf( "Profiling Counts:\n===================\n" );
+	for( int i = 0; i < ksyms->top; i++ ) {
+		if( ksyms->symbols[i].count != 0 ) {
+			debugf_raw( "%s\t%d\t%ld\n", ksyms->symbols[i].name, ksyms->symbols[i].count, ksyms->symbols[i].time );
+		}
+	}
+	debugf( "====================\n" );
+	#endif
+
 
 	do_immediate_shutdown();
 }
@@ -225,7 +238,7 @@ bool kshell_handle_special_keypress( uint8_t scancode ) {
  * @param main_function pointer to the function address to run
  * @return kshell_command* pointer to a new kshell_command
  */
-kshell_command *kshell_command_create( char *command_name, void *main_function ) {
+kshell_command __attribute__ ((no_instrument_function)) *kshell_command_create( char *command_name, void *main_function ) {
 	kshell_command *cmd = (kshell_command *)kmalloc( sizeof( kshell_command ) );
 	strcpy( cmd->name, command_name );
 	cmd->entry = main_function;

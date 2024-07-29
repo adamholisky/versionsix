@@ -1,13 +1,6 @@
 #./configure --prefix=/usr/local/osdev --enable-tui
 set disassembly-flavor att
 
-tui enable
-tui new-layout main {-horizontal { {-horizontal src 3 asm 2} 4 cmd 1 } 5  regs 1 } 1 status 0
-set tui border-kind acs
-layout main
-winheight src -5 
-focus cmd
-
 file /usr/local/osdev/versions/versionsix/build/versionvi.bin
 directory /usr/local/osdev/versions/versionsix/kernel
 

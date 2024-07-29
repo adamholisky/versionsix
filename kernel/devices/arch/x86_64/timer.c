@@ -3,13 +3,14 @@
 #include "timer.h"
 
 uint32_t timer_counter;
+uint64_t system_count;
 bool done_waiting;
 
 void timer_initalize( void ) {
     irq_handler_func timer_func = timer_handler;
     interrupt_add_irq_handler( 0, timer_func );
 
-    uint16_t divisor = 11931;      // Calculate our divisor, default 65535 --> 1193180/hz
+    uint16_t divisor = 1193180 / 10000;      // Calculate our divisor, default 65535 --> 1193180/hz
     outportb( 0x43, 0x36 );             // Set our command byte 0x36
     outportb( 0x40, divisor & 0xFF );   // Set low byte of divisor
     outportb( 0x40, divisor >> 8 );     // Set high byte of divisor
@@ -20,14 +21,15 @@ void timer_initalize( void ) {
 
 void timer_handler( registers **context ) {
     // These numbers are awful. This whole thing needs to be made to not be dumb.
+    system_count++;
 
-    if( timer_counter == 50 ) {
+   /*  if( timer_counter == 50 ) {
         main_console_blink_cursor();
     } else if( timer_counter == 100 ) {
         main_console_blink_cursor();
-    }
+    } */
 
-    if( timer_counter < 101 ) { 
+    if( timer_counter < 1001 ) { 
         timer_counter++;
     } else {
         timer_counter = 0;

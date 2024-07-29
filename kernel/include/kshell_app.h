@@ -7,12 +7,13 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-void kshell_add_command( char *command_name, void *main_function );
+void __attribute__ ((no_instrument_function)) kshell_add_command( char *command_name, void *main_function );
 
 #define KSHELL_COMMAND( name, main_function ) \
-	int kshell_app_ ##name## _main( int c, char *argv[] ); \
-	void kshell_app_add_command_ ##name ( void ) { \
+	int __attribute__ ((no_instrument_function)) kshell_app_ ##name## _main( int c, char *argv[] ); \
+	void __attribute__ ((no_instrument_function)) kshell_app_add_command_ ##name ( void ) { \
 		kshell_add_command( #name, (void *)main_function ); \
+		debugf( "Added.\n" ); \
 	}
 
 #ifdef __cplusplus

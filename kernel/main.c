@@ -47,8 +47,13 @@ void kernel_main( void ) {
 	timer_initalize();
 	paging_initalize();
 	memory_initalize();
-	framebuffer_initalize();
 	kernel_symbols_initalize();
+
+	#ifdef VIOS_ENABLE_PROFILING
+	profiling_initalize();
+	#endif
+
+	framebuffer_initalize();
 	pci_initalize();
 	ahci_initalize();
 	fs_initalize();

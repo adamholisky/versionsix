@@ -2,10 +2,20 @@
     "folders": [
         {
             "path": "."
+        },
+        {
+            "path": "../libcvv/libc"
         }
     ],
     "settings": {
         "save-gdb-breakpoints.savePath": "${workspaceFolder}/build_support/gdb_control/breakpoints.gdb",
-        "save-gdb-breakpoints.autoSave": true
+        "save-gdb-breakpoints.autoSave": true,
+        "files.associations": {
+            "bitset": "c",
+            "format": "c",
+            "compare": "c",
+            "cstdint": "c",
+            "algorithm": "c"
+        }
     }
 }

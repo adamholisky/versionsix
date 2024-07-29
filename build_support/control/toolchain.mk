@@ -5,6 +5,9 @@ OBJDUMP = /usr/local/osdev/bin/x86_64-elf-objdump
 
 #CFLAGS = $(DEFINES) -Wno-write-strings -fcompare-debug-second -ffreestanding -fno-omit-frame-pointer -O0 -g -I$(ROOT_DIR)/kernel/include -I$(ROOT_DIR)/../libcvv/libc/include
 
+#-finstrument-functions \
+	-finstrument-functions-exclude-file-list=helper_asm.S,interrupt_asm.S,debug.c,serial.c,ksymbols.c,bootstrap.c,interrupt.c,write.c \
+	-finstrument-functions-exclude-function-list=inportb,outportb,in_port_long,out_port_long,timer_handler
 
 CFLAGS = $(DEFINES) -Wno-write-strings \
 	-ffreestanding \
@@ -22,6 +25,7 @@ CFLAGS = $(DEFINES) -Wno-write-strings \
     -mabi=sysv           \
 	-mno-sse \
     -mcmodel=kernel      
+
 CFLAGS_END = -nostdlib -lgcc
 AFLAGS = $(CFLAGS)
 
@@ -64,7 +68,7 @@ QEMU_COMMON = 	-device ahci,id=ahci \
 				-serial null \
 				-serial file:$(ROOT_DIR)/build_support/logs/serial_out.txt \
 				\
-				-d trace:"ahci*" \
+				-d cpu_reset \
 				\
 				-no-reboot
 QEMU_DISPLAY_NONE =	-display none

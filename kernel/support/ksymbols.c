@@ -42,6 +42,36 @@ char *kernel_symbols_get_function_name_at( uint64_t addr ) {
 	return symbols_get_function_name_at( &ksyms, addr );
 }
 
+#ifdef VIOS_ENABLE_PROFILING
+void kernel_symbols_inc_count( uint64_t addr ) {
+	for( int i = 0; i < ksyms.top; i++ ) {
+		if( ksyms.symbols[i].addr == addr ) {
+			ksyms.symbols[i].count++;
+			return;
+		}
+	}
+}
+
+void kernel_symbols_set_start( uint64_t addr, uint64_t count ) {
+	for( int i = 0; i < ksyms.top; i++ ) {
+		if( ksyms.symbols[i].addr == addr ) {
+			ksyms.symbols[i].start = count;
+			return;
+		}
+	}
+}
+
+void kernel_symbols_set_time( uint64_t addr, uint64_t count ) {
+	for( int i = 0; i < ksyms.top; i++ ) {
+		if( ksyms.symbols[i].addr == addr ) {
+			ksyms.symbols[i].time = ksyms.symbols[i].time + (count - ksyms.symbols[i].start);
+			ksyms.symbols[i].start = 0;
+			return;
+		}
+	}
+}
+#endif
+
 symbol *symbols_get_symbol_array( symbol_collection *syms ) {
 	return syms->symbols;
 }

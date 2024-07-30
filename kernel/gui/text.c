@@ -2,8 +2,7 @@
 #include <framebuffer.h>
 #include <gui/gui.h>
 #include <gui/text.h>
-#include <fs.h>
-#include <vfs.h>
+#include <gui/font.h>
 
 extern framebuffer_state fb_state;
 
@@ -101,152 +100,19 @@ int utf8_encode(uint8_t *out, uint32_t utf)
   }
 }
 
-font_bitmap *bitmaps = NULL;
-
-void load_font_psf( void ) {
-	char font_path[] = "/usr/share/fonts/zap-light20.psf";
-
-	vfs_stat_data stats;
-
-	int stat_error = vfs_stat( vfs_lookup_inode(font_path), &stats );
-	if( stat_error != VFS_ERROR_NONE ) {
-		debugf( "Error: %d\n", stat_error );
-		return 1;
-	}
-
-	uint8_t *data = vfs_malloc( stats.size );
-	int read_err = vfs_read( vfs_lookup_inode(font_path), data, stats.size, 0 );
-	if( read_err < VFS_ERROR_NONE ) {
-		debugf( "Error when reading: %d\n", read_err );
-		return 1;
-	}
-
-	data[ stats.size ] = 0;
-
-	psf_font *header = (psf_font *)data;
-
-	bitmaps = kmalloc( sizeof(font_bitmap) * header->numglyph);
-
-	uint16_t *start = (data + header->headersize);
-
-	debugf( "Number glyphs: %d\n", header->numglyph );
-	debugf( "Bytes per glyph: %d\n", header->bytesperglyph );
-	debugf( "Flags: %X\n", header->flags );
-	debugf( "Height: %d\n", header->height );
-	debugf( "Width: %d\n", header->width );
-	debugf( "uint16: %d\n", sizeof(uint16_t) );
-	debugf( "Header size: 0x%X\n", header->headersize );
-	debugf( "Data Start: 0x%016llx\n", data );
-	debugf( "Glyp Start: 0x%016llx\n", start );
-
-	for( int i = 0; i < header->numglyph; i++ ) {
-		bitmaps[i].num = i;
-
-		for( int j = 0; j < 20; j++ ) {
-			bitmaps[i].pixel_row[j] = (*start << 8) | (*start  >> 8);
-
-			*start++;
-		}
-	}
-}
-
-void load_font_bdf( void ) {
-	char font_path[] = "/usr/share/fonts/gomme10x20n.bdf";
-
-	vfs_stat_data stats;
-
-	int stat_error = vfs_stat( vfs_lookup_inode(font_path), &stats );
-	if( stat_error != VFS_ERROR_NONE ) {
-		debugf( "Error: %d\n", stat_error );
-		return 1;
-	}
-
-	uint8_t *data = vfs_malloc( stats.size );
-	int read_err = vfs_read( vfs_lookup_inode(font_path), data, stats.size, 0 );
-	if( read_err < VFS_ERROR_NONE ) {
-		debugf( "Error when reading: %d\n", read_err );
-		return 1;
-	}
-
-	data[ stats.size ] = 0;
-
-	bool keep_going = true;
-	bool in_char = false;
-	uint16_t current_char = 0;
-	bool in_bitmap = false;
-	int bitmap_line = 0;
-	int j = 0;
-
-	do {
-		char line[250];
-		
-		memset( line, 0, 250 );
-
-		for( int i = 0; i < 250; i++ ) {
-			if( *data == '\n' ) {
-				data++;
-				i = 250;
-			} else {
-				line[i] = *data++;
-			}
-		}
-
-		if( in_char ) {
-			if( in_bitmap ) {
-				if( strncmp(line, "ENDCHAR", sizeof("ENDCHAR") - 1) == 0 ) {
-					in_char = false;
-					in_bitmap = false;
-					bitmap_line = 0;
-					j++;
-				} else {
-					bitmaps[j].pixel_row[bitmap_line] = strtol(line, NULL, 16);
-					/* if( current_char == 'V' ) {
-						debugf( "bitmap line: %X %X %X\n", bitmaps[j].pixel_row[bitmap_line], line_data, line_data16 );
-					} */
-					bitmap_line++;
-				}
-			} else {
-				if( strncmp(line, "ENCODING ", sizeof("ENCODING ") - 1) == 0 ) {
-					char *encoding_line = line;
-					encoding_line = encoding_line + sizeof("ENCODING ") - 1;
-					current_char = atoi(encoding_line);
-					bitmaps[j].num = current_char;
-					//debugf( "Found 0x%X (%d) '%c'\n", current_char, current_char, current_char );
-				} else if( strncmp(line, "BITMAP", sizeof("BITMAP") - 1) == 0 ) {
-					in_bitmap = true;
-				}
-			}
-		} else {
-			if( strncmp(line, "CHARS ", 6) == 0 ) {
-				char *chars_line = line;
-				chars_line = chars_line + 6;
-				uint16_t num_chars = atoi(chars_line);
-				bitmaps = kmalloc( sizeof(font_bitmap) * num_chars );
-				//debugf( "Num Chars: %d\n", num_chars );
-			} else if( strncmp(line, "STARTCHAR ", sizeof("STARTCHAR ") - 1) == 0 ) {
-				in_char = true;
-			}
-		}
-
-		if( *data == 0 ) {
-			keep_going = false;
-		}
-	} while( keep_going );
-
-	debugf( "added %d chars\n", j );
-}
-
 void draw_char( uint16_t char_num, uint16_t x, uint16_t y ) {
 	draw_char_with_color( char_num, x, y, COLOR_RGB_WHITE, COLOR_RGB_BLUE );
 }
 
 void draw_char_with_color( uint16_t char_num, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg ) {
+	font_bitmap *bitmaps = font_get_main_bitmap();
+	font_info *info = font_get_main_info();
 
 	int16_t index = -1;
-	for( int n = 0; n < 255; n++ ) {
+	for( int n = 0; n < info->num_glyphs; n++ ) {
 		if( bitmaps[n].num == char_num ) {
 			index = n;
-			n = 255;
+			n = info->num_glyphs;
 		}
 	}
 
@@ -255,12 +121,12 @@ void draw_char_with_color( uint16_t char_num, uint16_t x, uint16_t y, uint32_t f
 	}
 
 	//debugf( "printing: %c 0x%04X (%d).\n", bitmaps[index].num, bitmaps[index].num, bitmaps[index].num);
-	for( int i = 0; i < 20; i++ ) {
+	for( int i = 0; i < info->height; i++ ) {
 		uint32_t *loc = (uint32_t *)fb_state.fb_info->address + ((y+i) * (fb_state.fb_info->pitch / 4)) + x;
 
 		//debugf( "Row: %d == %X\n", i, bitmaps[index].pixel_row[i] );
 		//debugf_raw( "\"" );
-		for( int j = 16; j != 6; j-- ) {
+		for( int j = 16; j != (16 - info->width); j-- ) {
 			if( ((bitmaps[index].pixel_row[i] >> j) & 0x1) ) {
 				//debugf_raw( "*" );
 				*(loc + (16 - j)) = fg;

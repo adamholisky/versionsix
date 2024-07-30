@@ -1,6 +1,7 @@
 #include <kernel_common.h>
 #include <gui/gui.h>
 #include <gui/console.h>
+#include <gui/font.h>
 #include <kmemory.h>
 #include <framebuffer.h>
 
@@ -22,14 +23,15 @@ void vui_console_initalize( vui_console *con, uint16_t top, uint16_t left, uint1
 	con->current_pixel_x = con->text_area_left;
 	con->current_pixel_y = con->text_area_top;
 	
-	con->char_width = 10;
-	con->char_height = 20; // adjusted +2 for ssfn thing
+	font_info *fi = font_get_main_info();
+	con->char_width = fi->width;
+	con->char_height = fi->height;
 
 	con->num_cols = con->text_area_width / con->char_width;
 	con->num_rows = con->text_area_height / con->char_height;
 
-	con->fg_color = COLOR_RGB_WHITE;
-	con->bg_color = COLOR_RGB_BLUE;
+	con->fg_color = 0x00eaeaea;
+	con->bg_color = 0x00232323;
 
 	dfv( con->num_cols );
 	dfv( con->num_rows );

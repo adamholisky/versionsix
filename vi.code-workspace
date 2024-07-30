@@ -15,7 +15,8 @@
             "format": "c",
             "compare": "c",
             "cstdint": "c",
-            "algorithm": "c"
+            "algorithm": "c",
+            "font.h": "c"
         }
     }
 }

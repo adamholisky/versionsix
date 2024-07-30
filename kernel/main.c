@@ -23,6 +23,7 @@
 #include <rtc.h>
 #include <ahci.h>
 #include <fs.h>
+#include <gui/font.h>
 
 #undef ENABLE_NETWORKING
 
@@ -59,11 +60,9 @@ void kernel_main( void ) {
 	
 	task_initalize();
 	keyboard_initalize();
-	load_font_psf();
-
-	//do_immediate_shutdown();
 
 	// Next setup the main console for use. From here on out, printf is okay.
+	font_load_psf( "/usr/share/fonts/zap-light20.psf" );
 	vui_console_initalize( &main_console, 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );
 	printf( "Versions OS VI\n" );
 	

@@ -22,8 +22,8 @@ void vui_console_initalize( vui_console *con, uint16_t top, uint16_t left, uint1
 	con->current_pixel_x = con->text_area_left;
 	con->current_pixel_y = con->text_area_top;
 	
-	con->char_width = 8;
-	con->char_height = 18; // adjusted +2 for ssfn thing
+	con->char_width = 10;
+	con->char_height = 20; // adjusted +2 for ssfn thing
 
 	con->num_cols = con->text_area_width / con->char_width;
 	con->num_rows = con->text_area_height / con->char_height;

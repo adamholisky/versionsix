@@ -2,6 +2,8 @@
 #include <framebuffer.h>
 #include <gui/gui.h>
 #include <gui/text.h>
+#include <fs.h>
+#include <vfs.h>
 
 #define USE_DOS_CODEPAGE_437_TRANSLATION
 #ifdef USE_DOS_CODEPAGE_437_TRANSLATION
@@ -29,12 +31,12 @@ extern framebuffer_state fb_state;
 extern char *u_vga16;
 extern char *unifont_vvi;
 
-#define SSFN_IMPLEMENTATION
+/* #define SSFN_IMPLEMENTATION
 #define SSFN_realloc krealloc
 #define SSFN_free    kfree
 #include <gui/ssfn.h>
 ssfn_t ssfn_context;
-ssfn_buf_t ssfn_buffer;
+ssfn_buf_t ssfn_buffer; */
 
 void vui_text_initalize( vui_text *txt, uint16_t top, uint16_t left, uint16_t width, uint16_t height ) {
 	txt->pixel_top = top;
@@ -45,7 +47,7 @@ void vui_text_initalize( vui_text *txt, uint16_t top, uint16_t left, uint16_t wi
 	//ssfn_src = (ssfn_font_t *)&unifont_vvi;
 	//ssfn_src = (ssfn_font_t *)&u_vga16;
 
-	memset( &ssfn_context, 0, sizeof(ssfn_context) );
+	/* memset( &ssfn_context, 0, sizeof(ssfn_context) );
 	ssfn_load( &ssfn_context, &u_vga16 );
 	ssfn_buffer.ptr = fb_state.fb_info->address;
 	ssfn_buffer.w = width;
@@ -60,7 +62,7 @@ void vui_text_initalize( vui_text *txt, uint16_t top, uint16_t left, uint16_t wi
 	if( err < 0 ) {
 		debugf( "ssfn_select err: %d\n", err );
 		return;
-	}
+	} */
 
 
 	/* ssfn_dst.ptr = (uint8_t *)fb_state.fb_info->address;
@@ -73,13 +75,13 @@ void vui_text_initalize( vui_text *txt, uint16_t top, uint16_t left, uint16_t wi
 }
 
 void vui_text_put_char( vui_text *txt, uint8_t c ) {
-	uint8_t temp_string[2] = {c, 0};
-	ssfn_render( &ssfn_context, &ssfn_buffer, temp_string );
+	/* uint8_t temp_string[2] = {c, 0};
+	ssfn_render( &ssfn_context, &ssfn_buffer, temp_string ); */
 }
 
 void vui_text_put_char_unicode( vui_text *txt, uint32_t c ) {
-	uint8_t temp_string[2] = {c, 0};
-	ssfn_render( &ssfn_context, &ssfn_buffer, temp_string );
+	/* uint8_t temp_string[2] = {c, 0};
+	ssfn_render( &ssfn_context, &ssfn_buffer, temp_string ); */
 }
 
 void vui_text_put_char_at( vui_text *txt, uint8_t c, uint16_t x, uint16_t y ) {
@@ -87,11 +89,12 @@ void vui_text_put_char_at( vui_text *txt, uint8_t c, uint16_t x, uint16_t y ) {
 }
 
 void vui_text_put_char_at_unicode( vui_text *txt, uint32_t c, uint16_t x, uint16_t y )  {
-	uint8_t temp_string[2] = {c, 0};
+	draw_char( c, x, y );
+	/* uint8_t temp_string[2] = {c, 0};
 
 	ssfn_buffer.x = x;
 	ssfn_buffer.y = y;
-	ssfn_render( &ssfn_context, &ssfn_buffer, temp_string );
+	ssfn_render( &ssfn_context, &ssfn_buffer, temp_string ); */
 }
 
 void vui_text_put_char_at_with_color( vui_text *txt, uint8_t c, uint16_t x, uint16_t y, uint32_t foreground_color, uint32_t background_color ) {
@@ -99,36 +102,11 @@ void vui_text_put_char_at_with_color( vui_text *txt, uint8_t c, uint16_t x, uint
 }
 
 void vui_text_put_char_at_with_color_unicode( vui_text *txt, uint32_t c, uint16_t x, uint16_t y, uint32_t foreground_color, uint32_t background_color ) {
-	uint8_t final_chars[4] = {(uint8_t)c, 0, 0, 0};
-	int err = 0;
-
-	//debugf( "c = 0x%X '%c'\n", c, c );
-
-	#ifdef USE_DOS_CODEPAGE_437_TRANSLATION
-	if( c < 255 ) {
-		utf8_encode( final_chars, codepage_conversion[c] );
-	} else {
-		//utf8_encode( final_chars, c );
-	}
-	#endif
-
-	// Clear the background, ssfn doesn't
-	fb_primative_fill_rect( ssfn_buffer.ptr, background_color, x, y + 10, x + 8, y + 14 + 18 );
-
-	ssfn_buffer.fg = foreground_color | FULL_ALPHA;
-	ssfn_buffer.bg = 0;
-	ssfn_buffer.x = x;
-	ssfn_buffer.y = y + 14;
-	err = ssfn_render( &ssfn_context, &ssfn_buffer, &final_chars );
-
-	if( err < 0 ) {
-		debugf( "ssfn_render[%d] err: %d\n", 0, err );
-		return;
-	}
+	draw_char_with_color( c, x, y, foreground_color, background_color );
 }
 
 void vui_text_put_string( vui_text *txt, char *str ) {
-	ssfn_render( &ssfn_context, &ssfn_buffer, str );
+	//ssfn_render( &ssfn_context, &ssfn_buffer, str );
 }
 
 /**
@@ -181,4 +159,128 @@ int utf8_encode(uint8_t *out, uint32_t utf)
     out[3] = 0;
     return 0;
   }
+}
+
+font_bitmap *bitmaps = NULL;
+
+void load_font( void ) {
+	char font_path[] = "/share/fonts/gomme10x20n.bdf";
+
+	vfs_stat_data stats;
+
+	int stat_error = vfs_stat( vfs_lookup_inode(font_path), &stats );
+	if( stat_error != VFS_ERROR_NONE ) {
+		debugf( "Error: %d\n", stat_error );
+		return 1;
+	}
+
+	uint8_t *data = vfs_malloc( stats.size );
+	int read_err = vfs_read( vfs_lookup_inode(font_path), data, stats.size, 0 );
+	if( read_err < VFS_ERROR_NONE ) {
+		debugf( "Error when reading: %d\n", read_err );
+		return 1;
+	}
+
+	data[ stats.size ] = 0;
+
+	bool keep_going = true;
+	bool in_char = false;
+	uint16_t current_char = 0;
+	bool in_bitmap = false;
+	int bitmap_line = 0;
+	int j = 0;
+
+	do {
+		char line[250];
+		
+		memset( line, 0, 250 );
+
+		for( int i = 0; i < 250; i++ ) {
+			if( *data == '\n' ) {
+				data++;
+				i = 250;
+			} else {
+				line[i] = *data++;
+			}
+		}
+
+		if( in_char ) {
+			if( in_bitmap ) {
+				if( strncmp(line, "ENDCHAR", sizeof("ENDCHAR") - 1) == 0 ) {
+					in_char = false;
+					in_bitmap = false;
+					bitmap_line = 0;
+					j++;
+				} else {
+					bitmaps[j].pixel_row[bitmap_line] = strtol(line, NULL, 16);
+					/* if( current_char == 'V' ) {
+						debugf( "bitmap line: %X %X %X\n", bitmaps[j].pixel_row[bitmap_line], line_data, line_data16 );
+					} */
+					bitmap_line++;
+				}
+			} else {
+				if( strncmp(line, "ENCODING ", sizeof("ENCODING ") - 1) == 0 ) {
+					char *encoding_line = line;
+					encoding_line = encoding_line + sizeof("ENCODING ") - 1;
+					current_char = atoi(encoding_line);
+					bitmaps[j].num = current_char;
+					//debugf( "Found 0x%X (%d) '%c'\n", current_char, current_char, current_char );
+				} else if( strncmp(line, "BITMAP", sizeof("BITMAP") - 1) == 0 ) {
+					in_bitmap = true;
+				}
+			}
+		} else {
+			if( strncmp(line, "CHARS ", 6) == 0 ) {
+				char *chars_line = line;
+				chars_line = chars_line + 6;
+				uint16_t num_chars = atoi(chars_line);
+				bitmaps = kmalloc( sizeof(font_bitmap) * num_chars );
+				//debugf( "Num Chars: %d\n", num_chars );
+			} else if( strncmp(line, "STARTCHAR ", sizeof("STARTCHAR ") - 1) == 0 ) {
+				in_char = true;
+			}
+		}
+
+		if( *data == 0 ) {
+			keep_going = false;
+		}
+	} while( keep_going );
+
+	debugf( "added %d chars\n", j );
+}
+
+void draw_char( uint16_t char_num, uint16_t x, uint16_t y ) {
+	draw_char_with_color( char_num, x, y, COLOR_RGB_WHITE, COLOR_RGB_BLUE );
+}
+
+void draw_char_with_color( uint16_t char_num, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg ) {
+
+	int16_t index = -1;
+	for( int n = 0; n < 255; n++ ) {
+		if( bitmaps[n].num == char_num ) {
+			index = n;
+			n = 255;
+		}
+	}
+
+	if( index == -1 ) {
+		debugf( "Cannot find bitmap for glyph number 0x%04X (%d).\n", char_num, char_num );
+	}
+
+	//debugf( "printing: %c 0x%04X (%d).\n", bitmaps[index].num, bitmaps[index].num, bitmaps[index].num);
+	for( int i = 0; i < 20; i++ ) {
+		uint32_t *loc = (uint32_t *)fb_state.fb_info->address + ((y+i) * (fb_state.fb_info->pitch / 4)) + x;
+
+		//debugf( "Row: %d == %X\n", i, bitmaps[index].pixel_row[i] );
+		//debugf_raw( "\"" );
+		for( int j = 16; j != 6; j-- ) {
+			if( ((bitmaps[index].pixel_row[i] >> j) & 0x1) ) {
+				//debugf_raw( "*" );
+				*(loc + (16 - j)) = fg;
+			} else {
+				//debugf_raw( " " );
+			}
+		}
+		//debugf_raw( "\"\n" );
+	}
 }

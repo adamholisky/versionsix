@@ -52,13 +52,14 @@ void kernel_main( void ) {
 	#ifdef VIOS_ENABLE_PROFILING
 	profiling_initalize();
 	#endif
-
 	framebuffer_initalize();
 	pci_initalize();
 	ahci_initalize();
 	fs_initalize();
+	
 	task_initalize();
 	keyboard_initalize();
+	load_font();
 
 	// Next setup the main console for use. From here on out, printf is okay.
 	vui_console_initalize( &main_console, 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );

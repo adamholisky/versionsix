@@ -103,7 +103,54 @@ int utf8_encode(uint8_t *out, uint32_t utf)
 
 font_bitmap *bitmaps = NULL;
 
-void load_font( void ) {
+void load_font_psf( void ) {
+	char font_path[] = "/usr/share/fonts/zap-light20.psf";
+
+	vfs_stat_data stats;
+
+	int stat_error = vfs_stat( vfs_lookup_inode(font_path), &stats );
+	if( stat_error != VFS_ERROR_NONE ) {
+		debugf( "Error: %d\n", stat_error );
+		return 1;
+	}
+
+	uint8_t *data = vfs_malloc( stats.size );
+	int read_err = vfs_read( vfs_lookup_inode(font_path), data, stats.size, 0 );
+	if( read_err < VFS_ERROR_NONE ) {
+		debugf( "Error when reading: %d\n", read_err );
+		return 1;
+	}
+
+	data[ stats.size ] = 0;
+
+	psf_font *header = (psf_font *)data;
+
+	bitmaps = kmalloc( sizeof(font_bitmap) * header->numglyph);
+
+	uint16_t *start = (data + header->headersize);
+
+	debugf( "Number glyphs: %d\n", header->numglyph );
+	debugf( "Bytes per glyph: %d\n", header->bytesperglyph );
+	debugf( "Flags: %X\n", header->flags );
+	debugf( "Height: %d\n", header->height );
+	debugf( "Width: %d\n", header->width );
+	debugf( "uint16: %d\n", sizeof(uint16_t) );
+	debugf( "Header size: 0x%X\n", header->headersize );
+	debugf( "Data Start: 0x%016llx\n", data );
+	debugf( "Glyp Start: 0x%016llx\n", start );
+
+	for( int i = 0; i < header->numglyph; i++ ) {
+		bitmaps[i].num = i;
+
+		for( int j = 0; j < 20; j++ ) {
+			bitmaps[i].pixel_row[j] = (*start << 8) | (*start  >> 8);
+
+			*start++;
+		}
+	}
+}
+
+void load_font_bdf( void ) {
 	char font_path[] = "/usr/share/fonts/gomme10x20n.bdf";
 
 	vfs_stat_data stats;

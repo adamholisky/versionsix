@@ -59,7 +59,9 @@ void kernel_main( void ) {
 	
 	task_initalize();
 	keyboard_initalize();
-	load_font();
+	load_font_psf();
+
+	//do_immediate_shutdown();
 
 	// Next setup the main console for use. From here on out, printf is okay.
 	vui_console_initalize( &main_console, 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );

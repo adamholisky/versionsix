@@ -31,7 +31,7 @@ int kshell_app_cat_main( int argc, char *argv[] ) {
 	} else {
 		/* printf( "Missing filename.\n" );
         return 1; */
-		char picard[] = "/share/test_data/picard_history.txt";
+		char picard[] = "/home/adam/picardhistory.txt";
 		path = picard;
 
 		vfs_stat_data stats;

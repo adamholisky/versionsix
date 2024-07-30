@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := all
 
 ROOT_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-DEFINES = -DVIFS_OS_ENV=1
+DEFINES = -DVIFS_OS_ENV
 
 include $(ROOT_DIR)/build_support/control/paths.mk 
 include $(ROOT_DIR)/build_support/control/toolchain.mk 

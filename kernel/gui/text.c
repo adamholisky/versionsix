@@ -104,7 +104,7 @@ int utf8_encode(uint8_t *out, uint32_t utf)
 font_bitmap *bitmaps = NULL;
 
 void load_font( void ) {
-	char font_path[] = "/share/fonts/gomme10x20n.bdf";
+	char font_path[] = "/usr/share/fonts/gomme10x20n.bdf";
 
 	vfs_stat_data stats;
 

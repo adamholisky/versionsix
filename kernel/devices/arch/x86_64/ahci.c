@@ -452,7 +452,7 @@ bool ahci_read_at_byte_offset_512_chunks( uint32_t offset, uint32_t size, uint8_
 		read_result = read_ahci( &abar->ports[1], sector + i, 0, 1, (uint16_t *)(global_buffer_phys) );
 
 		if( !read_result ) {
-			debugf( "Read failed. sector = %X\n", sector );
+			//debugf( "Read failed. sector = %X\n", sector );
 			return false;
 		}
 
@@ -478,6 +478,7 @@ bool ahci_read_at_byte_offset_512_chunks( uint32_t offset, uint32_t size, uint8_
 			} else {
 				size_left = size_left - 512;
 			}
+			//debugf( "memcpy: dest = 0x%016llX, src = 0x%016llx, size = 0x%X (%d)\n", buffer + (i*512) - internal_offset, global_buffer, mem_to_copy );
 			memcpy( buffer + (i*512) - internal_offset, (uint8_t *)global_buffer, mem_to_copy );
 		}
 		

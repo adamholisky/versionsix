@@ -113,9 +113,13 @@ create_img_stage_2:
 	@sudo losetup -d $(LOOP_DRIVE)
 
 drive:
-	rm $(ROOT_DIR)/afs.img
-	touch $(ROOT_DIR)/afs.img
-	$(ROOT_DIR)/scratch/afs/afs
+	@test $(ROOT_DIR)/afs.img || gzip $(ROOT_DIR)/afs.img
+	@test $(ROOT_DIR)/scratch/backup.afs.img.gz || rm $(ROOT_DIR)/scratch/backup.afs.img.gz
+	@test $(ROOT_DIR)/afs.img.gz || mv $(ROOT_DIR)/afs.img.gz $(ROOT_DIR)/scratch/backup.afs.img.gz
+	@$(ROOT_DIR)/../vifs/vifs new 50 -afs $(ROOT_DIR)/afs.img >> $(BUILD_LOG)
+	@$(ROOT_DIR)/../vifs/vifs bootstrap 0 -afs $(ROOT_DIR)/afs.img >> $(BUILD_LOG)
+	@$(ROOT_DIR)/../vifs/vifs cpdir $(ROOT_DIR)/os_root / -afs $(ROOT_DIR)/afs.img >> $(BUILD_LOG)
+	@>&2 echo [Make AFS Drive] Done
 
 clean:
 	@rm -rf build_support/logs/build.log

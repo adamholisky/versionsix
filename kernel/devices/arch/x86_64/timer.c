@@ -23,11 +23,11 @@ void timer_handler( registers **context ) {
     // These numbers are awful. This whole thing needs to be made to not be dumb.
     system_count++;
 
-   /*  if( timer_counter == 50 ) {
+    if( timer_counter == 50 ) {
         main_console_blink_cursor();
     } else if( timer_counter == 100 ) {
         main_console_blink_cursor();
-    } */
+    }
 
     if( timer_counter < 100 ) { 
         timer_counter++;

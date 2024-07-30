@@ -108,6 +108,21 @@ void draw_char_with_color( uint16_t char_num, uint16_t x, uint16_t y, uint32_t f
 	font_bitmap *bitmaps = font_get_main_bitmap();
 	font_info *info = font_get_main_info();
 
+/* 	uint8_t red = (fg & 0x00FF0000) >> 16;
+	uint8_t green = (fg & 0x0000FF00) >> 8;
+	uint8_t blue = (fg & 0x000000FF);
+
+	red = (((fg & 0x00FF0000) >> 16)/4);
+	green = (((fg & 0x0000FF00) >> 8)/4);
+	blue = ((fg & 0x000000FF)/4); */
+
+	//uint32_t smoothing_color = (red << 16) | (green << 8) | blue;
+	uint32_t smoothing_color = ((((fg & 0x00FF0000) >> 16)/4) << 16) | ((((fg & 0x0000FF00) >> 8)/4) << 8) | ((fg & 0x000000FF)/4);
+
+	//smoothing_color = 0x00FF0000;
+
+	//debugf( "smoothing color: 0x%08X\n", smoothing_color );
+
 	int16_t index = -1;
 	for( int n = 0; n < info->num_glyphs; n++ ) {
 		if( bitmaps[n].num == char_num ) {
@@ -130,8 +145,50 @@ void draw_char_with_color( uint16_t char_num, uint16_t x, uint16_t y, uint32_t f
 			if( ((bitmaps[index].pixel_row[i] >> j) & 0x1) ) {
 				//debugf_raw( "*" );
 				*(loc + (16 - j)) = fg;
+
+				/**
+				 * X!
+				 * !E
+				 */
+				if( (i + 1 <= info->height) && (j - 1 >= (16 - info->width)) ) { // 1 down and 1 right can happen
+					//debugf( "1 Can happen.\n" );
+					if( ((bitmaps[index].pixel_row[i + 1] >> (j-1)) & 0x1) ) { // if it exists
+						if( !((bitmaps[index].pixel_row[i + 1] >> j) & 0x1) ) {  // if 1 down from current j does not exit
+							//debugf( "AA apply!\n" );
+							*(loc + (fb_state.fb_info->pitch / 4) + (16 - j)) = smoothing_color;// then fill it
+						}
+
+						/* if( !((bitmaps[index].pixel_row[i] >> (j-1)) & 0x1) ) {  // if 1 over from current j does not exit
+							//debugf( "AA apply!\n" );
+							*(loc + (16 - j - 1)) = smoothing_color;// then fill it
+						} */
+					}
+
+				} 
+
+				/**
+				 * !X
+				 * E!
+				 */
+				if( (i + 1 <= info->height) && (j + 1 >= (16 - info->width)) ) { // 1 down and 1 left can happen
+					//debugf( "2 Can happen.\n" );
+					if( ((bitmaps[index].pixel_row[i + 1] >> (j+1)) & 0x1) ) { // if it exists
+						if( !((bitmaps[index].pixel_row[i + 1] >> j) & 0x1) ) {  // if 1 down from current j does not exit
+							//debugf( "AA apply!\n" );
+							*(loc + (fb_state.fb_info->pitch / 4) + (16 - j)) = smoothing_color;// then fill it
+						}
+
+						/* if( !((bitmaps[index].pixel_row[i] >> (j + 1)) & 0x1) ) {  // if 1 across from current j does not exit
+							//debugf( "AA apply!\n" );
+							*(loc + (16 - j + 1)) = smoothing_color;// then fill it
+						} */
+					}
+
+				} 
+
 			} else {
 				//debugf_raw( " " );
+				*(loc + (16 - j)) = bg;
 			}
 		}
 		//debugf_raw( "\"\n" );

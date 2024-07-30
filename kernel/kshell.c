@@ -94,7 +94,7 @@ void kshell_main_loop( void ) {
 
 		/* Step 1: Get the line, put it into current_line */
 		do {
-			main_console_set_cursor_visiblity( false );
+			//main_console_set_cursor_visiblity( false );
 			scancode = keyboard_get_scancode();
 			c = keyboard_scancode_to_char( scancode );	// this checks for scancode under 0x81, otherwise returns 0
 			
@@ -125,7 +125,7 @@ void kshell_main_loop( void ) {
 			}
 		} while( get_next_key );
 		
-		main_console_set_cursor_visiblity( false );
+		//main_console_set_cursor_visiblity( false );
 
 		// don't do a double newline if enter key was pressed
 		if( do_extra_newline == true ) {

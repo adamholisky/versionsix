@@ -11,15 +11,18 @@ char name_stderr[] = "srderr";
  * @brief Initalize the filesystem
  * 
  */
-#define KDEBUG_FS_INIT
-void fs_initalize( void ) {
+#define KDEBUG_FS_INIT1
+void fs_initalize_part1( void ) {
 	int vfs_init_err = vfs_initalize();
 	if( vfs_init_err != VFS_ERROR_NONE ) {
 		debugf( "VFS Initalization failed: %d\n", vfs_init_err );
 		
 		return;
 	}
+}
 
+#define KDEBUG_FS_INIT2
+void fs_initalize_part2( void ) {
 	int afs_init_err = afs_initalize();
 	if( afs_init_err != VFS_ERROR_NONE ) {
 		debugf( "AFS Initalization failed: %d\n", afs_init_err );

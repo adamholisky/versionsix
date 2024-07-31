@@ -1,8 +1,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "bootstrap.h"
-#include "serial.h"
+#include <bootstrap.h>
+#include <device.h>
+#include <serial.h>
+#include <string.h>
 
 uint32_t default_port;
 uint32_t buffer_add_loc;
@@ -13,6 +15,8 @@ bool data_is_being_read;
 int32_t data_buffer_task;
 bool data_ready;
 bool serial_cr_recvd;
+
+device serial4;
 
 void serial_initalize(void)
 {
@@ -27,6 +31,42 @@ void serial_initalize(void)
 	serial_setup_port(COM4);
 
 	default_port = COM1;
+}
+
+device *device_register_serial4( void ) {
+	memset( &serial4, 0, sizeof(device) );
+
+	strcpy( serial4.major_id, "serial" );
+	strcpy( serial4.minor_id, "4" );
+
+	serial4.close = serial4_close;
+	serial4.open = serial4_open;
+	serial4.read = serial4_read;
+	serial4.write = serial4_write;
+
+	device_register( &serial4 );
+}
+
+void serial4_open( void ) {
+	// Intentionally blank
+}
+
+void serial4_close( void ) {
+	// Intentionally blank
+}
+
+uint8_t serial4_read( void ) {
+	return 0;
+}
+
+void serial4_write( void *buff, size_t count ) {
+	char *char_buff = (char *)buff;
+	char *char_buff_end = (char *)buff + count;
+
+	while (char_buff != char_buff_end) {
+		serial_write_port(*char_buff, COM4);
+		char_buff++;
+	}
 }
 
 void serial_setup_port(uint32_t port)

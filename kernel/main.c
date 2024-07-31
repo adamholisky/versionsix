@@ -24,6 +24,7 @@
 #include <ahci.h>
 #include <fs.h>
 #include <gui/font.h>
+#include <device.h>
 
 #undef ENABLE_NETWORKING
 
@@ -56,8 +57,10 @@ void kernel_main( void ) {
 	framebuffer_initalize();
 	pci_initalize();
 	ahci_initalize();
-	fs_initalize();
-	
+	fs_initalize_part1();
+	device_initalize();
+	fs_initalize_part2();
+
 	task_initalize();
 	keyboard_initalize();
 

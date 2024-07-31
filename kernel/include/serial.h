@@ -6,6 +6,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <device.h>
 
 #define serial_use_default_port 0
 
@@ -22,6 +23,12 @@ void serial_setup_port( uint32_t port );
 void serial_set_default_port( uint32_t port );
 void serial_write_port( char c, uint32_t port );
 char serial_read_port( uint32_t port );
+
+device *device_register_serial4( void );
+void serial4_open( void );
+void serial4_close( void );
+uint8_t serial4_read( void );
+void serial4_write( void *buff, size_t count );
 
 #ifdef __cplusplus
 }

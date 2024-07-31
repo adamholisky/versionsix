@@ -42,27 +42,45 @@ bool devices_setup( void ) {
 void device_register( device *d ) {
 	device_list *head = &device_head;
 	device_list *tail = NULL;
+	device_list *dl = NULL;
+	bool found = false;
 
 	do {
+		if( head->dev == NULL ) {
+			dl = head;
+			found = true;
+		} else {
+			if( head->next != NULL ) {
+				head = head->next;
+			} else {
+				head->next = kmalloc( sizeof(device_list) );
+				dl = head->next;
+				found = true;
+			}
+		}
 		tail = head;
 		head = head->next;
-	} while( head != NULL );
+	} while( head != NULL && !found );
 
-	tail->next = kmalloc( sizeof(device_list) );
-	tail = tail->next;
+	if( dl == NULL ) {
+		debugf( "Cannot find free device.\n" );
+		return;
+	}
 
-	tail->dev = d;
-	tail->next = NULL;
+	dl->dev = d;
+	dl->next = NULL;
 }
 
 device *device_get_major_minor_device( char *major, char *minor ) {
 	device_list *head = &device_head;
+	device_list *dl = NULL;
 	bool found = false;
 
 	do {
 		if( strcmp(head->dev->major_id, major) == 0 ) {
 			if( strcmp(head->dev->minor_id, minor) == 0 ) {
 				found = true;
+				dl = head;
 			}
 		}
 
@@ -74,5 +92,5 @@ device *device_get_major_minor_device( char *major, char *minor ) {
 		return NULL;
 	}
 
-	return head->dev;
+	return dl->dev;
 }

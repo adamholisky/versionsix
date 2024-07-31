@@ -18,7 +18,7 @@ uint64_t kernel_heap_physical_memory_next;
 
 paging_page_entry kernel_pts[2][512][512] __attribute__ ((aligned (4096)));
 paging_page_entry kernel_pds[2][512] __attribute__ ((aligned (4096)));
-paging_page_entry kernel_pdpt[2] __attribute__ ((aligned (4096)));
+paging_page_entry kernel_pdpts[2] __attribute__ ((aligned (4096)));
 
 extern kinfo kernel_info;
 
@@ -40,8 +40,10 @@ void paging_initalize( void ) {
     limine_pt_next_free = 0;
     virtual_base = kernel_info.kernel_virtual_base;
     physical_base = kernel_info.kernel_physical_base;
+    
     kernel_virtual_memory_next = kernel_info.kernel_end;
     kernel_physical_memory_next = kernel_info.kernel_allocate_memory_start;
+
     kernel_heap_virtual_memory_next = 0xEEEEEEEE00000000;
     kernel_heap_physical_memory_next = kernel_info.usable_memory_start;
 
@@ -54,9 +56,9 @@ void paging_initalize( void ) {
             limine_pd = (paging_page_entry *)(limine_pdpt[i].address << 12);
 
             //debugf( "addr: %016llx\n", ((uint64_t)((uint64_t)(kernel_pds + (i - 510)) - virtual_base + physical_base) >> 12));
-            kernel_pdpt[i - 510].present = 1;
-            kernel_pdpt[i - 510].rw = 1;
-            kernel_pdpt[i - 510].address = (uint64_t)((uint64_t)(kernel_pds + (i - 510)) - virtual_base + physical_base) >> 12;
+            kernel_pdpts[i - 510].present = 1;
+            kernel_pdpts[i - 510].rw = 1;
+            kernel_pdpts[i - 510].address = (uint64_t)((uint64_t)(kernel_pds + (i - 510)) - virtual_base + physical_base) >> 12;
         
             // 3. Loop through each PD entry
             for( int j = 0; j < 512; j++ ) {
@@ -262,6 +264,26 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
         debugf( "page_map( virtual_address = 0x%016llX, physical_address = 0x%016llx )\n", virtual_address, physical_address );
     #endif
 
+    if( virtual_address > 0xFFFFFFFFFFFF0000 ) {
+        debugf( "WARNING! Approaching end of virtuual address space: 0x%016llX (phys = 0x%016llX)\n", virtual_address, physical_address );
+    }
+
+    if( virtual_address == 0xFFFFFFFFFFFFF000 ) {
+        debugf( "ERROR! Tried to allocate: 0x%016llX. Ending.", virtual_address );
+        do_immediate_shutdown();
+    }
+
+    if( virtual_address > virtual_base ) {
+        if( physical_address > kernel_info.kernel_allocate_memory_start + kernel_info.kernel_allocate_memory_size - 0x10000 ) {
+            debugf( "WARNING! Approaching end of kernel physical memory space: 0x%016llX\n", physical_address );
+        }
+
+        if( physical_address >= kernel_info.kernel_allocate_memory_start + kernel_info.kernel_allocate_memory_size ) {
+            debugf( "ERROR! Tried to allocate beyond end of kernel physical memory space: 0x%016llX. Ending.\n", physical_address );
+            do_immediate_shutdown();
+        }
+    }
+
     // Find indexes
     uint64_t index_pml4 = (virtual_address >> 39) & 0x1FF;
     uint64_t index_pdpt = (virtual_address >> 30) & 0x1FF;
@@ -325,18 +347,19 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
     // If we're allocating a kernel address, use the allocated PTs, otherwise assign
     if( virtual_address > virtual_base ) {
         if( setup_pdpt ) {
-            pdpt = (paging_page_entry *)&limine_pdpt[index_pdpt];
+            //pdpt = (paging_page_entry *)&limine_pdpt[index_pdpt];
+            pdpt = (paging_page_entry *)&limine_pdpt[0];
 
             #ifdef DEBUG_PAGE_MAP
-            debugf( "pdpt: %llx\n", pdpt );
+            debugf( "pdpt to setup: %llx\n", pdpt );
             #endif
         }
 
         if( setup_pd ) {
-            pd = (paging_page_entry *)&kernel_pds[index_pdpt - 510][index_pd];
+            pd = (paging_page_entry *)&kernel_pds[index_pdpt - 510][0];
 
             #ifdef DEBUG_PAGE_MAP
-            debugf( "pd: %llx\n", pd );
+            debugf( "pd to setup: %llx\n", pd );
             #endif
         }
 
@@ -344,7 +367,7 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
             pt = (paging_page_entry *)&kernel_pts[index_pdpt - 510][index_pd][0];
 
             #ifdef DEBUG_PAGE_MAP
-            debugf( "pt: %llx\n", pt );
+            debugf( "pt to setup: %llx\n", pt );
             #endif
         }
     } else {
@@ -408,7 +431,7 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
         pdpt[index_pdpt].address = pd_physical_addr >> 12;
         pdpt[index_pdpt].rw = 1;
         pdpt[index_pdpt].present = 1;
-        //debugf( "setup_pdpt triggered\n" );
+        debugf( "setup_pdpt triggered\n" );
     } else if( setup_pd ) {
         pdpt[index_pdpt].address = pd_physical_addr >> 12;
     }
@@ -416,18 +439,34 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
     uint64_t pdpt_physical_addr = (uint64_t)pdpt - virtual_base_modifier + physical_base_modifier;
 
     if( setup_pml4 ) { 
+        // Why?
+
         limine_pml4[index_pml4].address = pdpt_physical_addr >> 12;
         limine_pml4[index_pml4].rw = 1;
         limine_pml4[index_pml4].present = 1;
+    } else if( setup_pdpt ) {
+        
+        /* limine_pml4[index_pml4].address = pdpt_physical_addr >> 12;
+        limine_pml4[index_pml4].rw = 1;
+        limine_pml4[index_pml4].present = 1;
+ */
+        debugf( "setup pml4 for new pdpt triggered.\n" );
     }
 
     asm_refresh_cr3();
 
     #ifdef DEBUG_PAGE_MAP
 
+    debugf( "dumping pt:\n" );
     paging_dump_page( &pt[index_pt] );
+
+    debugf( "dumping pd:\n" );
     paging_dump_page( &pd[index_pd] );
+
+    debugf( "dumping pdpt:\n" );
     paging_dump_page( &pdpt[index_pdpt] );
+
+    debugf( "dumping pml4:\n" );
     paging_dump_page( &limine_pml4[index_pml4] );
 
     debugf( "pt_physical_addr: %llx\n", pt_physical_addr );

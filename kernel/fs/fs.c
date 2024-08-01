@@ -19,10 +19,7 @@ void fs_initalize_part1( void ) {
 		
 		return;
 	}
-}
 
-#define KDEBUG_FS_INIT2
-void fs_initalize_part2( void ) {
 	int afs_init_err = afs_initalize();
 	if( afs_init_err != VFS_ERROR_NONE ) {
 		debugf( "AFS Initalization failed: %d\n", afs_init_err );
@@ -45,8 +42,8 @@ void fs_initalize_part2( void ) {
 	}
 	debugf( "Mounted afs on /.\n" );
 
-	// Directory for RFS
-	vfs_mkdir( 1, "/", "proc" );
+	// Directory for devices
+	vfs_mkdir( 1, "/", "dev" );
 
 	// Mount RFS
 	int rfs_mount_err = vfs_mount( FS_TYPE_RFS, NULL, "/proc" );
@@ -56,4 +53,17 @@ void fs_initalize_part2( void ) {
 		return;
 	}
 	vfs_debugf( "Mounted rfs on /proc.\n" );
+
+	int rfs_mount_err2 = vfs_mount( FS_TYPE_RFS, NULL, "/dev" );
+	if( rfs_mount_err2 != 0 ) {
+		debugf( "Could not mount /dev fs.\n" );
+
+		return;
+	}
+	vfs_debugf( "Mounted rfs on /dev.\n" );
+}
+
+#define KDEBUG_FS_INIT2
+void fs_initalize_part2( void ) {
+
 }

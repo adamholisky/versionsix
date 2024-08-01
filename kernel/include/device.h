@@ -22,6 +22,7 @@ typedef struct {
 } device_list;
 
 void device_initalize( void );
+void devices_populate_fs( void );
 bool devices_setup( void );
 void device_register( device *d );
 device *device_get_major_minor_device( char *major, char *minor );

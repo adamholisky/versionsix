@@ -60,9 +60,12 @@ void kernel_main( void ) {
 	framebuffer_initalize();
 	pci_initalize();
 	ahci_initalize();
+
+	// FS and device population, this needs to run in this order
 	fs_initalize_part1();
 	device_initalize();
 	fs_initalize_part2();
+	devices_populate_fs();
 
 	task_initalize();
 	keyboard_initalize();

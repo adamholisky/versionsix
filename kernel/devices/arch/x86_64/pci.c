@@ -31,6 +31,10 @@ void pci_initalize( void ) {
 					hack_8254_device = device; */
 				}
 
+				if( pci_devices[pci_devices_top - 1].device_id == 0x1111 ) {
+					debugf( "0x1111 found: bus = %d, device = %d\n", bus, device );
+				}
+
 				if( pci_devices[ pci_devices_top - 1 ].header_type == 0x80 ) {
 					for( f = 1; f < 8; f++ ) {
 						vendor = pci_config_read( bus, device, f, 0 );

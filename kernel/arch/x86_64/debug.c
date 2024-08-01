@@ -16,7 +16,7 @@
 #include "file.h"
 #include <debug.h>
 
-char debugf_buff[1024];
+char debugf_buff[4096];
 
 void debugf_stage2( char * message, ... ) {
     va_list args;

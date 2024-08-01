@@ -122,21 +122,20 @@ int afs_mount( inode_id id, char *path, uint8_t *data_root ) {
 		return VFS_ERROR_MEMORY;
 	}
 
-	debugf("1\n");
 	drive = (afs_drive *)vfs_disk_read( 0, 0, sizeof(afs_drive), (uint8_t *)drive );
-	debugf("2\n");
+
 	afs_inodes_tail->block_id = drive->root_directory;
 	afs_inodes_tail->vfs_id = id;
 	afs_inodes_tail->next = NULL;
 
 	afs_root_dir = vfs_malloc( sizeof(afs_block_directory) );
-	debugf("3\n");
+
 	if( afs_root_dir == NULL ) {
 		return VFS_ERROR_MEMORY;
 	}
 
 	afs_root_dir = (afs_block_directory *)afs_read_block(drive->root_directory, sizeof(afs_block_directory), (uint8_t *)afs_root_dir);
-	debugf("4\n");
+
 	uint32_t length_of_block_meta = drive->block_count * sizeof(afs_block_meta_data);
 	block_meta_data = vfs_malloc( length_of_block_meta );
 
@@ -147,9 +146,8 @@ int afs_mount( inode_id id, char *path, uint8_t *data_root ) {
 	vfs_debugf( "length_of_block_meta: %ld\n", length_of_block_meta );
 
 	vfs_disk_read( 1, sizeof(afs_drive), length_of_block_meta, (uint8_t *)block_meta_data );
-	debugf("5\n");
+
 	afs_load_directory_as_inodes( id, afs_root_dir );
-	debugf("6\n");
 
 	return VFS_ERROR_NONE;
 }

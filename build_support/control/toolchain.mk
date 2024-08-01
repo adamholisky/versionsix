@@ -21,9 +21,9 @@ CFLAGS = $(DEFINES) -Wno-write-strings \
 	-I$(ROOT_DIR)/kernel/include \
 	-I$(ROOT_DIR)/../libcvv/libc/include \
     -m64                 \
+	-mno-sse \
     -march=x86-64        \
     -mabi=sysv           \
-	-mno-sse \
     -mcmodel=kernel      
 
 CFLAGS_END = -nostdlib -lgcc

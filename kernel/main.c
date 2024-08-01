@@ -35,6 +35,8 @@ vui_console main_console;
 
 extern void tcp_test( void );
 
+char fxsave_region[512] __attribute__((aligned(16)));
+
 void kernel_main( void ) {
 	// Begin with boostrap services
 	serial_initalize();
@@ -42,8 +44,10 @@ void kernel_main( void ) {
 	load_limine_info();
 	rtc_initalize();
 	
+	
 	// Continue with core services, all of these need to boot in this order
 	interrupt_initalize();
+	sse_initalize();
 	syscall_initalize();
 	acpi_initalize();
 	timer_initalize();

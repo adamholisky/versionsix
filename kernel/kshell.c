@@ -52,8 +52,8 @@ void kshell_initalize( void ) {
 void kshell_run( void ) { 
 	main_shell.keep_going = true;
 
-	printf( "%c%c%c\n", 0xDA, 0xC4, 0xBF );
-	printf( "%c %c\n", 0x7C, 0x7C );
+	/* printf( "%c%c%c\n", 0xDA, 0xC4, 0xBF );
+	printf( "%c %c\n", 0x7C, 0x7C ); */
 
 	kshell_main_loop();
 

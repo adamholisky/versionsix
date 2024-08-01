@@ -73,7 +73,7 @@ void __cyg_profile_func_exit  (void *this_fn, void *call_site);
 #define db4() debugf( "4" )
 #define db5() debugf( "5" ) */
 
-/* extern void sse_initalize( void ); */
+extern void sse_initalize( void );
 
 #ifdef __cplusplus
 }

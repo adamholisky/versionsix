@@ -47,19 +47,19 @@ device *device_register_serial4( void ) {
 	device_register( &serial4 );
 }
 
-void serial4_open( void ) {
+void serial4_open( inode_id id ) {
 	// Intentionally blank
 }
 
-void serial4_close( void ) {
+void serial4_close( inode_id id ) {
 	// Intentionally blank
 }
 
-uint8_t serial4_read( void ) {
+uint8_t serial4_read( inode_id id, uint8_t *buff, uint64_t count, uint64_t offset ) {
 	return 0;
 }
 
-void serial4_write( void *buff, size_t count ) {
+void serial4_write( inode_id id, void *buff, size_t count, size_t offset ) {
 	char *char_buff = (char *)buff;
 	char *char_buff_end = (char *)buff + count;
 

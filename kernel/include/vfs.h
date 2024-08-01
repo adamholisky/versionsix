@@ -144,7 +144,7 @@ typedef struct {
 	int (*mount)( inode_id, char *, uint8_t * );
 	int (*open)( inode_id );
 	int (*read)( inode_id, uint8_t *, uint64_t, uint64_t );
-	int (*stat)( inode_id, vfs_stat_data *stat_data );
+	int (*stat)( inode_id, vfs_stat_data * );
 	int (*write)( inode_id, uint8_t *, uint64_t, uint64_t );
 } vfs_operations;
 

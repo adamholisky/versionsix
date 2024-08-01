@@ -38,7 +38,7 @@ void devices_populate_fs( void ) {
 		memset( &name, 0, 50 );
 		strcpy( name, head->dev->major_id );
 		strcat( name, head->dev->minor_id );
-		inode_id id = vfs_create( VFS_INODE_TYPE_FILE, "/dev", name );
+		inode_id id = vfs_create( VFS_INODE_TYPE_DEVICE, "/dev", name );
 		
 		vfs_inode *ino = vfs_lookup_inode_ptr_by_id(id);
 		if( ino == NULL ) {
@@ -48,7 +48,7 @@ void devices_populate_fs( void ) {
 
 		// TODO: This should live in vfs_create code
 		ino->dev = kmalloc( sizeof(vfs_device) );
-		
+
 		ino->dev->data = head->dev;
 
 		head = head->next;

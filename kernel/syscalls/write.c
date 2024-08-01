@@ -20,15 +20,15 @@ size_t write(int fd, void *buff, size_t count) {
 		}
 	}
 
-	if( stderr_dev == NULL ) {
-		if( devices_setup() ) {
-			stderr_dev = device_get_major_minor_device( "stderr", "0" );
-		}
-	}
-
 	if (fd == FD_STDERR) {
+		if( stderr_dev == NULL ) {
+			if( devices_setup() ) {
+				stderr_dev = device_get_major_minor_device( "stderr", "0" );
+			}
+		}
+		
 		if( stderr_dev ) {
-			stderr_dev->write( buff, count );
+			stderr_dev->write( 0, buff, count, 0 );
 		} else {
 			int com_port = COM4;
 

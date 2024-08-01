@@ -2,6 +2,10 @@
 #include "rfs.h"
 #include "afs.h"
 
+#ifdef VIFS_OS_ENV
+#include <device.h>
+#endif
+
 #undef VFS_CACHE_DEBUG
 
 vfs_filesystem *file_systems;
@@ -344,6 +348,14 @@ int vfs_write( inode_id id, uint8_t *data, uint64_t size, uint64_t offset ) {
 		//vfs_debugf( "inode ID %ld not found, aborting write.\n", id );
 		return VFS_ERROR_FILE_NOT_FOUND;
 	}
+
+	#ifdef VIFS_OS_ENV
+	if( node->type == VFS_INODE_TYPE_DEVICE ) {
+		device *dev = node->dev->data;
+
+		return dev->write( id, data, size, offset );
+	}
+	#endif
 
 	vfs_filesystem *fs = vfs_get_fs( node->fs_type );
 

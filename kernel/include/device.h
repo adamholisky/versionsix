@@ -5,20 +5,22 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <vfs.h>
 
 typedef struct {
-    char major_id[7];
-    char minor_id[7];
+	char major_id[7];
+	char minor_id[7];
 
-    void (*close)( void );
-    void (*open)( void );
-    uint8_t (*read)( void );
-    void (*write)( void *, size_t );
+	void (*close)( inode_id );
+	int (*open)( inode_id );
+	int (*read)( inode_id, uint8_t *, uint64_t, uint64_t );
+	int (*stat)( inode_id, vfs_stat_data * );
+	int (*write)( inode_id, uint8_t *, size_t, size_t );
 } device;
 
 typedef struct {
-    device *dev;
-    void *next;
+	device *dev;
+	void *next;
 } device_list;
 
 void device_initalize( void );

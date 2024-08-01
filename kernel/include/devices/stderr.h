@@ -9,10 +9,10 @@ extern "C" {
 #include <device.h>
 
 void device_register_stderr( void );
-void stderr_close( void );
-void stderr_open( void );
-uint8_t stderr_read( void );
-void stderr_write( void *buff, size_t count );
+void stderr_close( inode_id id );
+void stderr_open( inode_id id );
+uint8_t stderr_read( inode_id id, uint8_t * buff, uint64_t count, uint64_t offset );
+void stderr_write( inode_id id, void *buff, size_t count, size_t offset );
 
 #ifdef __cplusplus
 }

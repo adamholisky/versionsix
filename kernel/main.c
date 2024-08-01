@@ -44,7 +44,6 @@ void kernel_main( void ) {
 	load_limine_info();
 	rtc_initalize();
 	
-	
 	// Continue with core services, all of these need to boot in this order
 	interrupt_initalize();
 	sse_initalize();

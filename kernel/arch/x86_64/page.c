@@ -170,7 +170,7 @@ void paging_initalize( void ) {
 }
 
 #undef DEBUG_PAGE_ALLOCATE
-uint64_t *page_allocate( uint8_t number ) {
+uint64_t *page_allocate( uint32_t number ) {
     uint64_t *return_val = NULL;
 
     #ifdef DEBUG_PAGE_ALLOCATE

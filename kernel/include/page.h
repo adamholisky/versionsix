@@ -55,7 +55,7 @@ typedef struct {
 
 
 void paging_initalize( void );
-uint64_t *page_allocate( uint8_t number );
+uint64_t *page_allocate( uint32_t number );
 uint64_t *page_allocate_kernel( uint32_t number );
 uint64_t *page_allocate_kernel_mmio( uint8_t number );
 void paging_dump_page_direct( uint64_t page );

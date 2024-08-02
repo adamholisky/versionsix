@@ -210,7 +210,6 @@ int vfs_mount( uint8_t fs_type, uint8_t *data, char *path ) {
 	vfs_filesystem *fs = vfs_get_fs( fs_type );
 	vfs_inode *mount_point = NULL;
 
-	vfs_debugf("b");
 	mount_point = vfs_lookup_inode_ptr( path );
 	
 	if( mount_point == NULL ) {
@@ -229,8 +228,6 @@ int vfs_mount( uint8_t fs_type, uint8_t *data, char *path ) {
 		vfs_debugf( "Mount point \"%s\" is not a directory.\n", path );
 		return VFS_ERROR_NOT_A_DIRECTORY;
 	}
-
-	vfs_debugf("a");
 	
 	mount_point->fs_type = fs_type;
 	mount_point->fs_id = fs_id_top++;
@@ -259,9 +256,7 @@ int vfs_mount( uint8_t fs_type, uint8_t *data, char *path ) {
 	mp_list_item->ptr = mount_point;
 	strcpy(mp_list_item->name, path);
 	mount_points.count++;
-
-	vfs_debugf("done");
-
+		
 	return fs->op.mount( mount_point->id, path, data );
 }
 

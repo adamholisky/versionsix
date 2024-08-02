@@ -25,10 +25,10 @@ void serial_write_port( char c, uint32_t port );
 char serial_read_port( uint32_t port );
 
 device *device_register_serial4( void );
-void serial4_open( void );
-void serial4_close( void );
-uint8_t serial4_read( void );
-void serial4_write( void *buff, size_t count );
+void serial4_open( inode_id id );
+void serial4_close( inode_id id );
+uint8_t serial4_read( inode_id id, uint8_t *buff, uint64_t count, uint64_t offset );
+void serial4_write( inode_id id, void *buff, size_t count, size_t offset );
 
 #ifdef __cplusplus
 }

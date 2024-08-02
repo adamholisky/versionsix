@@ -29,6 +29,32 @@ void device_initalize( void ) {
 	devices_setup_status = true;
 }
 
+void devices_populate_fs( void ) {
+	device_list *head = &device_head;
+
+	do {
+		char name[50];
+
+		memset( &name, 0, 50 );
+		strcpy( name, head->dev->major_id );
+		strcat( name, head->dev->minor_id );
+		inode_id id = vfs_create( VFS_INODE_TYPE_DEVICE, "/dev", name );
+		
+		vfs_inode *ino = vfs_lookup_inode_ptr_by_id(id);
+		if( ino == NULL ) {
+			debugf( "ino returned null!\n" );
+			return;
+		}
+
+		// TODO: This should live in vfs_create code
+		ino->dev = kmalloc( sizeof(vfs_device) );
+
+		ino->dev->data = head->dev;
+
+		head = head->next;
+	} while( head != NULL );
+}
+
 /**
  * @brief Returns if devices are ready to use or not
  * 

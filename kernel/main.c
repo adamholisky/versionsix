@@ -60,9 +60,12 @@ void kernel_main( void ) {
 	framebuffer_initalize();
 	pci_initalize();
 	ahci_initalize();
+
+	// FS and device population, this needs to run in this order
 	fs_initalize_part1();
 	device_initalize();
 	fs_initalize_part2();
+	devices_populate_fs();
 
 	task_initalize();
 	keyboard_initalize();
@@ -71,13 +74,17 @@ void kernel_main( void ) {
 	font_load_psf( "/usr/share/fonts/zap-light20.psf" );
 	vui_console_initalize( &main_console, 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );
 	printf( "Versions OS VI\n" );
-	
+
 	// Service startup order from here onwards really shouldn't matter too much
 	#ifdef ENABLE_NETWORKING
 	memset( &networking_info, 0, sizeof( net_info ) );
-	e1000_initalize();
+	e1000_initalize();	
 	dhcp_start();
 	#endif
+
+	char test_message[] = "Test FS write to device?\n";
+	int len = strlen( test_message );
+	vfs_write( vfs_lookup_inode("/dev/stderr0"), test_message, len, 0 );
 
 	task_create( TASK_TYPE_KERNEL_THREAD, "Task Chain", (uint64_t *)task_chain_a );
 	task_create( TASK_TYPE_KERNEL_THREAD, "KShell", (uint64_t *)kshell_initalize );

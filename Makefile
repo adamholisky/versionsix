@@ -11,7 +11,7 @@ SOURCES_ASMS = $(shell ls kernel/**/*.S)
 OBJECTS_C = $(patsubst %.c, build/%.o, $(shell ls kernel/**/*.c | xargs -n 1 basename))
 OBJECTS_ASMS = $(patsubst %.S, build/%.o, $(shell ls kernel/**/*.S | xargs -n 1 basename))
 
-all: debug_dump cp_fs install
+all: debug_dump install
 
 #$(CC) -T build_support/linker.ld -o build/versionvi.bin $(CFLAGS) ../libcvv/libc/vvlibc.o $(OBJECTS_C) $(OBJECTS_ASMS) $(CFLAGS_END)
 

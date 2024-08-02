@@ -1,19 +1,5 @@
 {
-    "files.associations": {
-        "serial.h": "c",
-        "kernel_common.h": "c",
-        "stdint.h": "c",
-        "kshell.h": "c",
-        "timer.h": "c",
-        "stddef.h": "c",
-        "limine.h": "c",
-        "arp.h": "c",
-        "console.h": "c",
-        "mmio.h": "c",
-        "ahci.h": "c",
-        "afs.h": "c",
-        "stdbool.h": "c",
-        "unistd.h": "c"
-    },
-    "editor.wordWrap":"on"
+    "editor.wordWrap":"on",
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4
 }

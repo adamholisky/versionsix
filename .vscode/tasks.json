@@ -6,6 +6,14 @@
         {
             "label": "build_it",
             "type": "shell",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
             "command": "make",
             "problemMatcher": [
                 "$gcc"
@@ -19,6 +27,19 @@
             "label": "clean",
             "type": "shell",
             "command": "make clean"
+        },
+        {
+            "label": "Run Default",
+            "type": "shell",
+            "command": "make run",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
         }
     ]
 }

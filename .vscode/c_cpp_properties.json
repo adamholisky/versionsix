@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/local/osdev/versions/vi/kernel/include/**",
+                "/usr/local/osdev/versions/vi/kernel/include",
                 "/usr/local/osdev/versions/libcvv/libc/include"
             ],
             "defines": [],

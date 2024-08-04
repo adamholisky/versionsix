@@ -25,6 +25,10 @@
         "save-gdb-breakpoints.savePath": "${workspaceFolder}/build_support/gdb_control/breakpoints.gdb",
         "save-gdb-breakpoints.autoSave": true,
         "terminal.explorerKind": "integrated",
-        "editor.cursorStyle": "block"
+        "editor.cursorStyle": "block",
+        "files.associations": {
+            "stdbool.h": "c",
+            "stdio.h": "c"
+        }
     }
 }

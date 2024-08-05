@@ -5,7 +5,8 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include <gui/text.h>
+#include <vui/vui.h>
+#include <vui/font.h>
 
 typedef struct {
 	uint16_t pixel_top;
@@ -37,10 +38,10 @@ typedef struct {
 
 	uint32_t tab_size;
 
-	vui_text text_area;
-
 	bool show_cursor;
 	bool blink_hidden;
+
+	vui_font *font;
 
 	char *buffer;
 } vui_console;

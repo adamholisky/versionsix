@@ -14,7 +14,8 @@
 #include <e1000.h>
 #include <task.h>
 #include <elf.h>
-#include <gui/console.h>
+#include <vui/vui.h>
+#include <vui/console.h>
 #include <net/arp.h>
 #include <net/ethernet.h>
 #include <net/dhcp.h>
@@ -23,7 +24,7 @@
 #include <rtc.h>
 #include <ahci.h>
 #include <fs.h>
-#include <gui/font.h>
+#include <vui/font.h>
 #include <device.h>
 
 #undef ENABLE_NETWORKING
@@ -71,7 +72,8 @@ void kernel_main( void ) {
 	keyboard_initalize();
 
 	// Next setup the main console for use. From here on out, printf is okay.
-	font_load_psf( "/usr/share/fonts/zap-light20.psf" );
+	vui_init( (uint32_t *)kernel_info.framebuffer_info.address, 1024, 768 );
+	vui_font_load( VUI_FONT_TYPE_PSF, "Zap Light", "/usr/share/fonts/zap-light20.psf" );
 	vui_console_initalize( &main_console, 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );
 	printf( "Versions OS VI\n" );
 

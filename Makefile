@@ -39,6 +39,22 @@ cp_fs:
 	@cp -f ../vifs/include/rfs.h kernel/include/rfs.h
 	@cp -f ../vifs/include/afs.h kernel/include/afs.h
 
+cp_vit:
+	@cp -f ../viui/include/vit.h kernel/include/vit.h
+
+	@cp -f ../viui/include/vui/desktop.h kernel/include/vui/desktop.h
+	@cp -f ../viui/include/vui/font.h kernel/include/vui/font.h
+	@cp -f ../viui/include/vui/label.h kernel/include/vui/label.h
+	@cp -f ../viui/include/vui/vui.h kernel/include/vui/vui.h
+	@cp -f ../viui/include/vui/window.h kernel/include/vui/window.h
+
+	@cp -f ../viui/src/vui/desktop.c kernel/vui/desktop.c
+	@cp -f ../viui/src/vui/font.c kernel/vui/font.c
+	@cp -f ../viui/src/vui/label.c kernel/vui/label.c
+	@cp -f ../viui/src/vui/vui.c kernel/vui/vui.c
+	@cp -f ../viui/src/vui/window.c kernel/vui/window.c
+
+
 install:
 	@make install_stage2 >> $(BUILD_LOG)
 	@>&2 printf "[Install] Done\n"

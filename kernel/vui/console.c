@@ -1,7 +1,7 @@
 #include <kernel_common.h>
-#include <gui/gui.h>
-#include <gui/console.h>
-#include <gui/font.h>
+#include <vui/vui.h>
+#include <vui/console.h>
+#include <vui/font.h>
 #include <kmemory.h>
 #include <framebuffer.h>
 
@@ -23,9 +23,9 @@ void vui_console_initalize( vui_console *con, uint16_t top, uint16_t left, uint1
 	con->current_pixel_x = con->text_area_left;
 	con->current_pixel_y = con->text_area_top;
 	
-	font_info *fi = font_get_main_info();
-	con->char_width = fi->width;
-	con->char_height = fi->height;
+	con->font = vui_font_get_font( "Zap VGA" );
+	con->char_width = con->font->info.width;
+	con->char_height = con->font->info.height;
 
 	con->num_cols = con->text_area_width / con->char_width;
 	con->num_rows = con->text_area_height / con->char_height;
@@ -36,11 +36,10 @@ void vui_console_initalize( vui_console *con, uint16_t top, uint16_t left, uint1
 	dfv( con->num_cols );
 	dfv( con->num_rows );
 	
-	fb_primative_fill_rect( fb_state.fb_info->address, con->bg_color, con->pixel_top, con->pixel_left, con->pixel_width, con->pixel_height );
+	vui_draw_rect( con->pixel_top, con->pixel_left, con->pixel_width, con->pixel_height, con->bg_color );
 	
 	con->buffer = (char *)kmalloc( sizeof(char) * con->num_cols * con->num_rows );
 	memset( con->buffer, 0, sizeof(char) * con->num_cols * con->num_rows );
-	vui_text_initalize( &con->text_area, con->text_area_top, con->text_area_left, con->text_area_width, con->text_area_height );
 
 	con->current_row = 1;
 	con->current_col = 1;
@@ -48,6 +47,8 @@ void vui_console_initalize( vui_console *con, uint16_t top, uint16_t left, uint1
 
 	con->show_cursor = false;
 	con->blink_hidden = false;
+
+	vui_refresh();
 }
 
 void vui_console_put_char( vui_console *con, uint8_t c ) { 
@@ -77,7 +78,8 @@ void vui_console_put_char_at( vui_console *con, uint8_t c, uint16_t row, uint16_
 			}
 
 			*(con->buffer + (row*con->num_cols) + col) = c;
-			vui_text_put_char_at_with_color( &con->text_area, c, con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color );
+			vui_draw_char_with_color( c, con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color, con->font, true );
+			vui_refresh_rect( con->current_pixel_x, con->current_pixel_y, con->char_width, con->char_height );
 
 			con->current_col++;
 			con->current_pixel_x = con->current_pixel_x + con->char_width;
@@ -88,7 +90,8 @@ void vui_console_put_char_at( vui_console *con, uint8_t c, uint16_t row, uint16_
 	if( con->show_cursor == true ) {
 		// Clear the previous cursor if a new line
 		if( c == '\n' ) {
-			vui_text_put_char_at_with_color( &con->text_area, ' ', cursor_x, cursor_y, con->fg_color, con->bg_color );
+			vui_draw_char_with_color( ' ', con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color, con->font, true );
+			vui_refresh_rect( con->current_pixel_x, con->current_pixel_y, con->char_width, con->char_height );
 		}
 
 		vui_console_update_cursor( con );
@@ -178,10 +181,12 @@ void vui_console_do_backspace( vui_console *con ) {
 
 	con->current_col--;
 	con->current_pixel_x = con->current_pixel_x - con->char_width;
-	vui_text_put_char_at_with_color( &con->text_area, ' ', con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color );
+	vui_draw_char_with_color( ' ', con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color, con->font, true );
+	vui_refresh_rect( con->current_pixel_x, con->current_pixel_y, con->char_width, con->char_height );
 
 	if( cursor_visibility == true ) {
-		vui_text_put_char_at_with_color( &con->text_area, ' ', con->current_pixel_x + con->char_width, con->current_pixel_y, con->fg_color, con->bg_color );
+		vui_draw_char_with_color( ' ', con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color, con->font, true );
+		vui_refresh_rect( con->current_pixel_x, con->current_pixel_y, con->char_width, con->char_height );
 	}
 
 	// restore cursor visiblity
@@ -197,7 +202,8 @@ void vui_console_do_backspace( vui_console *con ) {
  */
 void vui_console_update_cursor( vui_console *con ) {
 	if( con->show_cursor == true ) {
-		vui_text_put_char_at_with_color( &con->text_area, 0xDB, con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color );
+		vui_draw_char_with_color( 0xDB, con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color, con->font, true );
+		vui_refresh_rect( con->current_pixel_x, con->current_pixel_y, con->char_width, con->char_height );
 	}
 }
 
@@ -213,6 +219,7 @@ void vui_console_blink_cursor( vui_console *con ) {
 			con->blink_hidden = true;
 		}
 
-		vui_text_put_char_at_with_color( &con->text_area, c, con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color );
+		vui_draw_char_with_color( c, con->current_pixel_x, con->current_pixel_y, con->fg_color, con->bg_color, con->font, true );
+		vui_refresh_rect( con->current_pixel_x, con->current_pixel_y, con->char_width, con->char_height );
 	}
 }

@@ -1,19 +1,36 @@
-#ifndef VIOS_GUI_FONT_INCLUDED
-#define VIOS_GUI_FONT_INCLUDED
+#ifndef VIOS_VUI_FONT_INCLUDED
+#define VIOS_VUI_FONT_INCLUDED
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "vui/vui.h"
+
+#define VUI_FONT_TYPE_PSF 1
+#define VUI_FONT_TYPE_BDF 2
+#define VUI_FONT_TYPE_VDF 3
 
 typedef struct {
     uint16_t height;
     uint16_t width;
     uint16_t num_glyphs;
+    uint16_t id;
+    char name[50];
+    char path[255];
 } font_info;
 
 typedef struct {
 	uint16_t num;
+    
 	uint16_t pixel_row[20];
 } font_bitmap;
+
+typedef struct {
+    font_bitmap *bitmaps;
+    font_info info;
+
+    void *next;
+} vui_font;
 
 #define PSF1_FONT_MAGIC 0x0436
 
@@ -36,10 +53,13 @@ typedef struct {
     uint32_t width;         /* width in pixels */
 } psf_font;
 
-font_bitmap *font_get_main_bitmap( void );
-font_info *font_get_main_info( void );
-bool font_load_psf( char *font_path );
-bool font_load_bdf( char *font_path );
+void vui_font_initalize( void );
+void vui_font_load( uint8_t type, char *name, char *font_path );
+vui_font *vui_font_get_font( char *name );
+vui_font *vui_font_get_main_font( void );
+bool vui_font_load_psf( vui_font *font );
+
+//bool font_load_bdf( char *font_path );
 
 #ifdef __cplusplus
 }

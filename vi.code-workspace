@@ -28,7 +28,13 @@
         "editor.cursorStyle": "block",
         "files.associations": {
             "stdbool.h": "c",
-            "stdio.h": "c"
+            "stdio.h": "c",
+            "stdlib.h": "c",
+            "window.h": "c",
+            "desktop.h": "c",
+            "dirent.h": "c",
+            "stdint.h": "c",
+            "ratio": "c"
         }
     }
 }

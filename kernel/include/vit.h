@@ -12,6 +12,7 @@ extern "C" {
 
 #ifdef VI_ENV_OS
 	#include <kernel_common.h>
+	#include <vfs.h>
 	#include <fs.h>
 #else
 	#include <stdio.h>
@@ -23,7 +24,7 @@ extern "C" {
     #include <errno.h>
 #endif
 
-//#include "lib/bitmap.h"
+#include "lib/bitmap.h"
 #include "vui/vui.h"
 
 /**************************************/

@@ -7,7 +7,9 @@
                 "/usr/local/osdev/versions/vi/kernel/include",
                 "/usr/local/osdev/versions/libcvv/libc/include"
             ],
-            "defines": [],
+            "defines": [
+                "VI_ENV_OS"
+            ],
             "compilerPath": "/usr/local/osdev/bin/x86_64-elf-g++",
             "cStandard": "c17",
             "cppStandard": "gnu++17",

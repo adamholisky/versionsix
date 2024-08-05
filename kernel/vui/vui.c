@@ -22,7 +22,7 @@ void vui_main_test_loop( void ) {
 	vui_font_load( VUI_FONT_TYPE_PSF, "Zap VGA", "zap-ext-vga16.psf" );
 	#endif
 
-	/* vui_theme *theme = vui_get_active_theme();
+	vui_theme *theme = vui_get_active_theme();
 
 	vui_handle desktop = vui_desktop_create( 0, 0, vui.width, vui.height, VUI_DESKTOP_FLAG_NONE );
 	vui_draw_handle( desktop );
@@ -41,7 +41,7 @@ void vui_main_test_loop( void ) {
 
 	vui_draw_handle( win );
 	vui_draw_handle( smooth_text );
-	vui_draw_handle( not_smooth_text ); */
+	vui_draw_handle( not_smooth_text );
 }
 
 /**
@@ -67,7 +67,9 @@ void vui_init( uint32_t *fb_addr, uint16_t width, uint16_t height ) {
 	vui.active_theme.window_title_bar_background = 0x00363636;
 	vui.active_theme.window_title_bar_foreground = 0x00EAEAEA;
 
+	#ifndef VI_ENV_OS
 	vui_main_test_loop();
+	#endif
 }
 
 vui_handle vui_allocate_handle( uint16_t type ) {
@@ -238,8 +240,7 @@ void vui_draw_char_with_color( uint16_t char_num, uint16_t x, uint16_t y, uint32
 
 	int16_t index = -1;
 	
-
-	for( int n = 0; n < font->info.num_glyphs; n++ ) {		
+	for( int n = 0; n < font->info.num_glyphs; n++ ) {
 		if( font->bitmaps[n].num == char_num ) {
 			index = n;
 			n = font->info.num_glyphs;

@@ -42,6 +42,9 @@ cp_fs:
 cp_vit:
 	@cp -f ../viui/include/vit.h kernel/include/vit.h
 
+	@cp -f ../viui/include/lib/bitmap.h kernel/include/lib/bitmap.h
+	@cp -f ../viui/src/lib/bitmap.c kernel/lib/bitmap.c
+
 	@cp -f ../viui/include/vui/desktop.h kernel/include/vui/desktop.h
 	@cp -f ../viui/include/vui/font.h kernel/include/vui/font.h
 	@cp -f ../viui/include/vui/label.h kernel/include/vui/label.h

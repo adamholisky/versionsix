@@ -27,21 +27,25 @@ void vui_main_test_loop( void ) {
 	vui_handle desktop = vui_desktop_create( 0, 0, vui.width, vui.height, VUI_DESKTOP_FLAG_NONE );
 	vui_draw_handle( desktop );
 
-	vui_handle smooth_text = vui_label_create( 30, 100, "Adam Holisky Versions OS 6.0.0.1", VUI_LABEL_FLAG_NONE );
+	/* vui_handle smooth_text = vui_label_create( 30, 100, "Adam Holisky Versions OS 6.0.0.1", VUI_LABEL_FLAG_NONE );
 
 	vui_handle not_smooth_text = vui_label_create( 30, 130, "ABCDEFGHIJKLMNOPQRSTUVWXYZ `1234567890-= ~!@#$%^&*()_+ \"\'/\\.,<>[]{}", VUI_LABEL_FLAG_NO_SMOOTHING );
 
 	vui_label_set_color( smooth_text, COLOR_RGB_BLACK, theme->window_background );
 	vui_label_set_color( not_smooth_text, COLOR_RGB_BLACK, theme->window_background );
 
-	vui_label_set_font( not_smooth_text, vui_font_get_font("Zap VGA") );
+	vui_label_set_font( not_smooth_text, vui_font_get_font("Zap VGA") ); */
 
 	vui_handle win = vui_window_create( 25, 25, 800, 400, VUI_WINDOW_FLAG_NONE );
 	vui_window_set_title( win, "ViOS 6" );
 
+	vui_window *win_s = vui_get_handle_data(win);
+
+	vui_handle con = vui_console_create( );
+
 	vui_draw_handle( win );
-	vui_draw_handle( smooth_text );
-	vui_draw_handle( not_smooth_text );
+	/* vui_draw_handle( smooth_text );
+	vui_draw_handle( not_smooth_text ); */
 }
 
 /**
@@ -112,6 +116,9 @@ void vui_draw_handle( vui_handle H ) {
 			break;
 		case VUI_HANDLE_TYPE_LABEL:
 			vui_label_draw_from_struct( vui.handles[H].data );
+			break;
+		case VUI_HANDLE_TYPE_CONSOLE:
+			vui_console_draw_from_struct( vui.handles[H].data );
 			break;
 		default:
 			vdf( "VUI: Cannot find handle type to draw.\n" );
@@ -329,5 +336,21 @@ void vui_draw_string( char *s, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg,
 		vui_draw_char_with_color( *s, current_x, y, fg, bg, f, smoothing );
 		s++;
 		current_x = current_x + f->info.width;
+	}
+}
+
+void vui_move_rect( uint32_t dest_x, uint32_t dest_y, uint32_t dest_w, uint32_t dest_h, uint32_t src_x, uint32_t src_y, uint32_t src_w, uint32_t src_h ) {
+	unsigned int i = 0;
+	uint8_t * mem_dest;
+	uint8_t * mem_src;
+	uint32_t *mem_dest32;
+	uint32_t *mem_src32;
+	unsigned int mem_size;
+
+	for( i = 0; i < src_h; i++ ) {
+		mem_dest32 = vui.buffer + dest_x + ((dest_y + i) * (vui.pitch / 4));
+		mem_src32 = vui.buffer + src_x + ((src_y + i) * (vui.pitch / 4));
+		mem_size = src_w;
+		for(; mem_size != 0; mem_size--) *mem_dest32++ = *mem_src32++;
 	}
 }

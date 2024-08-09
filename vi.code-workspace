@@ -34,7 +34,8 @@
             "desktop.h": "c",
             "dirent.h": "c",
             "stdint.h": "c",
-            "ratio": "c"
+            "ratio": "c",
+            "coroutine": "c"
         }
     }
 }

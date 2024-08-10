@@ -17,18 +17,9 @@ extern "C" {
 #define VUI_WINDOW_TITLE_MAX 50
 
 typedef struct {
-	uint16_t handle;
+	INSERT_VUI_COMMON
+
 	uint32_t flags;
-
-	uint16_t x;
-	uint16_t y;
-	uint16_t width;
-	uint16_t height;
-
-	uint16_t inner_x;
-	uint16_t inner_y;
-	uint16_t inner_width;
-	uint16_t inner_height;
 
 	uint32_t color_background;
 

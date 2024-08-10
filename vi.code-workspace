@@ -35,7 +35,11 @@
             "dirent.h": "c",
             "stdint.h": "c",
             "ratio": "c",
-            "coroutine": "c"
+            "coroutine": "c",
+            "ethernet.h": "c",
+            "console.h": "c",
+            "network.h": "c",
+            "string.h": "c"
         }
     }
 }

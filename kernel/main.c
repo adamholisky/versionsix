@@ -14,8 +14,6 @@
 #include <e1000.h>
 #include <task.h>
 #include <elf.h>
-#include <vui/vui.h>
-#include <vui/console.h>
 #include <net/arp.h>
 #include <net/ethernet.h>
 #include <net/dhcp.h>
@@ -24,15 +22,23 @@
 #include <rtc.h>
 #include <ahci.h>
 #include <fs.h>
-#include <vui/font.h>
 #include <device.h>
+#include <vui/vui.h>
+#include <vui/console.h>
+#include <vui/desktop.h>
+#include <vui/font.h>
+#include <vui/label.h>
+#include <vui/window.h>
+
 
 #undef ENABLE_NETWORKING
 
 kinfo kernel_info;
 net_info networking_info;
+extern vui_core vui;
 
-vui_console main_console;
+vui_handle main_console_handle;
+vui_console *main_console;
 
 extern void tcp_test( void );
 
@@ -73,9 +79,31 @@ void kernel_main( void ) {
 
 	// Next setup the main console for use. From here on out, printf is okay.
 	vui_init( (uint32_t *)kernel_info.framebuffer_info.address, 1024, 768 );
+	vui_font_initalize();
 	vui_font_load( VUI_FONT_TYPE_PSF, "Zap Light", "/usr/share/fonts/zap-light20.psf" );
 	vui_font_load( VUI_FONT_TYPE_PSF, "Zap VGA", "/usr/share/fonts/zap-ext-vga16.psf" );
-	vui_console_initalize( &main_console, 0, 0, kernel_info.framebuffer_info.width, kernel_info.framebuffer_info.height );
+
+	vui_theme *theme = vui_get_active_theme();
+
+	vui_handle desktop = vui_desktop_create( 0, 25, vui.width, vui.height - 25, VUI_DESKTOP_FLAG_NONE );
+	vui_handle smooth_text = vui_label_create( 5, 768 - 25, "Versions OS 6.0.0.1", VUI_LABEL_FLAG_NONE, desktop );
+	vui_label_set_color( smooth_text, COLOR_RGB_WHITE, theme->window_background );
+	vui_handle_set_name( desktop, "desktop" );
+
+	vui_handle win = vui_window_create( 25, 40, 900, 600, VUI_WINDOW_FLAG_NONE );
+	vui_window_set_title( win, "ViOS 6" );
+	vui_handle_set_name( win, "window_console" );
+	vui_window *win_s = vui_get_handle_data(win);
+	vui_window_set_background_color( win, 0x232323 );
+
+	main_console_handle = vui_console_create( win_s->inner_x, win_s->inner_y, win_s->inner_width, win_s->inner_height, win );
+	main_console = vui_get_handle_data( main_console_handle );
+	vui_add_to_parent( win, main_console_handle );
+
+	vui_draw( desktop );
+	vui_draw( win );
+	
+	
 	printf( "Versions OS VI\n" );
 
 	// Service startup order from here onwards really shouldn't matter too much
@@ -102,15 +130,17 @@ void kernel_main( void ) {
 }
 
 void main_console_putc( uint8_t c ) {
-	vui_console_put_char( &main_console, c );
+	vui_console_put_char( main_console, c );
+	//main_console->redraw_window = true;
+	//vui_console_draw_from_struct( main_console );
 }
 
 void main_console_set_cursor_visiblity( bool visible ) {
-	main_console.show_cursor = visible;
+	main_console->show_cursor = visible;
 }
 
 void main_console_blink_cursor( void ) {
-	vui_console_blink_cursor( &main_console );
+	vui_console_blink_cursor( main_console );
 }
 
 void task_chain_a( void ) {

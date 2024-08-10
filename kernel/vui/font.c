@@ -92,6 +92,14 @@ vui_font *vui_font_get_main_font( void ) {
     return main_font;
 }
 
+void vui_font_get_bounding_box( char *text, vui_font *font, uint16_t *width, uint16_t *height ) {
+	uint16_t num_chars = strlen(text);
+	vui_font *f = ( font == NULL ? main_font : font );
+
+	*width = num_chars * f->info.width;
+	*height = f->info.height;
+}
+
 /**
  * @brief Loads the given PSF font, sets it as the primary font.
  * 
@@ -99,7 +107,7 @@ vui_font *vui_font_get_main_font( void ) {
  * @return true Font was loaded successfully
  * @return false Font failed to load
  */
-#define KDEBUG_FONT_LOAD_PSF
+#undef KDEBUG_FONT_LOAD_PSF
 bool vui_font_load_psf( vui_font *font ) {
 
 	#ifdef VI_ENV_OS

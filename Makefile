@@ -31,6 +31,8 @@ build/%.o: %.S
 	$(eval OBJNAME := $(shell basename $@))
 	$(CC) $(AFLAGS) -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
 
+cp: cp_fs cp_vit
+
 cp_fs:
 	@cp -f ../vifs/src/vfs.c kernel/fs/vfs.c
 	@cp -f ../vifs/src/rfs.c kernel/fs/rfs.c
@@ -45,15 +47,33 @@ cp_vit:
 	@cp -f ../viui/include/lib/bitmap.h kernel/include/lib/bitmap.h
 	@cp -f ../viui/src/lib/bitmap.c kernel/lib/bitmap.c
 
+	@cp -f ../viui/include/lib/hash.h kernel/include/lib/hash.h
+	@cp -f ../viui/src/lib/hash.c kernel/lib/hash.c
+
+	@cp -f ../viui/include/lib/dictionary.h kernel/include/lib/dictionary.h
+	@cp -f ../viui/src/lib/dictionary.c kernel/lib/dictionary.c
+
+	@cp -f ../viui/include/vui/button.h kernel/include/vui/button.h
+	@cp -f ../viui/include/vui/console.h kernel/include/vui/console.h
 	@cp -f ../viui/include/vui/desktop.h kernel/include/vui/desktop.h
+	@cp -f ../viui/include/vui/event.h kernel/include/vui/event.h
 	@cp -f ../viui/include/vui/font.h kernel/include/vui/font.h
 	@cp -f ../viui/include/vui/label.h kernel/include/vui/label.h
+	@cp -f ../viui/include/vui/layout.h kernel/include/vui/layout.h
+	@cp -f ../viui/include/vui/menu.h kernel/include/vui/menu.h
+	@cp -f ../viui/include/vui/menubar.h kernel/include/vui/menubar.h
 	@cp -f ../viui/include/vui/vui.h kernel/include/vui/vui.h
 	@cp -f ../viui/include/vui/window.h kernel/include/vui/window.h
 
+	@cp -f ../viui/src/vui/button.c kernel/vui/button.c
+	@cp -f ../viui/src/vui/console.c kernel/vui/console.c
 	@cp -f ../viui/src/vui/desktop.c kernel/vui/desktop.c
+	@cp -f ../viui/src/vui/event.c kernel/vui/event.c
 	@cp -f ../viui/src/vui/font.c kernel/vui/font.c
 	@cp -f ../viui/src/vui/label.c kernel/vui/label.c
+	@cp -f ../viui/src/vui/layout.c kernel/vui/layout.c
+	@cp -f ../viui/src/vui/menu.c kernel/vui/menu.c
+	@cp -f ../viui/src/vui/menubar.c kernel/vui/menubar.c
 	@cp -f ../viui/src/vui/vui.c kernel/vui/vui.c
 	@cp -f ../viui/src/vui/window.c kernel/vui/window.c
 

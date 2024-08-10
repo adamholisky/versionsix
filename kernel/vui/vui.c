@@ -1,52 +1,15 @@
 #include "vit.h"
 #include "vui/vui.h"
+#include "vui/event.h"
 #include "vui/font.h"
 #include "vui/desktop.h"
 #include "vui/window.h"
 #include "vui/label.h"
+#include "vui/console.h"
+#include "vui/button.h"
+#include "vui/menubar.h"
 
 vui_core vui;
-
-/**
- * @brief Test main loop for VUI development. Works on dev and OS.
- * 
- */
-void vui_main_test_loop( void ) {
-	vui_font_initalize();
-
-	#ifdef VI_ENV_OS
-	vui_font_load( VUI_FONT_TYPE_PSF, "Zap Light", "/usr/share/fonts/zap-light20.psf" );
-	vui_font_load( VUI_FONT_TYPE_PSF, "Zap VGA", "/usr/share/fonts/zap-ext-vga16.psf" );
-	#else
-	vui_font_load( VUI_FONT_TYPE_PSF, "Zap Light", "zap-light20.psf" );
-	vui_font_load( VUI_FONT_TYPE_PSF, "Zap VGA", "zap-ext-vga16.psf" );
-	#endif
-
-	vui_theme *theme = vui_get_active_theme();
-
-	vui_handle desktop = vui_desktop_create( 0, 0, vui.width, vui.height, VUI_DESKTOP_FLAG_NONE );
-	vui_draw_handle( desktop );
-
-	/* vui_handle smooth_text = vui_label_create( 30, 100, "Adam Holisky Versions OS 6.0.0.1", VUI_LABEL_FLAG_NONE );
-
-	vui_handle not_smooth_text = vui_label_create( 30, 130, "ABCDEFGHIJKLMNOPQRSTUVWXYZ `1234567890-= ~!@#$%^&*()_+ \"\'/\\.,<>[]{}", VUI_LABEL_FLAG_NO_SMOOTHING );
-
-	vui_label_set_color( smooth_text, COLOR_RGB_BLACK, theme->window_background );
-	vui_label_set_color( not_smooth_text, COLOR_RGB_BLACK, theme->window_background );
-
-	vui_label_set_font( not_smooth_text, vui_font_get_font("Zap VGA") ); */
-
-	vui_handle win = vui_window_create( 25, 25, 800, 400, VUI_WINDOW_FLAG_NONE );
-	vui_window_set_title( win, "ViOS 6" );
-
-	vui_window *win_s = vui_get_handle_data(win);
-
-	vui_handle con = vui_console_create( );
-
-	vui_draw_handle( win );
-	/* vui_draw_handle( smooth_text );
-	vui_draw_handle( not_smooth_text ); */
-}
 
 /**
  * @brief Initalize the VUI GUI system
@@ -61,7 +24,7 @@ void vui_init( uint32_t *fb_addr, uint16_t width, uint16_t height ) {
 	vui.height = height;
 	vui.pitch = width * 4;
 	vui.buffer = vmalloc( 4 * width * height );
-	vui.handle_next = 0;
+	vui.handle_next = 1;
 
 	memset( vui.buffer, 0, 4 * width * height );
 
@@ -70,12 +33,20 @@ void vui_init( uint32_t *fb_addr, uint16_t width, uint16_t height ) {
 	vui.active_theme.window_background = 0x00D6D6D6;
 	vui.active_theme.window_title_bar_background = 0x00363636;
 	vui.active_theme.window_title_bar_foreground = 0x00EAEAEA;
-
-	#ifndef VI_ENV_OS
-	vui_main_test_loop();
-	#endif
+	vui.active_theme.button_foreground = 0xD6D6D6;
+	vui.active_theme.button_background = 0x0056C1;	
+	vui.active_theme.button_hover = 0x0064E1;
+	vui.active_theme.button_active = 0x003476;
+	vui.active_theme.menubar_background = 0xD9D9D9;
+	vui.active_theme.menubar_foreground = 0x363636;
 }
 
+/**
+ * @brief 
+ * 
+ * @param type 
+ * @return vui_handle 
+ */
 vui_handle vui_allocate_handle( uint16_t type ) {
 	if( vui.handle_next >= VUI_HANDLES_MAX ) {
 		vdf( "VUI: Reached max handles!\n" );
@@ -86,9 +57,68 @@ vui_handle vui_allocate_handle( uint16_t type ) {
 	vui.handles[vui.handle_next].type = type;
 	vui.handles[vui.handle_next].H = vui.handle_next;
 
+	// If the handle that's being added is a dispatcher, then add it to the list
+	if( vui_is_dispatcher(type) ) {	
+		vui_handle_list_add( &vui.dispatchers, vui.handle_next );
+	}
+
 	vui.handle_next++;
 
 	return vui.handle_next - 1;
+}
+
+
+
+/**
+ * @brief 
+ * 
+ * @param H 
+ */
+void vui_create_cleanup( vui_handle H ) {
+	vui_common *vc = vui_get_handle_data(H);
+
+	if( vc == NULL ) {
+		vdf( "vui_common is NULL. Big problem. Aborting.\n" );
+		return;
+	}
+
+	if( vui_is_dispatcher(vc->type) ) {
+		vui_sort_list_by_priority( &vui.dispatchers );
+	}
+}
+
+/**
+ * @brief 
+ * 
+ * @param H 
+ * @return uint16_t 
+ */
+uint16_t vui_get_type_from_master_list( vui_handle H ) {
+	return vui.handles[H].type;
+}
+
+/**
+ * @brief Sets the internal name of the element
+ * 
+ * @param H 
+ * @param name 
+ */
+void vui_handle_set_name( vui_handle H, char *name ) {
+	vui_common *vc = vui_get_handle_data(H);
+
+	strcpy(vc->name, name);
+}
+
+/**
+ * @brief Returns the name of the handle
+ * 
+ * @param H 
+ * @return char* 
+ */
+char *vui_handle_get_name( vui_handle H ) {
+	vui_common *vc = vui_get_handle_data(H);
+
+	return vc->name;
 }
 
 /**
@@ -99,6 +129,164 @@ vui_handle vui_allocate_handle( uint16_t type ) {
  */
 void vui_set_handle_data( vui_handle H, void *data ) {
 	vui.handles[H].data = data;
+}
+
+/**
+ * @brief Draws the given handle and all its children
+ * 
+ * @param H vui_handle of the element to draw
+ */
+void vui_draw( vui_handle H ) {
+	// Step 1: Draw the container
+	vui_draw_handle(H);
+
+	// Step 2: Iterate through children, draw each
+	vui_common *parent_st = vui_get_handle_data(H);
+
+	if( parent_st == NULL ) {
+		vdf( "Parent struct is null. Aborting.\n" );
+		return;
+	}
+
+	vui_handle_list *top = &parent_st->children;
+
+	do {
+		if( top->H != 0 ) {
+			vui_draw_handle( top->H );
+		}
+		
+		top = top->next;
+	} while( top != NULL );
+}
+
+/**
+ * @brief Adds the given handle to the provided handle list
+ * 
+ * @param list Pointer to the list to add to
+ * @param handle_to_add Handle to add 
+ */
+bool vui_handle_list_add( vui_handle_list *list, vui_handle handle_to_add ) {
+	vui_handle_list *top = list;
+	vui_handle_list *node = NULL;
+	bool free_node_found = false;
+
+	if( top == NULL ) {
+		vdf( "Top is NULL. Aborting.\n" );
+		return false;
+	}
+
+	do {
+		if( top->next == NULL ) {
+			if( top->H == 0 ) {
+				node = top;
+			} else {
+				top->next = vmalloc( sizeof(vui_handle_list) );
+				node = top->next;
+			}
+
+			free_node_found = true;
+		} else {
+			top = top->next;
+		}
+	} while( top != NULL && !free_node_found );
+
+	if( node == NULL ) {
+		vdf( "Free node returned as null. Aborting.\n" );
+		return false;
+	}
+
+	node->H = handle_to_add;
+	node->next = NULL;
+
+	return true;
+}
+
+/**
+ * @brief Adds the child handle to the parent
+ * 
+ * @param parent 
+ * @param child 
+ */
+void vui_add_to_parent( vui_handle parent, vui_handle child ) {
+	// Step 1: Get the data structs as vui_common
+	vui_common *parent_st = vui_get_handle_data(parent);
+	vui_common *child_st = vui_get_handle_data(child);
+
+	if( parent_st == NULL ) {
+		vdf( "Parent_st is NULL. Aborting.\n" );
+		return;
+	}
+
+	if( child_st == NULL ) {
+		vdf( "Child_st is NULL. Aborting.\n" );
+		return;
+	}
+
+	// Step 2: Find the end of the list, add to it
+	vui_handle_list *top = &parent_st->children;
+	vui_handle_list_add( &parent_st->children, child_st->handle );
+	child_st->parent = parent_st->handle;
+
+	// Step 4: Sort parent's child handles by priority order
+	// TODO ^^
+}
+
+/**
+ * @brief Sorts the provided list by priority
+ * 
+ * @param list 
+ */
+void vui_sort_list_by_priority( vui_handle_list *list ) {
+	bool keep_going = true;
+	bool did_sort = false;
+
+	//vdf( "Priority List Pre Sort:\n" );
+	for( vui_handle_list *hl = list; hl != NULL; hl = hl->next ) {
+		vui_common *vc = vui_get_handle_data(hl->H);
+		//vdf( "   %d -> %08X\n", hl->H, vc->priority );
+	}
+
+	if( list->H == 0 ) {
+		return;
+	}
+
+	if( list->next == NULL ) {
+		return;
+	}
+
+	do {
+		vui_handle_list *top = list;
+		vui_handle_list *current = list->next;
+		keep_going = true;
+		did_sort = false;
+
+		while( keep_going ) {
+			vui_common *top_st = vui_get_handle_data(top->H);
+			vui_common *current_st = vui_get_handle_data(current->H);
+			vui_handle temp = 0;
+
+			if( current_st->priority < top_st->priority ) {
+				temp = top->H;
+				top->H = current->H;
+				current->H = temp;
+
+				did_sort = true;
+			}
+
+			if( current->next == NULL ) {
+				keep_going = false;
+			} else {
+				top = current;
+				current = top->next;
+			}
+		}
+	} while( did_sort );
+
+	//vdf( "Priority List Post Sort:\n" );
+	for( vui_handle_list *hl = list; hl != NULL; hl = hl->next ) {
+		vui_common *vc = vui_get_handle_data(hl->H);
+		//vdf( "   %d -> %08X\n", hl->H, vc->priority );
+	}
 }
 
 /**
@@ -120,6 +308,12 @@ void vui_draw_handle( vui_handle H ) {
 		case VUI_HANDLE_TYPE_CONSOLE:
 			vui_console_draw_from_struct( vui.handles[H].data );
 			break;
+		case VUI_HANDLE_TYPE_BUTTON:
+			vui_button_draw_from_struct( vui.handles[H].data );
+			break;
+		case VUI_HANDLE_TYPE_MENUBAR:
+			vui_menubar_draw_from_struct( vui.handles[H].data );
+			break;
 		default:
 			vdf( "VUI: Cannot find handle type to draw.\n" );
 	}
@@ -137,21 +331,38 @@ void *vui_get_handle_data( vui_handle H) {
 	return vui.handles[H].data;
 }
 
+/**
+ * @brief 
+ * 
+ * @return vui_theme* 
+ */
 vui_theme *vui_get_active_theme( void ) {
 	return &vui.active_theme;
 }
-
 
 /**
  * @brief Refresh the entire VUI screen
  * 
  */
 void vui_refresh( void ) {
+	vdf( "Refreshed entire ui.\n" );
+
 	memcpy( vui.fb, vui.buffer, 4 * vui.width * vui.height );
 
 	#ifndef VI_ENV_OS
 	vit_gui_update();
 	#endif
+}
+
+void vui_refresh_handle( vui_handle H ) {
+	vui_common *vc = vui_get_handle_data(H);
+
+	if( vc == NULL ) {
+		vdf( "Refresh handle %d returned NULL. Aborting.\n", H );
+		return;
+	}
+
+	vui_refresh_rect( vc->absolute_x, vc->absolute_y, vc->width, vc->height );
 }
 
 /**
@@ -163,6 +374,8 @@ void vui_refresh( void ) {
  * @param height height in pixels
  */
 void vui_refresh_rect( uint16_t x, uint16_t y, uint16_t width, uint16_t height ) {
+	//vdf( "Refreshed: x: %d    y: %d    width: %d    height: %d\n", x, y, width, height );
+
 	uint32_t offset_x = x;
 	uint32_t offset_y = y * vui.pitch/4;
 
@@ -325,12 +538,23 @@ void vui_draw_char_with_color( uint16_t char_num, uint16_t x, uint16_t y, uint32
 	}
 }
 
+/**
+ * @brief 
+ * 
+ * @param s 
+ * @param x 
+ * @param y 
+ * @param fg 
+ * @param bg 
+ * @param font 
+ * @param smoothing 
+ */
 void vui_draw_string( char *s, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg, vui_font *font, bool smoothing ) {
 	int len = strlen(s);
 	int current_x = x;
 	vui_font *f = ( font == NULL ? vui_font_get_main_font() : font );
 
-	vdf( "Smoothing: %d\n", smoothing );
+	//vdf( "Smoothing: %d\n", smoothing );
 
 	for( int i = 0; i < len; i++ ) {
 		vui_draw_char_with_color( *s, current_x, y, fg, bg, f, smoothing );
@@ -339,6 +563,18 @@ void vui_draw_string( char *s, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg,
 	}
 }
 
+/**
+ * @brief 
+ * 
+ * @param dest_x 
+ * @param dest_y 
+ * @param dest_w 
+ * @param dest_h 
+ * @param src_x 
+ * @param src_y 
+ * @param src_w 
+ * @param src_h 
+ */
 void vui_move_rect( uint32_t dest_x, uint32_t dest_y, uint32_t dest_w, uint32_t dest_h, uint32_t src_x, uint32_t src_y, uint32_t src_w, uint32_t src_h ) {
 	unsigned int i = 0;
 	uint8_t * mem_dest;

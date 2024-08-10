@@ -9,14 +9,9 @@ extern "C" {
 #define VUI_DESKTOP_FLAG_NONE				0
 
 typedef struct {
-	uint16_t handle;
-	uint32_t flags;
-	
-	uint16_t x;
-	uint16_t y;
-	uint16_t width;
-	uint16_t height;
+	INSERT_VUI_COMMON
 
+	uint32_t flags;
 	uint32_t color_background;
 } vui_desktop;
 

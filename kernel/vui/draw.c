@@ -209,71 +209,37 @@ void vui_draw_char( uint16_t char_num, uint16_t x, uint16_t y, uint32_t fg, uint
 		for( int i = 0; i < font->info.height; i++ ) {
 			uint32_t *loc = vui.buffer + ((y+i) * (vui.pitch / 4)) + x;
 
-			for( int j = 16; j != (16 - font->info.width - width_mod); j-- ) {
-				*(loc + (16 - j)) = bg;
+			for( int j = 0; j != font->info.width; j++ ) {
+				*(loc + j) = bg;
 			}
 		}
 	}
 
-	//vdf( "printing: %c 0x%04X (%d).\n", bitmaps[index].num, bitmaps[index].num, bitmaps[index].num);
+	//vdf( "printing: %c 0x%04X (%d).\n", font->bitmaps[index].num, font->bitmaps[index].num, font->bitmaps[index].num);
 	for( int i = 0; i < font->info.height; i++ ) {
 		uint32_t *loc = vui.buffer + ((y+i) * (vui.pitch / 4)) + x;
 		uint32_t *loc_imm = vui.fb + ((y+i) * (vui.pitch / 4)) + x;
 		
-
-		
-		//vdf( "Row: %d == %X\n", i, bitmaps[index].pixel_row[i] );
+		//vdf( "Row: %d == %X\n", i, font->bitmaps[index].pixel_row[i] );
 		//vdf( "\"" );
-		for( int j = 16; j != (16 - font->info.width - width_mod); j-- ) {
+		for( int j = 0; j != font->info.width; j++ ) {
 			if( ((font->bitmaps[index].pixel_row[i] >> j) & 0x1) ) {
 				//vdf( "*" );
-				*(loc + (16 - j)) = fg;
-				if( flags & VUI_DRAW_FLAGS_IMMEDIATE ) { *(loc_imm + (16 - j)) = fg; }
+				*(loc + j) = fg;
+				if( flags & VUI_DRAW_FLAGS_IMMEDIATE ) { *(loc_imm + j) = fg; }
 
-				if( smoothing ){
-					/**
-					 * X!
-					 * !E
-					 */
-					if( (i + 1 <= font->info.height) && (j - 1 >= (16 - font->info.width - width_mod)) ) { // 1 down and 1 right can happen
-						//debugf( "1 Can happen.\n" );
-						if( ((font->bitmaps[index].pixel_row[i + 1] >> (j-1)) & 0x1) ) { // if it exists
-							if( !((font->bitmaps[index].pixel_row[i + 1] >> j) & 0x1) ) {  // if 1 down from current j does not exit
-								//vdf( "AA apply!\n" );
-								*(loc + (vui.pitch / 4) + (16 - j)) = smoothing_color;// then fill it
-								if( flags & VUI_DRAW_FLAGS_IMMEDIATE ) { *(loc_imm + (vui.pitch / 4) + (16 - j)) = smoothing_color; }
-							}
+				
+			} else {
+				//vdf( " " );
+			}
 
-							if( !((font->bitmaps[index].pixel_row[i] >> (j-1)) & 0x1) ) {  // if 1 over from current j does not exit
-								//debugf( "AA apply!\n" );
-								*(loc + (16 - j + 1)) = smoothing_color;// then fill it
-								if( flags & VUI_DRAW_FLAGS_IMMEDIATE ) { *(loc_imm + (16 - j + 1)) = smoothing_color;  }
-							}
-						}
+			if( smoothing ){
+				if( ((font->aa_mask[index].pixel_row[i] >> j) & 0x1) ) {
+					//vdf( "*" );
+					*(loc + j) = smoothing_color;
+					if( flags & VUI_DRAW_FLAGS_IMMEDIATE ) { *(loc_imm + j) = smoothing_color; }
 
-					}
-
-					/**
-					 * !X
-					 * E!
-					 */
-					if( (i + 1 <= font->info.height) && (j + 1 >= (16 - font->info.width -  width_mod)) ) { // 1 down and 1 left can happen
-						//vdf( "2 Can happen.\n" );
-						if( ((font->bitmaps[index].pixel_row[i + 1] >> (j+1)) & 0x1) ) { // if it exists
-							if( !((font->bitmaps[index].pixel_row[i + 1] >> j) & 0x1) ) {  // if 1 down from current j does not exit
-								//vdf( "smoothing 2a\n" );
-								*(loc + (vui.pitch / 4) + (16 - j)) = smoothing_color;// then fill it
-								if( flags & VUI_DRAW_FLAGS_IMMEDIATE ) { *(loc + (vui.pitch / 4) + (16 - j)) = smoothing_color; }
-							}
-
-							if( !((font->bitmaps[index].pixel_row[i] >> (j + 1)) & 0x1) ) {  // if 1 across from current j does not exit
-								//vdf( "smoothing 2b\n" );
-								*(loc + (16 - j - 1)) = smoothing_color;// then fill it
-								if( flags & VUI_DRAW_FLAGS_IMMEDIATE ) { *(loc + (16 - j - 1)) = smoothing_color; }
-							}
-						}
-
-					}
+					
 				}
 			}
 		}
@@ -337,3 +303,6 @@ void vui_move_rect( uint32_t dest_x, uint32_t dest_y, uint32_t dest_w, uint32_t 
 		for(; mem_size != 0; mem_size--) *mem_dest32++ = *mem_src32++;
 	}
 }
+
+
+

@@ -32,7 +32,7 @@ void vui_menubar_draw( vui_handle H ) {
 	
 	char str[255];
 
-	sprintf( str, " Vi  |  File     Edit     Tests     Debug"	 );
+	sprintf( str, " File     Edit     Tests     Debug    Windows"	 );
 	vui_draw_string( str, 5, 5, theme->menubar_foreground, theme->menubar_background, vui_font_get_font("Zap VGA"), VUI_DRAW_FLAGS_NONE );
 
 }

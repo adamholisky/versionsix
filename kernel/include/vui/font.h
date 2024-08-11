@@ -27,6 +27,7 @@ typedef struct {
 
 typedef struct {
     font_bitmap *bitmaps;
+    font_bitmap *aa_mask;
     font_info info;
 
     void *next;
@@ -59,6 +60,7 @@ vui_font *vui_font_get_font( char *name );
 vui_font *vui_font_get_main_font( void );
 bool vui_font_load_psf( vui_font *font );
 void vui_font_get_bounding_box( char *text, vui_font *font, uint16_t *width, uint16_t *height );
+void vui_font_create_aa_mask( vui_font *font, uint16_t char_num );
 
 //bool font_load_bdf( char *font_path );
 

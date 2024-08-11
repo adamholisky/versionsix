@@ -111,6 +111,9 @@ typedef struct {
 	void (*on_mouse_enter)(vui_event *);
 	void (*on_mouse_exit)(vui_event *);
 	void (*on_mouse_up)(vui_event *);
+
+	void (*draw_from_struct)(void *);
+	void (*draw_from_handle)(vui_handle);
 } vui_operations;
 
 typedef struct {

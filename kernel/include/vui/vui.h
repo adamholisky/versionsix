@@ -29,6 +29,11 @@ extern "C" {
 #define VUI_PRIORITY_WINDOW 0x20
 #define VUI_PRIORITY_DESKTOP 0xFFFFFFFF
 
+#define VUI_DRAW_FLAGS_NONE 				0
+#define VUI_DRAW_FLAGS_DISABLE_SMOOTHING	(1 << 0)
+#define VUI_DRAW_FLAGS_IMMEDIATE 			(1 << 1)
+#define VUI_DRAW_FLAGS_TRANSPARENT			(1 << 2)
+
 typedef uint32_t vui_handle;
 
 typedef struct {
@@ -83,6 +88,9 @@ typedef struct {
 	vui_theme active_theme;
 
 	vui_handles handles[VUI_HANDLES_MAX];
+
+	bool immediate_output;
+	bool disable_font_smoothing;
 
 	vui_handle_list dispatchers;
 	vui_handle handle_next;
@@ -182,8 +190,8 @@ vui_theme *vui_get_active_theme( void );
 void vui_draw( vui_handle H );
 void vui_draw_handle( vui_handle H );
 void vui_draw_rect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color );
-void vui_draw_string( char *s, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg, vui_font *font, bool smoothing );
-void vui_draw_char_with_color( uint16_t char_num, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg, vui_font *font, bool smoothing );
+void vui_draw_string( char *s, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg, vui_font *font, uint64_t flags );
+void vui_draw_char( uint16_t char_num, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg, vui_font *font, uint64_t flags );
 void vui_move_rect( uint32_t dest_x, uint32_t dest_y, uint32_t dest_w, uint32_t dest_h, uint32_t src_x, uint32_t src_y, uint32_t src_w, uint32_t src_h );
 
 #ifdef __cplusplus

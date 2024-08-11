@@ -39,7 +39,9 @@
             "ethernet.h": "c",
             "console.h": "c",
             "network.h": "c",
-            "string.h": "c"
-        }
+            "string.h": "c",
+            "vui.h": "c"
+        },
+        "terminal.integrated.fontSize": 12
     }
 }

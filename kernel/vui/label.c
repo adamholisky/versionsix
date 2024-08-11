@@ -46,10 +46,10 @@ void vui_label_set_font( vui_handle H, vui_font *font ) {
 }
 
 void vui_label_draw_from_struct( vui_label *label ) {
-	if( label->flags & VUI_LABEL_FLAG_NO_SMOOTHING ) {
-		vui_draw_string( label->text, label->x, label->y, label->color_foreground, label->color_background, label->font, false );
-	} else {
-		vui_draw_string( label->text, label->x, label->y, label->color_foreground, label->color_background, label->font, true );
-	}
-	
+	uint64_t flags = 0;
+
+	flags = flags | (label->flags & VUI_LABEL_FLAG_NO_SMOOTHING ? VUI_DRAW_FLAGS_DISABLE_SMOOTHING : 0);
+	flags = flags | (label->flags & VUI_LABEL_FLAG_TRANSPARENT ? VUI_DRAW_FLAGS_TRANSPARENT : 0);
+
+	vui_draw_string( label->text, label->x, label->y, label->color_foreground, label->color_background, label->font, flags );	
 }

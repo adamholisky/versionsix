@@ -8,6 +8,7 @@ extern "C" {
 
 #define VUI_LABEL_FLAG_NONE				0
 #define VUI_LABEL_FLAG_NO_SMOOTHING		(1 << 0)
+#define VUI_LABEL_FLAG_TRANSPARENT		(1 << 1)
 
 typedef struct {
 	INSERT_VUI_COMMON

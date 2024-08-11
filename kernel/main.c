@@ -87,7 +87,7 @@ void kernel_main( void ) {
 
 	vui_handle desktop = vui_desktop_create( 0, 25, vui.width, vui.height - 25, VUI_DESKTOP_FLAG_NONE );
 	vui_handle smooth_text = vui_label_create( 5, 768 - 25, "Versions OS 6.0.0.1", VUI_LABEL_FLAG_NONE, desktop );
-	vui_label_set_color( smooth_text, COLOR_RGB_WHITE, theme->window_background );
+	vui_label_set_color( smooth_text, COLOR_RGB_WHITE, theme->desktop );
 	vui_handle_set_name( desktop, "desktop" );
 
 	vui_handle win = vui_window_create( 25, 40, 900, 600, VUI_WINDOW_FLAG_NONE );

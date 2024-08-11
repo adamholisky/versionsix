@@ -32,7 +32,7 @@ void vui_menu_draw_from_struct( vui_menu *menu ) {
 	vui_draw_rect( menu->inner_x, menu->inner_y, menu->inner_width, menu->inner_height, theme->menubar_background ); 
 
 	for( int i = 0; i < menu->num_items; i++ ) {
-		vui_draw_string( menu->items[i].text, menu->inner_x + 5, menu->inner_y + (i * 25) + 5, theme->menubar_foreground, theme->menubar_background, vui_font_get_font("Zap VGA"), true );
+		vui_draw_string( menu->items[i].text, menu->inner_x + 5, menu->inner_y + (i * 25) + 5, theme->menubar_foreground, theme->menubar_background, vui_font_get_font("Zap VGA"), VUI_DRAW_FLAGS_NONE );
 	}
 }
 

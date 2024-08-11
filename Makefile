@@ -68,6 +68,7 @@ cp_vit:
 	@cp -f ../viui/src/vui/button.c kernel/vui/button.c
 	@cp -f ../viui/src/vui/console.c kernel/vui/console.c
 	@cp -f ../viui/src/vui/desktop.c kernel/vui/desktop.c
+	@cp -f ../viui/src/vui/draw.c kernel/vui/draw.c
 	@cp -f ../viui/src/vui/event.c kernel/vui/event.c
 	@cp -f ../viui/src/vui/font.c kernel/vui/font.c
 	@cp -f ../viui/src/vui/label.c kernel/vui/label.c

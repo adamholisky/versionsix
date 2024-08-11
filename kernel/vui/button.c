@@ -85,7 +85,7 @@ void vui_button_draw_from_struct( vui_button *button ) {
 	uint16_t x = button->absolute_x + (button->width / 2) - (width / 2);
 	uint16_t y = button->absolute_y + (button->height / 2) - (height / 2);
 
-	vui_draw_string( button->text, x, y, button->color_foreground, bg_color, vui_font_get_font("Zap VGA"), true );
+	vui_draw_string( button->text, x, y, button->color_foreground, bg_color, vui_font_get_font("Zap VGA"), VUI_DRAW_FLAGS_NONE );
 }
 
 /**

@@ -45,10 +45,12 @@ AFLAGS = $(CFLAGS)
 # -netdev tap,ifname=tap0,br=br0,script=no,id=private_net \
 				-device e1000,netdev=private_net,mac=12:34:56:78:9A:BC \
 				-object filter-dump,id=f1,netdev=private_net,file=dump.dat 
+
+# 				--enable-kvm \
+
 QEMU = /usr/bin/qemu-system-x86_64
 QEMU_COMMON = 	-device ahci,id=ahci \
 				\
-				--enable-kvm \
 				\
 				-drive id=main_drive,format=raw,if=none,file=$(ROOT_DIR)/vi_hd.img \
 				-device ide-hd,drive=main_drive,bus=ahci.0 \
@@ -76,6 +78,6 @@ QEMU_COMMON = 	-device ahci,id=ahci \
 QEMU_DISPLAY_NONE =	-display none
 
 #  -vnc :1
-QEMU_DISPLAY_NORMAL = -vga std
+QEMU_DISPLAY_NORMAL = -vga std -display gtk,gl=on
 QEMU_DEBUG_COMMON = -S -gdb tcp::5894 
 QEMU_DEBUG_LOGGING = -D $(ROOT_DIR)/build_support/logs/qemu_debug_log.txt 

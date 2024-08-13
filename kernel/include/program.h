@@ -21,15 +21,12 @@ typedef struct _program {
 	struct _program *next;
 } program;
 
-
-
-
-
+void program_initalize( void );
 int program_load( char *path );
-int program_load_data( void *data, size_t size );
-int program_load_elf_module( void *data, size_t size );
-int program_load_elf_library( void *data, size_t size );
-int program_load_elf_binary( void *data, size_t size );
+int program_load_data( program *p, void *data, size_t size );
+int program_load_elf_module( program *p, void *data, size_t size );
+int program_load_elf_library( program *p, void *data, size_t size );
+int program_load_elf_binary( program *p, void *data, size_t size );
 
 
 #ifdef __cplusplus

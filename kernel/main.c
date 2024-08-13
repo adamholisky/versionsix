@@ -29,6 +29,7 @@
 #include <vui/font.h>
 #include <vui/label.h>
 #include <vui/window.h>
+#include <tests.h>
 
 
 #undef ENABLE_NETWORKING
@@ -102,7 +103,7 @@ void kernel_main( void ) {
 
 	vui_draw( desktop );
 	vui_draw( win );
-	
+		
 	
 	printf( "Versions OS VI\n" );
 
@@ -118,6 +119,9 @@ void kernel_main( void ) {
 	vfs_write( vfs_lookup_inode("/dev/stderr0"), test_message, len, 0 );
 
 	task_create( TASK_TYPE_KERNEL_THREAD, TASK_GENERATOR_DEV, "Task Chain", (uint64_t *)task_chain_a );
+
+	tests_run_tests();		
+
 	task_create( TASK_TYPE_KERNEL_THREAD, TASK_GENERATOR_DEV, "KShell", (uint64_t *)kshell_initalize );
 	syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 

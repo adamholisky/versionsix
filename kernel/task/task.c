@@ -3,6 +3,7 @@
 #include <task.h>
 #include <timer.h>
 #include <kshell.h>
+#include <program.h>
 
 kernel_process_data process_data;
 uint16_t task_id_top;
@@ -23,6 +24,8 @@ void task_initalize( void ) {
 
 	process_data.current_task_id = 0;
 	process_data.yield_to_next = 0;
+
+	program_initalize();
 }
 
 /**

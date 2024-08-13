@@ -13,7 +13,7 @@ program *programs;
  * @brief Initalzie the program environment
  * 
  */
-void program_init( void ) {
+void program_initalize( void ) {
 	id_top = 1000;
 	programs = NULL;
 }
@@ -105,30 +105,39 @@ int program_load( char *path ) {
 
 	data[ stats.size ] = 0;
 
-	program_load_data( data, stats.size );
+	program *p = program_allocate();
+
+	strcpy( p->path, path );
+
+	program_load_data( p, data, stats.size );
 
 	kfree(data);
 }
 
-int program_load_data( void *data, size_t size ) {
+#undef KDEBUG_PROGRAM_LOAD_DATA
+int program_load_data( program *p, void *data, size_t size ) {
 	uint8_t *data_bytes = (uint8_t *)data;
+
+	#ifdef KDEBUG_PROGRAM_LOAD_DATA
+	debugf( "Loding: \"%s\"    data: 0x%016llX    size: 0x%llX \n", p->path, data, size );
+	debugf( "data_bytes[0]: 0x%X\n", data_bytes[0] );	
+	#endif
 	
 	// Identify the data and run the loading routine
 	if( data_bytes[0] == 0x7F ) {
+		Elf64_Ehdr *elf_header = data;
 		// Load ELF file
 
-		if( strncmp( data_bytes, "ELF", 3 ) == 0 ) {
-			Elf64_Ehdr *elf_header = data;
-
+		if( strncmp( (data_bytes + 1), "ELF", 3 ) == 0 ) {
 			switch( elf_header->e_type ) {
 				case ET_REL:
-					return program_load_elf_module( data, size );
+					return program_load_elf_module( p, data, size );
 					break;
 				case ET_DYN:
-					return program_load_elf_library( data, size );
+					return program_load_elf_library( p, data, size );
 					break;
 				case ET_EXEC:
-					return program_load_elf_binary( data, size );
+					return program_load_elf_binary( p, data, size );
 					break;
 				default:
 					debugf( "Invalid ELF e_type: %d\n", elf_header->e_type );
@@ -140,14 +149,14 @@ int program_load_data( void *data, size_t size ) {
 	}
 }
 
-int program_load_elf_module( void *data, size_t size ) {
-
+int program_load_elf_module( program *p, void *data, size_t size ) {
+	debugf( "Loding elf module	: \"%s\"    data: 0x%016llX    size: 0x%llX \n", p->path, data, size );
 }
 
-int program_load_elf_library( void *data, size_t size ) {
-
+int program_load_elf_library( program *p, void *data, size_t size ) {
+	debugf( "Loding elf library	: \"%s\"    data: 0x%016llX    size: 0x%llX \n", p->path, data, size );
 }
 
-int program_load_elf_binary( void *data, size_t size ) {
-
+int program_load_elf_binary( program *p, void *data, size_t size ) {
+	debugf( "Loding elf binary	: \"%s\"    data: 0x%016llX    size: 0x%llX \n", p->path, data, size );
 }

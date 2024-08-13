@@ -260,7 +260,7 @@ int kshell_command_run( kshell_command *cmd, int argc, char *argv[] ) {
 
 	kshell_main_func_to_call func = (kshell_main_func_to_call)cmd->entry;
 
-	uint16_t cmd_task_id = task_create( TASK_TYPE_KERNEL_PROCESS, cmd->name, cmd->entry );
+	uint16_t cmd_task_id = task_create( TASK_TYPE_KERNEL_PROCESS, TASK_GENERATOR_DEV, cmd->name, cmd->entry );
 
 	syscall_args exec_args;
 	exec_args.arg_1 = cmd_task_id;

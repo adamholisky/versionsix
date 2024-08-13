@@ -33,7 +33,7 @@ void task_initalize( void ) {
  * @param entry Entry point
  * @return uint16_t task id
  */
-uint16_t task_create( uint8_t task_type, char *name, uint64_t *entry ) {
+uint16_t task_create( uint8_t task_type, uint8_t generator, char *name, uint64_t *entry ) {
 	uint16_t task_id = 0;
 
 	if( task_type == TASK_TYPE_KERNEL ) {
@@ -67,6 +67,13 @@ uint16_t task_create( uint8_t task_type, char *name, uint64_t *entry ) {
 	new_task->task_context.rflags = 0x200;
 	new_task->task_context.rsp = (uint64_t)kmalloc( 4 * 1024 ) + 4*1024;
 	new_task->task_context.rip = (uint64_t)entry;
+
+	switch( generator ) {
+		case TASK_GENERATOR_ELF:
+			break;
+		default:
+			// Nothing?
+	}
 
 	debugf( "Task created: ID: %d, Name: \"%s\"\n", new_task->id, new_task->display_name );
 

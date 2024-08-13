@@ -15,6 +15,7 @@ extern "C" {
 #include <syscall.h>
 #include <debug.h>
 #include <framebuffer.h>
+#include <error.h>
 
 #define VIFS_OS
 

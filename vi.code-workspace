@@ -26,22 +26,5 @@
         "save-gdb-breakpoints.autoSave": true,
         "terminal.explorerKind": "integrated",
         "editor.cursorStyle": "block",
-        "files.associations": {
-            "stdbool.h": "c",
-            "stdio.h": "c",
-            "stdlib.h": "c",
-            "window.h": "c",
-            "desktop.h": "c",
-            "dirent.h": "c",
-            "stdint.h": "c",
-            "ratio": "c",
-            "coroutine": "c",
-            "ethernet.h": "c",
-            "console.h": "c",
-            "network.h": "c",
-            "string.h": "c",
-            "vui.h": "c"
-        },
-        "terminal.integrated.fontSize": 12
     }
 }

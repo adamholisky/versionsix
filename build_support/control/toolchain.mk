@@ -10,6 +10,8 @@ OBJDUMP = /usr/local/osdev/bin/x86_64-elf-objdump
 	-finstrument-functions-exclude-function-list=inportb,outportb,in_port_long,out_port_long,timer_handler
 
 CFLAGS = $(DEFINES) -Wno-write-strings \
+	-Wno-pointer-to-int-cast \
+	-Wno-discarded-qualifiers \
 	-ffreestanding \
 	-fno-omit-frame-pointer \
 	-fno-lto             \

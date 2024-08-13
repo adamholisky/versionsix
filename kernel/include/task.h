@@ -73,6 +73,9 @@ Task End of Life:
 #define TASK_STATUS_INACTIVE 4
 #define TASK_STATUS_DEAD 5
 
+#define TASK_GENERATOR_DEV 0
+#define TASK_GENERATOR_ELF 1
+
 typedef void (*task_entry_func)( void );
 
 typedef struct _task task;
@@ -107,7 +110,7 @@ typedef struct {
 } kernel_process_data;
 
 void task_initalize( void );
-uint16_t task_create( uint8_t task_type, char *name, uint64_t *entry );
+uint16_t task_create( uint8_t task_type, uint8_t generator, char *name, uint64_t *entry );
 void task_sched_yield( registers **context );
 void task_test_thread_a( void );
 void task_test_thread_b( void );

@@ -11,13 +11,15 @@ extern "C" {
 #define ERR_UNKNOWN -1
 #define ERR_STAT -2
 #define ERR_INVALID_ELF_TYPE -3
+#define ERR_ELF_INAVLID -4
 
 
 static const char *error_strings[] = {
 	"None",
 	"Unknown",
 	"Stat",
-	"Invlaid ELF type"
+	"Invlaid ELF type",
+	"Invalid ELF"
 };
 
 char *error_get_str( int16_t error_no );

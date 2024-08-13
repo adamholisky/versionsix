@@ -7,6 +7,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <interrupt.h>
+#include <elf.h>
 
 #define PROGRAM_TYPE_LIB 0
 #define PROGRAM_TYPE_EXEC 1
@@ -16,6 +17,8 @@ typedef struct _program {
 
 	uint8_t type;
 	char path[255];	
+
+	elf_file *elf;
 
 	struct _program *prev;
 	struct _program *next;

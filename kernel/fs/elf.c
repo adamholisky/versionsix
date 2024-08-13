@@ -1,7 +1,7 @@
 #include <kernel_common.h>
 #include <elf.h>
 
-#undef DEBUG_ELF_FILE_CONST
+#define DEBUG_ELF_FILE_CONST
 void elf_file_initalize( elf_file *elf, uint64_t *file_start ) {
     elf->file_base = file_start;
 
@@ -15,16 +15,19 @@ void elf_file_initalize( elf_file *elf, uint64_t *file_start ) {
     elf->symbol_table = (Elf64_Sym *)((uint64_t)elf->file_base + symbol_table_header->sh_offset);
 
     elf->num_symbols = symbol_table_header->sh_size/sizeof(Elf64_Sym);
+    //elf_load_symbols( elf );
+
 
     #ifdef DEBUG_ELF_FILE_CONST
-    debugf( "file_base: %016llx\n", file_base );
-    debugf( "elf ident: 0x%02X %c %c %c\n", elf_header->e_ident[0], elf_header->e_ident[1], elf_header->e_ident[2], elf_header->e_ident[3] );
-    debugf( "Section Header Offset: 0x%llx\n", elf_header->e_shoff );
-    debugf( "section headers: %016llx\n", section_headers );
+    debugf( "file_base: %016llx\n", elf->file_base );
+    debugf( "elf ident: 0x%02X %c %c %c\n", elf->elf_header->e_ident[0], elf->elf_header->e_ident[1], elf->elf_header->e_ident[2], elf->elf_header->e_ident[3] );
+    debugf( "Section Header Offset: 0x%llx\n", elf->elf_header->e_shoff );
+    debugf( "section headers: %016llx\n", elf->section_headers );
+    debugf( "Symbol table: %016llX\n", elf->symbol_table );
 
-    kdebug_peek_at_n( (uint64_t)string_table, 20 );
+    //kdebug_peek_at_n( (uint64_t)elf->string_table, 20 );
 
-    debugf( "Symbol table num entries: %d\n", num_symbols );
+    debugf( "Symbol table num entries: %d\n", elf->num_symbols );
     #endif
 }
 
@@ -67,4 +70,22 @@ char* elf_get_strtab( elf_file *elf ) {
 
 char* elf_get_str_at_offset( elf_file *elf, uint64_t offset ) {
     return (char *)((uint64_t)elf->string_table + offset);
+}
+
+int elf_load_symbols( elf_file *elf ) {
+	Elf64_Sym* symbol_table = elf_get_symtab( elf );
+
+	elf->symbols = kmalloc( sizeof(symbol_collection) );
+
+    for( int i = 0; i < elf->num_symbols; i++ ) {
+        Elf64_Sym* sym = (Elf64_Sym*)((uint64_t)symbol_table + sizeof(Elf64_Sym)*i); 
+        
+        //debugf( "%03d %s --> 0x%016llx\n", i, elf_get_str_at_offset( elf, sym->st_name), sym->st_value );
+		
+        symbols_add( elf->symbols, 
+                    elf_get_str_at_offset( elf, sym->st_name), 
+                    sym->st_value, 
+                    sym->st_size 
+                    );
+    }
 }

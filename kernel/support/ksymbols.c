@@ -1,4 +1,5 @@
 #include <kernel_common.h>
+#include <kmemory.h>
 #include <ksymbols.h>
 #include <debug.h>
 #include <elf.h>
@@ -131,4 +132,10 @@ uint64_t symbols_get_symbol_addr( symbol_collection *syms, char *name ) {
 	}
 
 	return ret;
+}
+
+void symbols_diagnostic( symbol_collection *syms ) {
+	for( int i = 0; i < syms->top; i++ ) {
+		debugf( "symbol[ %d ]    addr: 0x%016llX   size: 0x%08X    name: \"%s\"\n", i, syms->symbols[i].addr, syms->symbols[i].size, syms->symbols[i].name );
+	}
 }

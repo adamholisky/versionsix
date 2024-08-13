@@ -5,6 +5,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <ksymbols.h>
 
 /* elf.h
 * 
@@ -137,6 +138,8 @@ typedef struct {
 	char* string_table;
 	Elf64_Sym* symbol_table;
 	uint64_t num_symbols;
+
+	symbol_collection *symbols;
 } elf_file;
 
 void elf_file_initalize( elf_file *elf, uint64_t *file_start );
@@ -145,6 +148,7 @@ Elf64_Shdr* elf_get_section_header( elf_file *elf, int type );
 Elf64_Sym* elf_get_symtab( elf_file *elf );
 char* elf_get_strtab( elf_file *elf );
 char* elf_get_str_at_offset( elf_file *elf, uint64_t offset );
+int elf_load_symbols( elf_file *elf );
 
 #ifdef __cplusplus
 }

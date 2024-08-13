@@ -32,6 +32,7 @@ uint64_t symbols_get_total_symbols( symbol_collection *syms );
 uint64_t symbols_get_symbol_addr( symbol_collection *syms, char * name );
 char *symbols_get_function_name_at( symbol_collection *syms, uint64_t addr );
 void symbols_initalize( void );
+void symbols_diagnostic( symbol_collection *syms );
 
 void kernel_symbols_initalize( void );
 symbol_collection *get_ksyms_object( void );

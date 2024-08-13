@@ -129,6 +129,16 @@ int program_load_data( program *p, void *data, size_t size ) {
 		// Load ELF file
 
 		if( strncmp( (data_bytes + 1), "ELF", 3 ) == 0 ) {
+			p->elf = kmalloc( sizeof(elf_file) );
+			elf_file_initalize( p->elf, data );
+
+			if( !elf_load_symbols( p->elf ) ) {
+				debugf( "Symbols failed to load." );
+				return ERR_ELF_INAVLID;
+			}
+
+			symbols_diagnostic( p->elf->symbols );
+
 			switch( elf_header->e_type ) {
 				case ET_REL:
 					return program_load_elf_module( p, data, size );
@@ -151,6 +161,8 @@ int program_load_data( program *p, void *data, size_t size ) {
 
 int program_load_elf_module( program *p, void *data, size_t size ) {
 	debugf( "Loding elf module	: \"%s\"    data: 0x%016llX    size: 0x%llX \n", p->path, data, size );
+
+	
 }
 
 int program_load_elf_library( program *p, void *data, size_t size ) {

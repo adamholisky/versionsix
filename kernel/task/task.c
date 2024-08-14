@@ -3,6 +3,7 @@
 #include <task.h>
 #include <timer.h>
 #include <kshell.h>
+#include <page.h>
 #include <program.h>
 
 kernel_process_data process_data;
@@ -71,6 +72,7 @@ uint16_t task_create( uint8_t task_type, uint8_t generator, char *name, uint64_t
 	new_task->task_context.rsp = (uint64_t)kmalloc( 4 * 1024 ) + 4*1024;
 	new_task->task_context.rip = (uint64_t)entry;
 
+	new_task->generator = generator;
 	switch( generator ) {
 		case TASK_GENERATOR_ELF:
 			break;
@@ -81,6 +83,13 @@ uint16_t task_create( uint8_t task_type, uint8_t generator, char *name, uint64_t
 	debugf( "Task created: ID: %d, Name: \"%s\"\n", new_task->id, new_task->display_name );
 
 	return task_id;
+}
+
+void task_create_from_program( program *p ) {
+	p->task_id = task_create( TASK_TYPE_PROCESS, TASK_GENERATOR_ELF, p->path, p->elf->elf_header->e_entry );
+
+	task *t = get_task_data( p->task_id );
+	t->p = p;
 }
 
 #undef DEBUG_TASK_SCHED_YIELD
@@ -146,8 +155,24 @@ void task_sched_yield( registers **context ) {
 	if( old_task->status != TASK_STATUS_DEAD ) {
 		old_task->status = TASK_STATUS_INACTIVE;
 	}
+
+	if( new_task->generator == TASK_GENERATOR_ELF ) {
+		debugf( "DING!\n" );
+		extern bool show_page_map_debug;
+		show_page_map_debug = true;
+		for( int i = 0; i < new_task->p->num_data_pages; i++ ) {
+			db1();
+			page_map( new_task->p->data_pages[i].virt, new_task->p->data_pages[i].phys );
+		}
+
+		for( int i = 0; i < new_task->p->num_text_pages; i++ ) {
+			db2();
+			page_map( new_task->p->text_pages[i].virt, new_task->p->text_pages[i].phys );
+		}
+		show_page_map_debug = false;
+	}
+
 	new_task->status = TASK_STATUS_ACTIVE;
-	
 
 	#ifdef DEBUG_TASK_SCHED_YIELD
 	log_entry_exit();

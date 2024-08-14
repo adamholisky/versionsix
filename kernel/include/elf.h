@@ -24,7 +24,7 @@ extern "C" {
 #define Elf64_Off uint64_t
 #define Elf64_Sword int32_t
 #define Elf64_Word uint32_t
-#define Elf64_Xword uint32_t
+#define Elf64_Xword uint64_t
 #define Elf64_Sxword int64_t
 
 #define EI_NIDENT 16
@@ -59,11 +59,28 @@ extern "C" {
 #define PT_LOAD 1
 #define PT_DYNAMIC 2
 
+#define PF_X 1
+#define PF_W 2
+#define PF_R 4
+
 #define ELF32_R_SYM(i) ((i)>>8)
 #define ELF32_R_TYPE(i) ((unsigned char)(i))
 #define ELF32_R_INFO(s,t) (((s)<<8)+(unsigned char)(t))
 
+#define STT_NOTYPE 0
+#define STT_OBJECT 1
 #define STT_FUNC 2
+#define STT_SECTION 3
+#define STT_FILE 4
+#define STT_LOPROC 13
+#define STT_HIPROC 15
+
+#define STB_LOCAL 0
+#define STB_GLOBAL 1
+#define STB_WEAK 2
+#define STB_LOPROC 13
+#define STB_HIPROC 15
+
 #define ELF32_ST_BIND(INFO)	((INFO) >> 4)
 #define ELF32_ST_TYPE(INFO)	((INFO) & 0x0F)
 
@@ -139,16 +156,27 @@ typedef struct {
 	Elf64_Sym* symbol_table;
 	uint64_t num_symbols;
 
+	Elf64_Phdr *program_headers;
+	uint8_t num_program_headers;
+
 	symbol_collection *symbols;
 } elf_file;
 
 void elf_file_initalize( elf_file *elf, uint64_t *file_start );
 Elf64_Shdr* elf_get_section_header_by_name( elf_file *elf, char* name );
-Elf64_Shdr* elf_get_section_header( elf_file *elf, int type );
+Elf64_Shdr *elf_get_section_header_by_index( elf_file *elf, uint8_t index );
+Elf64_Shdr* elf_get_section_header_by_type( elf_file *elf, int type );
+
+Elf64_Phdr *get_program_header_by_index( elf_file *elf, uint8_t index );
+
 Elf64_Sym* elf_get_symtab( elf_file *elf );
 char* elf_get_strtab( elf_file *elf );
 char* elf_get_str_at_offset( elf_file *elf, uint64_t offset );
 int elf_load_symbols( elf_file *elf );
+
+
+char *elf_type_to_str( uint8_t type );
+char *elf_bind_to_str( uint8_t bind );
 
 #ifdef __cplusplus
 }

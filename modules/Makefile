@@ -20,7 +20,7 @@ export
 
 all: $(SOURCES) $(OBJECTS)
 	@echo $(OBJECTS)
-	@cp -f build/*.o /usr/local/osdev/versions/vi/os_root/modules/
+	cp -f build/*.o /usr/local/osdev/versions/vi/os_root/modules/
 
 build/%.o: %.c 
 	$(CC) -fPIC $(CFLAGS) -c $< -o ./build/$*.o1

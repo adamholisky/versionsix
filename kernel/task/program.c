@@ -4,6 +4,7 @@
 #include <program.h>
 #include <fs.h>
 #include <elf.h>
+#include <page.h>
 
 uint16_t id_top;
 
@@ -87,20 +88,20 @@ int program_destroy( program *p ) {
  * @param path Path to the file to laod
  * @	return int 0 if successfull, otherwise error code
  */	
-int program_load( char *path ) {
+program *program_load( char *path ) {
 	vfs_stat_data stats;
 
 	int stat_error = vfs_stat( vfs_lookup_inode(path), &stats );
 	if( stat_error != VFS_ERROR_NONE ) {
 		printf( "Error: %d\n", stat_error );
-		return 1;
+		return NULL;
 	}
 
 	char *data = kmalloc( stats.size );
 	int read_err = vfs_read( vfs_lookup_inode(path), data, stats.size, 0 );
 	if( read_err < VFS_ERROR_NONE ) {
 		printf( "Error when reading: %d\n", read_err );
-		return 1;
+		return NULL;
 	}
 
 	data[ stats.size ] = 0;
@@ -112,6 +113,8 @@ int program_load( char *path ) {
 	program_load_data( p, data, stats.size );
 
 	kfree(data);
+
+	return p;
 }
 
 #undef KDEBUG_PROGRAM_LOAD_DATA
@@ -167,6 +170,51 @@ int program_load_elf_module( program *p, void *data, size_t size ) {
 
 int program_load_elf_library( program *p, void *data, size_t size ) {
 	debugf( "Loding elf library	: \"%s\"    data: 0x%016llX    size: 0x%llX \n", p->path, data, size );
+
+	for( int i = 0; i < p->elf->num_program_headers; i++ ) {
+		Elf64_Phdr *pheader = get_program_header_by_index( p->elf, i );
+		if( pheader->p_type == PT_LOAD ) {
+			debugf( "Loading +0x%X to 0x%llX for 0x%X (%d) bytes.\n", pheader->p_offset, pheader->p_vaddr, pheader->p_memsz, pheader->p_memsz );
+
+			uint32_t num_pages = pheader->p_memsz / PAGE_SIZE;
+			num_pages = num_pages + (pheader->p_memsz % PAGE_SIZE ? 1 : 0);
+
+			program_pages *pages = NULL;
+
+			if( pheader->p_flags & PF_X ) {
+				debugf( "    Code segment. %d pages.\n", num_pages );
+
+				p->text_pages = kmalloc( sizeof(program_pages) * num_pages );
+				p->num_text_pages = num_pages;
+
+				pages = p->text_pages;
+			} else if( pheader->p_flags & PF_R ) {
+				debugf( "    Data segment. %d pages.\n", num_pages );
+
+				p->data_pages = kmalloc( sizeof(program_pages) * num_pages );
+				p->num_data_pages = num_pages;
+
+				pages = p->data_pages;
+			}
+
+			if( pages == NULL ) {
+				debugf( "Pages is null. Aborting.\n" );
+				return -1;
+			}
+
+			debugf( "Allocating %d pages.\n", num_pages );
+
+			for( int j = 0; j < num_pages; j++ ) {
+				pages[j].kern_virt = page_allocate_kernel(1);
+				pages[j].virt = pheader->p_vaddr + (j * PAGE_SIZE );
+				pages[j].phys = paging_virtual_to_physical( pages->kern_virt );
+
+				debugf( "    kern_virt: %X    virt: %X    phys: %X\n", pages[j].kern_virt, pages[j].virt, pages[j].phys );
+			}
+
+			memcpy( pages[0].kern_virt, (uint8_t *)data + pheader->p_offset, pheader->p_filesz );
+		}
+	}
 }
 
 int program_load_elf_binary( program *p, void *data, size_t size ) {

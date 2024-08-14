@@ -7,6 +7,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <interrupt.h>
+#include <program.h>
 
 #define TASKS_MAX 20
 #define TASKS_NAME_MAX 25
@@ -83,6 +84,7 @@ typedef struct _task task;
 struct _task {
 	uint8_t type;
 	task_entry_func entry;
+	uint8_t generator;
 
 	char display_name[ TASKS_NAME_MAX ];
 	char file_name[ TASKS_NAME_MAX ];
@@ -99,6 +101,8 @@ struct _task {
 
 	uint16_t parent_task_id;
 
+	program *p;
+
 	task *next;
 };
 
@@ -111,6 +115,7 @@ typedef struct {
 
 void task_initalize( void );
 uint16_t task_create( uint8_t task_type, uint8_t generator, char *name, uint64_t *entry );
+void task_create_from_program( program *p );
 void task_sched_yield( registers **context );
 void task_test_thread_a( void );
 void task_test_thread_b( void );

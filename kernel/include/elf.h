@@ -67,6 +67,9 @@ extern "C" {
 #define ELF32_R_TYPE(i) ((unsigned char)(i))
 #define ELF32_R_INFO(s,t) (((s)<<8)+(unsigned char)(t))
 
+#define ELF64_R_SYM(i) ((i) >> 32)
+#define ELF64_R_TYPE(i)	((i) & 0xffffffff)
+
 #define STT_NOTYPE 0
 #define STT_OBJECT 1
 #define STT_FUNC 2
@@ -99,7 +102,7 @@ typedef struct {
 	Elf64_Half e_shentsize;
 	Elf64_Half e_shnum;
 	Elf64_Half e_shstrndx;
-} Elf64_Ehdr;
+} __attribute__((packed)) Elf64_Ehdr;
 
 
 typedef struct {
@@ -111,7 +114,7 @@ typedef struct {
 	Elf64_Xword p_filesz;	
 	Elf64_Xword p_memsz;	
 	Elf64_Xword p_align;
-} Elf64_Phdr;
+} __attribute__((packed)) Elf64_Phdr;
 
 
 typedef struct {
@@ -125,7 +128,7 @@ typedef struct {
 	Elf64_Word sh_info;		
 	Elf64_Xword sh_addralign;	
 	Elf64_Xword sh_entsize;
-} Elf64_Shdr;
+} __attribute__((packed)) Elf64_Shdr;
 
 typedef struct {
 	Elf64_Word st_name;		
@@ -134,25 +137,26 @@ typedef struct {
 	Elf64_Half st_shndx;
 	Elf64_Addr st_value;
 	Elf64_Xword st_size;
-} Elf64_Sym;
+} __attribute__((packed)) Elf64_Sym;
 
 typedef struct {
 	Elf64_Addr r_offset;
 	Elf64_Xword r_info;
-} Elf64_Rel;
+} __attribute__((packed)) Elf64_Rel;
 
 typedef struct {
 	Elf64_Addr r_offset;
 	Elf64_Xword r_info;	
 	Elf64_Sxword r_addend;
-} Elf64_Rela;
+} __attribute__((packed)) Elf64_Rela;
 
 typedef struct {
 	uint64_t* file_base;
 
 	Elf64_Ehdr* elf_header;
 	Elf64_Shdr* section_headers;
-	char* string_table;
+	char *string_table;
+	char *string_table_section_names;
 	Elf64_Sym* symbol_table;
 	uint64_t num_symbols;
 
@@ -167,13 +171,16 @@ Elf64_Shdr* elf_get_section_header_by_name( elf_file *elf, char* name );
 Elf64_Shdr *elf_get_section_header_by_index( elf_file *elf, uint8_t index );
 Elf64_Shdr* elf_get_section_header_by_type( elf_file *elf, int type );
 
+char* elf_get_strtab( elf_file *elf );
+char* elf_get_str_at_offset( elf_file *elf, uint64_t offset );
+char *elf_get_section_name( elf_file *elf, uint64_t name_offset );
+
 Elf64_Phdr *get_program_header_by_index( elf_file *elf, uint8_t index );
 
 Elf64_Sym* elf_get_symtab( elf_file *elf );
-char* elf_get_strtab( elf_file *elf );
-char* elf_get_str_at_offset( elf_file *elf, uint64_t offset );
-int elf_load_symbols( elf_file *elf );
+char *elf_get_symbol_name_from_symbol_index( elf_file *elf, uint32_t index );
 
+int elf_load_symbols( elf_file *elf );
 
 char *elf_type_to_str( uint8_t type );
 char *elf_bind_to_str( uint8_t bind );

@@ -174,6 +174,8 @@ int program_load_elf_library( program *p, void *data, size_t size ) {
 
 	for( int i = 0; i < p->elf->num_program_headers; i++ ) {
 		Elf64_Phdr *pheader = get_program_header_by_index( p->elf, i );
+
+		
 		if( pheader->p_type == PT_LOAD ) {
 			debugf( "Loading +0x%X to 0x%llX for 0x%X (%d) bytes.\n", pheader->p_offset, pheader->p_vaddr, pheader->p_memsz, pheader->p_memsz );
 
@@ -182,11 +184,24 @@ int program_load_elf_library( program *p, void *data, size_t size ) {
 
 			program_pages *pages = NULL;
 
+			uint64_t actual_virt_address = 0;
+			uint64_t virt_offset = 0;
+
+			if( pheader->p_vaddr != 0x0 ) {
+				actual_virt_address = (pheader->p_vaddr / 4096) * 4096;
+
+				num_pages++; // Fix this, should be based off size of program entry + page size to account for an extra page in the vaddr is over page size
+
+				virt_offset = pheader->p_vaddr - actual_virt_address;
+			}
+
+
 			if( pheader->p_flags & PF_X ) {
 				debugf( "    Code segment. %d pages.\n", num_pages );
 
 				p->text_pages = kmalloc( sizeof(program_pages) * num_pages );
 				p->num_text_pages = num_pages;
+				p->text_pages_virt_start = pheader->p_vaddr;
 
 				pages = p->text_pages;
 			} else if( pheader->p_flags & PF_R ) {
@@ -194,6 +209,7 @@ int program_load_elf_library( program *p, void *data, size_t size ) {
 
 				p->data_pages = kmalloc( sizeof(program_pages) * num_pages );
 				p->num_data_pages = num_pages;
+				p->data_pages_virt_start = pheader->p_vaddr;
 
 				pages = p->data_pages;
 			}
@@ -207,52 +223,95 @@ int program_load_elf_library( program *p, void *data, size_t size ) {
 
 			for( int j = 0; j < num_pages; j++ ) {
 				pages[j].kern_virt = page_allocate_kernel(1);
-				pages[j].virt = pheader->p_vaddr + (j * PAGE_SIZE );
-				pages[j].phys = paging_virtual_to_physical( pages->kern_virt );
+				pages[j].virt = actual_virt_address + (j * PAGE_SIZE );
+				pages[j].phys = paging_virtual_to_physical( pages[j].kern_virt );
 
 				debugf( "    kern_virt: %X    virt: %X    phys: %X\n", pages[j].kern_virt, pages[j].virt, pages[j].phys );
 			}
 
-			memcpy( pages[0].kern_virt, (uint8_t *)data + pheader->p_offset, pheader->p_filesz );
+			memcpy( pages[0].kern_virt + virt_offset, (uint8_t *)data + pheader->p_offset, pheader->p_filesz );
 		}
 	}
 
 	Elf64_Shdr *rel_plt = elf_get_section_header_by_name( p->elf, ".rela.plt" );
-    if (rel_plt != NULL) {
-        uint8_t *rel_plt_data = (uint8_t*)data + rel_plt->sh_offset;
+	if (rel_plt != NULL) {
+		uint8_t *rel_plt_data = (uint8_t*)data + rel_plt->sh_offset;
 
 		#ifdef KDEBUG_PROGRAM_LOAD_ELF_LIBRARY
 		debugf( "raw data start: %X\n", data );
 		debugf( "plt:sh_offset %X\n", rel_plt->sh_offset);
 		debugf( "data %X %x\n", rel_plt_data, *rel_plt_data );
-        debugf( ".plt out:\n");
-        for (int j = 0; j < (rel_plt->sh_size); j++) {
-            debugf_raw("%02X ", *(rel_plt_data + j));
-        }
-        debugf("\n\n");
+		debugf( ".plt out:\n");
+		for (int j = 0; j < (rel_plt->sh_size); j++) {
+			debugf_raw("%02X ", *(rel_plt_data + j));
+		}
+		debugf("\n\n");
 		#endif
-    }
-    else {
-        debugf("Could not find .rel.plt section.\n");
-    }
+	}
+	else {
+		debugf("Could not find .rel.plt section.\n");
+	}
 
-    
-/* 	Elf32_Shdr* got_plt = elf_find_got_plt((uint32_t*)dl.base, elf_header);
-    if (got_plt != NULL) {
-        uint32_t* data = (uint32_t*)(dl.base + got_plt->sh_addr);
+	Elf64_Shdr* got_plt = elf_get_section_header_by_name( p->elf, ".got.plt" );
+	if (got_plt != NULL) {
+		uint8_t *got_plt_data = (uint8_t *)data + got_plt->sh_offset;
 
-		#ifdef KDEBUG_DLOPEN
-        debugf(".got.plt out:\n");
-        for (int j = 0; j < (got_plt->sh_size/4); j++) {
-            debugf("%08X\t", (uint32_t) * (data + j));
-        }
-        debugf("\n\n");
+		#ifdef KDEBUG_PROGRAM_LOAD_ELF_LIBRARY
+		debugf(".got.plt out:\n");
+		for (int j = 0; j < (got_plt->sh_size); j++) {
+			debugf_raw("%02X ", *(got_plt_data + j));
+		}
+		debugf("\n\n");
 		#endif
-    }
-    else {
-        klog("Could not find .got.plt section\n");
-    }
- */
+	}
+	else {
+		debugf("Could not find .got.plt section\n");
+	}
+
+	for(int rel_num = 0; rel_num < (rel_plt->sh_size/(sizeof(Elf64_Rela))); rel_num++) {
+		Elf64_Rel *elf_rel = (Elf64_Rela*)((uint8_t*)data + rel_plt->sh_offset + (rel_num * sizeof(Elf64_Rel)));
+
+		debugf( "elf_rel->r_info: %llX\n", elf_rel->r_info );
+		debugf( "elf_rel->r_offset: %llX\n", elf_rel->r_offset );
+		debugf( "ELF64_R_SYM: %llX\n", ELF64_R_SYM( elf_rel->r_info ) );
+
+		//if( elf_get_sym_shndx_from_index((uint32_t*)dl.base, elf_header, ELF32_R_SYM(elf_rel->r_info)) == 0 ) {
+
+			symbol *sym = symbols_get_symbol_addr( 
+												get_ksyms_object(),
+												elf_get_symbol_name_from_symbol_index( p->elf, ELF64_R_SYM( elf_rel->r_info ) )
+												);
+			
+			if( sym == NULL ) {
+				debugf( "Symbol not found.\n" );
+				return;
+			}
+
+			debugf( "Found symbol: %s at %llX\n", elf_get_symbol_name_from_symbol_index( p->elf, ELF64_R_SYM( elf_rel->r_info ) ), sym->addr );
+
+			uint8_t *data_pages_start = (uint8_t *)p->data_pages[0].kern_virt;
+			uint64_t *got_entry = (uint64_t*)(data_pages_start + (elf_rel->r_offset - p->data_pages_virt_start) );
+			
+			debugf( "got entry: %llx\n", got_entry );
+
+			*got_entry = sym->addr;
+
+			//*got_entry = (uint64_t)kdebug_get_symbol_addr( elf_get_sym_name_from_index((uint32_t*)dl.base, elf_header, ELF32_R_SYM(elf_rel->r_info)) );
+
+			#ifdef KDEBUG_PROGRAM_LOAD_ELF_LIBRARY
+            debugf( "GOT entry: 0x%llX\n", *got_entry );
+			//debugf( "rel sym: 0x%08X, %d, %d, %X, %s\n", elf_rel->r_offset, ELF32_R_TYPE(elf_rel->r_info), ELF32_R_SYM(elf_rel->r_info),  elf_get_sym_shndx_from_index((uint32_t*)dl.base, elf_header, ELF32_R_SYM(elf_rel->r_info)), elf_get_sym_name_from_index((uint32_t*)dl.base, elf_header, ELF32_R_SYM(elf_rel->r_info)) );
+			#endif
+		/* } else {
+            klog( "Should not go here.\n" );
+			// Link main -- I think I'm doing something wrong by having to do this, maybe not handling got right?
+			uint32_t *got_entry = (uint32_t*)(dl.base + elf_rel->r_offset);
+
+			*got_entry = (uint32_t)elf_get_sym_value_from_index((uint32_t*)dl.base, elf_header, ELF32_R_SYM(elf_rel->r_info));
+		} */
+	}
+
+	
 }
 
 int program_load_elf_binary( program *p, void *data, size_t size ) {

@@ -28,9 +28,11 @@ typedef struct _program {
 	elf_file *elf;
 
 	uint32_t num_text_pages;
+	uint64_t text_pages_virt_start;
 	program_pages *text_pages;
 
 	uint32_t num_data_pages;
+	uint64_t data_pages_virt_start;
 	program_pages *data_pages;
 
 	struct _program *prev;

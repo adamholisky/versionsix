@@ -158,19 +158,31 @@ void task_sched_yield( registers **context ) {
 
 	if( new_task->generator == TASK_GENERATOR_ELF ) {
 		debugf( "DING!\n" );
+
+		extern bool show_page_map_debug;
+		show_page_map_debug = true;
+
 		
 		for( int i = 0; i < new_task->p->num_data_pages; i++ ) {
 			db1();
-			page_map( new_task->p->data_pages[i].virt, new_task->p->data_pages[i].phys );
+			uint64_t *r = page_map( new_task->p->data_pages[i].virt, new_task->p->data_pages[i].phys );
+
+			debugf( "r = 0x%016llX\n", r );
 		}
 
 		for( int i = 0; i < new_task->p->num_text_pages; i++ ) {
 			db2();
 			page_map( new_task->p->text_pages[i].virt, new_task->p->text_pages[i].phys );
 		}
-		
 
+		show_page_map_debug = false;
+		
 		paging_page_entry *page = paging_get_page_for_virtual_address( 0x0 );
+		page = paging_get_page_for_virtual_address( 0x200200 );
+
+		paging_examine_page_for_address( 0x200000 );
+
+		kdebug_peek_at_n( new_task->p->data_pages[0].virt, 4 );
 	}
 
 	new_task->status = TASK_STATUS_ACTIVE;

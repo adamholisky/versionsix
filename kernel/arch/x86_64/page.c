@@ -268,6 +268,7 @@ show_page_map_debug = true;
 
 uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
 	if( show_page_map_debug ) {
+		debugf( "========== ENTER PAGE MAP ==========\n" );
 		debugf( "page_map( virtual_address = 0x%016llX, physical_address = 0x%016llx )\n", virtual_address, physical_address );
 	}
 
@@ -336,6 +337,7 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
 					setup_pt = true;
 				} else {
 				   // Already assigned, do something?
+				   debugf( "WARNING! ALREADY ASSIGNED.\n" );
 				}
 			}
 		}
@@ -434,6 +436,7 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
 		//debugf( "setup_pd triggered\n" );
 	} else if( setup_pt ) {
 		pd[index_pd].address = pt_physical_addr >> 12;
+		pd[index_pd].page_size = 0;
 	}
 
 	uint64_t pd_physical_addr = (uint64_t)pd - virtual_base_modifier + physical_base_modifier;
@@ -485,6 +488,8 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
 		debugf( "pd_physical_addr: %llx\n", pd_physical_addr );
 		debugf( "pdpt_physical_addr: %llx\n", pdpt_physical_addr );
 		debugf( "virtual_addr: %llx\n", virtual_address );
+
+		debugf( "========== EXIT PAGE MAP ==========\n" );
 	}
 	
 	return (uint64_t *)virtual_address;
@@ -546,25 +551,28 @@ void paging_examine_page_for_address( uint64_t virtual_address ) {
 	if( limine_pml4[index_pml4].present == 0 ) {
 		debugf( "PML4 index no present.\n" );
 	} else {
-
+		debugf( "PML4 @ index %d:\n", index_pml4 );
 		paging_dump_page( &limine_pml4[index_pml4] );
 		pdpt = limine_pml4[index_pml4].address << 12;
 		
 		if( pdpt[index_pdpt].present == 0 ) {
 			debugf( "PDPT index not present.\n" );
 		} else {
+			debugf( "PDPT @ index %d:\n", index_pdpt );
 			paging_dump_page( &pdpt[index_pdpt] );
 			pd = pdpt[index_pdpt].address << 12;
 
 			if( pd[index_pd].present == 0 ) {
 				debugf( "PD index not present.\n" );
 			} else {
+				debugf( "PD @ index %d:\n", index_pd );
 				paging_dump_page( &pd[index_pd] );
 				pt = pd[index_pd].address << 12;
 
 				if( pt[index_pt].present == 0 ) {
-					debugf( "PT index not present.\n" );
+					debugf( "PT index %d not present.\n", index_pt );
 				} else {
+					debugf( "PT @ index %d:\n", index_pt );
 					paging_dump_page( &pt[index_pt] );
 				}
 			}

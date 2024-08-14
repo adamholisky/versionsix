@@ -12,6 +12,10 @@ void elf_file_initalize( elf_file *elf, uint64_t *file_start ) {
 	//Elf64_Shdr* string_table_header = elf_get_section_header( elf, SHT_STRTAB );
 	Elf64_Shdr *string_table_header = elf_get_section_header_by_index( elf, elf->elf_header->e_shstrndx );
 	elf->string_table = (char *)((uint64_t)elf->file_base + string_table_header->sh_offset);
+
+	// This is assuming that the section name string table is right after the string table, which is how i've seen it in ELF files so far... probably way wrong and dangerous.
+	Elf64_Shdr *section_name_table_header = elf_get_section_header_by_index( elf, elf->elf_header->e_shstrndx + 1 );
+	elf->string_table_section_names = (char *)((uint8_t *)elf->file_base + section_name_table_header->sh_offset);
 	
 	Elf64_Shdr* symbol_table_header = elf_get_section_header_by_type( elf, SHT_SYMTAB );
 	elf->symbol_table = (Elf64_Sym *)((uint64_t)elf->file_base + symbol_table_header->sh_offset);
@@ -28,11 +32,16 @@ void elf_file_initalize( elf_file *elf, uint64_t *file_start ) {
 	debugf( "section headers: %016llx\n", elf->section_headers );
 	debugf( "Symbol table: %016llX\n", elf->symbol_table );
 	debugf( "String table: %016llx\n", elf->string_table );
+	debugf( "Section name str table: %016llx\n", elf->string_table_section_names );
 	debugf( "Ph number: %d\n", elf->num_program_headers );
 	debugf( "Ph Offset: 0x%llx\n", elf->elf_header->e_phoff );
 	debugf( "Ph Addr: 0x%llx\n", elf->program_headers );
 
-	kdebug_peek_at_n( (uint64_t)elf->string_table, 15 );
+	debugf( "String Table:\n" );
+	kdebug_peek_at_n( (uint64_t)elf->string_table, 5);
+
+	debugf( "\nSection name table:\n" );
+	kdebug_peek_at_n( (uint64_t)elf->string_table_section_names, 15 );
 
 	debugf( "Symbol table num entries: %d\n", elf->num_symbols );
 	#endif
@@ -60,9 +69,9 @@ Elf64_Shdr* elf_get_section_header_by_name( elf_file *elf, char *name ) {
 	for( int i = 0; i < elf->elf_header->e_shnum; i++ ) {
 		Elf64_Shdr* section = (Elf64_Shdr*)((uint8_t *)elf->section_headers + (elf->elf_header->e_shentsize*i));
 
-		char *section_name = elf_get_str_at_offset( elf, section->sh_name );
+		char *section_name = (char *)((uint64_t)elf->string_table_section_names + section->sh_name);
 
-		debugf( "section %d type: %d  offset: 0x%X name: %s\n", i,  section->sh_type, section->sh_name, section_name );
+		//debugf( "section %d type: %d  offset: 0x%X name: %s\n", i,  section->sh_type, section->sh_name, section_name );
 
 		if( strcmp( name, section_name ) == 0 ) {
 			i = elf->elf_header->e_shnum + 1;
@@ -109,12 +118,29 @@ char* elf_get_strtab( elf_file *elf ) {
 	return elf->string_table;
 }
 
-char* elf_get_str_at_offset( elf_file *elf, uint64_t offset ) {
+char *elf_get_str_at_offset( elf_file *elf, uint64_t offset ) {
 	return (char *)((uint64_t)elf->string_table + offset);
+}
+
+char *elf_get_section_name( elf_file *elf, uint64_t name_offset ) {
+	return (char *)((uint64_t)elf->string_table_section_names + name_offset);
 }
 
 Elf64_Phdr *get_program_header_by_index( elf_file *elf, uint8_t index ) {
 	return (Elf64_Phdr *)((uint8_t *)elf->file_base + elf->elf_header->e_phoff + (index * elf->elf_header->e_phentsize)); 
+}
+
+char *elf_get_symbol_name_from_symbol_index( elf_file *elf, uint32_t index ) {
+	Elf64_Shdr *sect_dynsym = elf_get_section_header_by_name( elf, ".dynsym" );
+	Elf64_Shdr *sect_dynstr = elf_get_section_header_by_name( elf, ".dynstr" );
+
+	Elf64_Sym *sym = (Elf64_Sym *)((uint8_t *)elf->file_base + sect_dynsym->sh_offset + (sizeof(Elf64_Sym) * index));
+
+	char *ret = (char *)( (uint8_t *)elf->file_base + sect_dynstr->sh_offset + sym->st_name );
+
+	debugf( "sym name: %s\n", ret );
+
+	return ret;
 }
 
 /**

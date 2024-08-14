@@ -168,6 +168,7 @@ int program_load_elf_module( program *p, void *data, size_t size ) {
 	
 }
 
+#define KDEBUG_PROGRAM_LOAD_ELF_LIBRARY
 int program_load_elf_library( program *p, void *data, size_t size ) {
 	debugf( "Loding elf library	: \"%s\"    data: 0x%016llX    size: 0x%llX \n", p->path, data, size );
 
@@ -215,6 +216,43 @@ int program_load_elf_library( program *p, void *data, size_t size ) {
 			memcpy( pages[0].kern_virt, (uint8_t *)data + pheader->p_offset, pheader->p_filesz );
 		}
 	}
+
+	Elf64_Shdr *rel_plt = elf_get_section_header_by_name( p->elf, ".rela.plt" );
+    if (rel_plt != NULL) {
+        uint8_t *rel_plt_data = (uint8_t*)data + rel_plt->sh_offset;
+
+		#ifdef KDEBUG_PROGRAM_LOAD_ELF_LIBRARY
+		debugf( "raw data start: %X\n", data );
+		debugf( "plt:sh_offset %X\n", rel_plt->sh_offset);
+		debugf( "data %X %x\n", rel_plt_data, *rel_plt_data );
+        debugf( ".plt out:\n");
+        for (int j = 0; j < (rel_plt->sh_size); j++) {
+            debugf_raw("%02X ", *(rel_plt_data + j));
+        }
+        debugf("\n\n");
+		#endif
+    }
+    else {
+        debugf("Could not find .rel.plt section.\n");
+    }
+
+    
+/* 	Elf32_Shdr* got_plt = elf_find_got_plt((uint32_t*)dl.base, elf_header);
+    if (got_plt != NULL) {
+        uint32_t* data = (uint32_t*)(dl.base + got_plt->sh_addr);
+
+		#ifdef KDEBUG_DLOPEN
+        debugf(".got.plt out:\n");
+        for (int j = 0; j < (got_plt->sh_size/4); j++) {
+            debugf("%08X\t", (uint32_t) * (data + j));
+        }
+        debugf("\n\n");
+		#endif
+    }
+    else {
+        klog("Could not find .got.plt section\n");
+    }
+ */
 }
 
 int program_load_elf_binary( program *p, void *data, size_t size ) {

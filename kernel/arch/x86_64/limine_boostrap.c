@@ -61,7 +61,7 @@ void load_limine_info( void ) {
 	debugf_raw( "          Base                Length              Type\n" );
 
 	for( int i = 0; i < memmap_request.response->entry_count; i++ ) {
-		debugf_raw( "    0x%02X  0x%016llX  0x%016llX  0x%X\n", i, memmap_request.response->entries[i]->base,  memmap_request.response->entries[i]->length,  memmap_request.response->entries[i]->type );
+		debugf_raw( "    0x%02X  0x%016llX  0x%016llX  %s\n", i, memmap_request.response->entries[i]->base,  memmap_request.response->entries[i]->length, limine_mem_map_type_to_text(memmap_request.response->entries[i]->type) );
 
 		if( memmap_request.response->entries[i]->type == 0 ) {
 			if( memmap_request.response->entries[i]->length > usable_memory_size ) {
@@ -105,4 +105,25 @@ void load_limine_info( void ) {
 	kernel_info.framebuffer_info.pitch = fb_request.response->framebuffers[0]->pitch;
 	kernel_info.framebuffer_info.pixel_width = kernel_info.framebuffer_info.pitch / kernel_info.framebuffer_info.width;
     kernel_info.rsdp_table_address = (uint64_t)rsdp_request.response->address;
+}
+
+char *limine_mem_map_type_to_text( uint8_t type ) {
+	switch( type ) {
+		case LIMINE_MEMMAP_ACPI_NVS:
+			return "ACPI NVS";
+		case LIMINE_MEMMAP_USABLE:
+			return "Usable";
+		case LIMINE_MEMMAP_RESERVED:
+			return "Reserved";
+		case LIMINE_MEMMAP_ACPI_RECLAIMABLE:
+			return "ACPI Reclaimable";
+		case LIMINE_MEMMAP_BAD_MEMORY:
+			return "Bad memroy";
+		case LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE:
+			return "Bootloader reclaimable";
+		case LIMINE_MEMMAP_KERNEL_AND_MODULES:
+			return "Kernel and modules";
+		case LIMINE_MEMMAP_FRAMEBUFFER:
+			return "Framebuffer";
+	}
 }

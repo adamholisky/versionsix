@@ -26,5 +26,8 @@
         "save-gdb-breakpoints.autoSave": true,
         "terminal.explorerKind": "integrated",
         "editor.cursorStyle": "block",
+        "files.associations": {
+            "limine_bootstrap.h": "c"
+        },
     }
 }

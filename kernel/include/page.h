@@ -89,8 +89,6 @@ uint64_t paging_make_page( uint64_t physical_address, uint32_t flags );
 void paging_diagnostic_cr3( uint64_t cr3_virtual );
 void paging_diagnostic_output_entry( uint64_t paging_dir_entry, uint64_t starting_virtual, uint16_t i, char *spaces, char *type );
 
-extern void clobber_cr3( uint64_t cr3, uint64_t go_to );
-
 #ifdef __cplusplus
 }
 #endif

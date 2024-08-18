@@ -446,6 +446,16 @@ void paging_initalize( void ) {
 	#endif
 }
 
+uint64_t paging_page_map_to_pml4( uint64_t *pml4, uint64_t physial, uint64_t virtual, uint64_t flags ) {
+
+}
+
+uint64_t *page_allocate_kernel_linear( uint32_t number_of_pages ) {
+
+}
+
+/* OLD CODE */
+
 #undef DEBUG_PAGE_ALLOCATE
 uint64_t *page_allocate( uint32_t number ) {
 	uint64_t *return_val = NULL;

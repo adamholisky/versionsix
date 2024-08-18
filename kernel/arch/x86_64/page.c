@@ -3,8 +3,7 @@
 #include "page.h"
 #include <string.h>
 
-uint64_t kernel_virtual_memory_next;
-uint64_t kernel_physical_memory_next;
+
 uint64_t kernel_physical_base;
 uint64_t kernel_virtual_base;
 uint64_t kernel_heap_virtual_memory_next;
@@ -23,6 +22,25 @@ uint64_t k_pt1[512] __attribute__ ((aligned (4096)));
 uint64_t k_pt2[512] __attribute__ ((aligned (4096)));
 uint64_t k_pt3[512] __attribute__ ((aligned (4096)));
 uint64_t k_pt4[512] __attribute__ ((aligned (4096)));
+
+uint64_t k_current_pml4_index;
+uint64_t k_current_pdpt_index;
+uint64_t k_current_pd_index;
+uint64_t k_current_pt_index;
+
+uint64_t *k_current_pml4;
+uint64_t *k_current_pdpt;
+uint64_t *k_current_pd;
+uint64_t *k_current_pt;
+
+uint64_t k_remaining_pd;
+uint64_t k_remaining_pt;
+
+uint64_t kernel_virtual_memory_next;
+uint64_t kernel_physical_memory_next;
+
+uint64_t *k_new_pt;
+uint64_t *k_new_pd;
 
 extern kinfo kernel_info;
 
@@ -111,6 +129,10 @@ void paging_setup_initial_structures( void ) {
 	debugf( "num_kernel_pages: 0x%X\n", num_kernel_pages );
 	#endif
 
+	k_current_pml4 = k_pml4;
+	k_current_pdpt = k_pdpt;
+	k_current_pd = k_pd;
+
 	for( uint16_t i = 0; i < num_kernel_pages; i++ ) {
 		page_indexes index;
 		paging_get_indexes( 0xFFFFFFFF80000000 + (i * k_page_size), &index );
@@ -159,6 +181,12 @@ void paging_setup_initial_structures( void ) {
 		}
 
 		kpages_current_physical = kpages_current_physical + k_page_size;
+
+		k_current_pml4_index = index.pml4;
+		k_current_pdpt_index = index.pdpt;
+		k_current_pd_index = index.pd;
+		k_current_pt_index = index.pt;
+		k_current_pt = k_pt_physical + ADDR_IDENTITY_MAP;
 	}
 
 	k_pml4[im_page_index.pml4] = paging_make_page( im_phys_addr, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
@@ -180,6 +208,8 @@ void paging_setup_initial_structures( void ) {
 	#endif
 
 	set_cr3( k_pml4_phys );
+
+	
 
 	#ifdef KDEBUG_PAGING_INIT_SETUP
 	debugf( "Done.\n" );
@@ -307,6 +337,11 @@ void paging_initalize( void ) {
 	kernel_heap_virtual_memory_next = 0xEEEEEEEE00000000;
 	kernel_heap_physical_memory_next = kernel_info.usable_memory_start;
 
+	k_new_pt = page_allocate_kernel_linear(1);
+	k_new_pd = page_allocate_kernel_linear(1);
+	
+
+
 	// Let's do a paging test, fail hard if it fails
 	kernel_info.in_paging_sanity_test = true;
 	uint64_t *paging_sanity_check = page_allocate_kernel(1);
@@ -399,13 +434,10 @@ uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, ui
 				setup_pd = true;
 				setup_pt = true;
 			} else {
-				pt = pd[ virt_indexes.pdpt ] & PAGE_ADDR_MASK;
+				pt = pd[ virt_indexes.pd ] & PAGE_ADDR_MASK;
 
-				if( !(pt[ virt_indexes.pt ] & PAGE_FLAG_PRESENT) ) {
+				if( pt == 0) {
 					setup_pt = true;
-				} else {
-				   // Already assigned, do something?
-				   debugf( "WARNING! ALREADY ASSIGNED.\n" );
 				}
 			}
 		}
@@ -422,8 +454,7 @@ uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, ui
 	}
 
 	if( setup_pdpt ) {
-		pdpt = (paging_page_entry *)page_allocate_kernel(1);
-		memset( pdpt, 0, 4096 );
+		pdpt = (uint64_t *)page_allocate_kernel_linear(1);
 
 		#ifdef DEBUG_PAGE_MAP
 		debugf( "allocated pdpt: %llx\n", pdpt );
@@ -431,8 +462,7 @@ uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, ui
 	}
 
 	if( setup_pd ) {
-		pd = (paging_page_entry *)page_allocate_kernel(1);
-		memset( pd, 0, 4096 );
+		pd = (uint64_t *)page_allocate_kernel_linear(1);
 
 		#ifdef DEBUG_PAGE_MAP
 		debugf( "allocated pd: %llx\n", pd );
@@ -440,17 +470,132 @@ uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, ui
 	}
 
 	if( setup_pt ) {
-		pt = (paging_page_entry *)page_allocate_kernel(1);
-		memset( pt, 0, 4096 );
+		pt = (uint64_t *)page_allocate_kernel_linear(1);
 		
 		#ifdef DEBUG_PAGE_MAP
 		debugf( "allocated pt: %llx\n", pt );
 		#endif
 	}
+
+	pt[virt_indexes.pt] = paging_make_page( physical_address, flags );
+	paging_invalidate_page( virtual_address );
+	
+	return virtual_address;
 }
 
-uint64_t *page_allocate_kernel_linear( uint32_t number_of_pages ) {
+/**
+ * @brief Allocates the next available kernel page.
+ * 
+ * @param number_of_pages 
+ * @return uint64_t* 
+ */
+void *page_allocate_kernel_linear( uint32_t number_of_pages ) {
+	uint64_t return_virt_addr = NULL;
 
+	if( number_of_pages < 1 ) {
+		return NULL;
+	}
+
+	// We want to make sure the new_pt and new_pd spaces are available 
+	// BEFORE we start to allocate pages for the call. Otherwise the
+	// addresses won't be linear.
+
+	if( k_current_pd == k_new_pd ) {
+		k_new_pd = page_allocate_kernel_linear(1);
+		paging_increment_kernel_page_index();
+	}
+
+	if( k_current_pt == k_new_pt ) {
+		k_new_pt = page_allocate_kernel_linear(1);
+		paging_increment_kernel_page_index();
+	}
+
+	// This needs to happen here because the above commands might alter k_vm_next
+	return_virt_addr = kernel_virtual_memory_next;
+
+	// Finally increment through the needed pages
+	for( int i = 0; i < number_of_pages; i++ ) {
+		paging_allocate_single_linear_kernel_page();
+		paging_increment_kernel_page_index();
+	}
+
+	return return_virt_addr;
+}
+
+/**
+ * @brief Allocates a single linear page in the kernel space
+ * 
+ * BIG THING -- we can't increment indexes here because this is used to allocate
+ * a new page for the next PT or PD. Setting the k_new_pt and k_new_pd happens
+ * after this function returns.
+ * 
+ * @return void* 
+ */
+void *paging_allocate_single_linear_kernel_page( void ) {
+	// Create the page
+	uint64_t page_entry = paging_make_page( kernel_physical_memory_next, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+
+	// Zero out the page
+	memset( (void *)kernel_virtual_memory_next, 0, PAGE_SIZE );
+
+	// Set the entry in the page table
+	k_current_pt[k_current_pt_index] = page_entry;
+	paging_invalidate_page( kernel_virtual_memory_next );
+
+	// Move the pointers forward one page
+	kernel_virtual_memory_next = kernel_virtual_memory_next + PAGE_SIZE;
+	kernel_physical_memory_next = kernel_physical_memory_next + PAGE_SIZE;
+}
+
+/**
+ * @brief Increments the indexes in the kernel page handlers.
+ * 
+ * At the end of this function, the following are guarnateed to be valid:
+ * 1. k_current_pt_index
+ * 2. k_curernt_pt
+ * 3. k_current_pd_index
+ * 4. k_current_pd
+ * 
+ */
+void paging_increment_kernel_page_index( void ) {
+	// If we allocated PT entry #511, then roll over to a new PT
+	// else increment the index
+	if( k_current_pt_index == 511 ) {
+		k_current_pt_index = 0;
+		k_current_pt = k_new_pt;
+
+		k_current_pd[k_current_pd_index] = paging_make_page( k_new_pt - kernel_virtual_base + kernel_physical_base, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+		paging_invalidate_page( k_new_pt );
+
+		k_current_pd_index++;
+	} else {
+		k_current_pt_index++;
+	}
+
+	// If we allocated (above) PD index 512, then roll over to a new PD
+	// else do nothing.
+	// This is 512 because 511 is a valid PD entry, and 512 would be hit
+	// when the pd is incremented above.
+	if( k_current_pd_index == 512 ) {
+		k_current_pd_index = 0;
+		k_current_pd = k_new_pd;
+
+		k_current_pdpt[k_current_pdpt_index] = paging_make_page( k_new_pd - kernel_virtual_base + kernel_physical_base, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+		paging_invalidate_page( k_new_pd );
+
+		k_current_pdpt_index++;
+	}
+}
+
+/**
+ * @brief Invalidates the page.
+ * 
+ * @todo Write this soon
+ * 
+ * @param page_physical_address 
+ */
+void paging_invalidate_page( uint64_t page_virtual_address ) {
+	asm_refresh_cr3();
 }
 
 /* OLD CODE */

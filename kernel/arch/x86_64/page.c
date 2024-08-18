@@ -44,34 +44,41 @@ extern kinfo kernel_info;
 
 uint64_t magic = 0xBAD011112222B000;
 
+#undef KDEBUG_PAGING_INIT_SETUP
 void paging_setup_initial_structures( void ) {
+	#ifdef KDEBUG_PAGING_INIT_SETUP
 	// Sanity check myself
 	uint64_t *magic_2 = (uint64_t)&magic - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base + kernel_info.hhdm_offset;
 	debugf( "magic_2:  0x%016llX\n", magic_2 );
 	debugf( "*magic_2: 0x%016llX\n", *magic_2 );
+	#endif
 
 	// Setup the identity map
 	uint64_t cr3_contents = get_cr3();
 	uint64_t *pml4 = cr3_contents + kernel_info.hhdm_offset;
 	
+	#ifdef KDEBUG_PAGING_INIT_SETUP
 	debugf( "cr3 contents: 0x%016llX\n", cr3_contents );
 	debugf( "pml4: 0x%016llX\n", pml4 );
 	debugf( "*pml4:0x%016llX\n", *pml4 );
 
-
-
-
-	page_indexes im_page_index;
+	
 	paging_get_indexes( identity_map_start, &im_page_index );
 
 	debugf( "start indexes: pml4: %llx    pdpt: %x    pd: %x    pt: %x\n", im_page_index.pml4, im_page_index.pdpt, im_page_index.pd, im_page_index.pt );
+	#endif
 
+	page_indexes im_page_index;
 	paging_get_indexes( identity_map_end, &im_page_index );
+	
+	#ifdef KDEBUG_PAGING_INIT_SETUP
 	debugf( "end indexes:   pml4: %x    pdpt: %x    pd: %x    pt: %x\n", im_page_index.pml4, im_page_index.pdpt, im_page_index.pd, im_page_index.pt );
+	#endif
 
 	uint64_t im_phys_addr = identity_map;
 	im_phys_addr = im_phys_addr - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
-	debugf( "im_phys_addr: 0x%016llX\n", im_phys_addr );
+	
+	//debugf( "im_phys_addr: 0x%016llX\n", im_phys_addr );
 
 	for( int i = 0; i < 8; i++ ) {
 		identity_map[i] = paging_make_page( i * 0x40000000UL , PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE | PAGE_FLAG_PAGE_SIZE );
@@ -79,16 +86,9 @@ void paging_setup_initial_structures( void ) {
 
 	pml4[im_page_index.pml4] = paging_make_page( im_phys_addr, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 	
-	debugf("yay?\n" );
-	kernel_info.expecting_pf = true;
 	asm_refresh_cr3();
 
-	//do_immediate_shutdown();
-
-	debugf("yay!\n" );
-
-	paging_diagnostic_cr3( cr3_contents );
-
+	//paging_diagnostic_cr3( cr3_contents );
 
 	memset( k_pml4, 0, sizeof(uint64_t) * 512 );
 	memset( k_pdpt, 0, sizeof(uint64_t) * 512 );
@@ -98,7 +98,7 @@ void paging_setup_initial_structures( void ) {
 
 	memmap_entry *kernel_memmap_entry = NULL;
 
-	uint64_t k_page_size = 0x200000;
+	uint64_t k_page_size = 0x1000;
 
 	for( int i = 0; i < kernel_info.memmap_count; i++ ) {
 		if( kernel_info.memmap[i].type == LIMINE_MEMMAP_KERNEL_AND_MODULES ) {
@@ -116,63 +116,56 @@ void paging_setup_initial_structures( void ) {
 		num_kernel_pages++;
 	}
 
-	//uint64_t kpages_current_physical = kernel_memmap_entry->base;
-
 	uint64_t kpages_current_physical = 0xFFFFFFFF80000000 - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
 
+	#ifdef KDEBUG_PAGING_INIT_SETUP
 	debugf( "num_kernel_pages: 0x%X\n", num_kernel_pages );
-
-/* 	uint64_t virt = &k_pt1[1];
-	uint64_t phys = virt - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
-	debugf( "k_pt1 virt / phys: 0x%016llx / 0x%016llx\n", virt, phys );
-	do_immediate_shutdown(); */
+	#endif
 
 	for( uint16_t i = 0; i < num_kernel_pages; i++ ) {
 		page_indexes index;
 		paging_get_indexes( 0xFFFFFFFF80000000 + (i * k_page_size), &index );
 
+		#ifdef KDEBUG_PAGING_INIT_SETUP
 		debugf( "For: 0x%016llX\n", kpages_current_physical );
 		debugf( " indexes: pml4: %llx    pdpt: %x    pd: %x    pt: %x\n", index.pml4, index.pdpt, index.pd, index.pt );
-		
+		#endif
+
 		uint64_t k_pt_physical = 0;
 
-		//debugf( "index.pd = %d\n", index.pd );
-
-		/* if( index.pd == 0 ) {
-			k_pt1[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_CACHE_DISABLED | PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+		if( index.pd == 0 ) {
+			k_pt1[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 			k_pt_physical = (uint64_t)(&k_pt1[index.pt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
 		} else if( index.pd == 1 ) {
-			k_pt2[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_CACHE_DISABLED | PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+			k_pt2[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 			k_pt_physical = (uint64_t)(&k_pt2[index.pt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
 		} else if( index.pd == 2 ) {
-			k_pt3[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_CACHE_DISABLED | PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+			k_pt3[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 			k_pt_physical = (uint64_t)(&k_pt3[index.pt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
 		} else if( index.pd == 3 ) {
-			k_pt4[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_CACHE_DISABLED | PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+			k_pt4[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 			k_pt_physical = (uint64_t)(&k_pt4[index.pt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
 		} else {
 			debugf( "Ran out of PDs for kernel. Time to refactor this shit.\n" );
 			do_immediate_shutdown();
-		} */
+		}
 
-		//debugf( "k_pt_phys: 0x%016llx\n", k_pt_physical );
-
-		k_pt_physical = kpages_current_physical;
-
+		#ifdef KDEBUG_PAGING_INIT_SETUP
 		debugf( "kpages_current_phys: 0x%016llX\n", kpages_current_physical );
+		#endif
 		
 		if( !GET_PDE_PRESENT(k_pd[index.pd]) ) {
-			debugf( "***** CREATING PD: index.pd: %X\n", index.pd );
-			k_pd[index.pd] = paging_make_page( k_pt_physical, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE | PAGE_FLAG_PAGE_SIZE );
+			//debugf( "***** CREATING PD: index.pd: %X\n", index.pd );
+			k_pd[index.pd] = paging_make_page( k_pt_physical, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 		}
 
 		if( !GET_PDE_PRESENT(k_pdpt[index.pdpt]) ) {
-			debugf( "***** CREATING PDPT: index.pdpt: %X\n", index.pdpt );
+			//debugf( "***** CREATING PDPT: index.pdpt: %X\n", index.pdpt );
 			k_pdpt[index.pdpt] = paging_make_page( (uint64_t)(&k_pd[index.pd]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 		}
 
 		if( !GET_PDE_PRESENT(k_pml4[index.pml4]) ) {
-			debugf( "***** CREATING PML4: index.pml4: %X\n", index.pml4 );
+			//debugf( "***** CREATING PML4: index.pml4: %X\n", index.pml4 );
 			k_pml4[index.pml4] = paging_make_page( (uint64_t)(&k_pdpt[index.pdpt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 		}
 
@@ -181,48 +174,28 @@ void paging_setup_initial_structures( void ) {
 
 	k_pml4[im_page_index.pml4] = paging_make_page( im_phys_addr, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 
+	#ifdef KDEBUG_PAGING_INIT_SETUP
 	debugf( "k_PDPT: 0x%llX\n", k_pdpt );
-
+	#endif
 	
 
 	uint64_t k_pml4_phys = (uint64_t)&k_pml4 - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
 
+	#ifdef KDEBUG_PAGING_INIT_SETUP
 	debugf( "k_pml4_virt: 0x%016llX\n", k_pml4 );
 	debugf( "k_pml4_phys: 0x%016llX\n", k_pml4_phys );
-
+	
 	paging_diagnostic_cr3( k_pml4_phys );
 
 	debugf( "Hit it.\n" );
+	#endif
 
 	set_cr3( k_pml4_phys );
 
-	//clobber_cr3( k_pml4_phys, kernel_main );
-
-post_page_reset:	debugf( "Done.\n" );
+	#ifdef KDEBUG_PAGING_INIT_SETUP
+	debugf( "Done.\n" );
+	#endif
 }
-
-	/* for( int i = 0; i < 512; i++ ) {
-		paging_diagnostic_output_entry( pml4[i], 0, i, "", "PML4" );
-
-		if( GET_PDE_PRESENT( pml4[i] ) ) {
-			uint64_t addr = pml4[i] & 0x000FFFFFFFFFF000;
-			uint64_t *pdpt = addr + kernel_info.hhdm_offset;
-
-			for( int j = 0; j < 512; j++ ) {
-				paging_diagnostic_output_entry( pdpt[j], 0, j, "    ", "PDPT" );
-
-				if( GET_PDE_PRESENT( pdpt[j] ) ) {
-					uint64_t addr_pd = pdpt[j] & 0x000FFFFFFFFFF000;
-					uint64_t *pd = addr_pd + kernel_info.hhdm_offset;
-
-					for( int k = 0; k < 512; k++ ) {
-						paging_diagnostic_output_entry( pd[k], 0, k, "        ", "PD" );
-					}
-				}
-				
-			}
-		}
-	} */
 
 void paging_diagnostic_cr3( uint64_t cr3_physical ) {
 	//debugf( "cr3_physical: 0x%016llX\n", cr3_physical );
@@ -310,7 +283,7 @@ uint64_t paging_make_page( uint64_t physical_address, uint32_t flags ) {
 	if( flags & PAGE_FLAG_PAGE_SIZE ) { page = SET_PDE_PAGE_SIZE(page); }
 	if( flags & PAGE_FLAG_EXECUTE_DIABLED ) { page = SET_PDE_EXECUTE_DISABLED(page); }
 
-	debugf( "Page made: 0x%016llX\n", page );
+	//debugf( "Page made: 0x%016llX\n", page );
 
 	return page;
 }

@@ -25,8 +25,6 @@ SECTIONS
     /* that is the beginning of the region. */
     . = 0xffffffff80000000;
 
-    . += 0x200000;
-
     _kernel_start = .;
 
     .text : {

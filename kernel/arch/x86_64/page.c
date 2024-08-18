@@ -195,6 +195,10 @@ void paging_setup_initial_structures( void ) {
 	debugf( "Hit it.\n" );
 
 	set_cr3( k_pml4_phys );
+
+	//clobber_cr3( k_pml4_phys, kernel_main );
+
+post_page_reset:	debugf( "Done.\n" );
 }
 
 	/* for( int i = 0; i < 512; i++ ) {

@@ -47,7 +47,7 @@ void load_limine_info( void ) {
     uint64_t usable_memory_start = 0;
 	uint64_t usable_memory_size = 0;
 
-    debugf( "kernel_main:          0x%p\n", kernel_main );
+    debugf( "kernel_main:          0x%016llx\n", kernel_main );
 	debugf( "Physical kernel base: 0x%016llx\n", kaddr_request.response->physical_base );
 	debugf( "Virtaul kernel base:  0x%016llx\n", kaddr_request.response->virtual_base );
 	debugf( "Virtual kstart:       0x%016llx\n", &_kernel_start );

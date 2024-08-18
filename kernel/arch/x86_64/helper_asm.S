@@ -28,10 +28,18 @@ asm_refresh_cr3:
 	mov %rcx, %cr3
 	ret
 
+.extern post_page_reset
 .global set_cr3
 set_cr3:
+	mov $1, %rax
+	cpuid
 	mov %rdi, %cr3
 	ret
+
+.global clobber_cr3
+clobber_cr3:
+	mov %rdi, %cr3
+	jmp %rsi
 
 .global setup_kernel_stack
 setup_kernel_stack:

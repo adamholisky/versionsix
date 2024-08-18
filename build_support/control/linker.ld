@@ -25,25 +25,22 @@ SECTIONS
     /* that is the beginning of the region. */
     . = 0xffffffff80000000;
 
+    . += 0x200000;
+
     _kernel_start = .;
 
     .text : {
         *(.text)
     } :text
 
-    /* Define a section to contain the Limine requests and assign it to its own PHDR */
+    . += CONSTANT(MAXPAGESIZE);
+
     .requests : {
         KEEP(*(.requests_start_marker))
         KEEP(*(.requests))
         KEEP(*(.requests_end_marker))
     } :requests
  
-    /* Move to the next memory page for .text */
-    . += CONSTANT(MAXPAGESIZE);
-
-    
-
-    /* Move to the next memory page for .rodata */
     . += CONSTANT(MAXPAGESIZE);
 
     .rodata : {

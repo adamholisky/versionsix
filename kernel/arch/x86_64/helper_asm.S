@@ -28,6 +28,26 @@ asm_refresh_cr3:
 	mov %rcx, %cr3
 	ret
 
+.global set_cr3
+set_cr3:
+	mov %rdi, %cr3
+	ret
+
+.global setup_kernel_stack
+setup_kernel_stack:
+	pop %r11
+		mov %rdi, %rsp
+
+		push $0
+		push %rsi
+		push %rbx
+		mov %rsp, %rbp
+		sub $0x48, %rsp
+	push %r11
+	xor %r11, %r11
+
+	ret
+
 #define CR0_FPU_EM (1 << 2)
 #define CR0_FPU_EXCP (1 << 5)
 #define CR4_SSE_ENABLE (1 << 9)

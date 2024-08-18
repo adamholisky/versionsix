@@ -24,7 +24,14 @@ extern uint64_t get_cr0( void );
 extern uint64_t get_cr2( void );
 extern uint64_t get_cr3( void );
 extern uint64_t get_cr4( void );
+extern void set_cr3( uint64_t cr3 );
 extern void asm_refresh_cr3( void );
+
+typedef struct {
+    uint64_t base;
+    uint64_t size;
+    uint8_t type;
+} memmap_entry;
 
 typedef struct {
     uint64_t kernel_physical_base;
@@ -38,11 +45,17 @@ typedef struct {
     uint64_t kernel_file_address;
     uint64_t kernel_file_size;
     uint64_t rsdp_table_address;
+    uint64_t hhdm_offset;
 
     framebuffer_information framebuffer_info;
 
+    memmap_entry    memmap[20];
+    uint8_t memmap_count;
+
     bool in_paging_sanity_test;
     bool in_page_fault_test;
+
+    bool expecting_pf;
 } kinfo;
 
 #define htonl(l)  ( (((l) & 0xFF) << 24) | (((l) & 0xFF00) << 8) | (((l) & 0xFF0000) >> 8) | (((l) & 0xFF000000) >> 24))

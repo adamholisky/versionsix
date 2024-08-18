@@ -1,4 +1,5 @@
 #include "kernel_common.h"
+#include <limine.h>
 #include "page.h"
 #include <string.h>
 
@@ -20,12 +21,311 @@ paging_page_entry kernel_pts[2][512][512] __attribute__ ((aligned (4096)));
 paging_page_entry kernel_pds[2][512] __attribute__ ((aligned (4096)));
 paging_page_entry kernel_pdpts[2] __attribute__ ((aligned (4096)));
 
+// lol we support a max of 16gb memory now
+uint64_t const max_memory = 0x240000000; // emulator runs at 8gb, so cheat for now
+uint64_t const identity_map_start = 0xFFFF800000000000;
+uint64_t identity_map_end = identity_map_start + max_memory;
+uint64_t identity_map[512] __attribute__ ((aligned (4096)));
+
+uint64_t k_pml4[512] __attribute__ ((aligned (4096)));
+uint64_t k_pdpt[512] __attribute__ ((aligned (4096)));
+uint64_t k_pd[512] __attribute__ ((aligned (4096)));
+uint64_t k_pt1[512] __attribute__ ((aligned (4096)));
+uint64_t k_pt2[512] __attribute__ ((aligned (4096)));
+uint64_t k_pt3[512] __attribute__ ((aligned (4096)));
+uint64_t k_pt4[512] __attribute__ ((aligned (4096)));
+
 extern kinfo kernel_info;
 
 // Intentionally turning off warnings given we need to smash data together
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
 #pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 #pragma GCC diagnostic ignored "-Wint-conversion"
+
+uint64_t magic = 0xBAD011112222B000;
+
+void paging_setup_initial_structures( void ) {
+	// Sanity check myself
+	uint64_t *magic_2 = (uint64_t)&magic - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base + kernel_info.hhdm_offset;
+	debugf( "magic_2:  0x%016llX\n", magic_2 );
+	debugf( "*magic_2: 0x%016llX\n", *magic_2 );
+
+	// Setup the identity map
+	uint64_t cr3_contents = get_cr3();
+	uint64_t *pml4 = cr3_contents + kernel_info.hhdm_offset;
+	
+	debugf( "cr3 contents: 0x%016llX\n", cr3_contents );
+	debugf( "pml4: 0x%016llX\n", pml4 );
+	debugf( "*pml4:0x%016llX\n", *pml4 );
+
+
+
+
+	page_indexes im_page_index;
+	paging_get_indexes( identity_map_start, &im_page_index );
+
+	debugf( "start indexes: pml4: %llx    pdpt: %x    pd: %x    pt: %x\n", im_page_index.pml4, im_page_index.pdpt, im_page_index.pd, im_page_index.pt );
+
+	paging_get_indexes( identity_map_end, &im_page_index );
+	debugf( "end indexes:   pml4: %x    pdpt: %x    pd: %x    pt: %x\n", im_page_index.pml4, im_page_index.pdpt, im_page_index.pd, im_page_index.pt );
+
+	uint64_t im_phys_addr = identity_map;
+	im_phys_addr = im_phys_addr - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
+	debugf( "im_phys_addr: 0x%016llX\n", im_phys_addr );
+
+	for( int i = 0; i < 8; i++ ) {
+		identity_map[i] = paging_make_page( i * 0x40000000UL , PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE | PAGE_FLAG_PAGE_SIZE );
+	}
+
+	pml4[im_page_index.pml4] = paging_make_page( im_phys_addr, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+	
+	debugf("yay?\n" );
+	kernel_info.expecting_pf = true;
+	asm_refresh_cr3();
+
+	//do_immediate_shutdown();
+
+	debugf("yay!\n" );
+
+	paging_diagnostic_cr3( cr3_contents );
+
+
+	memset( k_pml4, 0, sizeof(uint64_t) * 512 );
+	memset( k_pdpt, 0, sizeof(uint64_t) * 512 );
+	memset( k_pd, 0, sizeof(uint64_t) * 512 );
+	memset( k_pt1, 0, sizeof(uint64_t) * 512 );
+	memset( k_pt2, 0, sizeof(uint64_t) * 512 );
+
+	memmap_entry *kernel_memmap_entry = NULL;
+
+	uint64_t k_page_size = 0x200000;
+
+	for( int i = 0; i < kernel_info.memmap_count; i++ ) {
+		if( kernel_info.memmap[i].type == LIMINE_MEMMAP_KERNEL_AND_MODULES ) {
+			kernel_memmap_entry = &kernel_info.memmap[i];
+		}
+	}
+
+	if( kernel_memmap_entry == NULL ) {
+		debugf( "Could not find kernel memory map entry.\n" );
+		do_immediate_shutdown();
+	}
+
+	uint16_t num_kernel_pages = kernel_memmap_entry->size / k_page_size;
+	if( kernel_memmap_entry->size % k_page_size ) {
+		num_kernel_pages++;
+	}
+
+	//uint64_t kpages_current_physical = kernel_memmap_entry->base;
+
+	uint64_t kpages_current_physical = 0xFFFFFFFF80000000 - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
+
+	debugf( "num_kernel_pages: 0x%X\n", num_kernel_pages );
+
+/* 	uint64_t virt = &k_pt1[1];
+	uint64_t phys = virt - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
+	debugf( "k_pt1 virt / phys: 0x%016llx / 0x%016llx\n", virt, phys );
+	do_immediate_shutdown(); */
+
+	for( uint16_t i = 0; i < num_kernel_pages; i++ ) {
+		page_indexes index;
+		paging_get_indexes( 0xFFFFFFFF80000000 + (i * k_page_size), &index );
+
+		debugf( "For: 0x%016llX\n", kpages_current_physical );
+		debugf( " indexes: pml4: %llx    pdpt: %x    pd: %x    pt: %x\n", index.pml4, index.pdpt, index.pd, index.pt );
+		
+		uint64_t k_pt_physical = 0;
+
+		//debugf( "index.pd = %d\n", index.pd );
+
+		/* if( index.pd == 0 ) {
+			k_pt1[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_CACHE_DISABLED | PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+			k_pt_physical = (uint64_t)(&k_pt1[index.pt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
+		} else if( index.pd == 1 ) {
+			k_pt2[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_CACHE_DISABLED | PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+			k_pt_physical = (uint64_t)(&k_pt2[index.pt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
+		} else if( index.pd == 2 ) {
+			k_pt3[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_CACHE_DISABLED | PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+			k_pt_physical = (uint64_t)(&k_pt3[index.pt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
+		} else if( index.pd == 3 ) {
+			k_pt4[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_CACHE_DISABLED | PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+			k_pt_physical = (uint64_t)(&k_pt4[index.pt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
+		} else {
+			debugf( "Ran out of PDs for kernel. Time to refactor this shit.\n" );
+			do_immediate_shutdown();
+		} */
+
+		//debugf( "k_pt_phys: 0x%016llx\n", k_pt_physical );
+
+		k_pt_physical = kpages_current_physical;
+
+		debugf( "kpages_current_phys: 0x%016llX\n", kpages_current_physical );
+		
+		if( !GET_PDE_PRESENT(k_pd[index.pd]) ) {
+			debugf( "***** CREATING PD: index.pd: %X\n", index.pd );
+			k_pd[index.pd] = paging_make_page( k_pt_physical, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE | PAGE_FLAG_PAGE_SIZE );
+		}
+
+		if( !GET_PDE_PRESENT(k_pdpt[index.pdpt]) ) {
+			debugf( "***** CREATING PDPT: index.pdpt: %X\n", index.pdpt );
+			k_pdpt[index.pdpt] = paging_make_page( (uint64_t)(&k_pd[index.pd]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+		}
+
+		if( !GET_PDE_PRESENT(k_pml4[index.pml4]) ) {
+			debugf( "***** CREATING PML4: index.pml4: %X\n", index.pml4 );
+			k_pml4[index.pml4] = paging_make_page( (uint64_t)(&k_pdpt[index.pdpt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+		}
+
+		kpages_current_physical = kpages_current_physical + k_page_size;
+	}
+
+	k_pml4[im_page_index.pml4] = paging_make_page( im_phys_addr, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+
+	debugf( "k_PDPT: 0x%llX\n", k_pdpt );
+
+	
+
+	uint64_t k_pml4_phys = (uint64_t)&k_pml4 - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
+
+	debugf( "k_pml4_virt: 0x%016llX\n", k_pml4 );
+	debugf( "k_pml4_phys: 0x%016llX\n", k_pml4_phys );
+
+	paging_diagnostic_cr3( k_pml4_phys );
+
+	debugf( "Hit it.\n" );
+
+	set_cr3( k_pml4_phys );
+}
+
+	/* for( int i = 0; i < 512; i++ ) {
+		paging_diagnostic_output_entry( pml4[i], 0, i, "", "PML4" );
+
+		if( GET_PDE_PRESENT( pml4[i] ) ) {
+			uint64_t addr = pml4[i] & 0x000FFFFFFFFFF000;
+			uint64_t *pdpt = addr + kernel_info.hhdm_offset;
+
+			for( int j = 0; j < 512; j++ ) {
+				paging_diagnostic_output_entry( pdpt[j], 0, j, "    ", "PDPT" );
+
+				if( GET_PDE_PRESENT( pdpt[j] ) ) {
+					uint64_t addr_pd = pdpt[j] & 0x000FFFFFFFFFF000;
+					uint64_t *pd = addr_pd + kernel_info.hhdm_offset;
+
+					for( int k = 0; k < 512; k++ ) {
+						paging_diagnostic_output_entry( pd[k], 0, k, "        ", "PD" );
+					}
+				}
+				
+			}
+		}
+	} */
+
+void paging_diagnostic_cr3( uint64_t cr3_physical ) {
+	//debugf( "cr3_physical: 0x%016llX\n", cr3_physical );
+
+	uint64_t *pml4 = cr3_physical + kernel_info.hhdm_offset;
+	//debugf( "pml4 == 0x%llX\n", pml4 );
+
+	for( uint16_t i = 0; i < 512; i++ ) {
+		if( GET_PDE_PRESENT(pml4[i]) ) {
+			paging_diagnostic_output_entry( pml4[i], 0x0, i, "", "PML4" );
+
+			//debugf( "pml4[0x%02X]: 0x%016llx\n", i, pml4[i] );
+
+			uint64_t pdpt_addr = (pml4[i] & 0x000FFFFFFFFFF000);
+			uint64_t *pdpt = pdpt_addr + kernel_info.hhdm_offset;
+
+			//debugf( "pdpt_addr: 0x%016llX\n", pdpt_addr );
+			//debugf( "pdpt:      0x%016llX\n", pdpt );
+			
+			for( uint16_t j = 0; j < 512; j++ ) {
+				//debugf( "PDPT: 0x%llX\n", *pdpt );
+				
+				if( GET_PDE_PRESENT(pdpt[j]) ) {
+					//db1();
+					paging_diagnostic_output_entry( pdpt[j], 0x0, j, "  ", "PDPT" );
+
+					if( GET_PDE_PAGE_SIZE(pdpt[j]) == 0 ) {
+						uint64_t pd_addr = (pdpt[j] & 0x000FFFFFFFFFF000);
+						uint64_t *pd = (uint64_t *)(pd_addr + kernel_info.hhdm_offset);
+
+						for( uint16_t k = 0; k < 512; k++ ) {
+							if( GET_PDE_PRESENT(pd[k]) ) {
+								paging_diagnostic_output_entry( pd[k], 0x0, k, "    ", "PD" );
+								
+								if( GET_PDE_PAGE_SIZE(pd[k]) == 0 ) {
+									uint64_t pt_addr = (pd[k] & 0x000FFFFFFFFFF000);
+									uint64_t *pt = (uint64_t *)(pt_addr + kernel_info.hhdm_offset);
+
+									uint16_t pts_present = 0;
+									for( uint16_t z = 0; z < 512; z++ ) {
+										
+										if( GET_PDE_PRESENT(pt[z]) ) {
+											//paging_diagnostic_output_entry( pt[z], 0x0, z, "      ", "PT" );
+											pts_present++;
+										}
+									}
+									debugf_raw( "      PT[x]: %d page tables present.\n", pts_present );
+								}
+							}
+						}
+					}
+					
+				}
+			}
+		}
+	}
+}
+
+void paging_diagnostic_output_entry( uint64_t pg_dir_entry, uint64_t starting_virtual, uint16_t i, char *spaces, char *type ) {
+	//debugf( "p_diag_out_entry  pg_dir_entry: 0x%llX   start_virt: 0x%llX  i: 0x%llX\n", pg_dir_entry, starting_virtual, i );
+	
+	char p = ( GET_PDE_PRESENT(pg_dir_entry) == 1 ? 'P' : ' ' );
+	char rw = ( GET_PDE_READ_WRITE(pg_dir_entry) ? 'W' : 'R' );
+	char cd = ( GET_PDE_CACHE_DISABLED(pg_dir_entry) ? 'C' : ' ' );
+	char ps = ( GET_PDE_PAGE_SIZE(pg_dir_entry) ? 'S' : ' ' );
+
+	if( p == 'P' ) {
+		debugf_raw( "%s%s[0x%03X]: %c %c %c %c 0x%016llX\n", spaces, type, i, p, rw, cd, ps, pg_dir_entry );
+	}
+}
+
+uint64_t paging_make_page( uint64_t physical_address, uint32_t flags ) {
+	uint64_t page = 0;
+
+	//page = SET_PDE_ADDRESS( page, physical_address );
+
+	page = physical_address & 0x000FFFFFFFFFF000;
+
+	if( flags & PAGE_FLAG_PRESENT ) { page = SET_PDE_PRESENT(page); }
+	if( flags & PAGE_FLAG_READ_WRITE ) { page = SET_PDE_READ_WRITE(page); }
+	if( flags & PAGE_FLAG_USER_SUPERVISOR ) { page = SET_PDE_USER_SUPERVISOR(page); }
+	if( flags & PAGE_FLAG_WRITE_THROUGH ) { page = SET_PDE_WRITE_THROUGH(page); }
+	if( flags & PAGE_FLAG_CACHE_DISABLED ) { page = SET_PDE_CACHE_DISABLED(page); }
+	if( flags & PAGE_FLAG_ACCESSED ) { page = SET_PDE_ACCESSED(page); }
+	if( flags & PAGE_FLAG_PAGE_SIZE ) { page = SET_PDE_PAGE_SIZE(page); }
+	if( flags & PAGE_FLAG_EXECUTE_DIABLED ) { page = SET_PDE_EXECUTE_DISABLED(page); }
+
+	debugf( "Page made: 0x%016llX\n", page );
+
+	return page;
+}
+
+void paging_get_indexes( uint64_t virtual_address, page_indexes *indexes ) {
+	indexes->pml4 = (virtual_address >> 39) & 0x1FF;
+	indexes->pdpt = (virtual_address >> 30) & 0x1FF;
+	indexes->pd = (virtual_address >> 21) & 0x1FF;
+	indexes->pt = (virtual_address >> 12) & 0x1FF;
+}
+
+uint64_t paging_get_addr_from_index( uint16_t index_pml4, uint16_t index_pdpt, uint16_t index_pd, uint16_t index_pt ) {
+	uint64_t addr = 0;
+
+	addr = addr | (index_pml4 << 39 );
+	addr = addr | (index_pdpt << 30 );
+	addr = addr | (index_pd << 21 );
+	addr = addr | (index_pt << 12 );
+}
 
 #undef DEBUG_PAGING_INITALIZE
 void paging_initalize( void ) {
@@ -668,3 +968,4 @@ paging_page_entry *paging_get_page_for_virtual_address( uint64_t virtual_address
 
 	return ret_val;
 }
+

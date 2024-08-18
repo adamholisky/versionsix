@@ -45,15 +45,28 @@ extern void tcp_test( void );
 
 char fxsave_region[512] __attribute__((aligned(16)));
 
+/* extern setup_kernel_stack( uint64_t addr, uint64_t *kmain );
+uint64_t kernel_stack[ (1024 * 64)/8 ]; */
+
 void kernel_main( void ) {
+	//setup_kernel_stack( &kernel_stack[ (1024 * 64)/8 ], kernel_main );
 	// Begin with boostrap services
 	serial_initalize();
 	debugf( "Versions OS VI Debug Out\n" );
 	load_limine_info();
+	
+
 	rtc_initalize();
 	
 	// Continue with core services, all of these need to boot in this order
 	interrupt_initalize();
+
+	__asm__ volatile("cli");
+	paging_setup_initial_structures();
+	__asm__ volatile("sti");
+
+	do_immediate_shutdown();
+
 	sse_initalize();
 	syscall_initalize();
 	acpi_initalize();

@@ -27,7 +27,10 @@
         "terminal.explorerKind": "integrated",
         "editor.cursorStyle": "block",
         "files.associations": {
-            "limine_bootstrap.h": "c"
+            "limine_bootstrap.h": "c",
+            "compare": "c",
+            "cstdint": "c",
+            "format": "c"
         },
     }
 }

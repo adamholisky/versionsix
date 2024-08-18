@@ -57,10 +57,19 @@ void load_limine_info( void ) {
 	debugf( "cr4:                  0x%llx\n", get_cr4() );
 
 	// Get the memory map and iterate over each entrry, saving the largest contiguous block as the physical base for our allocateable memory
+	kernel_info.memmap_count = memmap_request.response->entry_count;
+	
+	debugf( "Memory map size:      %d\n", kernel_info.memmap_count );
 	debugf( "Memory Map:\n" );
 	debugf_raw( "          Base                Length              Type\n" );
 
+	
+
 	for( int i = 0; i < memmap_request.response->entry_count; i++ ) {
+		kernel_info.memmap[i].base = memmap_request.response->entries[i]->base;
+		kernel_info.memmap[i].size = memmap_request.response->entries[i]->length;
+		kernel_info.memmap[i].type = memmap_request.response->entries[i]->type;
+
 		debugf_raw( "    0x%02X  0x%016llX  0x%016llX  %s\n", i, memmap_request.response->entries[i]->base,  memmap_request.response->entries[i]->length, limine_mem_map_type_to_text(memmap_request.response->entries[i]->type) );
 
 		if( memmap_request.response->entries[i]->type == 0 ) {
@@ -105,6 +114,7 @@ void load_limine_info( void ) {
 	kernel_info.framebuffer_info.pitch = fb_request.response->framebuffers[0]->pitch;
 	kernel_info.framebuffer_info.pixel_width = kernel_info.framebuffer_info.pitch / kernel_info.framebuffer_info.width;
     kernel_info.rsdp_table_address = (uint64_t)rsdp_request.response->address;
+	kernel_info.hhdm_offset = hhdm_request.response->offset;
 }
 
 char *limine_mem_map_type_to_text( uint8_t type ) {

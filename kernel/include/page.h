@@ -33,6 +33,13 @@ typedef struct {
 	uint8_t	    execute_disable : 1; // 63
 } __attribute__ ((packed)) paging_page_entry;
 
+typedef struct {
+	uint64_t	pml4;
+	uint64_t	pdpt;
+	uint64_t	pd;
+	uint64_t	pt;	
+} page_indexes;
+
 #define GET_PDE_PRESENT( pde ) pde & 0x1 
 #define GET_PDE_READ_WRITE( pde ) pde & 0x2 >> 1
 #define GET_PDE_USER_SUPERVISOR( pde ) (pde & 0x4) >> 2
@@ -41,7 +48,7 @@ typedef struct {
 #define GET_PDE_ACCESSED( pde ) (pde & 0x20) >> 5
 #define GET_PDE_PAGE_SIZE( pde ) (pde & 0x80) >> 7
 #define GET_PDE_EXECUTE_DISABLED( pde ) pde >> 63
-#define GET_PDE_ADDRESS( pde ) (pde & 0x000FFFFFFFFF000) >> 12
+#define GET_PDE_ADDRESS( pde ) (pde & 0x000FFFFFFFFFF000UL) >> 12
 
 #define SET_PDE_PRESENT( pde ) pde | (1 << 0)
 #define SET_PDE_READ_WRITE( pde ) pde | (1 << 1)
@@ -51,7 +58,16 @@ typedef struct {
 #define SET_PDE_ACCESSED( pde ) pde | (1 << 5)
 #define SET_PDE_PAGE_SIZE( pde ) pde | (1 << 7)
 #define SET_PDE_EXECUTE_DISABLED( pde ) pde | (1 << 63)
-#define SET_PDE_ADDRESS( pde, addr ) pde | (addr << 12)
+#define SET_PDE_ADDRESS( pde, addr ) pde | ((addr << 12) & 0x000FFFFFFFFFF000UL)
+
+#define PAGE_FLAG_PRESENT (1 << 0)
+#define PAGE_FLAG_READ_WRITE (1 << 1)
+#define PAGE_FLAG_USER_SUPERVISOR (1 << 2)
+#define PAGE_FLAG_WRITE_THROUGH (1 << 3)
+#define PAGE_FLAG_CACHE_DISABLED (1 << 4)
+#define PAGE_FLAG_ACCESSED (1 << 5)
+#define PAGE_FLAG_PAGE_SIZE (1 << 6)
+#define PAGE_FLAG_EXECUTE_DIABLED (1 << 7)
 
 
 void paging_initalize( void );
@@ -65,6 +81,13 @@ uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address );
 void paging_examine_page_for_address( uint64_t virtual_address );
 uint64_t paging_virtual_to_physical( uint64_t virtual_address );
 paging_page_entry *paging_get_page_for_virtual_address( uint64_t virtual_address );
+
+void paging_setup_initial_structures( void );
+void paging_get_indexes( uint64_t virtual_address, page_indexes *indexes );
+uint64_t paging_get_addr_from_index( uint16_t index_pml4, uint16_t index_pdpt, uint16_t index_pd, uint16_t index_pt );
+uint64_t paging_make_page( uint64_t physical_address, uint32_t flags );
+void paging_diagnostic_cr3( uint64_t cr3_virtual );
+void paging_diagnostic_output_entry( uint64_t paging_dir_entry, uint64_t starting_virtual, uint16_t i, char *spaces, char *type );
 
 #ifdef __cplusplus
 }

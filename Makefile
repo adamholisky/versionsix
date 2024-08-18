@@ -98,10 +98,10 @@ run: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING) 
 
 run_debug: install
-	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_COMMON)
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_COMMON) $(QEMU_DEBUG_LOGGING)
 
 gdb:
-	gdb -q --command=$(ROOT_DIR)/build_support/gdb_control/commands.gdb
+	gdb -q --command=$(ROOT_DIR)/build_support/gdb_control/tui.gdb
 
 gdbseer:
 	seergdb --connect localhost:5894 /usr/local/osdev/versions/versionsix/build/versionvi.bin

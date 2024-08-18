@@ -3,23 +3,12 @@
 #include "page.h"
 #include <string.h>
 
-paging_page_entry *limine_pml4;
-paging_page_entry *limine_pdpt;
-paging_page_entry *limine_pd;
-paging_page_entry *limine_pt;
-paging_page_entry *limine_next_open_pt;
 uint64_t kernel_virtual_memory_next;
 uint64_t kernel_physical_memory_next;
-uint32_t limine_pt_next_free;
-uint32_t limine_pd_count;
 uint64_t kernel_physical_base;
 uint64_t kernel_virtual_base;
 uint64_t kernel_heap_virtual_memory_next;
 uint64_t kernel_heap_physical_memory_next;
-
-paging_page_entry kernel_pts[2][512][512] __attribute__ ((aligned (4096)));
-paging_page_entry kernel_pds[2][512] __attribute__ ((aligned (4096)));
-paging_page_entry kernel_pdpts[2] __attribute__ ((aligned (4096)));
 
 // lol we support a max of 16gb memory now
 uint64_t const max_memory = 0x240000000; // emulator runs at 8gb, so cheat for now
@@ -309,12 +298,6 @@ void paging_initalize( void ) {
 	uint64_t cr3 = get_cr3();
 	paging_cr3 *paging_cr3_data = (paging_cr3 *)&cr3;
 
-	
-	limine_pml4 = (paging_page_entry *)(paging_cr3_data->address << 12);
-	limine_pdpt = (paging_page_entry *)(limine_pml4[0x1FF].address << 12);
-	//limine_pd = (paging_page_entry *)(limine_pdpt[0x1FE].address << 12);
-	//limine_pt = (paging_page_entry *)(limine_pd[0].address << 12);
-	limine_pt_next_free = 0;
 	kernel_virtual_base = kernel_info.kernel_virtual_base;
 	kernel_physical_base = kernel_info.kernel_physical_base;
 	
@@ -323,73 +306,6 @@ void paging_initalize( void ) {
 
 	kernel_heap_virtual_memory_next = 0xEEEEEEEE00000000;
 	kernel_heap_physical_memory_next = kernel_info.usable_memory_start;
-
-	// Copy over each page entry that's setup by the bootloader into our tables.
-	// 1. Loop through each PDPT entry
-	for( int i = 0x1FE; i < 512; i++ ) {
-
-		// 2. If the PDPT entry is present, then go into the PD entry
-		if( limine_pdpt[i].present == 1 ) {
-			limine_pd = (paging_page_entry *)(limine_pdpt[i].address << 12);
-
-			//debugf( "addr: %016llx\n", ((uint64_t)((uint64_t)(kernel_pds + (i - 510)) - kernel_virtual_base + kernel_physical_base) >> 12));
-			kernel_pdpts[i - 510].present = 1;
-			kernel_pdpts[i - 510].rw = 1;
-			kernel_pdpts[i - 510].address = (uint64_t)((uint64_t)(kernel_pds + (i - 510)) - kernel_virtual_base + kernel_physical_base) >> 12;
-		
-			// 3. Loop through each PD entry
-			for( int j = 0; j < 512; j++ ) {
-
-				//debugf( "j = %d\n", j );
-				// 4. If the PD entry is present, then go into the PT
-				if( limine_pd[j].present == 1 ) {
-					limine_pt = (paging_page_entry *)(limine_pd[j].address << 12);
-
-					kernel_pds[i - 510][j].address = (uint64_t)(((uint64_t)(&kernel_pts[i - 0x1FE][j][0]) - kernel_virtual_base + kernel_physical_base) >> 12);
-					kernel_pds[i - 510][j].present = 1;
-					kernel_pds[i - 510][j].rw = 1;
-
-					// 5. Loop throuhg each PT entry, copy it into the kernel tables
-					for( int k = 0; k < 512; k++ ) {
-						uint64_t *bootloader_pt_entry = (uint64_t *)(limine_pt + k);
-
-						paging_page_entry *pt_entry = &kernel_pts[i - 0x1FE][j][k];
-						uint64_t *kernel_pt_entry = (uint64_t *)(pt_entry);
-
-						*kernel_pt_entry = *bootloader_pt_entry;
-
-						if( kernel_pts[i - 0x1FE][j][k].present != 0 ) {
-							//debugf( "k pt entry: kernel_pt[0x%03X][%d][%d] = 0x%016llX\n", i, j, k, kernel_pts[i - 0x1FE][j][k] );
-						}
-					}
-				}
-			}
-		}
-	}
-
-	#ifdef DEBUG_PAGING_INITALIZE
-	debugf( "0x1fe addr: %016llx\n", limine_pdpt[0x1fe].address << 12 );
-	debugf( "addr: %016llx\n", ((uint64_t)((uint64_t)(&kernel_pds[0][0]) - kernel_virtual_base + kernel_physical_base) >> 12));
-	#endif
-	
-	limine_pdpt[0x1FE].address = ((uint64_t)((uint64_t)(&kernel_pds[0][0]) - kernel_virtual_base + kernel_physical_base) >> 12);
-	
-	#ifdef DEBUG_PAGING_INITALIZE
-	debugf( "0x1fe addr: %016llx\n", limine_pdpt[0x1fe].address << 12 );
-	#endif
-
-	#ifdef DEBUG_PAGING_INITALIZE
-	debugf( "0x1ff addr: %016llx\n", limine_pdpt[0x1ff].address << 12 );
-	debugf( "addr: %016llx\n", ((uint64_t)((uint64_t)(&kernel_pds[1][0]) - kernel_virtual_base + kernel_physical_base) >> 12));
-	#endif
-	
-	limine_pdpt[0x1Ff].address = ((uint64_t)((uint64_t)(&kernel_pds[1][0]) - kernel_virtual_base + kernel_physical_base) >> 12);
-	
-	#ifdef DEBUG_PAGING_INITALIZE
-	debugf( "0x1ff addr: %016llx\n", limine_pdpt[0x1ff].address << 12 );
-	#endif
-
-	asm_refresh_cr3();
 
 	// Let's do a paging test, fail hard if it fails
 	kernel_info.in_paging_sanity_test = true;
@@ -446,8 +362,91 @@ void paging_initalize( void ) {
 	#endif
 }
 
-uint64_t paging_page_map_to_pml4( uint64_t *pml4, uint64_t physial, uint64_t virtual, uint64_t flags ) {
+uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, uint64_t virtual_address, uint64_t flags ) {
+	page_indexes virt_indexes;
+	paging_get_indexes( virtual_address, &virt_indexes );
 
+	bool setup_pml4 = false;
+	bool setup_pdpt = false;
+	bool setup_pd = false;
+	bool setup_pt = false;
+
+	uint64_t *pml4 = NULL;
+	uint64_t *pdpt = NULL;
+	uint64_t *pd = NULL;
+	uint64_t *pt = NULL;
+
+	if( pml_4 == NULL ) {
+		pml4 = get_cr3();
+	}
+
+	if( !(pml4[ virt_indexes.pml4 ] & PAGE_FLAG_PRESENT) ) {
+		setup_pml4 = true;
+		setup_pdpt = true;
+		setup_pd = true;
+		setup_pt = true;
+	} else {
+		pdpt = pml4[ virt_indexes.pml4 ] & PAGE_ADDR_MASK;
+		
+		if( !(pdpt[ virt_indexes.pdpt ] & PAGE_FLAG_PRESENT) ) {
+			setup_pdpt = true;
+			setup_pd = true;
+			setup_pt = true;
+		} else {
+			pd = pdpt[ virt_indexes.pdpt ] & PAGE_ADDR_MASK;
+
+			if( !(pd[ virt_indexes.pd ] & PAGE_FLAG_PRESENT ) ) {
+				setup_pd = true;
+				setup_pt = true;
+			} else {
+				pt = pd[ virt_indexes.pdpt ] & PAGE_ADDR_MASK;
+
+				if( !(pt[ virt_indexes.pt ] & PAGE_FLAG_PRESENT) ) {
+					setup_pt = true;
+				} else {
+				   // Already assigned, do something?
+				   debugf( "WARNING! ALREADY ASSIGNED.\n" );
+				}
+			}
+		}
+	}
+
+	if( show_page_map_debug ) {
+		debugf( "Pre-setup pdpt: 0x%016llx\n", pdpt );
+		debugf( "Pre-setup pd:   0x%016llx\n", pd );
+		debugf( "Pre-setup pt:   0x%016llx\n", pt );
+		debugf( "setup_pml4: %d @ index 0x%X\n", setup_pml4, virt_indexes.pml4 );
+		debugf( "setup_pdpt: %d @ index 0x%X\n", setup_pdpt, virt_indexes.pdpt );
+		debugf( "setup_pd: %d @ index 0x%X\n", setup_pd, virt_indexes.pd );
+		debugf( "setup_pt: %d @ index 0x%X\n", setup_pt, virt_indexes.pt );
+	}
+
+	if( setup_pdpt ) {
+		pdpt = (paging_page_entry *)page_allocate_kernel(1);
+		memset( pdpt, 0, 4096 );
+
+		#ifdef DEBUG_PAGE_MAP
+		debugf( "allocated pdpt: %llx\n", pdpt );
+		#endif
+	}
+
+	if( setup_pd ) {
+		pd = (paging_page_entry *)page_allocate_kernel(1);
+		memset( pd, 0, 4096 );
+
+		#ifdef DEBUG_PAGE_MAP
+		debugf( "allocated pd: %llx\n", pd );
+		#endif
+	}
+
+	if( setup_pt ) {
+		pt = (paging_page_entry *)page_allocate_kernel(1);
+		memset( pt, 0, 4096 );
+		
+		#ifdef DEBUG_PAGE_MAP
+		debugf( "allocated pt: %llx\n", pt );
+		#endif
+	}
 }
 
 uint64_t *page_allocate_kernel_linear( uint32_t number_of_pages ) {

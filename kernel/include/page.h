@@ -3,7 +3,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 #define PAGE_SIZE 0x1000
+#define PAGE_ADDR_MASK 0x000FFFFFFFFFF000
 
 typedef struct {
     uint8_t     reserved : 3; // 0, 1, 2
@@ -66,8 +68,8 @@ typedef struct {
 #define PAGE_FLAG_WRITE_THROUGH (1 << 3)
 #define PAGE_FLAG_CACHE_DISABLED (1 << 4)
 #define PAGE_FLAG_ACCESSED (1 << 5)
-#define PAGE_FLAG_PAGE_SIZE (1 << 6)
-#define PAGE_FLAG_EXECUTE_DIABLED (1 << 7)
+#define PAGE_FLAG_PAGE_SIZE (1 << 7)
+#define PAGE_FLAG_EXECUTE_DIABLED (1 << 63)
 
 
 void paging_initalize( void );

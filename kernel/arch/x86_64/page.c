@@ -312,7 +312,7 @@ uint64_t paging_make_page( uint64_t physical_address, uint32_t flags ) {
 void paging_get_indexes( uint64_t virtual_address, page_indexes *indexes ) {
 	indexes->pml4 = (virtual_address >> 39) & 0x1FF;
 	indexes->pdpt = (virtual_address >> 30) & 0x1FF;
-	indexes->pd = (virtual_address >> 21UL) & 0x1FFUL;
+	indexes->pd = (virtual_address >> 21) & 0x1FF;
 	indexes->pt = (virtual_address >> 12) & 0x1FF;
 }
 
@@ -702,17 +702,21 @@ void paging_invalidate_page( uint64_t page_virtual_address ) {
 
 /* OLD CODE */
 
-#undef DEBUG_PAGE_ALLOCATE
+#define DEBUG_PAGE_ALLOCATE
 void *page_allocate( uint32_t number ) {
 	void *return_val = kernel_heap_virtual_memory_next;
 
+
 	#ifdef DEBUG_PAGE_ALLOCATE
 	log_entry_enter();
+	debugf( "number: %d\n", number);
 	#endif
 
 	if( number < 1 ) {
 		return NULL;
 	}
+
+	debugf( "kh_vmem_nx: 0x%016llX\n", kernel_heap_virtual_memory_next );
 
 	for( int i = 0; i < number; i++ ) {
 		paging_page_map_to_pml4( NULL, kernel_heap_physical_memory_next, kernel_heap_virtual_memory_next, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );   
@@ -725,7 +729,7 @@ void *page_allocate( uint32_t number ) {
 	log_entry_exit();
 	#endif
 
-	//debugf( "Page allocated: 0x%016llX\n", return_val );
+	debugf( "Page allocated: 0x%016llX\n", return_val );
 	return return_val;
 }
 

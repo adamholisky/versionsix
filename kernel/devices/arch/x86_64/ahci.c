@@ -28,7 +28,7 @@ void ahci_initalize( void ) {
 	pci_dump_header( pci_ahci_drive );
 
 	mmio_initalize( &ahci_mmio, pci_ahci_drive->bar5 );
-	abar = (HBA_MEM *)pci_ahci_drive->bar5;
+	abar = (HBA_MEM *)(pci_ahci_drive->bar5 + ADDR_IDENTITY_MAP);
 
 	// TODO: use the results to handle whatever drive is attached, for now we hard code
 	ahci_probe_port( abar );
@@ -37,7 +37,7 @@ void ahci_initalize( void ) {
 	num_cmd_slots = (abar->cap & 0x0f00) >> 8;
 
 	// port_page gets the port control 
-	global_port_page = page_allocate_kernel_mmio( 1 );
+	global_port_page = page_allocate_kernel_mmio(1);
 	global_port_page_phys = paging_virtual_to_physical( global_port_page );
 	memset( global_port_page, 0, PAGE_SIZE );
 
@@ -49,7 +49,7 @@ void ahci_initalize( void ) {
 	// TODO: Remove hard coding for "1" here
 	ahci_port_rebase( &abar->ports[1], 1, global_port_page, global_port_page_phys );
 
-	global_buffer = page_allocate_kernel_mmio(2);
+	global_buffer = page_allocate_kernel_mmio(1);
 	global_buffer_phys = paging_virtual_to_physical( global_buffer );
 
 	#ifdef KDEBUG_AHCI_INIT

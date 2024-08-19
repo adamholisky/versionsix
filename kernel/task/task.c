@@ -159,8 +159,8 @@ void task_sched_yield( registers **context ) {
 	if( new_task->generator == TASK_GENERATOR_ELF ) {
 		debugf( "DING!\n" );
 
-		extern bool show_page_map_debug;
-		show_page_map_debug = true;
+		//extern bool show_page_map_debug;
+		//show_page_map_debug = true;
 
 		
 		for( int i = 0; i < new_task->p->num_data_pages; i++ ) {
@@ -175,7 +175,7 @@ void task_sched_yield( registers **context ) {
 			page_map( new_task->p->text_pages[i].virt, new_task->p->text_pages[i].phys );
 		}
 
-		show_page_map_debug = false;
+		//show_page_map_debug = false;
 		
 		paging_page_entry *page = paging_get_page_for_virtual_address( 0x0 );
 		page = paging_get_page_for_virtual_address( 0x200200 );

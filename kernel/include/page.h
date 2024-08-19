@@ -37,10 +37,10 @@ typedef struct {
 } __attribute__ ((packed)) paging_page_entry;
 
 typedef struct {
-	uint64_t	pml4;
-	uint64_t	pdpt;
-	uint64_t	pd;
-	uint64_t	pt;	
+	uint16_t	pml4;
+	uint16_t	pdpt;
+	uint16_t	pd;
+	uint16_t	pt;	
 } page_indexes;
 
 #define GET_PDE_PRESENT( pde ) pde & 0x1 
@@ -60,7 +60,7 @@ typedef struct {
 #define SET_PDE_CACHE_DISABLED( pde ) pde | (1 << 4)
 #define SET_PDE_ACCESSED( pde ) pde | (1 << 5)
 #define SET_PDE_PAGE_SIZE( pde ) pde | (1 << 7)
-#define SET_PDE_EXECUTE_DISABLED( pde ) pde | (1 << 63)
+#define SET_PDE_EXECUTE_DISABLED( pde ) pde | (1UL << 63)
 #define SET_PDE_ADDRESS( pde, addr ) pde | ((addr << 12) & 0x000FFFFFFFFFF000UL)
 
 #define PAGE_FLAG_PRESENT (1 << 0)
@@ -70,20 +70,22 @@ typedef struct {
 #define PAGE_FLAG_CACHE_DISABLED (1 << 4)
 #define PAGE_FLAG_ACCESSED (1 << 5)
 #define PAGE_FLAG_PAGE_SIZE (1 << 7)
-#define PAGE_FLAG_EXECUTE_DIABLED (1 << 63)
+#define PAGE_FLAG_EXECUTE_DIABLED (1UL << 63)
 
-
-void paging_initalize( void );
-uint64_t *page_allocate( uint32_t number );
-uint64_t *page_allocate_kernel( uint32_t number );
-uint64_t *page_allocate_kernel_mmio( uint8_t number );
 void paging_dump_page_direct( uint64_t page );
 void paging_dump_cr3( paging_cr3 *cr3 );
 void paging_dump_page( paging_page_entry *page );
-uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address );
 void paging_examine_page_for_address( uint64_t virtual_address );
 uint64_t paging_virtual_to_physical( uint64_t virtual_address );
 paging_page_entry *paging_get_page_for_virtual_address( uint64_t virtual_address );
+
+void paging_initalize( void );
+void *page_map( uint64_t virtual_address, uint64_t physical_address );
+void *page_allocate( uint32_t number );
+void *page_allocate_mmio( uint32_t number );
+void *page_allocate_kernel( uint32_t number );
+void *page_allocate_kernel_mmio( uint32_t number );
+
 
 void paging_setup_initial_structures( void );
 void paging_get_indexes( uint64_t virtual_address, page_indexes *indexes );
@@ -95,6 +97,7 @@ void paging_invalidate_page( uint64_t page_virtual_address );
 void paging_increment_kernel_page_index( void );
 void *paging_allocate_single_linear_kernel_page( void );
 void *page_allocate_kernel_linear( uint32_t number_of_pages );
+uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, uint64_t virtual_address, uint64_t flags );
 
 #ifdef __cplusplus
 }

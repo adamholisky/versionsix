@@ -5,7 +5,9 @@
 
 
 uint64_t kernel_physical_base;
+uint64_t kernel_physical_allocation_base;
 uint64_t kernel_virtual_base;
+uint64_t kernel_virtual_allocation_base;
 uint64_t kernel_heap_virtual_memory_next;
 uint64_t kernel_heap_physical_memory_next;
 
@@ -23,10 +25,10 @@ uint64_t k_pt2[512] __attribute__ ((aligned (4096)));
 uint64_t k_pt3[512] __attribute__ ((aligned (4096)));
 uint64_t k_pt4[512] __attribute__ ((aligned (4096)));
 
-uint64_t k_current_pml4_index;
-uint64_t k_current_pdpt_index;
-uint64_t k_current_pd_index;
-uint64_t k_current_pt_index;
+uint16_t k_current_pml4_index;
+uint16_t k_current_pdpt_index;
+uint16_t k_current_pd_index;
+uint16_t k_current_pt_index;
 
 uint64_t *k_current_pml4;
 uint64_t *k_current_pdpt;
@@ -142,18 +144,24 @@ void paging_setup_initial_structures( void ) {
 		debugf( " indexes: pml4: %llx    pdpt: %x    pd: %x    pt: %x\n", index.pml4, index.pdpt, index.pd, index.pt );
 		#endif
 
+		debugf( " indexes: pml4: %llx    pdpt: %x    pd: %x    pt: %x\n", index.pml4, index.pdpt, index.pd, index.pt );
+
 		uint64_t k_pt_physical = 0;
 
 		if( index.pd == 0 ) {
+			k_current_pt = k_pt1;
 			k_pt1[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 			k_pt_physical = (uint64_t)(&k_pt1[index.pt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
 		} else if( index.pd == 1 ) {
+			k_current_pt = k_pt2;
 			k_pt2[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 			k_pt_physical = (uint64_t)(&k_pt2[index.pt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
 		} else if( index.pd == 2 ) {
+			k_current_pt = k_pt3;
 			k_pt3[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 			k_pt_physical = (uint64_t)(&k_pt3[index.pt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
 		} else if( index.pd == 3 ) {
+			k_current_pt = k_pt4;
 			k_pt4[index.pt] = paging_make_page( kpages_current_physical, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 			k_pt_physical = (uint64_t)(&k_pt4[index.pt]) - kernel_info.kernel_virtual_base + kernel_info.kernel_physical_base;
 		} else {
@@ -181,12 +189,6 @@ void paging_setup_initial_structures( void ) {
 		}
 
 		kpages_current_physical = kpages_current_physical + k_page_size;
-
-		k_current_pml4_index = index.pml4;
-		k_current_pdpt_index = index.pdpt;
-		k_current_pd_index = index.pd;
-		k_current_pt_index = index.pt;
-		k_current_pt = k_pt_physical + ADDR_IDENTITY_MAP;
 	}
 
 	k_pml4[im_page_index.pml4] = paging_make_page( im_phys_addr, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
@@ -257,7 +259,7 @@ void paging_diagnostic_cr3( uint64_t cr3_physical ) {
 									for( uint16_t z = 0; z < 512; z++ ) {
 										
 										if( GET_PDE_PRESENT(pt[z]) ) {
-											//paging_diagnostic_output_entry( pt[z], 0x0, z, "      ", "PT" );
+											paging_diagnostic_output_entry( pt[z], 0x0, z, "      ", "PT" );
 											pts_present++;
 										}
 									}
@@ -310,17 +312,17 @@ uint64_t paging_make_page( uint64_t physical_address, uint32_t flags ) {
 void paging_get_indexes( uint64_t virtual_address, page_indexes *indexes ) {
 	indexes->pml4 = (virtual_address >> 39) & 0x1FF;
 	indexes->pdpt = (virtual_address >> 30) & 0x1FF;
-	indexes->pd = (virtual_address >> 21) & 0x1FF;
+	indexes->pd = (virtual_address >> 21UL) & 0x1FFUL;
 	indexes->pt = (virtual_address >> 12) & 0x1FF;
 }
 
 uint64_t paging_get_addr_from_index( uint16_t index_pml4, uint16_t index_pdpt, uint16_t index_pd, uint16_t index_pt ) {
 	uint64_t addr = 0;
 
-	addr = addr | (index_pml4 << 39 );
-	addr = addr | (index_pdpt << 30 );
-	addr = addr | (index_pd << 21 );
-	addr = addr | (index_pt << 12 );
+	addr = addr | ((uint64_t)index_pml4 << 39 );
+	addr = addr | ((uint64_t)index_pdpt << 30 );
+	addr = addr | ((uint64_t)index_pd << 21 );
+	addr = addr | ((uint64_t)index_pt << 12 );
 }
 
 #undef DEBUG_PAGING_INITALIZE
@@ -330,16 +332,63 @@ void paging_initalize( void ) {
 
 	kernel_virtual_base = kernel_info.kernel_virtual_base;
 	kernel_physical_base = kernel_info.kernel_physical_base;
+
+	kernel_virtual_allocation_base = kernel_info.kernel_end;
+	kernel_physical_allocation_base = kernel_info.kernel_allocate_memory_start;
 	
 	kernel_virtual_memory_next = kernel_info.kernel_end;
 	kernel_physical_memory_next = kernel_info.kernel_allocate_memory_start;
 
-	kernel_heap_virtual_memory_next = 0xEEEEEEEE00000000;
+	kernel_heap_virtual_memory_next = 0x0000700000000000;
 	kernel_heap_physical_memory_next = kernel_info.usable_memory_start;
+
+	page_indexes indexes;
+	paging_get_indexes( kernel_virtual_memory_next, &indexes );
+	k_current_pml4_index = indexes.pml4;
+	k_current_pdpt_index = indexes.pdpt;
+	k_current_pd_index = indexes.pd;
+	k_current_pt_index = indexes.pt;
+	
+	k_new_pt = 0xFFFF000000000000;
+	k_new_pd = 0xFFFF000000000000;
 
 	k_new_pt = page_allocate_kernel_linear(1);
 	k_new_pd = page_allocate_kernel_linear(1);
 	
+	debugf( "k_new_pt: 0x%016llX\n", k_new_pt );
+	debugf( "k_new_pd: 0x%016llX\n", k_new_pd );
+
+	/* 
+	
+	// This works, leaving for a bit
+	
+	for( int i = 0; i < 2000; i++ ) {
+		uint16_t pd_idx_save = k_current_pd_index;
+		uint16_t pt_idx_save = k_current_pt_index;
+		uint64_t *p = page_allocate_kernel_linear(1);
+		debugf( "%d  p: 0x%016llX    pd: %X    pt: %X\n", i, p, pd_idx_save, pt_idx_save );
+	} 
+	*/
+
+	/* void *test_code_page = page_allocate_kernel_linear(1);
+	void *test_data_page = page_allocate_kernel_linear(1);
+
+	uint8_t *virt_cp = 0;
+	uint8_t *virt_dp = 0x200000;
+
+	paging_page_map_to_pml4( k_pml4, test_code_page - kernel_virtual_allocation_base + kernel_physical_allocation_base, virt_cp, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+
+	virt_cp[0] = 'A';
+	virt_cp[1] = 'H';
+
+	debugf( "virt_cp: %s\n", virt_cp );
+
+	paging_page_map_to_pml4( k_pml4, test_data_page - kernel_virtual_allocation_base + kernel_physical_allocation_base, virt_dp, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+
+	virt_dp[0] = 'K';
+	virt_dp[1] = 'S';
+
+	debugf( "virt_dp: %s\n", virt_dp ); */
 
 
 	// Let's do a paging test, fail hard if it fails
@@ -397,7 +446,18 @@ void paging_initalize( void ) {
 	#endif
 }
 
+#define KDEBUG_PAGE_MAP_PML4
+bool KDEBUG_PAGE_MAP_ACTIVE = false;
+
 uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, uint64_t virtual_address, uint64_t flags ) {
+	#ifdef KDEBUG_PAGE_MAP_PML4
+	KDEBUG_PAGE_MAP_ACTIVE = true;
+	#endif
+
+	if( KDEBUG_PAGE_MAP_ACTIVE ) {
+		debugf( "pml_4: 0x%016llX  phys_addr: 0x%016llX  virt_addr: 0x%016llX  flags: 0x%016llX\n", pml_4, physical_address, virtual_address, flags );
+	}
+
 	page_indexes virt_indexes;
 	paging_get_indexes( virtual_address, &virt_indexes );
 
@@ -411,8 +471,14 @@ uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, ui
 	uint64_t *pd = NULL;
 	uint64_t *pt = NULL;
 
+	pml4 = pml_4;
+
 	if( pml_4 == NULL ) {
-		pml4 = get_cr3();
+		pml4 = get_cr3() + ADDR_IDENTITY_MAP;
+	}
+
+	if( KDEBUG_PAGE_MAP_ACTIVE ) {
+		debugf( "pml4: 0x%016llX\n", pml4 );
 	}
 
 	if( !(pml4[ virt_indexes.pml4 ] & PAGE_FLAG_PRESENT) ) {
@@ -421,29 +487,29 @@ uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, ui
 		setup_pd = true;
 		setup_pt = true;
 	} else {
-		pdpt = pml4[ virt_indexes.pml4 ] & PAGE_ADDR_MASK;
+		pdpt = (pml4[ virt_indexes.pml4 ] & PAGE_ADDR_MASK) + ADDR_IDENTITY_MAP;
 		
 		if( !(pdpt[ virt_indexes.pdpt ] & PAGE_FLAG_PRESENT) ) {
 			setup_pdpt = true;
 			setup_pd = true;
 			setup_pt = true;
 		} else {
-			pd = pdpt[ virt_indexes.pdpt ] & PAGE_ADDR_MASK;
+			pd = (pdpt[ virt_indexes.pdpt ] & PAGE_ADDR_MASK ) + ADDR_IDENTITY_MAP;
 
 			if( !(pd[ virt_indexes.pd ] & PAGE_FLAG_PRESENT ) ) {
 				setup_pd = true;
 				setup_pt = true;
 			} else {
-				pt = pd[ virt_indexes.pd ] & PAGE_ADDR_MASK;
+				pt = (pd[ virt_indexes.pd ] & PAGE_ADDR_MASK ) + ADDR_IDENTITY_MAP;
 
-				if( pt == 0) {
+				if( pt == 0 ) {
 					setup_pt = true;
 				}
 			}
 		}
 	}
 
-	if( show_page_map_debug ) {
+	if( KDEBUG_PAGE_MAP_ACTIVE ) {
 		debugf( "Pre-setup pdpt: 0x%016llx\n", pdpt );
 		debugf( "Pre-setup pd:   0x%016llx\n", pd );
 		debugf( "Pre-setup pt:   0x%016llx\n", pt );
@@ -456,25 +522,36 @@ uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, ui
 	if( setup_pdpt ) {
 		pdpt = (uint64_t *)page_allocate_kernel_linear(1);
 
-		#ifdef DEBUG_PAGE_MAP
-		debugf( "allocated pdpt: %llx\n", pdpt );
-		#endif
+		if( KDEBUG_PAGE_MAP_ACTIVE ) {
+			debugf( "pdpt: 0x%016llX\n", pdpt );
+			debugf( "kvab: 0x%016llX\n", kernel_virtual_allocation_base );
+			debugf( "pdpt: 0x%016llX\n", (void *)pdpt - kernel_virtual_allocation_base );
+			debugf( "pdpt: 0x%016llX\n", (void *)pdpt - kernel_virtual_allocation_base + kernel_physical_allocation_base );
+		}
+
+		pml4[virt_indexes.pml4] = paging_make_page( (void *)pdpt - kernel_virtual_allocation_base + kernel_physical_allocation_base, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+
+		if( KDEBUG_PAGE_MAP_ACTIVE ) {
+			debugf( "allocated pdpt: %llx\n", pdpt );
+		}
 	}
 
 	if( setup_pd ) {
 		pd = (uint64_t *)page_allocate_kernel_linear(1);
+		pdpt[virt_indexes.pdpt] = paging_make_page( (void *)pd - kernel_virtual_allocation_base + kernel_physical_allocation_base, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 
-		#ifdef DEBUG_PAGE_MAP
-		debugf( "allocated pd: %llx\n", pd );
-		#endif
+		if( KDEBUG_PAGE_MAP_ACTIVE ) {
+			debugf( "allocated pd: %llx\n", pd );
+		}
 	}
 
 	if( setup_pt ) {
 		pt = (uint64_t *)page_allocate_kernel_linear(1);
+		pd[virt_indexes.pd] = paging_make_page( (void *)pt - kernel_virtual_allocation_base + kernel_physical_allocation_base, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 		
-		#ifdef DEBUG_PAGE_MAP
-		debugf( "allocated pt: %llx\n", pt );
-		#endif
+		if( KDEBUG_PAGE_MAP_ACTIVE ) {
+			debugf( "allocated pt: %llx\n", pt );
+		}
 	}
 
 	pt[virt_indexes.pt] = paging_make_page( physical_address, flags );
@@ -490,6 +567,7 @@ uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, ui
  * @return uint64_t* 
  */
 void *page_allocate_kernel_linear( uint32_t number_of_pages ) {
+	__asm__ volatile("cli");
 	uint64_t return_virt_addr = NULL;
 
 	if( number_of_pages < 1 ) {
@@ -501,12 +579,14 @@ void *page_allocate_kernel_linear( uint32_t number_of_pages ) {
 	// addresses won't be linear.
 
 	if( k_current_pd == k_new_pd ) {
-		k_new_pd = page_allocate_kernel_linear(1);
+		//debugf( "In new PD.\n" );
+		k_new_pd = paging_allocate_single_linear_kernel_page();
 		paging_increment_kernel_page_index();
 	}
 
 	if( k_current_pt == k_new_pt ) {
-		k_new_pt = page_allocate_kernel_linear(1);
+		//debugf( "In new PT.\n" );
+		k_new_pt = paging_allocate_single_linear_kernel_page();
 		paging_increment_kernel_page_index();
 	}
 
@@ -519,6 +599,7 @@ void *page_allocate_kernel_linear( uint32_t number_of_pages ) {
 		paging_increment_kernel_page_index();
 	}
 
+	__asm__ volatile("sti");
 	return return_virt_addr;
 }
 
@@ -532,19 +613,25 @@ void *page_allocate_kernel_linear( uint32_t number_of_pages ) {
  * @return void* 
  */
 void *paging_allocate_single_linear_kernel_page( void ) {
+	//debugf( "virt: 0x%016llX    phys: 0x%016llX\n", kernel_virtual_memory_next, kernel_physical_memory_next );
+
 	// Create the page
 	uint64_t page_entry = paging_make_page( kernel_physical_memory_next, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 
-	// Zero out the page
-	memset( (void *)kernel_virtual_memory_next, 0, PAGE_SIZE );
+	//debugf( "page_entry: 0x%016llX\n", page_entry );
 
 	// Set the entry in the page table
 	k_current_pt[k_current_pt_index] = page_entry;
 	paging_invalidate_page( kernel_virtual_memory_next );
 
+	// Zero out the page
+	memset( (uint8_t *)kernel_virtual_memory_next, 0, PAGE_SIZE );
+
 	// Move the pointers forward one page
 	kernel_virtual_memory_next = kernel_virtual_memory_next + PAGE_SIZE;
 	kernel_physical_memory_next = kernel_physical_memory_next + PAGE_SIZE;
+
+	return kernel_virtual_memory_next - PAGE_SIZE;
 }
 
 /**
@@ -564,7 +651,12 @@ void paging_increment_kernel_page_index( void ) {
 		k_current_pt_index = 0;
 		k_current_pt = k_new_pt;
 
-		k_current_pd[k_current_pd_index] = paging_make_page( k_new_pt - kernel_virtual_base + kernel_physical_base, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
+		debugf( "k_new_pt: 0x%016llX\n", k_new_pt );
+		debugf( "k_new_pt: 0x%016llX\n", (void *)k_new_pt - kernel_virtual_allocation_base );
+		debugf( "k_new_pt: 0x%016llX\n", (void *)k_new_pt - kernel_virtual_allocation_base + kernel_physical_allocation_base );
+
+
+		k_current_pd[k_current_pd_index + 1] = paging_make_page( (void *)k_new_pt - kernel_virtual_allocation_base + kernel_physical_allocation_base, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 		paging_invalidate_page( k_new_pt );
 
 		k_current_pd_index++;
@@ -601,8 +693,8 @@ void paging_invalidate_page( uint64_t page_virtual_address ) {
 /* OLD CODE */
 
 #undef DEBUG_PAGE_ALLOCATE
-uint64_t *page_allocate( uint32_t number ) {
-	uint64_t *return_val = NULL;
+void *page_allocate( uint32_t number ) {
+	void *return_val = kernel_heap_virtual_memory_next;
 
 	#ifdef DEBUG_PAGE_ALLOCATE
 	log_entry_enter();
@@ -613,14 +705,10 @@ uint64_t *page_allocate( uint32_t number ) {
 	}
 
 	for( int i = 0; i < number; i++ ) {
-		if( i == 0 ) {
-			return_val = page_map( kernel_heap_virtual_memory_next, kernel_heap_physical_memory_next );   
-		} else {
-			page_map( kernel_heap_virtual_memory_next, kernel_heap_physical_memory_next );   
-		}
+		paging_page_map_to_pml4( NULL, kernel_heap_physical_memory_next, kernel_heap_virtual_memory_next, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );   
 		
-		kernel_heap_virtual_memory_next = kernel_heap_virtual_memory_next + 0x1000;
-		kernel_heap_physical_memory_next = kernel_heap_physical_memory_next + 0x1000;
+		kernel_heap_virtual_memory_next = kernel_heap_virtual_memory_next + PAGE_SIZE;
+		kernel_heap_physical_memory_next = kernel_heap_physical_memory_next + PAGE_SIZE;
 	}
 
 	#ifdef DEBUG_PAGE_ALLOCATE
@@ -631,11 +719,14 @@ uint64_t *page_allocate( uint32_t number ) {
 	return return_val;
 }
 
-#undef DEBUG_PAGE_ALLOCATE_KERNEL
-uint64_t *page_allocate_kernel( uint32_t number ) {
-	uint64_t *return_val = NULL;
+void *page_allocate_kernel( uint32_t number ) {
+	return page_allocate_kernel_linear( number );
+}
 
-	#ifdef DEBUG_PAGE_ALLOCATE_KERNEL
+void *page_allocate_kernel_mmio( uint32_t number ) {
+	void *return_val = kernel_virtual_memory_next;
+
+	#ifdef DEBUG_PAGE_ALLOCATE
 	log_entry_enter();
 	#endif
 
@@ -643,287 +734,49 @@ uint64_t *page_allocate_kernel( uint32_t number ) {
 		return NULL;
 	}
 
-	int i;
-	for( i = 0; i < number; i++ ) {
-		if( i == 0 ) {
-			return_val = page_map( kernel_virtual_memory_next, kernel_physical_memory_next );
-		} else {
-			page_map( kernel_virtual_memory_next, kernel_physical_memory_next );
-		}
+	for( int i = 0; i < number; i++ ) {
+		paging_page_map_to_pml4( NULL, kernel_virtual_memory_next, kernel_physical_memory_next, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE | PAGE_FLAG_CACHE_DISABLED | PAGE_FLAG_WRITE_THROUGH );   
 		
-		kernel_virtual_memory_next = kernel_virtual_memory_next + 0x1000;
-		kernel_physical_memory_next = kernel_physical_memory_next + 0x1000;
+		kernel_virtual_memory_next = kernel_virtual_memory_next + PAGE_SIZE;
+		kernel_physical_memory_next = kernel_physical_memory_next + PAGE_SIZE;
 	}
 
-	#ifdef DEBUG_PAGE_ALLOCATE_KERNEL
+	#ifdef DEBUG_PAGE_ALLOCATE
 	log_entry_exit();
 	#endif
 
-	//debugf( "Page allocated (kernel): addr=0x%016llX  number=%d  i=%d\n", return_val, number, i );
+	//debugf( "Page allocated: 0x%016llX\n", return_val );
 	return return_val;
 }
 
-uint64_t *page_allocate_kernel_mmio( uint8_t number ) {
-	uint64_t *return_val = NULL;
-	uint64_t *next_memory = NULL;
+void *page_allocate_mmio( uint32_t number ) {
+	void *return_val = kernel_heap_virtual_memory_next;
 
-	return_val = page_allocate_kernel( number );
+	#ifdef DEBUG_PAGE_ALLOCATE
+	log_entry_enter();
+	#endif
 
-	next_memory = return_val;
-
-	if( return_val == NULL ) {
-		df( "return_val is null\n" );
+	if( number < 1 ) {
+		return NULL;
 	}
 
 	for( int i = 0; i < number; i++ ) {
-		paging_page_entry *page = paging_get_page_for_virtual_address( (uint64_t)next_memory );
+		paging_page_map_to_pml4( NULL, kernel_heap_physical_memory_next, kernel_heap_virtual_memory_next, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE | PAGE_FLAG_CACHE_DISABLED | PAGE_FLAG_WRITE_THROUGH );   
 		
-		page->cache_disabled = 1;
-		page->write_through = 1;
-
-		next_memory = (uint64_t *)((uint64_t)next_memory + PAGE_SIZE);
+		kernel_heap_virtual_memory_next = kernel_heap_virtual_memory_next + PAGE_SIZE;
+		kernel_heap_physical_memory_next = kernel_heap_physical_memory_next + PAGE_SIZE;
 	}
 
-	asm_refresh_cr3();
+	#ifdef DEBUG_PAGE_ALLOCATE
+	log_entry_exit();
+	#endif
 
+	debugf( "Page allocated: 0x%016llX\n", return_val );
 	return return_val;
 }
 
-#undef DEBUG_PAGE_MAP
-
-bool show_page_map_debug = false;
-
-#ifdef DEBUG_PAGE_MAP
-show_page_map_debug = true;
-#endif
-
-uint64_t *page_map( uint64_t virtual_address, uint64_t physical_address ) {
-	if( show_page_map_debug ) {
-		debugf( "========== ENTER PAGE MAP ==========\n" );
-		debugf( "page_map( virtual_address = 0x%016llX, physical_address = 0x%016llx )\n", virtual_address, physical_address );
-	}
-
-	if( virtual_address > 0xFFFFFFFFFFFF0000 ) {
-		debugf( "WARNING! Approaching end of virtuual address space: 0x%016llX (phys = 0x%016llX)\n", virtual_address, physical_address );
-	}
-
-	if( virtual_address == 0xFFFFFFFFFFFFF000 ) {
-		debugf( "ERROR! Tried to allocate: 0x%016llX. Ending.", virtual_address );
-		do_immediate_shutdown();
-	}
-
-	if( virtual_address > kernel_virtual_base ) {
-		if( physical_address > kernel_info.kernel_allocate_memory_start + kernel_info.kernel_allocate_memory_size - 0x10000 ) {
-			debugf( "WARNING! Approaching end of kernel physical memory space: 0x%016llX\n", physical_address );
-		}
-
-		if( physical_address >= kernel_info.kernel_allocate_memory_start + kernel_info.kernel_allocate_memory_size ) {
-			debugf( "ERROR! Tried to allocate beyond end of kernel physical memory space: 0x%016llX. Ending.\n", physical_address );
-			do_immediate_shutdown();
-		}
-	}
-
-	// Find indexes
-	uint64_t index_pml4 = (virtual_address >> 39) & 0x1FF;
-	uint64_t index_pdpt = (virtual_address >> 30) & 0x1FF;
-	uint64_t index_pd = (virtual_address >> 21) & 0x1FF;
-	uint64_t index_pt = (virtual_address >> 12) & 0x1FF;
-	bool setup_pml4 = false;
-	bool setup_pdpt = false;
-	bool setup_pd = false;
-	bool setup_pt = false;
-	paging_page_entry *pdpt = NULL;
-	paging_page_entry *pd = NULL;
-	paging_page_entry *pt = NULL;
-
-	/*
-	1. Figure out what we need to setup for each level
-	2. Setup the directories/tables for each level
-	3. Go back and fill in addresses for each level
-	4. Return virtual address, otherwise NULL (failure)
-	*/
-
-	if( limine_pml4[index_pml4].present == 0 ) {
-		setup_pml4 = true;
-		setup_pdpt = true;
-		setup_pd = true;
-		setup_pt = true;
-	} else {
-		pdpt = limine_pml4[index_pml4].address << 12;
-		
-		if( pdpt[index_pdpt].present == 0 ) {
-			setup_pdpt = true;
-			setup_pd = true;
-			setup_pt = true;
-		} else {
-			pd = pdpt[index_pdpt].address << 12;
-
-			if( pd[index_pd].present == 0 ) {
-				setup_pd = true;
-				setup_pt = true;
-			} else {
-				pt = pd[index_pd].address << 12;
-
-				if( pt[index_pt].present == 0 ) {
-					setup_pt = true;
-				} else {
-				   // Already assigned, do something?
-				   debugf( "WARNING! ALREADY ASSIGNED.\n" );
-				}
-			}
-		}
-	}
-
-	if( show_page_map_debug ) {
-		debugf( "Pre-setup pdpt: 0x%016llx\n", pdpt );
-		debugf( "Pre-setup pd:   0x%016llx\n", pd );
-		debugf( "Pre-setup pt:   0x%016llx\n", pt );
-		debugf( "setup_pml4: %d @ index 0x%X\n", setup_pml4, index_pml4 );
-		debugf( "setup_pdpt: %d @ index 0x%X\n", setup_pdpt, index_pdpt );
-		debugf( "setup_pd: %d @ index 0x%X\n", setup_pd, index_pd );
-		debugf( "setup_pt: %d @ index 0x%X\n", setup_pt, index_pt );
-	}
-
-	// If we're allocating a kernel address, use the allocated PTs, otherwise assign
-	if( virtual_address > kernel_virtual_base ) {
-		if( setup_pdpt ) {
-			//pdpt = (paging_page_entry *)&limine_pdpt[index_pdpt];
-			pdpt = (paging_page_entry *)&limine_pdpt[0];
-
-			#ifdef DEBUG_PAGE_MAP
-			debugf( "pdpt to setup: %llx\n", pdpt );
-			#endif
-		}
-
-		if( setup_pd ) {
-			pd = (paging_page_entry *)&kernel_pds[index_pdpt - 510][0];
-
-			#ifdef DEBUG_PAGE_MAP
-			debugf( "pd to setup: %llx\n", pd );
-			#endif
-		}
-
-		if( setup_pt ) {
-			pt = (paging_page_entry *)&kernel_pts[index_pdpt - 510][index_pd][0];
-
-			#ifdef DEBUG_PAGE_MAP
-			debugf( "pt to setup: %llx\n", pt );
-			#endif
-		}
-	} else {
-		if( setup_pdpt ) {
-			pdpt = (paging_page_entry *)page_allocate_kernel(1);
-			memset( pdpt, 0, 4096 );
-
-			#ifdef DEBUG_PAGE_MAP
-			debugf( "allocated pdpt: %llx\n", pdpt );
-			#endif
-		}
-
-		if( setup_pd ) {
-			pd = (paging_page_entry *)page_allocate_kernel(1);
-			memset( pd, 0, 4096 );
-
-			#ifdef DEBUG_PAGE_MAP
-			debugf( "allocated pd: %llx\n", pd );
-			#endif
-		}
-
-		if( setup_pt ) {
-			pt = (paging_page_entry *)page_allocate_kernel(1);
-			memset( pt, 0, 4096 );
-			
-			#ifdef DEBUG_PAGE_MAP
-			debugf( "allocated pt: %llx\n", pt );
-			#endif
-		}
-	}
-
-	pt[index_pt].address = physical_address >> 12;
-	pt[index_pt].rw = 1;
-	pt[index_pt].present = 1;
-	pt[index_pt].cache_disabled = 1;
-	pt[index_pt].write_through = 1;
-
-	uint64_t physical_base_modifier = 0;
-	uint64_t virtual_base_modifier = 0;
-	if( virtual_address > kernel_virtual_base ) {
-		physical_base_modifier = kernel_physical_base;
-		virtual_base_modifier = kernel_virtual_base;
-	} else {
-		physical_base_modifier = kernel_info.kernel_allocate_memory_start;
-		virtual_base_modifier = kernel_info.kernel_end;
-	}
-
-	uint64_t pt_physical_addr = (uint64_t)pt - virtual_base_modifier + physical_base_modifier;
-
-	
-
-	if( setup_pd ) {
-		pd[index_pd].address = pt_physical_addr >> 12;
-		pd[index_pd].rw = 1;
-		pd[index_pd].present = 1;
-
-		//debugf( "setup_pd triggered\n" );
-	} else if( setup_pt ) {
-		pd[index_pd].address = pt_physical_addr >> 12;
-		pd[index_pd].page_size = 0;
-	}
-
-	uint64_t pd_physical_addr = (uint64_t)pd - virtual_base_modifier + physical_base_modifier;
-
-	if( setup_pdpt ) {
-		pdpt[index_pdpt].address = pd_physical_addr >> 12;
-		pdpt[index_pdpt].rw = 1;
-		pdpt[index_pdpt].present = 1;
-		debugf( "setup_pdpt triggered\n" );
-	} else if( setup_pd ) {
-		pdpt[index_pdpt].address = pd_physical_addr >> 12;
-	}
-
-	uint64_t pdpt_physical_addr = (uint64_t)pdpt - virtual_base_modifier + physical_base_modifier;
-
-	if( setup_pml4 ) { 
-		// Why?
-
-		limine_pml4[index_pml4].address = pdpt_physical_addr >> 12;
-		limine_pml4[index_pml4].rw = 1;
-		limine_pml4[index_pml4].present = 1;
-	} else if( setup_pdpt ) {
-		
-		/* limine_pml4[index_pml4].address = pdpt_physical_addr >> 12;
-		limine_pml4[index_pml4].rw = 1;
-		limine_pml4[index_pml4].present = 1;
- */
-		debugf( "setup pml4 for new pdpt triggered.\n" );
-	}
-
-	asm_refresh_cr3();
-
-	if( show_page_map_debug ) {
-		debugf( "dumping pt:\n" );
-		paging_dump_page( &pt[index_pt] );
-
-		debugf( "dumping pd:\n" );
-		paging_dump_page( &pd[index_pd] );
-
-		debugf( "dumping pdpt:\n" );
-		paging_dump_page( &pdpt[index_pdpt] );
-
-		debugf( "dumping pml4:\n" );
-		paging_dump_page( &limine_pml4[index_pml4] );
-
-		debugf( "pt_physical_addr:       %llx\n", pt_physical_addr );
-		debugf( "pt_physical_addr check: %llx\n", paging_virtual_to_physical(pt) );
-
-		debugf( "pd_physical_addr: %llx\n", pd_physical_addr );
-		debugf( "pdpt_physical_addr: %llx\n", pdpt_physical_addr );
-		debugf( "virtual_addr: %llx\n", virtual_address );
-
-		debugf( "========== EXIT PAGE MAP ==========\n" );
-	}
-	
-	return (uint64_t *)virtual_address;
+void *page_map( uint64_t virtual_address, uint64_t physical_address ) {
+	return paging_page_map_to_pml4( NULL, physical_address, virtual_address, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 }
 
 void paging_dump_page_direct( uint64_t page ) {
@@ -970,7 +823,7 @@ void paging_dump_page( paging_page_entry *page ) {
 }
 
 void paging_examine_page_for_address( uint64_t virtual_address ) {
-	uint64_t index_pml4 = (virtual_address >> 39) & 0x1FF;
+	/* uint64_t index_pml4 = (virtual_address >> 39) & 0x1FF;
 	uint64_t index_pdpt = (virtual_address >> 30) & 0x1FF;
 	uint64_t index_pd = (virtual_address >> 21) & 0x1FF;
 	uint64_t index_pt = (virtual_address >> 12) & 0x1FF;
@@ -1008,7 +861,7 @@ void paging_examine_page_for_address( uint64_t virtual_address ) {
 				}
 			}
 		}
-	}
+	} */
 }
 
 uint64_t paging_virtual_to_physical( uint64_t virtual_address ) {
@@ -1016,36 +869,37 @@ uint64_t paging_virtual_to_physical( uint64_t virtual_address ) {
 	uint64_t index_pdpt = (virtual_address >> 30) & 0x1FF;
 	uint64_t index_pd = (virtual_address >> 21) & 0x1FF;
 	uint64_t index_pt = (virtual_address >> 12) & 0x1FF;
-	paging_page_entry *pdpt = NULL;
-	paging_page_entry *pd = NULL;
-	paging_page_entry *pt = NULL;
+	uint64_t *pml4 = get_cr3() + ADDR_IDENTITY_MAP;
+	uint64_t *pdpt = NULL;
+	uint64_t *pd = NULL;
+	uint64_t *pt = NULL;
 	uint64_t physical_address = 0;
 
 	//debugf( "Examining page for address 0x%016llx:\n", virtual_address );
-	if( limine_pml4[index_pml4].present == 0 ) {
+	if( !(pml4[index_pml4] & PAGE_FLAG_PRESENT) ) {
 		debugf( "PML4 index no present.\n" );
 	} else {
 
 		//paging_dump_page( &limine_pml4[index_pml4] );
-		pdpt = limine_pml4[index_pml4].address << 12;
+		pdpt = (pml4[index_pml4] & PAGE_ADDR_MASK) + ADDR_IDENTITY_MAP;
 		
-		if( pdpt[index_pdpt].present == 0 ) {
+		if( !(pdpt[index_pdpt] & PAGE_FLAG_PRESENT) ) {
 			debugf( "PDPT index not present.\n" );
 		} else {
 			//paging_dump_page( &pdpt[index_pdpt] );
-			pd = pdpt[index_pdpt].address << 12;
+			pd = (pdpt[index_pdpt] & PAGE_ADDR_MASK) + ADDR_IDENTITY_MAP;
 
-			if( pd[index_pd].present == 0 ) {
+			if( !(pd[index_pd] & PAGE_FLAG_PRESENT) ) {
 				debugf( "PD index not present.\n" );
 			} else {
 				//paging_dump_page( &pd[index_pd] );
-				pt = pd[index_pd].address << 12;
+				pt = (pd[index_pd] & PAGE_ADDR_MASK) + ADDR_IDENTITY_MAP;
 
-				if( pt[index_pt].present == 0 ) {
+				if( !(pt[index_pt] & PAGE_FLAG_PRESENT) ) {
 					debugf( "PT index not present.\n" );
 				} else {
 					//paging_dump_page( &pt[index_pt] );
-					physical_address = pt[index_pt].address << 12;
+					physical_address = pt[index_pt] & PAGE_ADDR_MASK;
 				}
 			}
 		}
@@ -1055,7 +909,7 @@ uint64_t paging_virtual_to_physical( uint64_t virtual_address ) {
 }
 
 paging_page_entry *paging_get_page_for_virtual_address( uint64_t virtual_address ) {
-	uint64_t index_pml4 = (virtual_address >> 39) & 0x1FF;
+	/* uint64_t index_pml4 = (virtual_address >> 39) & 0x1FF;
 	uint64_t index_pdpt = (virtual_address >> 30) & 0x1FF;
 	uint64_t index_pd = (virtual_address >> 21) & 0x1FF;
 	uint64_t index_pt = (virtual_address >> 12) & 0x1FF;
@@ -1097,6 +951,6 @@ paging_page_entry *paging_get_page_for_virtual_address( uint64_t virtual_address
 		}
 	}
 
-	return ret_val;
+	return ret_val; */
 }
 

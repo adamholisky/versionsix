@@ -148,7 +148,7 @@ void main_console_set_cursor_visiblity( bool visible ) {
 }
 
 void main_console_blink_cursor( void ) {
-	vui_console_blink_cursor( main_console );
+	//vui_console_blink_cursor( main_console );
 }
 
 void task_chain_a( void ) {

@@ -80,7 +80,7 @@ uint16_t task_create( uint8_t task_type, uint8_t generator, char *name, uint64_t
 			// Nothing?
 	}
 
-	debugf( "Task created: ID: %d, Name: \"%s\"\n", new_task->id, new_task->display_name );
+	debugf( "Task created: ID: %d, Name: \"%s\", Entry: 0x%016llX\n", new_task->id, new_task->display_name, new_task->entry );
 
 	return task_id;
 }
@@ -180,9 +180,9 @@ void task_sched_yield( registers **context ) {
 		paging_page_entry *page = paging_get_page_for_virtual_address( 0x0 );
 		page = paging_get_page_for_virtual_address( 0x200200 );
 
-		paging_examine_page_for_address( 0x200000 );
+		paging_examine_page_for_address( 0x2003e0 );
 
-		kdebug_peek_at_n( new_task->p->data_pages[0].virt, 4 );
+		kdebug_peek_at_n( new_task->p->data_pages[0].virt, 100 );
 	}
 
 	new_task->status = TASK_STATUS_ACTIVE;

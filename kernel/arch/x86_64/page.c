@@ -144,7 +144,7 @@ void paging_setup_initial_structures( void ) {
 		debugf( " indexes: pml4: %llx    pdpt: %x    pd: %x    pt: %x\n", index.pml4, index.pdpt, index.pd, index.pt );
 		#endif
 
-		debugf( " indexes: pml4: %llx    pdpt: %x    pd: %x    pt: %x\n", index.pml4, index.pdpt, index.pd, index.pt );
+		//debugf( " indexes: pml4: %llx    pdpt: %x    pd: %x    pt: %x\n", index.pml4, index.pdpt, index.pd, index.pt );
 
 		uint64_t k_pt_physical = 0;
 
@@ -583,23 +583,22 @@ void *page_allocate_kernel_linear( uint32_t number_of_pages ) {
 		k_new_pd = paging_allocate_single_linear_kernel_page();
 		paging_increment_kernel_page_index();
 	}
-	db1();
+
 	if( k_current_pt == k_new_pt ) {
 		//debugf( "In new PT.\n" );
 		k_new_pt = paging_allocate_single_linear_kernel_page();
 		paging_increment_kernel_page_index();
 	}
-	db2();
+
 	// This needs to happen here because the above commands might alter k_vm_next
 	return_virt_addr = kernel_virtual_memory_next;
-	db3();
+
 	// Finally increment through the needed pages
 	for( int i = 0; i < number_of_pages; i++ ) {
-		dbA();
 		paging_allocate_single_linear_kernel_page();
 		paging_increment_kernel_page_index();
 	}
-	db4();
+
 	__asm__ volatile("sti");
 	return return_virt_addr;
 }
@@ -614,19 +613,16 @@ void *page_allocate_kernel_linear( uint32_t number_of_pages ) {
  * @return void* 
  */
 void *paging_allocate_single_linear_kernel_page( void ) {
-	debugf( "virt: 0x%016llX    phys: 0x%016llX\n", kernel_virtual_memory_next, kernel_physical_memory_next );
+	//debugf( "virt: 0x%016llX    phys: 0x%016llX\n", kernel_virtual_memory_next, kernel_physical_memory_next );
 
 	page_indexes idx;
 	paging_get_indexes( kernel_virtual_memory_next, &idx );
-	debugf( "idx.pt: %d    idx.pd: %d\n", idx.pt, idx.pd );
 
 	// Create the page
 	uint64_t page_entry = paging_make_page( kernel_physical_memory_next, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 
-	debugf( "page_entry: 0x%016llX\n", page_entry );
 
 	// Set the entry in the page table
-	debugf( "k_current_pt_index: %d\n", k_current_pt_index );
 	k_current_pt[k_current_pt_index] = page_entry;
 	paging_invalidate_page( kernel_virtual_memory_next );
 
@@ -706,7 +702,6 @@ void paging_invalidate_page( uint64_t page_virtual_address ) {
 void *page_allocate( uint32_t number ) {
 	void *return_val = kernel_heap_virtual_memory_next;
 
-
 	#ifdef DEBUG_PAGE_ALLOCATE
 	log_entry_enter();
 	debugf( "number: %d\n", number);
@@ -716,8 +711,6 @@ void *page_allocate( uint32_t number ) {
 		return NULL;
 	}
 
-	debugf( "kh_vmem_nx: 0x%016llX\n", kernel_heap_virtual_memory_next );
-
 	for( int i = 0; i < number; i++ ) {
 		paging_page_map_to_pml4( NULL, kernel_heap_physical_memory_next, kernel_heap_virtual_memory_next, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );   
 		
@@ -726,10 +719,10 @@ void *page_allocate( uint32_t number ) {
 	}
 
 	#ifdef DEBUG_PAGE_ALLOCATE
+	debugf( "Page allocated: 0x%016llX\n", return_val );
 	log_entry_exit();
 	#endif
 
-	debugf( "Page allocated: 0x%016llX\n", return_val );
 	return return_val;
 }
 

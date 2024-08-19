@@ -277,20 +277,23 @@ int program_load_elf_library( program *p, void *data, size_t size ) {
 
 		//if( elf_get_sym_shndx_from_index((uint32_t*)dl.base, elf_header, ELF32_R_SYM(elf_rel->r_info)) == 0 ) {
 
-			symbol *sym = symbols_get_symbol_addr( 
-												get_ksyms_object(),
-												elf_get_symbol_name_from_symbol_index( p->elf, ELF64_R_SYM( elf_rel->r_info ) )
-												);
+			symbol *sym = symbol_get_symbol( 
+											get_ksyms_object(),
+											elf_get_symbol_name_from_symbol_index( p->elf, ELF64_R_SYM( elf_rel->r_info ) )
+											);
 			
 			if( sym == NULL ) {
 				debugf( "Symbol not found.\n" );
 				return;
 			}
+			
+			debugf( "ksym: name: \"%s\"    addr: 0x%016llX\n",sym->name ,sym->addr );
 
 			debugf( "Found symbol: %s at %llX\n", elf_get_symbol_name_from_symbol_index( p->elf, ELF64_R_SYM( elf_rel->r_info ) ), sym->addr );
 
 			uint8_t *data_pages_start = (uint8_t *)p->data_pages[0].kern_virt;
-			uint64_t *got_entry = (uint64_t*)(data_pages_start + (elf_rel->r_offset - p->data_pages_virt_start) );
+			debugf( "0x%016llx\n", data_pages_start + elf_rel->r_offset - p->data_pages[0].virt );
+			uint64_t *got_entry = (uint64_t*)(data_pages_start + elf_rel->r_offset - p->data_pages[0].virt );
 			
 			debugf( "got entry: %llx\n", got_entry );
 

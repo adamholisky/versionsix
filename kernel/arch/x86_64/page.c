@@ -446,7 +446,7 @@ void paging_initalize( void ) {
 	#endif
 }
 
-#define KDEBUG_PAGE_MAP_PML4
+#undef KDEBUG_PAGE_MAP_PML4
 bool KDEBUG_PAGE_MAP_ACTIVE = false;
 
 uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, uint64_t virtual_address, uint64_t flags ) {
@@ -482,7 +482,7 @@ uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, ui
 	}
 
 	if( !(pml4[ virt_indexes.pml4 ] & PAGE_FLAG_PRESENT) ) {
-		setup_pml4 = true;
+		// Do we have the pml4 entry setup for the pdpt? No, then set it up.
 		setup_pdpt = true;
 		setup_pd = true;
 		setup_pt = true;
@@ -490,14 +490,14 @@ uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, ui
 		pdpt = (pml4[ virt_indexes.pml4 ] & PAGE_ADDR_MASK) + ADDR_IDENTITY_MAP;
 		
 		if( !(pdpt[ virt_indexes.pdpt ] & PAGE_FLAG_PRESENT) ) {
-			setup_pdpt = true;
+			// Do we have the pdpt entry setup for the pd? No, then set it up
 			setup_pd = true;
 			setup_pt = true;
 		} else {
 			pd = (pdpt[ virt_indexes.pdpt ] & PAGE_ADDR_MASK ) + ADDR_IDENTITY_MAP;
 
 			if( !(pd[ virt_indexes.pd ] & PAGE_FLAG_PRESENT ) ) {
-				setup_pd = true;
+				// Do we have the pd entry set up for the pt? No, then set it up
 				setup_pt = true;
 			} else {
 				pt = (pd[ virt_indexes.pd ] & PAGE_ADDR_MASK ) + ADDR_IDENTITY_MAP;
@@ -702,7 +702,7 @@ void paging_invalidate_page( uint64_t page_virtual_address ) {
 
 /* OLD CODE */
 
-#define DEBUG_PAGE_ALLOCATE
+#undef DEBUG_PAGE_ALLOCATE
 void *page_allocate( uint32_t number ) {
 	void *return_val = kernel_heap_virtual_memory_next;
 

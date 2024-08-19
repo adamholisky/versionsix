@@ -583,22 +583,23 @@ void *page_allocate_kernel_linear( uint32_t number_of_pages ) {
 		k_new_pd = paging_allocate_single_linear_kernel_page();
 		paging_increment_kernel_page_index();
 	}
-
+	db1();
 	if( k_current_pt == k_new_pt ) {
 		//debugf( "In new PT.\n" );
 		k_new_pt = paging_allocate_single_linear_kernel_page();
 		paging_increment_kernel_page_index();
 	}
-
+	db2();
 	// This needs to happen here because the above commands might alter k_vm_next
 	return_virt_addr = kernel_virtual_memory_next;
-
+	db3();
 	// Finally increment through the needed pages
 	for( int i = 0; i < number_of_pages; i++ ) {
+		dbA();
 		paging_allocate_single_linear_kernel_page();
 		paging_increment_kernel_page_index();
 	}
-
+	db4();
 	__asm__ volatile("sti");
 	return return_virt_addr;
 }
@@ -613,14 +614,19 @@ void *page_allocate_kernel_linear( uint32_t number_of_pages ) {
  * @return void* 
  */
 void *paging_allocate_single_linear_kernel_page( void ) {
-	//debugf( "virt: 0x%016llX    phys: 0x%016llX\n", kernel_virtual_memory_next, kernel_physical_memory_next );
+	debugf( "virt: 0x%016llX    phys: 0x%016llX\n", kernel_virtual_memory_next, kernel_physical_memory_next );
+
+	page_indexes idx;
+	paging_get_indexes( kernel_virtual_memory_next, &idx );
+	debugf( "idx.pt: %d    idx.pd: %d\n", idx.pt, idx.pd );
 
 	// Create the page
 	uint64_t page_entry = paging_make_page( kernel_physical_memory_next, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );
 
-	//debugf( "page_entry: 0x%016llX\n", page_entry );
+	debugf( "page_entry: 0x%016llX\n", page_entry );
 
 	// Set the entry in the page table
+	debugf( "k_current_pt_index: %d\n", k_current_pt_index );
 	k_current_pt[k_current_pt_index] = page_entry;
 	paging_invalidate_page( kernel_virtual_memory_next );
 
@@ -679,6 +685,10 @@ void paging_increment_kernel_page_index( void ) {
 	}
 }
 
+void paging_use_next_kernel_page_index( void ) {
+	
+}
+
 /**
  * @brief Invalidates the page.
  * 
@@ -720,11 +730,12 @@ void *page_allocate( uint32_t number ) {
 }
 
 void *page_allocate_kernel( uint32_t number ) {
+	debugf( "number: %d\n", number );
 	return page_allocate_kernel_linear( number );
 }
 
 void *page_allocate_kernel_mmio( uint32_t number ) {
-	void *return_val = kernel_virtual_memory_next;
+	void *return_val =  NULL;
 
 	#ifdef DEBUG_PAGE_ALLOCATE
 	log_entry_enter();
@@ -734,10 +745,22 @@ void *page_allocate_kernel_mmio( uint32_t number ) {
 		return NULL;
 	}
 
+	// This makes sure we have consecutive linear pages for mmio use,
+	// drivers generally like and need this.
+	if( k_current_pt_index + number > 511 ) {
+		do {
+			paging_increment_kernel_page_index();
+			debugf( "k_current_pt_index incremented.\n" );
+		} while( k_current_pt_index != 0 );
+	}
+
+	return_val = kernel_virtual_memory_next;
+
 	for( int i = 0; i < number; i++ ) {
-		paging_page_map_to_pml4( NULL, kernel_virtual_memory_next, kernel_physical_memory_next, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE | PAGE_FLAG_CACHE_DISABLED | PAGE_FLAG_WRITE_THROUGH );   
+		paging_page_map_to_pml4( NULL, kernel_physical_memory_next, kernel_virtual_memory_next,  PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE | PAGE_FLAG_CACHE_DISABLED | PAGE_FLAG_WRITE_THROUGH );   
 		
 		kernel_virtual_memory_next = kernel_virtual_memory_next + PAGE_SIZE;
+		paging_increment_kernel_page_index();
 		kernel_physical_memory_next = kernel_physical_memory_next + PAGE_SIZE;
 	}
 

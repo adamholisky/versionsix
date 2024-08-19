@@ -98,6 +98,7 @@ void paging_increment_kernel_page_index( void );
 void *paging_allocate_single_linear_kernel_page( void );
 void *page_allocate_kernel_linear( uint32_t number_of_pages );
 uint64_t paging_page_map_to_pml4( uint64_t *pml_4, uint64_t physical_address, uint64_t virtual_address, uint64_t flags );
+void paging_use_next_kernel_page_index( void );
 
 #ifdef __cplusplus
 }

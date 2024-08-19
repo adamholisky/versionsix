@@ -49,7 +49,7 @@ void ahci_initalize( void ) {
 	// TODO: Remove hard coding for "1" here
 	ahci_port_rebase( &abar->ports[1], 1, global_port_page, global_port_page_phys );
 
-	global_buffer = page_allocate_kernel_mmio(1);
+	global_buffer = page_allocate_kernel_mmio(2);
 	global_buffer_phys = paging_virtual_to_physical( global_buffer );
 
 	#ifdef KDEBUG_AHCI_INIT

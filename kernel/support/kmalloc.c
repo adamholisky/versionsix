@@ -752,7 +752,7 @@ int liballoc_unlock( void ) {
 
 void * liballoc_alloc( size_t n ) {
 	//debugf( "size: %d\n", n );
-	return (void *)page_allocate_kernel( n );
+	return (void *)page_allocate( n );
 }
 
 /** This frees previously allocated memory. The void* parameter passed

@@ -30,7 +30,8 @@
             "limine_bootstrap.h": "c",
             "compare": "c",
             "cstdint": "c",
-            "format": "c"
+            "format": "c",
+            "kernel_common.h": "c"
         },
     }
 }

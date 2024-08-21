@@ -1,8 +1,8 @@
 #include "kernel_common.h"
 #include <limine.h>
 #include "page.h"
+#include <page_group.h>
 #include <string.h>
-
 
 uint64_t kernel_physical_base;
 uint64_t kernel_physical_allocation_base;
@@ -218,113 +218,6 @@ void paging_setup_initial_structures( void ) {
 	#endif
 }
 
-void paging_diagnostic_cr3( uint64_t cr3_physical ) {
-	//debugf( "cr3_physical: 0x%016llX\n", cr3_physical );
-
-	uint64_t *pml4 = cr3_physical + kernel_info.hhdm_offset;
-	//debugf( "pml4 == 0x%llX\n", pml4 );
-
-	for( uint16_t i = 0; i < 512; i++ ) {
-		if( GET_PDE_PRESENT(pml4[i]) ) {
-			paging_diagnostic_output_entry( pml4[i], 0x0, i, "", "PML4" );
-
-			//debugf( "pml4[0x%02X]: 0x%016llx\n", i, pml4[i] );
-
-			uint64_t pdpt_addr = (pml4[i] & 0x000FFFFFFFFFF000);
-			uint64_t *pdpt = pdpt_addr + kernel_info.hhdm_offset;
-
-			//debugf( "pdpt_addr: 0x%016llX\n", pdpt_addr );
-			//debugf( "pdpt:      0x%016llX\n", pdpt );
-			
-			for( uint16_t j = 0; j < 512; j++ ) {
-				//debugf( "PDPT: 0x%llX\n", *pdpt );
-				
-				if( GET_PDE_PRESENT(pdpt[j]) ) {
-					//db1();
-					paging_diagnostic_output_entry( pdpt[j], 0x0, j, "  ", "PDPT" );
-
-					if( GET_PDE_PAGE_SIZE(pdpt[j]) == 0 ) {
-						uint64_t pd_addr = (pdpt[j] & 0x000FFFFFFFFFF000);
-						uint64_t *pd = (uint64_t *)(pd_addr + kernel_info.hhdm_offset);
-
-						for( uint16_t k = 0; k < 512; k++ ) {
-							if( GET_PDE_PRESENT(pd[k]) ) {
-								paging_diagnostic_output_entry( pd[k], 0x0, k, "    ", "PD" );
-								
-								if( GET_PDE_PAGE_SIZE(pd[k]) == 0 ) {
-									uint64_t pt_addr = (pd[k] & 0x000FFFFFFFFFF000);
-									uint64_t *pt = (uint64_t *)(pt_addr + kernel_info.hhdm_offset);
-
-									uint16_t pts_present = 0;
-									for( uint16_t z = 0; z < 512; z++ ) {
-										
-										if( GET_PDE_PRESENT(pt[z]) ) {
-											paging_diagnostic_output_entry( pt[z], 0x0, z, "      ", "PT" );
-											pts_present++;
-										}
-									}
-									debugf_raw( "      PT[x]: %d page tables present.\n", pts_present );
-								}
-							}
-						}
-					}
-					
-				}
-			}
-		}
-	}
-}
-
-void paging_diagnostic_output_entry( uint64_t pg_dir_entry, uint64_t starting_virtual, uint16_t i, char *spaces, char *type ) {
-	//debugf( "p_diag_out_entry  pg_dir_entry: 0x%llX   start_virt: 0x%llX  i: 0x%llX\n", pg_dir_entry, starting_virtual, i );
-	
-	char p = ( GET_PDE_PRESENT(pg_dir_entry) == 1 ? 'P' : ' ' );
-	char rw = ( GET_PDE_READ_WRITE(pg_dir_entry) ? 'W' : 'R' );
-	char cd = ( GET_PDE_CACHE_DISABLED(pg_dir_entry) ? 'C' : ' ' );
-	char ps = ( GET_PDE_PAGE_SIZE(pg_dir_entry) ? 'S' : ' ' );
-
-	if( p == 'P' ) {
-		debugf_raw( "%s%s[0x%03X]: %c %c %c %c 0x%016llX\n", spaces, type, i, p, rw, cd, ps, pg_dir_entry );
-	}
-}
-
-uint64_t paging_make_page( uint64_t physical_address, uint32_t flags ) {
-	uint64_t page = 0;
-
-	//page = SET_PDE_ADDRESS( page, physical_address );
-
-	page = physical_address & 0x000FFFFFFFFFF000;
-
-	if( flags & PAGE_FLAG_PRESENT ) { page = SET_PDE_PRESENT(page); }
-	if( flags & PAGE_FLAG_READ_WRITE ) { page = SET_PDE_READ_WRITE(page); }
-	if( flags & PAGE_FLAG_USER_SUPERVISOR ) { page = SET_PDE_USER_SUPERVISOR(page); }
-	if( flags & PAGE_FLAG_WRITE_THROUGH ) { page = SET_PDE_WRITE_THROUGH(page); }
-	if( flags & PAGE_FLAG_CACHE_DISABLED ) { page = SET_PDE_CACHE_DISABLED(page); }
-	if( flags & PAGE_FLAG_ACCESSED ) { page = SET_PDE_ACCESSED(page); }
-	if( flags & PAGE_FLAG_PAGE_SIZE ) { page = SET_PDE_PAGE_SIZE(page); }
-	if( flags & PAGE_FLAG_EXECUTE_DIABLED ) { page = SET_PDE_EXECUTE_DISABLED(page); }
-
-	//debugf( "Page made: 0x%016llX\n", page );
-
-	return page;
-}
-
-void paging_get_indexes( uint64_t virtual_address, page_indexes *indexes ) {
-	indexes->pml4 = (virtual_address >> 39) & 0x1FF;
-	indexes->pdpt = (virtual_address >> 30) & 0x1FF;
-	indexes->pd = (virtual_address >> 21) & 0x1FF;
-	indexes->pt = (virtual_address >> 12) & 0x1FF;
-}
-
-uint64_t paging_get_addr_from_index( uint16_t index_pml4, uint16_t index_pdpt, uint16_t index_pd, uint16_t index_pt ) {
-	uint64_t addr = 0;
-
-	addr = addr | ((uint64_t)index_pml4 << 39 );
-	addr = addr | ((uint64_t)index_pdpt << 30 );
-	addr = addr | ((uint64_t)index_pd << 21 );
-	addr = addr | ((uint64_t)index_pt << 12 );
-}
-
 #undef DEBUG_PAGING_INITALIZE
 void paging_initalize( void ) {
 	uint64_t cr3 = get_cr3();
@@ -445,6 +338,126 @@ void paging_initalize( void ) {
 	debugf( "*(page_test_2 + 1): %d\n", *(page_test_2 + 1) );
 	#endif
 }
+
+page_group main_page_group;
+
+void paging_initalize_page_groups( void ) {
+	main_page_group.physical_base = kernel_info.usable_memory_start;
+	main_page_group.page_size = PAGE_SIZE;
+
+	page_group_setup_bitmap( &main_page_group, kernel_info.usable_memory_size );
+
+
+}
+
+void paging_diagnostic_cr3( uint64_t cr3_physical ) {
+	//debugf( "cr3_physical: 0x%016llX\n", cr3_physical );
+
+	uint64_t *pml4 = cr3_physical + kernel_info.hhdm_offset;
+	//debugf( "pml4 == 0x%llX\n", pml4 );
+
+	for( uint16_t i = 0; i < 512; i++ ) {
+		if( GET_PDE_PRESENT(pml4[i]) ) {
+			paging_diagnostic_output_entry( pml4[i], 0x0, i, "", "PML4" );
+
+			//debugf( "pml4[0x%02X]: 0x%016llx\n", i, pml4[i] );
+
+			uint64_t pdpt_addr = (pml4[i] & 0x000FFFFFFFFFF000);
+			uint64_t *pdpt = pdpt_addr + kernel_info.hhdm_offset;
+
+			//debugf( "pdpt_addr: 0x%016llX\n", pdpt_addr );
+			//debugf( "pdpt:      0x%016llX\n", pdpt );
+			
+			for( uint16_t j = 0; j < 512; j++ ) {
+				//debugf( "PDPT: 0x%llX\n", *pdpt );
+				
+				if( GET_PDE_PRESENT(pdpt[j]) ) {
+					//db1();
+					paging_diagnostic_output_entry( pdpt[j], 0x0, j, "  ", "PDPT" );
+
+					if( GET_PDE_PAGE_SIZE(pdpt[j]) == 0 ) {
+						uint64_t pd_addr = (pdpt[j] & 0x000FFFFFFFFFF000);
+						uint64_t *pd = (uint64_t *)(pd_addr + kernel_info.hhdm_offset);
+
+						for( uint16_t k = 0; k < 512; k++ ) {
+							if( GET_PDE_PRESENT(pd[k]) ) {
+								paging_diagnostic_output_entry( pd[k], 0x0, k, "    ", "PD" );
+								
+								if( GET_PDE_PAGE_SIZE(pd[k]) == 0 ) {
+									uint64_t pt_addr = (pd[k] & 0x000FFFFFFFFFF000);
+									uint64_t *pt = (uint64_t *)(pt_addr + kernel_info.hhdm_offset);
+
+									uint16_t pts_present = 0;
+									for( uint16_t z = 0; z < 512; z++ ) {
+										
+										if( GET_PDE_PRESENT(pt[z]) ) {
+											paging_diagnostic_output_entry( pt[z], 0x0, z, "      ", "PT" );
+											pts_present++;
+										}
+									}
+									debugf_raw( "      PT[x]: %d page tables present.\n", pts_present );
+								}
+							}
+						}
+					}
+					
+				}
+			}
+		}
+	}
+}
+
+void paging_diagnostic_output_entry( uint64_t pg_dir_entry, uint64_t starting_virtual, uint16_t i, char *spaces, char *type ) {
+	//debugf( "p_diag_out_entry  pg_dir_entry: 0x%llX   start_virt: 0x%llX  i: 0x%llX\n", pg_dir_entry, starting_virtual, i );
+	
+	char p = ( GET_PDE_PRESENT(pg_dir_entry) == 1 ? 'P' : ' ' );
+	char rw = ( GET_PDE_READ_WRITE(pg_dir_entry) ? 'W' : 'R' );
+	char cd = ( GET_PDE_CACHE_DISABLED(pg_dir_entry) ? 'C' : ' ' );
+	char ps = ( GET_PDE_PAGE_SIZE(pg_dir_entry) ? 'S' : ' ' );
+
+	if( p == 'P' ) {
+		debugf_raw( "%s%s[0x%03X]: %c %c %c %c 0x%016llX\n", spaces, type, i, p, rw, cd, ps, pg_dir_entry );
+	}
+}
+
+uint64_t paging_make_page( uint64_t physical_address, uint32_t flags ) {
+	uint64_t page = 0;
+
+	//page = SET_PDE_ADDRESS( page, physical_address );
+
+	page = physical_address & 0x000FFFFFFFFFF000;
+
+	if( flags & PAGE_FLAG_PRESENT ) { page = SET_PDE_PRESENT(page); }
+	if( flags & PAGE_FLAG_READ_WRITE ) { page = SET_PDE_READ_WRITE(page); }
+	if( flags & PAGE_FLAG_USER_SUPERVISOR ) { page = SET_PDE_USER_SUPERVISOR(page); }
+	if( flags & PAGE_FLAG_WRITE_THROUGH ) { page = SET_PDE_WRITE_THROUGH(page); }
+	if( flags & PAGE_FLAG_CACHE_DISABLED ) { page = SET_PDE_CACHE_DISABLED(page); }
+	if( flags & PAGE_FLAG_ACCESSED ) { page = SET_PDE_ACCESSED(page); }
+	if( flags & PAGE_FLAG_PAGE_SIZE ) { page = SET_PDE_PAGE_SIZE(page); }
+	if( flags & PAGE_FLAG_EXECUTE_DIABLED ) { page = SET_PDE_EXECUTE_DISABLED(page); }
+
+	//debugf( "Page made: 0x%016llX\n", page );
+
+	return page;
+}
+
+void paging_get_indexes( uint64_t virtual_address, page_indexes *indexes ) {
+	indexes->pml4 = (virtual_address >> 39) & 0x1FF;
+	indexes->pdpt = (virtual_address >> 30) & 0x1FF;
+	indexes->pd = (virtual_address >> 21) & 0x1FF;
+	indexes->pt = (virtual_address >> 12) & 0x1FF;
+}
+
+uint64_t paging_get_addr_from_index( uint16_t index_pml4, uint16_t index_pdpt, uint16_t index_pd, uint16_t index_pt ) {
+	uint64_t addr = 0;
+
+	addr = addr | ((uint64_t)index_pml4 << 39 );
+	addr = addr | ((uint64_t)index_pdpt << 30 );
+	addr = addr | ((uint64_t)index_pd << 21 );
+	addr = addr | ((uint64_t)index_pt << 12 );
+}
+
+
 
 #undef KDEBUG_PAGE_MAP_PML4
 bool KDEBUG_PAGE_MAP_ACTIVE = false;

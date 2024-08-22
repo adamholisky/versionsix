@@ -14,9 +14,12 @@ page_group *page_group_new( page_group *group ) {
 }
 
 bool page_group_setup_bitmap( page_group *group, uint64_t size ) {
-	group->num_pages = size / group->physical_base;
+	debugf( "pg:                   0x%016llX\n", group );
+	debugf( "pg_page_size:         0x%016llX\n", group->page_size );
 
-	bool res = vi_bitmap_create( group->page_bitmap, group->num_pages );
+	group->num_pages = size / group->page_size;
+
+	bool res = vi_bitmap_create( &group->page_bitmap, group->num_pages );
 
 	if( !res ) {
 		debugf( "Page group bitmap unable to be created.\n" );
@@ -32,7 +35,7 @@ bool page_group_setup_bitmap( page_group *group, uint64_t size ) {
  */
 uint64_t page_group_get_next_free( page_group *group ) {
 	for( uint32_t i = 0; i < group->num_pages; i++ ) {
-		if( vi_bitmap_test( group->page_bitmap, i ) == false ) {
+		if( vi_bitmap_test( &group->page_bitmap, i ) == false ) {
 			return PAGE_GROUP_BIT_TO_ADDR( group, i );
 		}
 	}
@@ -53,7 +56,7 @@ uint64_t page_group_allocate_next_free( page_group *group ) {
 		return 0;
 	}
 
-	vi_bitmap_set( group->page_bitmap, PAGE_GROUP_ADDR_TO_BIT(group, addr) );
+	vi_bitmap_set( &group->page_bitmap, PAGE_GROUP_ADDR_TO_BIT(group, addr) );
 
 	return addr;
 }
@@ -68,7 +71,7 @@ uint64_t page_group_get_page_block( page_group *group, uint32_t num_pages ) {
 	}
 
 	for( uint32_t i = 0; i < group->num_pages; i++ ) {
-		if( vi_bitmap_test( group->page_bitmap, i ) == false ) {
+		if( vi_bitmap_test( &group->page_bitmap, i ) == false ) {
 			// We found a potential block
 			
 			// if num_pages == 1, then just be done
@@ -86,7 +89,7 @@ uint64_t page_group_get_page_block( page_group *group, uint32_t num_pages ) {
 					break;
 				}
 
-				if( vi_bitmap_test( group->page_bitmap, n ) == false ) {
+				if( vi_bitmap_test( &group->page_bitmap, n ) == false ) {
 					// If we get here then we know we don't have enough pages,
 					// set i to n so we can skip these
 					i = n;
@@ -115,11 +118,11 @@ bool page_group_is_free( page_group *group, uint64_t addr ) {
 		return false;
 	}
 
-	return vi_bitmap_test( group->page_bitmap, PAGE_GROUP_ADDR_TO_BIT(group,addr) );
+	return vi_bitmap_test( &group->page_bitmap, PAGE_GROUP_ADDR_TO_BIT(group,addr) );
 }
 
 bool page_group_is_num_free( page_group *group, uint32_t number ) {
-	return vi_bitmap_test( group->page_bitmap, number );
+	return vi_bitmap_test( &group->page_bitmap, number );
 }
 
 void page_group_add_page( ) {

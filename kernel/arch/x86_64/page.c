@@ -340,14 +340,30 @@ void paging_initalize( void ) {
 }
 
 page_group main_page_group;
+bool use_page_group = false;
 
 void paging_initalize_page_groups( void ) {
 	main_page_group.physical_base = kernel_info.usable_memory_start;
 	main_page_group.page_size = PAGE_SIZE;
 
+	// Start from the base of the allocatable memory
 	page_group_setup_bitmap( &main_page_group, kernel_info.usable_memory_size );
 
+	// Post setup, we should have the total allocated
+	uint64_t pages_already_allocated = (kernel_heap_physical_memory_next - kernel_info.usable_memory_start) / PAGE_SIZE;
 
+	uint64_t end_of_allocation_sync = 0;
+
+	for( int i = 0; i < pages_already_allocated; i++ ) {
+		end_of_allocation_sync = page_group_allocate_next_free( &main_page_group );
+		debugf( "i: %d\n", i );
+	}
+
+	if( end_of_allocation_sync + 0x1000 != kernel_heap_physical_memory_next ) {
+		debugf( "WARNING! Page group allocation sync failed.\n" );
+	} else {
+		use_page_group = true;
+	}
 }
 
 void paging_diagnostic_cr3( uint64_t cr3_physical ) {
@@ -713,7 +729,11 @@ void paging_invalidate_page( uint64_t page_virtual_address ) {
 
 #undef DEBUG_PAGE_ALLOCATE
 void *page_allocate( uint32_t number ) {
-	void *return_val = kernel_heap_virtual_memory_next;
+	return page_allocate_select( NULL, kernel_heap_virtual_memory_next, number, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE, false );
+}
+
+void *page_allocate_select( uint64_t *pml4, uint64_t virt_mem_start, uint32_t number, uint64_t flags, bool contiguous ) {
+	void *return_val = virt_mem_start;
 
 	#ifdef DEBUG_PAGE_ALLOCATE
 	log_entry_enter();
@@ -724,11 +744,31 @@ void *page_allocate( uint32_t number ) {
 		return NULL;
 	}
 
-	for( int i = 0; i < number; i++ ) {
-		paging_page_map_to_pml4( NULL, kernel_heap_physical_memory_next, kernel_heap_virtual_memory_next, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE );   
+	if( use_page_group ) {
+		if( contiguous ) {
+
+		} else {
+			uint64_t pg_addr = 0;
+
+			for( int i = 0; i < number; i++ ) {
+				pg_addr = page_group_allocate_next_free( &main_page_group );
+
+				paging_page_map_to_pml4( pml4, pg_addr, virt_mem_start, flags );
+
+				if( i == 0 ) {
+					return_val = pg_addr;
+				}
+			}
+			
+		}
 		
-		kernel_heap_virtual_memory_next = kernel_heap_virtual_memory_next + PAGE_SIZE;
-		kernel_heap_physical_memory_next = kernel_heap_physical_memory_next + PAGE_SIZE;
+	} else {
+		for( int i = 0; i < number; i++ ) {
+			paging_page_map_to_pml4( pml4, kernel_heap_physical_memory_next, virt_mem_start, flags );   
+		
+			kernel_heap_virtual_memory_next = kernel_heap_virtual_memory_next + PAGE_SIZE;
+			kernel_heap_physical_memory_next = kernel_heap_physical_memory_next + PAGE_SIZE;
+		}
 	}
 
 	#ifdef DEBUG_PAGE_ALLOCATE

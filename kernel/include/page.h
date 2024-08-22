@@ -79,7 +79,7 @@ void paging_examine_page_for_address( uint64_t virtual_address );
 uint64_t paging_virtual_to_physical( uint64_t virtual_address );
 paging_page_entry *paging_get_page_for_virtual_address( uint64_t virtual_address );
 
-void paging_initalize( void );
+
 void *page_map( uint64_t virtual_address, uint64_t physical_address );
 void *page_allocate( uint32_t number );
 void *page_allocate_mmio( uint32_t number );
@@ -88,6 +88,9 @@ void *page_allocate_kernel_mmio( uint32_t number );
 
 
 void paging_setup_initial_structures( void );
+void paging_initalize( void );
+void paging_initalize_page_groups( void );
+
 void paging_get_indexes( uint64_t virtual_address, page_indexes *indexes );
 uint64_t paging_get_addr_from_index( uint16_t index_pml4, uint16_t index_pdpt, uint16_t index_pd, uint16_t index_pt );
 uint64_t paging_make_page( uint64_t physical_address, uint32_t flags );

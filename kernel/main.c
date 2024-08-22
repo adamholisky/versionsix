@@ -65,6 +65,7 @@ void kernel_main( void ) {
 	paging_initalize();
 	memory_initalize();
 	kernel_symbols_initalize();
+	paging_initalize_page_groups();
 
 	#ifdef VIOS_ENABLE_PROFILING
 	profiling_initalize();

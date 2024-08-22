@@ -21,7 +21,7 @@ typedef struct {
 } page_group_page;
 
 typedef struct {
-	vi_bitmap *page_bitmap;
+	vi_bitmap page_bitmap;
 	uint64_t physical_base;
 	uint32_t num_pages;
 	uint32_t page_size;

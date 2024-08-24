@@ -85,6 +85,7 @@ void *page_allocate( uint32_t number );
 void *page_allocate_mmio( uint32_t number );
 void *page_allocate_kernel( uint32_t number );
 void *page_allocate_kernel_mmio( uint32_t number );
+void *page_allocate_provider( uint64_t *pml4, uint64_t virt_mem_start, uint32_t number, uint64_t flags, bool contiguous );
 
 
 void paging_setup_initial_structures( void );

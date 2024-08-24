@@ -729,22 +729,23 @@ void paging_invalidate_page( uint64_t page_virtual_address ) {
 
 #undef DEBUG_PAGE_ALLOCATE
 void *page_allocate( uint32_t number ) {
-	return page_allocate_select( NULL, kernel_heap_virtual_memory_next, number, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE, false );
+	return page_allocate_provider( NULL, kernel_heap_virtual_memory_next, number, PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE, false );
 }
 
-void *page_allocate_select( uint64_t *pml4, uint64_t virt_mem_start, uint32_t number, uint64_t flags, bool contiguous ) {
+void *page_allocate_provider( uint64_t *pml4, uint64_t virt_mem_start, uint32_t number, uint64_t flags, bool contiguous ) {
 	void *return_val = virt_mem_start;
 
-	#ifdef DEBUG_PAGE_ALLOCATE
+	//#ifdef DEBUG_PAGE_ALLOCATE
 	log_entry_enter();
 	debugf( "number: %d\n", number);
-	#endif
+	//#endif
 
 	if( number < 1 ) {
 		return NULL;
 	}
 
-	if( use_page_group ) {
+	//if( use_page_group ) {
+	if( false ) {
 		if( contiguous ) {
 
 		} else {
@@ -763,18 +764,21 @@ void *page_allocate_select( uint64_t *pml4, uint64_t virt_mem_start, uint32_t nu
 		}
 		
 	} else {
+		uint64_t vmem_current = virt_mem_start;
+
 		for( int i = 0; i < number; i++ ) {
-			paging_page_map_to_pml4( pml4, kernel_heap_physical_memory_next, virt_mem_start, flags );   
+			paging_page_map_to_pml4( pml4, kernel_heap_physical_memory_next, vmem_current, flags );   
 		
+			vmem_current = vmem_current + PAGE_SIZE;
 			kernel_heap_virtual_memory_next = kernel_heap_virtual_memory_next + PAGE_SIZE;
 			kernel_heap_physical_memory_next = kernel_heap_physical_memory_next + PAGE_SIZE;
 		}
 	}
 
-	#ifdef DEBUG_PAGE_ALLOCATE
+	//#ifdef DEBUG_PAGE_ALLOCATE
 	debugf( "Page allocated: 0x%016llX\n", return_val );
 	log_entry_exit();
-	#endif
+	//#endif
 
 	return return_val;
 }

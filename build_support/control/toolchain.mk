@@ -53,6 +53,7 @@ AFLAGS = $(CFLAGS)
 QEMU = /usr/bin/qemu-system-x86_64
 QEMU_COMMON = 	-device ahci,id=ahci \
 				\
+				--enable-kvm \
 				\
 				-drive id=main_drive,format=raw,if=none,file=$(ROOT_DIR)/vi_hd.img \
 				-device ide-hd,drive=main_drive,bus=ahci.0 \

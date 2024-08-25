@@ -84,7 +84,7 @@ void kernel_main( void ) {
 	keyboard_initalize();
 
 	// Next setup the main console for use. From here on out, printf is okay.
-	vui_init( (uint32_t *)kernel_info.framebuffer_info.address, 1024, 768 );
+	vui_init( (uint32_t *)kernel_info.framebuffer_info.address, 1920, 1080 );
 	vui_font_initalize();
 	vui_font_load( VUI_FONT_TYPE_PSF, "Zap Light", "/usr/share/fonts/zap-light20.psf" );
 	vui_font_load( VUI_FONT_TYPE_PSF, "Zap VGA", "/usr/share/fonts/zap-ext-vga16.psf" );

@@ -31,7 +31,8 @@
             "compare": "c",
             "cstdint": "c",
             "format": "c",
-            "kernel_common.h": "c"
+            "kernel_common.h": "c",
+            "button.h": "c"
         },
     }
 }

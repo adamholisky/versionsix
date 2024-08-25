@@ -17,7 +17,7 @@ void tests_run_tests( void ) {
 	//tests_run_program();
 
 	random_seed( system_count );
-	tests_animation();
+	animation_bouncing_square();
 
 	/* debugf( "End of run tests. Shutting down.\n" );
 	do_immediate_shutdown(); */
@@ -101,8 +101,9 @@ void tests_fps( void ) {
 	debugf( "FPS average: %d\n", fps );
 }
 
-void tests_animation( void ) {
+void animation_bouncing_square( void ) {
 	vui_sprite *sprite = kmalloc( sizeof(vui_sprite) );
+	uint32_t save_area[50 * 50];
 
 	sprite->height = 50;
 	sprite->width = 50;
@@ -121,23 +122,45 @@ void tests_animation( void ) {
 	int which_way = 0;
 
 	do {
+		save_rect( x_end, y_end, 50, 50, save_area );
+
 		if( which_way == 0 ) {
 			animate_sprite_x_y( sprite, x_start, y_start, x_end, y_end, 2 );
 		} else {
 			animate_sprite_x_y( sprite, x_start, y_start, x_end, y_end, 2 );
 		}
 
+		load_rect( x_end, y_end, 50, 50, save_area );
+
 		x_start = x_end;
 		y_start = y_end;
 
-		if( which_way == 0 ) {
-			x_end = 0;
-			y_end = dumb_rand(1080-50);
+		uint16_t zero_or_max = 0;
+		if( dumb_rand(3) <= 1 ) {
+			zero_or_max = 1;
+		}
 
+		uint16_t x_end_old = x_end;
+		uint16_t y_end_old = y_end;
+
+		//debugf( "zero_or_max: %d\n", zero_or_max );
+
+		if( which_way == 0 ) {
+			
+			x_end = (zero_or_max == 1 ? 1920-50 : 0);
+			y_end = dumb_rand(1080-50);
+			if( y_end_old - y_end < 500 ) { 
+				y_end = y_end - 500; 
+				if( y_end < 0 ) { y_end = abs(y_end); }
+			}
 			which_way = 1;
 		} else {
 			x_end = dumb_rand(1920-50);
-			y_end = 0;
+			y_end = (zero_or_max == 1 ? 1080-50 : 0);
+			if( x_end_old - x_end < 500 ) { 
+				x_end = x_end - 500; 
+				if( x_end < 0 ) { x_end = abs(x_end); }
+			}
 
 			which_way = 0;
 		}
@@ -147,13 +170,17 @@ void tests_animation( void ) {
 
 static unsigned long int next = 1;
 
-inline int dumb_rand( int r ) {
+int dumb_rand( int r ) {
 	next = next * 1103515245 + 12345;
     unsigned int rand = (next / 65536) % 32768;
 
-	debugf( "rand: %d\n", rand );
-	float ret_val = r * (rand/32767);
-	debugf( "ret_val: %d\n", ret_val );
+	//debugf( "rand: %d\n", rand );
+	float f_rand = rand;
+	float f_rand_max = 32767;
+	float f_r = r;
+	float f_ret_val = f_r * (f_rand/f_rand_max);
+	uint64_t ret_val = f_ret_val;
+	//debugf( "ret_val: %d\n", ret_val );
 
 	return ret_val;
 }

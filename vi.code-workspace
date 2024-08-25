@@ -19,6 +19,12 @@
         {
             "name": "VI CNC",
             "path": "../vicnc"
+        },
+        {
+            "path": "../vimusl"
+        },
+        {
+            "path": "../vimusl_inst"
         }
     ],
     "settings": {

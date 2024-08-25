@@ -4,7 +4,7 @@
 extern "C" {
 #endif
 
-#define DEBUG_SYMBOLS_MAX 2048
+#define DEBUG_SYMBOLS_MAX 4096
 
 #define kdebug_symbol_cannot_find "KDEBUG_cannot_find_symbol"
 

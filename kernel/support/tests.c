@@ -6,6 +6,9 @@
 #include <task.h>
 #include <kmemory.h>
 
+extern uint64_t system_count;
+extern vui_core vui;
+
 void test_page_group( void );
 
 void tests_run_tests( void ) {
@@ -13,6 +16,7 @@ void tests_run_tests( void ) {
 	//tests_fps();
 	//tests_run_program();
 
+	random_seed( system_count );
 	tests_animation();
 
 	/* debugf( "End of run tests. Shutting down.\n" );
@@ -40,8 +44,6 @@ void test_page_group( void ) {
 	printf( "allocated_mem:        0x%016llX\n", allocated_mem );
 }
 
-extern uint64_t system_count;
-extern vui_core vui;
 
 void tests_fps( void ) {
 	uint64_t fps_seconds_to_sample = 10;
@@ -110,30 +112,90 @@ void tests_animation( void ) {
 		*((uint32_t *)(sprite->image) + i) = COLOR_RGB_BLUE;
 	}
 
-	animate_sprite_x_y( sprite, 0, 0, 1920-50, 1080-50, 10 );
+	int16_t x_start = 0;
+	int16_t y_start = 0;
+
+	int16_t x_end = 1920-50;
+	int16_t y_end = 1080-50;
+
+	int which_way = 0;
+
+	do {
+		if( which_way == 0 ) {
+			animate_sprite_x_y( sprite, x_start, y_start, x_end, y_end, 2 );
+		} else {
+			animate_sprite_x_y( sprite, x_start, y_start, x_end, y_end, 2 );
+		}
+
+		x_start = x_end;
+		y_start = y_end;
+
+		if( which_way == 0 ) {
+			x_end = 0;
+			y_end = dumb_rand(1080-50);
+
+			which_way = 1;
+		} else {
+			x_end = dumb_rand(1920-50);
+			y_end = 0;
+
+			which_way = 0;
+		}
+	} while( 1 );
+	
+}
+
+static unsigned long int next = 1;
+
+inline int dumb_rand( int r ) {
+	next = next * 1103515245 + 12345;
+    unsigned int rand = (next / 65536) % 32768;
+
+	debugf( "rand: %d\n", rand );
+	float ret_val = r * (rand/32767);
+	debugf( "ret_val: %d\n", ret_val );
+
+	return ret_val;
+}
+
+void random_seed( uint64_t seed ) {
+	next = seed;
 }
 
 void animate_sprite_x_y( vui_sprite *sprite, uint16_t x_start, uint16_t y_start, uint16_t x_end, uint16_t y_end, uint16_t seconds ) {
 	uint16_t frames = seconds * 34;
-	uint16_t x_per_frame = (x_end - x_start)/frames;
-	uint16_t y_per_frame = (y_end - y_start)/frames;
-
-	printf( "xpf: 0x%X\n", x_per_frame );
-	printf( "ypf: 0x%X\n", y_per_frame );
 
 	uint32_t x = x_start;
 	uint32_t y = y_start;
 
-	uint32_t screen_copy[ sprite->width * sprite->height ];
+	uint8_t screen_copy[ sprite->width * sprite->height * 4];
 
 	bool first = true;
+
+	uint16_t x_prev = x_start;
+	uint16_t y_prev = y_start;
 
 	for( uint64_t i = 0; i < frames; i++ ) {
 		set_frame_start();
 
+		x_prev = x;
+		y_prev = y;
+
+		if( x_start <= x_end ) {
+			x = x_start + (i * (x_end - x_start)/frames);
+		} else {
+			x = x_start - (i * (x_start - x_end)/frames);
+		}
+		
+		if( y_start <= y_end ) {
+			y = y_start + (i * (y_end - y_start)/frames);
+		} else {
+			y = y_start - (i * (y_start - y_end)/frames);
+		}
+
 		if( !first ) {
-			load_rect( x - x_per_frame, y - y_per_frame, sprite->width, sprite->height, screen_copy );
-			vui_refresh_rect( x - x_per_frame, y - y_per_frame, sprite->width, sprite->height );			
+			load_rect( x_prev, y_prev, sprite->width, sprite->height, screen_copy );
+			vui_refresh_rect( x_prev, y_prev, sprite->width, sprite->height );			
 		} else {
 			first = false;
 		}
@@ -143,13 +205,11 @@ void animate_sprite_x_y( vui_sprite *sprite, uint16_t x_start, uint16_t y_start,
 		load_rect( x, y, sprite->width, sprite->height, sprite->image );
 		vui_refresh_rect( x, y, sprite->width, sprite->height );
 
-		x = x + x_per_frame;
-		y = y + y_per_frame;
 
 		wait_for_next_frame( 30 );
 	} 
 
-	load_rect( x - x_per_frame, y - y_per_frame, sprite->width, sprite->height, screen_copy );
+	load_rect( x, y, sprite->width, sprite->height, screen_copy );
 	load_rect( x_end, y_end, sprite->width, sprite->height, sprite->image );
 	vui_refresh();
 }
@@ -174,13 +234,13 @@ void wait_for_next_frame( uint16_t target_fps ) {
 	}
 }
 
-void save_rect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t *store ) {
+inline void save_rect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t *store ) {
 	for( int z = 0; z < height; z++ ) {
 		memcpy( store + (z * width * 4), vui.buffer + ((y+z) * (vui.pitch/4)) + x, width*4 );
 	}
 }
 
-void load_rect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t *store ) {
+inline void load_rect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t *store ) {
 	for( int z = 0; z < height; z++ ) {
 		memcpy( vui.buffer + ((y + z) * (vui.pitch/4)) + x, store + (z * width * 4), width*4 );
 	}

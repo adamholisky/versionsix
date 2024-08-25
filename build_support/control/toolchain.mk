@@ -9,6 +9,8 @@ OBJDUMP = /usr/local/osdev/bin/x86_64-elf-objdump
 	-finstrument-functions-exclude-file-list=helper_asm.S,interrupt_asm.S,debug.c,serial.c,ksymbols.c,bootstrap.c,interrupt.c,write.c \
 	-finstrument-functions-exclude-function-list=inportb,outportb,in_port_long,out_port_long,timer_handler
 
+#	-mno-sse \
+
 CFLAGS = $(DEFINES) -Wno-write-strings \
 	-Wno-pointer-to-int-cast \
 	-Wno-discarded-qualifiers \
@@ -23,7 +25,6 @@ CFLAGS = $(DEFINES) -Wno-write-strings \
 	-I$(ROOT_DIR)/kernel/include \
 	-I$(ROOT_DIR)/../libcvv/libc/include \
     -m64                 \
-	-mno-sse \
     -march=x86-64        \
     -mabi=sysv           \
     -mcmodel=kernel      

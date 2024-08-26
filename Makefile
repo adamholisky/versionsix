@@ -64,6 +64,7 @@ cp_vit:
 	@cp -f ../viui/include/vui/menubar.h kernel/include/vui/menubar.h
 	@cp -f ../viui/include/vui/vui.h kernel/include/vui/vui.h
 	@cp -f ../viui/include/vui/window.h kernel/include/vui/window.h
+	@cp -f ../viui/include/vui/schrift.h kernel/include/vui/schrift.h
 
 	@cp -f ../viui/src/vui/button.c kernel/vui/button.c
 	@cp -f ../viui/src/vui/console.c kernel/vui/console.c
@@ -77,7 +78,7 @@ cp_vit:
 	@cp -f ../viui/src/vui/menubar.c kernel/vui/menubar.c
 	@cp -f ../viui/src/vui/vui.c kernel/vui/vui.c
 	@cp -f ../viui/src/vui/window.c kernel/vui/window.c
-
+	@cp -f ../viui/src/vui/schrift.c kernel/vui/schrift.c
 
 install:
 	@make install_stage2 >> $(BUILD_LOG)
@@ -156,7 +157,7 @@ drive:
 	@test $(ROOT_DIR)/afs.img || gzip $(ROOT_DIR)/afs.img
 	@test $(ROOT_DIR)/scratch/backup.afs.img.gz || rm $(ROOT_DIR)/scratch/backup.afs.img.gz
 	@test $(ROOT_DIR)/afs.img.gz || mv $(ROOT_DIR)/afs.img.gz $(ROOT_DIR)/scratch/backup.afs.img.gz
-	@$(ROOT_DIR)/../vifs/vifs new 10 -afs $(ROOT_DIR)/afs.img >> $(BUILD_LOG)
+	@$(ROOT_DIR)/../vifs/vifs new 50 -afs $(ROOT_DIR)/afs.img >> $(BUILD_LOG)
 	@$(ROOT_DIR)/../vifs/vifs bootstrap 0 -afs $(ROOT_DIR)/afs.img >> $(BUILD_LOG)
 	@$(ROOT_DIR)/../vifs/vifs cpdir $(ROOT_DIR)/os_root / -afs $(ROOT_DIR)/afs.img >> $(BUILD_LOG)
 	@>&2 echo [Make AFS Drive] Done

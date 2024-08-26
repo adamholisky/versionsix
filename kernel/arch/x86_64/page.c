@@ -735,10 +735,10 @@ void *page_allocate( uint32_t number ) {
 void *page_allocate_provider( uint64_t *pml4, uint64_t virt_mem_start, uint32_t number, uint64_t flags, bool contiguous ) {
 	void *return_val = virt_mem_start;
 
-	//#ifdef DEBUG_PAGE_ALLOCATE
+	#ifdef DEBUG_PAGE_ALLOCATE
 	log_entry_enter();
 	debugf( "number: %d\n", number);
-	//#endif
+	#endif
 
 	if( number < 1 ) {
 		return NULL;
@@ -775,16 +775,16 @@ void *page_allocate_provider( uint64_t *pml4, uint64_t virt_mem_start, uint32_t 
 		}
 	}
 
-	//#ifdef DEBUG_PAGE_ALLOCATE
+	#ifdef DEBUG_PAGE_ALLOCATE
 	debugf( "Page allocated: 0x%016llX\n", return_val );
 	log_entry_exit();
-	//#endif
+	#endif
 
 	return return_val;
 }
 
 void *page_allocate_kernel( uint32_t number ) {
-	debugf( "number: %d\n", number );
+	//debugf( "number: %d\n", number );
 	return page_allocate_kernel_linear( number );
 }
 

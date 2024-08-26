@@ -8,6 +8,7 @@
 #include "vui/console.h"
 #include "vui/button.h"
 #include "vui/menubar.h"
+#include "vui/schrift.h"
 
 extern vui_core vui;
 
@@ -270,9 +271,42 @@ void vui_draw_string( char *s, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg,
 	vui_font *f = ( font == NULL ? vui_font_get_main_font() : font );
 
 	for( int i = 0; i < len; i++ ) {
-		vui_draw_char( *s, current_x, y, fg, bg, f, flags );
+		if( f->type == VUI_FONT_TYPE_TTF ) {
+			vui_draw_char_ttf( *s, current_x, y, fg, bg, f, flags );
+
+			SFT_Glyph test_glyph;
+			sft_lookup( &font->sft, *s, &test_glyph );
+			SFT_GMetrics glyph_metrics;
+			sft_gmetrics( &font->sft, test_glyph, &glyph_metrics );
+			//font->info.width = glyph_metrics.advanceWidth;
+
+			current_x = current_x + font->ttf_bitmaps->advance;
+		} else {
+			vui_draw_char( *s, current_x, y, fg, bg, f, flags );
+			current_x = current_x + f->info.width;
+		}
+		
 		s++;
-		current_x = current_x + f->info.width;
+	}
+}
+
+void vui_draw_string_ttf( char *s, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg, vui_font *font, uint16_t size, uint64_t flags ) {
+	int len = strlen(s);
+	int current_x = x;
+	vui_font *f = ( font == NULL ? vui_font_get_main_font() : font );
+
+	for( int i = 0; i < len; i++ ) {
+		if( f->type == VUI_FONT_TYPE_TTF ) {
+			uint32_t char_num = *s;
+
+			vui_draw_char_ttf( char_num, current_x, y, fg, bg, f, flags );
+
+			//vdf( "final width: %d\n", font->ttf_bitmaps[char_num].advance + 1 );
+
+			current_x = current_x + font->ttf_bitmaps[char_num].advance + 1;
+		}
+		
+		s++;
 	}
 }
 
@@ -304,5 +338,69 @@ void vui_move_rect( uint32_t dest_x, uint32_t dest_y, uint32_t dest_w, uint32_t 
 	}
 }
 
+void vui_draw_char_ttf( uint32_t char_num, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg, vui_font *font, uint64_t flags ) {
+	//vdf( "draw: %X (%c)\n", char_num, (char)char_num );
 
+	uint32_t y_offset = (font->size - font->ttf_bitmaps[(uint8_t)char_num].y_offset);
 
+	for( int i = 0; i < font->ttf_bitmaps[(uint8_t)char_num].height + y_offset; i++ ) {
+		uint32_t pix_row = i;
+		if( y_offset != 0 && i >= y_offset) {
+			pix_row = i - y_offset;
+			//vdf( "%c: %d ->  %d ", (char)char_num, y_offset, pix_row );
+		}
+
+		uint32_t *loc = vui.buffer + ((y+i) * (vui.pitch / 4)) + x + font->ttf_bitmaps[char_num].x_offset;
+		uint32_t *loc_imm = vui.fb + ((y+i) * (vui.pitch / 4)) + x + font->ttf_bitmaps[char_num].x_offset;
+		
+		//vdf( "Row: %d == %X\n", i, font->bitmaps[index].pixel_row[i] );
+		//vdf( "\"" );
+		//for( int j = 0; j != font->info.width; j++ ) {
+		for( int j = 0; j != font->ttf_bitmaps[char_num].width; j++ ) {
+			// handle the y-offset
+			if( i < y_offset ) {
+				//vdf( "offset %d (max: %d)\n", i, abs() );
+
+				if( !(flags & VUI_DRAW_FLAGS_TRANSPARENT) ) {
+					*(loc + j) = bg;
+					if( flags & VUI_DRAW_FLAGS_IMMEDIATE ) { *(loc_imm + j) = bg; }
+				}
+				continue;
+			}
+
+			// render as normal
+			if( font->ttf_bitmaps[(uint8_t)char_num].pixel[(pix_row * font->ttf_bitmaps[(uint8_t)char_num].width) + j] ) {
+				//vdf( "*" );
+
+				float adjust = font->ttf_bitmaps[(uint8_t)char_num].pixel[(pix_row * font->ttf_bitmaps[(uint8_t)char_num].width) + j];
+
+				uint8_t red_bg = ((bg & 0x00FF0000) >> 16);
+				uint8_t red = ((fg & 0x00FF0000) >> 16);
+				red = (uint8_t)( (red * (adjust / 0xFF)) + (((1 - (adjust / 0xFF))) * red_bg));
+
+				uint8_t green_bg = (bg & 0x0000FF00) >> 8;
+				uint8_t green = (fg & 0x0000FF00) >> 8;
+				green = (uint8_t)( (green * (adjust / 0xFF)) + (((1 - (adjust / 0xFF))) * green_bg));
+				
+				uint8_t blue_bg = (bg & 0x000000FF);
+				uint8_t blue = (fg & 0x000000FF);
+				blue = (uint8_t)( (blue * (adjust / 0xFF)) + (((1 - (adjust / 0xFF))) * blue_bg));
+
+				uint32_t color = (red << 16) | (green << 8) | (blue);
+
+				*(loc + j) = color;
+				if( flags & VUI_DRAW_FLAGS_IMMEDIATE ) { *(loc_imm + j) = color; }
+
+				
+			} else {
+				//vdf( " " );
+
+				if( !(flags & VUI_DRAW_FLAGS_TRANSPARENT) ) {
+					*(loc + j) = bg;
+					if( flags & VUI_DRAW_FLAGS_IMMEDIATE ) { *(loc_imm + j) = bg; }
+				}
+			}
+		}
+		//vdf( "\"\n" );
+	}
+}

@@ -194,7 +194,9 @@ void vui_draw( vui_handle H );
 void vui_draw_handle( vui_handle H );
 void vui_draw_rect( uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color );
 void vui_draw_string( char *s, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg, vui_font *font, uint64_t flags );
+void vui_draw_string_ttf( char *s, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg, vui_font *font, uint16_t size, uint64_t flags );
 void vui_draw_char( uint16_t char_num, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg, vui_font *font, uint64_t flags );
+void vui_draw_char_ttf( uint32_t char_num, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg, vui_font *font, uint64_t flags );
 void vui_move_rect( uint32_t dest_x, uint32_t dest_y, uint32_t dest_w, uint32_t dest_h, uint32_t src_x, uint32_t src_y, uint32_t src_w, uint32_t src_h );
 
 #ifdef __cplusplus

@@ -39,11 +39,13 @@ vui_handle vui_console_create( uint16_t x, uint16_t y, uint16_t width, uint16_t 
 	con->current_pixel_x = con->text_area_x;
 	con->current_pixel_y = con->text_area_y;
 	
-	con->font = vui_font_get_font( "Zap VGA" );
+	con->font = vui_font_get_font( "zap-vga" );
 	con->char_width = con->font->info.width;
 	con->char_height = con->font->info.height;
 
-	con->num_cols = con->text_area_width / con->char_width;
+	vdf( "w: %d   h: %d\n", con->char_width, con->char_height );
+
+	con->num_cols = (con->text_area_width / con->char_width);
 	con->num_rows = con->text_area_height / con->char_height;
 
 	con->fg_color = 0x00eaeaea;
@@ -115,7 +117,7 @@ void vui_console_draw_from_struct( vui_console *con ) {
 			uint16_t x = con->text_area_x;
 			uint16_t y = con->text_area_y + (con->char_height * i);
 
-			vui_draw_rect( x, y, con->pixel_width, con->char_height, con->bg_color );
+			vui_draw_rect( x, y, con->text_area_width, con->char_height, con->bg_color );
 
 			for( int j = 0; j < con->num_cols; j++ ) {
 				char c = (con->rows[i].buff[j] == 0 ? ' ' : con->rows[i].buff[j]);
@@ -629,6 +631,11 @@ void vui_console_tests( vui_handle H ) {
 	vui_console_put_string( con, "VUI Console test suite.\n" );
 
 	vui_console_put_string( con, long_string_for_test );
+
+/* 	char str[50] = {};
+	sprintf( str, "%c%c%c\n%c%c%c\n%c%c%c\n%c%c%c\n", 0xDA, 0xC4, 0xBf, 0x7C, 0xDB, 0x7C, 0x7C, 0xB2, 0x7C, 0xC0, 0xC4, 0xD9 );
+
+	vui_console_put_string( con, str ); */
 
 	/* vui_console_put_string( con, "\x1b[0;30;0mSo many escape code colors\n" );
 	vui_console_put_string( con, "\x1b[0;31;0mSo many escape code colors\n" );

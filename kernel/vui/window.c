@@ -66,7 +66,7 @@ void vui_window_draw_from_struct( vui_window *window ) {
 		vui_draw_rect( window->inner_x, window->inner_y - VUI_WINDOW_TITLE_BAR_HEIGHT, window->inner_width, VUI_WINDOW_TITLE_BAR_HEIGHT, theme->window_title_bar_background );
 
 		if( !(window->flags & VUI_WINDOW_FLAG_HIDE_TITLE) ) {
-			vui_draw_string( window->title, window->inner_x + 3, window->inner_y - VUI_WINDOW_TITLE_BAR_HEIGHT + 3, theme->window_title_bar_foreground, theme->window_title_bar_background, vui_font_get_font("Zap VGA"), VUI_DRAW_FLAGS_NONE );
+			vui_draw_string_ttf( window->title, window->inner_x + 3, window->inner_y - VUI_WINDOW_TITLE_BAR_HEIGHT + 1, theme->window_title_bar_foreground, theme->window_title_bar_background, vui_font_get_font("noto-sans-bold"), 13, VUI_DRAW_FLAGS_NONE );
 		}
 	}
 

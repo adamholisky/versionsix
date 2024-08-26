@@ -1,11 +1,32 @@
 #include "vit.h"
 #include "vui/vui.h"
 #include "vui/font.h"
+#include "vui/schrift.h"
 
 uint16_t font_id_top;
 
 vui_font fonts;
 vui_font *main_font;
+
+uint16_t dos_code_page[256] = {
+    0x0000,0x263A,0x263B,0x2665,0x2666,0x2663,0x2660,0x2022,0x25D8,0x25CB,0x25D9,0x2642,0x2640,0x266A,0x266B,0x263C,
+    0x25BA,0x25C4,0x2195,0x203C,0x00B6,0x00A7,0x25AC,0x21A8,0x2191,0x2193,0x2192,0x2190,0x221F,0x2194,0x25B2,0x25BC,
+    0x0020,0x0021,0x0022,0x0023,0x0024,0x0025,0x0026,0x0027,0x0028,0x0029,0x002a,0x002b,0x002c,0x002d,0x002e,0x002f,
+    0x0030,0x0031,0x0032,0x0033,0x0034,0x0035,0x0036,0x0037,0x0038,0x0039,0x003a,0x003b,0x003c,0x003d,0x003e,0x003f,
+    0x0040,0x0041,0x0042,0x0043,0x0044,0x0045,0x0046,0x0047,0x0048,0x0049,0x004a,0x004b,0x004c,0x004d,0x004e,0x004f,
+    0x0050,0x0051,0x0052,0x0053,0x0054,0x0055,0x0056,0x0057,0x0058,0x0059,0x005a,0x005b,0x005c,0x005d,0x005e,0x005f,
+    0x0060,0x0061,0x0062,0x0063,0x0064,0x0065,0x0066,0x0067,0x0068,0x0069,0x006a,0x006b,0x006c,0x006d,0x006e,0x006f,
+    0x0070,0x0071,0x0072,0x0073,0x0074,0x0075,0x0076,0x0077,0x0078,0x0079,0x007a,0x007b,0x007c,0x007d,0x007e,0x007f,
+    0x00c7,0x00fc,0x00e9,0x00e2,0x00e4,0x00e0,0x00e5,0x00e7,0x00ea,0x00eb,0x00e8,0x00ef,0x00ee,0x00ec,0x00c4,0x00c5,
+    0x00c9,0x00e6,0x00c6,0x00f4,0x00f6,0x00f2,0x00fb,0x00f9,0x00ff,0x00d6,0x00dc,0x00a2,0x00a3,0x00a5,0x20a7,0x0192,
+    0x00e1,0x00ed,0x00f3,0x00fa,0x00f1,0x00d1,0x00aa,0x00ba,0x00bf,0x2310,0x00ac,0x00bd,0x00bc,0x00a1,0x00ab,0x00bb,
+    0x2591,0x2592,0x2593,0x2502,0x2524,0x2561,0x2562,0x2556,0x2555,0x2563,0x2551,0x2557,0x255d,0x255c,0x255b,0x2510,
+    0x2514,0x2534,0x252c,0x251c,0x2500,0x253c,0x255e,0x255f,0x255a,0x2554,0x2569,0x2566,0x2560,0x2550,0x256c,0x2567,
+    0x2568,0x2564,0x2565,0x2559,0x2558,0x2552,0x2553,0x256b,0x256a,0x2518,0x250c,0x2588,0x2584,0x258c,0x2590,0x2580,
+    0x03b1,0x00df,0x0393,0x03c0,0x03a3,0x03c3,0x00b5,0x03c4,0x03a6,0x0398,0x03a9,0x03b4,0x221e,0x03c6,0x03b5,0x2229,
+    0x2261,0x00b1,0x2265,0x2264,0x2320,0x2321,0x00f7,0x2248,0x00b0,0x2219,0x00b7,0x221a,0x207f,0x00b2,0x25a0,0x00a0
+};
+
 
 /**
  * @brief Initalize the font system
@@ -58,13 +79,19 @@ void vui_font_load( uint8_t type, char *name, char *font_path ) {
 		case VUI_FONT_TYPE_PSF:
 			vui_font_load_psf( font_data_to_use );
 			break;
+		case VUI_FONT_TYPE_TTF:
+			vui_font_load_ttf( font_data_to_use );
+			break;
 		default:
 			vdf( "Font Load: Unknown type. Got: %d.\n", type );
 	}
 
-	for( int i = 0; i < font_data_to_use->info.num_glyphs; i++ ) {
-		vui_font_create_aa_mask( font_data_to_use, i );
+	if( type == VUI_FONT_TYPE_PSF ) {
+		for( int i = 0; i < font_data_to_use->info.num_glyphs; i++ ) {
+			vui_font_create_aa_mask( font_data_to_use, i );
+		}
 	}
+	
 }
 
 /**
@@ -102,6 +129,131 @@ void vui_font_get_bounding_box( char *text, vui_font *font, uint16_t *width, uin
 
 	*width = num_chars * f->info.width;
 	*height = f->info.height;
+}
+
+void vui_font_load_ttf( vui_font *font ) {
+	#ifdef VI_ENV_OS
+	vfs_stat_data stats;
+	uint32_t file_size;
+
+	int stat_error = vfs_stat( vfs_lookup_inode(font->info.path), &stats );
+	if( stat_error != VFS_ERROR_NONE ) {
+		debugf( "Error: %d\n", stat_error );
+		return;
+	}
+
+	file_size = stats.size;
+
+	uint8_t *data = vmalloc( file_size );
+	int read_err = vfs_read( vfs_lookup_inode(font->info.path), data, file_size, 0 );
+	if( read_err < VFS_ERROR_NONE ) {
+		debugf( "Error when reading: %d\n", read_err );
+		return;
+	}
+	#else
+	FILE *f = fopen( font->info.path, "r" );
+
+	if( f == NULL ) {
+		vdf( "Cannot open %s, f returned NULL.\n", font->info.path );
+		return;
+	}
+
+	struct stat file_meta;
+	stat( font->info.path, &file_meta );
+
+	uint32_t file_size = file_meta.st_size;
+
+	uint8_t *data = vmalloc( file_size );
+
+	if( fread( data, file_size, 1, f ) != 1 ) {
+		vdf( "Read failed on %s, fread returned not 1.\n", font->info.path );
+		return;
+	}
+	#endif
+
+	font->type = VUI_FONT_TYPE_TTF;
+	font->size = 13;
+	font->info.height = 13;
+	font->info.width = 13;
+	font->glyph_count = 256;
+	font->ttf_bitmaps = vmalloc( font->glyph_count * sizeof(font_ttf_bitmap) );
+	
+	for( int i = 0; i < font->glyph_count; i++ ) {
+		//font->ttf_bitmaps[i].pixel = vmalloc( 2 * font->size * font->size ); 
+	}
+
+	font->sft.xScale = font->size;
+	font->sft.yScale = font->size,
+	font->sft.flags = SFT_DOWNWARD_Y;
+
+	//sft.font = sft_loadfile("./fira_code.ttf");
+	font->sft.font = sft_loadmem( data, file_size );
+
+	if( font->sft.font == NULL ) {
+		vdf( "sft font failed to load" );
+	}
+
+	SFT_LMetrics line_metrics;
+	sft_lmetrics( &font->sft, &line_metrics );
+	//vdf( "asc: %f    dsc: %f    lineGap: %f\n", line_metrics.ascender, line_metrics.descender, line_metrics.lineGap );
+	font->info.height = 13;
+
+	SFT_Glyph test_glyph;
+	sft_lookup( &font->sft, 'V', &test_glyph );
+	SFT_GMetrics glyph_metrics;
+	sft_gmetrics( &font->sft, test_glyph, &glyph_metrics );
+	font->info.width = glyph_metrics.advanceWidth;
+
+	//vdf( "%f\n", glyph_metrics.advanceWidth );
+
+
+	SFT_Glyph v;
+	
+
+/* 	memset( img.pixels, 0, 2 * 20 * 20 );
+	vdf( "lookup result: %d\n", sft_lookup( &sft, 0xf0e1e, &v ) );
+	vdf( "render result: %d\n", sft_render( &sft, v, img ) );
+	memcpy( font->ttf_bitmaps[0].pixel, img.pixels, 2 * 20 * 20 );
+
+	memset( img.pixels, 0, 2 * 20 * 20 );
+	vdf( "lookup result: %d\n", sft_lookup( &sft, 0xf0cdf, &v ) );
+	vdf( "render result: %d\n", sft_render( &sft, v, img ) );
+	memcpy( font->ttf_bitmaps[1].pixel, img.pixels, 2 * 20 * 20 ); */
+
+	void *pix_store = vmalloc(2 * 100 * 100);
+
+	for( int i = 0; i < 256; i++ ) {
+		//vdf( "rendering %d\n", i );
+		int lookup_res = sft_lookup( &font->sft, dos_code_page[i], &v );
+
+		//vdf( "lookup_res: %d\n", lookup_res );
+		
+		SFT_GMetrics glyph_metrics;
+		int gmetrics_res = sft_gmetrics( &font->sft, v, &glyph_metrics );
+		//vdf( "gmetrics_res: %d\n", gmetrics_res );
+
+		font->ttf_bitmaps[i].x_offset = glyph_metrics.leftSideBearing;
+		font->ttf_bitmaps[i].y_offset = -glyph_metrics.yOffset;
+		font->ttf_bitmaps[i].advance = glyph_metrics.advanceWidth;
+		font->ttf_bitmaps[i].width = glyph_metrics.minWidth;
+		font->ttf_bitmaps[i].height = glyph_metrics.minHeight;
+		font->ttf_bitmaps[i].pixel = vmalloc( 2 * font->ttf_bitmaps[i].width * font->ttf_bitmaps[i].height ); 
+		
+		memset( pix_store, 0, 2 * 100 * 100 );
+
+		SFT_Image img = {
+			.pixels = pix_store,
+			.width = glyph_metrics.minWidth,
+			.height = glyph_metrics.minHeight
+		};
+
+		//vdf( "\'%c\' y_offset: %d\n", i, font->ttf_bitmaps[i].y_offset );
+		//memset( img.pixels, 0, 2 * font->ttf_bitmaps[i].width * font->ttf_bitmaps[i].height );
+		int render_res = sft_render( &font->sft, v, img );
+		//vdf( "render_res: %d\n", render_res );
+
+		memcpy( font->ttf_bitmaps[i].pixel, img.pixels, 2 * font->ttf_bitmaps[i].width * font->ttf_bitmaps[i].height);
+	}
 }
 
 /**

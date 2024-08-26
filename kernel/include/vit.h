@@ -35,11 +35,15 @@ extern "C" {
 
 #ifdef VI_ENV_OS
 	#define vmalloc kmalloc
-	#define vfree kfree
+	#define vrealloc krealloc
+	#define vcalloc kcalloc
+	#define vfree ;
 	#define vdebugf debugf
 	#define vdf debugf
 #else
 	#define vmalloc malloc
+	#define vrealloc realloc
+	#define vcalloc calloc
 	#define vfree free
 	#define vdebugf printf
 	#define vdf printf

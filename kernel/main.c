@@ -29,6 +29,7 @@
 #include <vui/font.h>
 #include <vui/label.h>
 #include <vui/window.h>
+#include <vui/menubar.h>
 #include <tests.h>
 
 
@@ -42,6 +43,8 @@ vui_handle main_console_handle;
 vui_console *main_console;
 
 extern void tcp_test( void );
+void load_font_stuff( void );
+void load_gui_stuff( void );
 
 char fxsave_region[512] __attribute__((aligned(16)));
 
@@ -85,29 +88,10 @@ void kernel_main( void ) {
 
 	// Next setup the main console for use. From here on out, printf is okay.
 	vui_init( (uint32_t *)kernel_info.framebuffer_info.address, 1920, 1080 );
-	vui_font_initalize();
-	vui_font_load( VUI_FONT_TYPE_PSF, "Zap Light", "/usr/share/fonts/zap-light20.psf" );
-	vui_font_load( VUI_FONT_TYPE_PSF, "Zap VGA", "/usr/share/fonts/zap-ext-vga16.psf" );
+	load_font_stuff();
+	load_gui_stuff();
 
-	vui_theme *theme = vui_get_active_theme();
-
-	vui_handle desktop = vui_desktop_create( 0, 25, vui.width, vui.height - 25, VUI_DESKTOP_FLAG_NONE );
-	vui_handle smooth_text = vui_label_create( 5, 768 - 25, "Versions OS 6.0.0.1", VUI_LABEL_FLAG_NONE, desktop );
-	vui_label_set_color( smooth_text, COLOR_RGB_WHITE, theme->desktop );
-	vui_handle_set_name( desktop, "desktop" );
-
-	vui_handle win = vui_window_create( 25, 40, 900, 600, VUI_WINDOW_FLAG_NONE );
-	vui_window_set_title( win, "ViOS 6" );
-	vui_handle_set_name( win, "window_console" );
-	vui_window *win_s = vui_get_handle_data(win);
-	vui_window_set_background_color( win, 0x232323 );
-
-	main_console_handle = vui_console_create( win_s->inner_x, win_s->inner_y, win_s->inner_width, win_s->inner_height, win );
-	main_console = vui_get_handle_data( main_console_handle );
-	vui_add_to_parent( win, main_console_handle );
-
-	vui_draw( desktop );
-	vui_draw( win );
+	
 		
 	
 	printf( "Versions OS VI\n" );
@@ -136,6 +120,43 @@ void kernel_main( void ) {
 	debugf( "Ending happy.\n" );
 	printf( "Ending happy.\n" );
 	do_immediate_shutdown();
+}
+
+void load_gui_stuff( void ) {
+	vui_theme *theme = vui_get_active_theme();
+
+	vui_handle menubar = vui_menubar_create();
+	vui_handle_set_name( menubar, "main_menubar" );
+
+	vui_handle desktop = vui_desktop_create( 0, 25, vui.width, vui.height - 25, VUI_DESKTOP_FLAG_NONE );
+	vui_handle smooth_text = vui_label_create( 5, 768 - 25, "Versions OS 6.0.0.1", VUI_LABEL_FLAG_NONE, desktop );
+	vui_label_set_color( smooth_text, COLOR_RGB_WHITE, theme->desktop );
+	vui_handle_set_name( desktop, "desktop" );
+
+	vui_handle win = vui_window_create( 25, 40, 900, 600, VUI_WINDOW_FLAG_NONE );
+	vui_window_set_title( win, "ViOS 6" );
+	vui_handle_set_name( win, "window_console" );
+	vui_window *win_s = vui_get_handle_data(win);
+	vui_window_set_background_color( win, 0x232323 );
+
+	main_console_handle = vui_console_create( win_s->inner_x, win_s->inner_y, win_s->inner_width, win_s->inner_height, win );
+	main_console = vui_get_handle_data( main_console_handle );
+	vui_add_to_parent( win, main_console_handle );
+
+	vui_draw( menubar );
+	vui_draw( desktop );
+	vui_draw( win );
+}
+
+void load_font_stuff( void ) {
+	vui_font_initalize();
+	vui_font_load( VUI_FONT_TYPE_PSF, "zap-light", "/usr/share/fonts/zap-light20.psf" );
+	vui_font_load( VUI_FONT_TYPE_PSF, "zap-vga", "/usr/share/fonts/zap-ext-vga16.psf" );
+/* 	vui_font_load( VUI_FONT_TYPE_TTF, "dejavu-sans", "/usr/share/fonts/DejaVuSans.ttf" );
+	vui_font_load( VUI_FONT_TYPE_TTF, "dejavu-sans-bold", "/usr/share/fonts/DejaVuSans-Bold.ttf" );
+	vui_font_load( VUI_FONT_TYPE_TTF, "dejavu-sans-italic", "/usr/share/fonts/DejaVuSans-Oblique.ttf" ); */
+	vui_font_load( VUI_FONT_TYPE_TTF, "noto-sans", "/usr/share/fonts/NotoSans-Regular.ttf" );
+	vui_font_load( VUI_FONT_TYPE_TTF, "noto-sans-bold", "/usr/share/fonts/NotoSans-SemiBold.ttf" );
 }
 
 void main_console_putc( uint8_t c ) {

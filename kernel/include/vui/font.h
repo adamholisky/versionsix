@@ -5,10 +5,12 @@ extern "C" {
 #endif
 
 #include "vui/vui.h"
+#include "vui/schrift.h"
 
 #define VUI_FONT_TYPE_PSF 1
 #define VUI_FONT_TYPE_BDF 2
 #define VUI_FONT_TYPE_VDF 3
+#define VUI_FONT_TYPE_TTF 4
 
 typedef struct {
     uint16_t height;
@@ -26,9 +28,31 @@ typedef struct {
 } font_bitmap;
 
 typedef struct {
+    uint16_t num;
+    uint32_t unicode_id;
+    uint32_t advance;
+    uint32_t y_offset;
+    uint32_t x_offset;
+
+    uint16_t width;
+    uint16_t height;
+
+    uint8_t *pixel;
+} font_ttf_bitmap;
+
+typedef struct {
     font_bitmap *bitmaps;
     font_bitmap *aa_mask;
     font_info info;
+
+    uint8_t type;
+    uint8_t size;
+    uint32_t glyph_count;
+    font_ttf_bitmap *ttf_bitmaps;
+    bool is_mono;
+
+    SFT sft;
+
 
     void *next;
 } vui_font;
@@ -59,6 +83,7 @@ void vui_font_load( uint8_t type, char *name, char *font_path );
 vui_font *vui_font_get_font( char *name );
 vui_font *vui_font_get_main_font( void );
 bool vui_font_load_psf( vui_font *font );
+void vui_font_load_ttf( vui_font *font );
 void vui_font_get_bounding_box( char *text, vui_font *font, uint16_t *width, uint16_t *height );
 void vui_font_create_aa_mask( vui_font *font, uint16_t char_num );
 

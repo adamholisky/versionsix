@@ -17,7 +17,7 @@ void tests_run_tests( void ) {
 	//tests_run_program();
 
 	random_seed( system_count );
-	animation_bouncing_square();
+	//animation_bouncing_square();
 
 	/* debugf( "End of run tests. Shutting down.\n" );
 	do_immediate_shutdown(); */

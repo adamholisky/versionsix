@@ -14,6 +14,8 @@ OBJDUMP = /usr/local/osdev/bin/x86_64-elf-objdump
 CFLAGS = $(DEFINES) -Wno-write-strings \
 	-Wno-pointer-to-int-cast \
 	-Wno-discarded-qualifiers \
+	-Wno-int-conversion \
+	-Wno-incompatible-pointer-types \
 	-ffreestanding \
 	-fno-omit-frame-pointer \
 	-fno-lto             \
@@ -23,7 +25,7 @@ CFLAGS = $(DEFINES) -Wno-write-strings \
 	-O0 \
 	-g \
 	-I$(ROOT_DIR)/kernel/include \
-	-I$(ROOT_DIR)/../libcvv/libc/include \
+	-I$(ROOT_DIR)/vi_klibc_static/include \
     -m64                 \
     -march=x86-64        \
     -mabi=sysv           \
@@ -54,7 +56,7 @@ AFLAGS = $(CFLAGS)
 QEMU = /usr/bin/qemu-system-x86_64
 QEMU_COMMON = 	-device ahci,id=ahci \
 				\
-				-drive id=main_drive,format=raw,if=none,file=$(ROOT_DIR)/vi_hd.img \
+				-drive id=main_drive,format=raw,if=none,file=$(ROOT_DIR)/$(KERNEL_BOOT_IMG) \
 				-device ide-hd,drive=main_drive,bus=ahci.0 \
 				\
 				-drive id=secondary_drive,format=raw,if=none,file=$(ROOT_DIR)/afs.img \
@@ -78,6 +80,7 @@ QEMU_COMMON = 	-device ahci,id=ahci \
 				\
 				-no-reboot
 QEMU_DISPLAY_NONE =	-display none
+QEMU_DISPLAY_CURSES = -display curses
 
 #  -vnc :1
 QEMU_DISPLAY_NORMAL = -vga std -display gtk,gl=on

@@ -103,7 +103,7 @@ char *symbols_get_function_name_at( symbol_collection *syms, uint64_t addr ) {
 	return ret_val;
 }
 
-symbol *symbol_get_symbol( symbol_collection *syms, char *name ) {
+symbol *symbols_get_symbol( symbol_collection *syms, char *name ) {
 	symbol *ret = NULL;
 
 	for( int i = 0; i < syms->top; i++ ) {
@@ -125,7 +125,7 @@ uint64_t symbols_get_total_symbols( symbol_collection *syms ) {
 uint64_t symbols_get_symbol_addr( symbol_collection *syms, char *name ) {
 	uint64_t ret = 0;
 
-	symbol * sym = symbol_get_symbol( syms, name );
+	symbol * sym = symbols_get_symbol( syms, name );
 
 	if( sym != NULL ) {
 		ret = sym->addr;

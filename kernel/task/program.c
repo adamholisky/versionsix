@@ -5,6 +5,7 @@
 #include <fs.h>
 #include <elf.h>
 #include <page.h>
+#include <ksymbols.h>
 
 uint16_t id_top;
 
@@ -277,14 +278,14 @@ int program_load_elf_library( program *p, void *data, size_t size ) {
 
 		//if( elf_get_sym_shndx_from_index((uint32_t*)dl.base, elf_header, ELF32_R_SYM(elf_rel->r_info)) == 0 ) {
 
-			symbol *sym = symbol_get_symbol( 
+			symbol *sym = symbols_get_symbol( 
 											get_ksyms_object(),
 											elf_get_symbol_name_from_symbol_index( p->elf, ELF64_R_SYM( elf_rel->r_info ) )
 											);
 			
 			if( sym == NULL ) {
 				debugf( "Symbol not found.\n" );
-				return;
+				return 0;
 			}
 			
 			debugf( "ksym: name: \"%s\"    addr: 0x%016llX\n",sym->name ,sym->addr );

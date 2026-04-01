@@ -1,6 +1,7 @@
 #include <vui/vui.h>
 #include <vui/console.h>
 #include <vui/font.h>
+#include <stdlib.h>
 
 /**
  * @brief 

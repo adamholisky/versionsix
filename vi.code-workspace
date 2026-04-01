@@ -5,8 +5,8 @@
             "path": "."
         },
         {
-            "name": "VI Libc",
-            "path": "../libcvv/libc"
+            "name": "VI klibc",
+            "path": "../viklibc"
         },
         {
             "name": "VI File System",
@@ -19,19 +19,13 @@
         {
             "name": "VI CNC",
             "path": "../vicnc"
-        },
-        {
-            "path": "../vimusl"
-        },
-        {
-            "path": "../vimusl_inst"
         }
     ],
     "settings": {
         "save-gdb-breakpoints.savePath": "${workspaceFolder}/build_support/gdb_control/breakpoints.gdb",
         "save-gdb-breakpoints.autoSave": true,
         "terminal.explorerKind": "integrated",
-        "editor.cursorStyle": "block",
+        "editor.cursorStyle": "line",
         "files.associations": {
             "limine_bootstrap.h": "c",
             "compare": "c",

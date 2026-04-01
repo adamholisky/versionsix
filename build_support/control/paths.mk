@@ -1,6 +1,6 @@
 
 BUILD_LOG = $(ROOT_DIR)/build_support/logs/build.log
 MOUNT_DIR = $(ROOT_DIR)/build_support/img_mount_point
-MOUNT_IMG = vi_hd.img
+KERNEL_BOOT_IMG = boot_drive.img
 SHELL :=/bin/bash -O globstar
 VPATH = $(shell find ./kernel -type d -printf "kernel/%P:")

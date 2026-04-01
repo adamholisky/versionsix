@@ -85,18 +85,19 @@ install:
 	@>&2 printf "[Install] Done\n"
 
 install_stage2: build/versionvi.bin
-	@>&2 echo [Install] Installing to $(MOUNT_IMG)
-	@$(eval LOOP_DRIVE := $(shell sudo losetup -f))
-	@sudo losetup -fP $(MOUNT_IMG)
-	@sudo mount $(LOOP_DRIVE)p1 $(MOUNT_DIR)
-	@sudo cp build/versionvi.bin -f $(MOUNT_DIR)/versionvi.bin
-	@sudo cp build_support/boot_files/limine.cfg -f $(MOUNT_DIR)/limine.cfg
-	@sudo umount $(MOUNT_DIR) 
-	@sudo losetup -d $(LOOP_DRIVE)
+	@>&2 echo [Install] Installing to $(KERNEL_BOOT_IMG)
+	@mcopy -D o -i $(ROOT_DIR)/$(KERNEL_BOOT_IMG)@@1M $(ROOT_DIR)/build_support/boot_files/limine.conf ::/boot/limine
+	@mcopy -D o -i $(ROOT_DIR)/$(KERNEL_BOOT_IMG)@@1M $(ROOT_DIR)/build/versionvi.bin ::/boot
 
 #& /mnt/c/"Program Files"/TightVNC/tvnviewer.exe :0
 run: install
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING)
+
+run-no-install:
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING) 
+
+run-term-no-install:
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_CURSES) $(QEMU_DEBUG_LOGGING) 
 
 run_debug: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_COMMON) $(QEMU_DEBUG_LOGGING)
@@ -141,17 +142,18 @@ create_img:
 #	This is failing on arch linux? Gives noacl error. Removing.
 # 	@sudo mount -o noacl $(LOOP_DRIVE)p1 $(MOUNT_DIR)
 create_img_stage_2:
-	@dd if=/dev/zero of=$(MOUNT_IMG) bs=100M count=2 >> $(BUILD_LOG)
-	@$(eval LOOP_DRIVE := $(shell sudo losetup -f))
-	@sudo losetup -fP $(MOUNT_IMG)
-	@echo -e "g\nn\n1\n\n+100M\nn\n2\n\n\nw" | sudo fdisk $(LOOP_DRIVE) >> $(BUILD_LOG)
-	@sudo mke2fs $(LOOP_DRIVE)p1
-	@sudo mke2fs $(LOOP_DRIVE)p2
-	@sudo mount $(LOOP_DRIVE)p1 $(MOUNT_DIR)
-	@sudo cp -r build_support/boot_files/* $(MOUNT_DIR)
-	@sudo umount $(MOUNT_DIR)
-	@sudo /usr/local/osdev/share/limine/limine-deploy $(LOOP_DRIVE)
-	@sudo losetup -d $(LOOP_DRIVE)
+	dd if=/dev/zero of=$(MOUNT_IMG) bs=200M count=2 >> $(BUILD_LOG)
+	$(eval LOOP_DRIVE := $(shell sudo losetup -f))
+	sudo losetup -fP $(MOUNT_IMG)
+	echo -e "g\nn\n1\n\n+100M\nn\n2\n\n\nw" | sudo fdisk $(LOOP_DRIVE) >> $(BUILD_LOG)
+	sudo mke2fs $(LOOP_DRIVE)p1
+	sudo mke2fs $(LOOP_DRIVE)p2
+	sudo mount $(LOOP_DRIVE)p1 $(MOUNT_DIR)
+	sudo cp -r build_support/boot_files/* $(MOUNT_DIR)
+	sudo umount $(MOUNT_DIR)
+	sudo echo "Running limine install...\n"
+	sudo /usr/local/osdev/bin/limine bios-install $(LOOP_DRIVE)
+	sudo losetup -d $(LOOP_DRIVE)
 
 drive:
 	@test $(ROOT_DIR)/afs.img || gzip $(ROOT_DIR)/afs.img

@@ -5,6 +5,7 @@
 #include <page_group.h>
 #include <task.h>
 #include <kmemory.h>
+#include <stdlib.h>
 
 extern uint64_t system_count;
 extern vui_core vui;

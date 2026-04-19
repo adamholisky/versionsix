@@ -75,6 +75,13 @@ void __cyg_profile_func_exit  (void *this_fn, void *call_site);
 
 extern void sse_initalize( void );
 
+#define vios_stdout 0
+#define vios_stdin 1
+#define vios_stderr 2
+//#define vios_fprintf( dest, message, ... ) fprintf_stage2_hack( dest, message, __VA_ARGS__ )
+
+int vios_fprintf( int dest, char *message, ... );
+
 #ifdef __cplusplus
 }
 

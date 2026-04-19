@@ -37,6 +37,22 @@ int kstrlen( char *s ) {
 	return len;
 }
 
+int vios_fprintf( int dest, char *message, ... ) {
+	char buff[1024];
+	va_list args;
+	int len = 0;
+
+	va_start( args, message );
+	len = vsnprintf( buff, 1024, message, args ); 
+	va_end( args );
+
+	if( dest == vios_stderr ) {
+		write( FD_STDERR, buff, len );
+	} else if( dest == vios_stdout ) {
+		write( FD_STDOUT, buff, len );
+	}
+}
+
 #ifdef VIOS_ENABLE_PROFILING
 extern uint64_t system_count;
 

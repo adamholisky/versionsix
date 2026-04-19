@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := all
 
 ROOT_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-DEFINES = -DVIFS_OS_ENV -DVI_ENV_OS
+DEFINES = -DVIFS_OS_ENV -DVI_ENV_OS -DVIOS
 
 include $(ROOT_DIR)/build_support/control/paths.mk 
 include $(ROOT_DIR)/build_support/control/toolchain.mk 
@@ -92,6 +92,9 @@ install_stage2: build/versionvi.bin
 #& /mnt/c/"Program Files"/TightVNC/tvnviewer.exe :0
 run: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING)
+
+run-vnc: install
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_VNC) $(QEMU_DEBUG_LOGGING)
 
 run-no-install:
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING) 

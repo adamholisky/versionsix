@@ -31,10 +31,12 @@
 #include <vui/window.h>
 #include <vui/menubar.h>
 #include <tests.h>
+#include <sys_info.h>
 
 
 #undef ENABLE_NETWORKING
 
+sys_info system_information;
 kinfo kernel_info;
 net_info networking_info;
 extern vui_core vui;
@@ -83,11 +85,28 @@ void kernel_main( void ) {
 	fs_initalize_part2();
 	devices_populate_fs();
 
+	klog( LOG_INFO, "Out of fs and dev setup" );
+
 	task_initalize();
 	keyboard_initalize();
 
+	klog( LOG_INFO, "Out of task and kb setup" );
+
+	system_information.version = 1;
+	memcpy( &system_information.kernel_info, &kernel_info, sizeof(kinfo) );
+
 	// Next setup the main console for use. From here on out, printf is okay.
-	vui_init( (uint32_t *)kernel_info.framebuffer_info.address, 1920, 1080 );
+	vui_init( (uint32_t *)kernel_info.framebuffer_info.address, 1024, 768 );
+
+	// Forcing the font load b/c the FS is messed up. TODO: Remove
+	for( int i = 0; i < (418820/0x1000) + 1; i++ ) {
+		page_map( 0xFFFFFFFF40000000 + (0x1000 * i), 0x2800000 + (0x1000 * i) );
+	}
+
+	for( int i = 0; i < (10634/0x1000) + 1; i++ ) {
+		page_map( 0xFFFFFFFF50000000 + (0x1000 * i), 0x2900000 + (0x1000 * i) );
+	}
+
 	load_font_stuff();
 	load_gui_stuff();
 
@@ -105,11 +124,11 @@ void kernel_main( void ) {
 
 	char test_message[] = "Test FS write to device?\n";
 	int len = strlen( test_message );
-	vfs_write( vfs_lookup_inode("/dev/stderr0"), test_message, len, 0 );
+	//vfs_write( vfs_lookup_inode("/dev/stderr0"), test_message, len, 0 );
 
-	task_create( TASK_TYPE_KERNEL_THREAD, TASK_GENERATOR_DEV, "Task Chain", (uint64_t *)task_chain_a );
+/* 	task_create( TASK_TYPE_KERNEL_THREAD, TASK_GENERATOR_DEV, "Task Chain", (uint64_t *)task_chain_a );
 
-	tests_run_tests();		
+	tests_run_tests();		*/
 
 	task_create( TASK_TYPE_KERNEL_THREAD, TASK_GENERATOR_DEV, "KShell", (uint64_t *)kshell_initalize );
 	syscall( SYSCALL_SCHED_YIELD, 0, NULL );
@@ -133,7 +152,7 @@ void load_gui_stuff( void ) {
 	vui_label_set_color( smooth_text, COLOR_RGB_WHITE, theme->desktop );
 	vui_handle_set_name( desktop, "desktop" );
 
-	vui_handle win = vui_window_create( 25, 40, 900, 600, VUI_WINDOW_FLAG_NONE );
+	vui_handle win = vui_window_create( 25, 40, 500, 400, VUI_WINDOW_FLAG_NONE );
 	vui_window_set_title( win, "ViOS 6" );
 	vui_handle_set_name( win, "window_console" );
 	vui_window *win_s = vui_get_handle_data(win);
@@ -150,13 +169,13 @@ void load_gui_stuff( void ) {
 
 void load_font_stuff( void ) {
 	vui_font_initalize();
-	vui_font_load( VUI_FONT_TYPE_PSF, "zap-light", "/usr/share/fonts/zap-light20.psf" );
-	vui_font_load( VUI_FONT_TYPE_PSF, "zap-vga", "/usr/share/fonts/zap-ext-vga16.psf" );
+	//vui_font_load( VUI_FONT_TYPE_PSF, "zap-light", "/usr/share/zap-light20.psf" );
+	vui_font_load( VUI_FONT_TYPE_PSF, "zap-vga", "/usr/share/zap-ext-vga16.psf" );
 /* 	vui_font_load( VUI_FONT_TYPE_TTF, "dejavu-sans", "/usr/share/fonts/DejaVuSans.ttf" );
 	vui_font_load( VUI_FONT_TYPE_TTF, "dejavu-sans-bold", "/usr/share/fonts/DejaVuSans-Bold.ttf" );
 	vui_font_load( VUI_FONT_TYPE_TTF, "dejavu-sans-italic", "/usr/share/fonts/DejaVuSans-Oblique.ttf" ); */
-	vui_font_load( VUI_FONT_TYPE_TTF, "noto-sans", "/usr/share/fonts/NotoSans-Regular.ttf" );
-	vui_font_load( VUI_FONT_TYPE_TTF, "noto-sans-bold", "/usr/share/fonts/NotoSans-SemiBold.ttf" );
+	vui_font_load( VUI_FONT_TYPE_TTF, "noto-sans", "/usr/share/NotoSans-Regular.ttf" );
+	vui_font_load( VUI_FONT_TYPE_TTF, "noto-sans-bold", "/usr/share/NotoSans-SemiBold.ttf" );
 }
 
 void main_console_putc( uint8_t c ) {

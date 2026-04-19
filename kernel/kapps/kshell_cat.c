@@ -5,7 +5,7 @@
 KSHELL_COMMAND( cat, kshell_app_cat_main )
 
 int kshell_app_cat_main( int argc, char *argv[] ) {
-	char *path = NULL;
+	/* char *path = NULL;
 
 	if( argc == 2 ) {
 		path = argv[1];
@@ -29,8 +29,6 @@ int kshell_app_cat_main( int argc, char *argv[] ) {
 		printf( "%s", data );
 		printf( "\n" );
 	} else {
-		/* printf( "Missing filename.\n" );
-        return 1; */
 		char picard[] = "/home/adam/picardhistory.txt";
 		path = picard;
 
@@ -52,7 +50,7 @@ int kshell_app_cat_main( int argc, char *argv[] ) {
 		data[ 5000 ] = 0;
 		printf( "%s", data );
 		printf( "\n" );
-	}
+	} */
 
 	
 

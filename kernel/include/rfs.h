@@ -26,6 +26,7 @@ typedef struct {
     inode_id vfs_parent_inode_id;
 
     uint8_t rfs_file_type;
+    char pathname[1024];
     char name[VFS_NAME_MAX];
     uint8_t *data;
     uint64_t size;
@@ -55,13 +56,13 @@ typedef struct {
 } rfs_mounted;
 
 int rfs_initalize( void );
-rfs_file *rfs_lookup_by_inode_id( inode_id id );
-int rfs_open( inode_id id );
-int rfs_mount( inode_id id, char *path, uint8_t *data_root );
-int rfs_create( inode_id parent, uint8_t type, char *path, char *name );
-int rfs_write( inode_id id, uint8_t *data, uint64_t size, uint64_t offset );
-int rfs_read( inode_id id, uint8_t *data, uint64_t size, uint64_t offset );
-int rfs_stat( inode_id id, vfs_stat_data *stat );
+rfs_file* rfs_lookup_by_pathname( char *pathname );
+int rfs_avs_list_compare_file_pathnames( void *a, void *b );
+int rfs_open(  char *pathname, int flags, mode_t mode );
+int rfs_getattr( char *pathname, struct stat *stbuff );
+int rfs_create( char *pathname, int mode );
+int rfs_read( char *pathname, char *buf, off_t offset, size_t length );
+int rfs_write( char *pathname, char *buff, off_t offset, size_t size );
 vfs_directory_list *rfs_dir_list( inode_id id, vfs_directory_list *list );
 
 #ifdef __cplusplus

@@ -3,6 +3,7 @@
 #include <task.h>
 #include <program.h>
 #include <fs.h>
+#include <vfs.h>
 #include <elf.h>
 #include <page.h>
 #include <ksymbols.h>
@@ -90,28 +91,28 @@ int program_destroy( program *p ) {
  * @	return int 0 if successfull, otherwise error code
  */	
 program *program_load( char *path ) {
-	vfs_stat_data stats;
+	file_stats stats;
 
-	int stat_error = vfs_stat( vfs_lookup_inode(path), &stats );
+	int stat_error = vfs_getattr( path, &stats );
 	if( stat_error != VFS_ERROR_NONE ) {
 		printf( "Error: %d\n", stat_error );
 		return NULL;
 	}
 
-	char *data = kmalloc( stats.size );
-	int read_err = vfs_read( vfs_lookup_inode(path), data, stats.size, 0 );
+	char *data = kmalloc( stats.st_size );
+	int read_err = vfs_read( path, data, stats.st_size, 0 );
 	if( read_err < VFS_ERROR_NONE ) {
 		printf( "Error when reading: %d\n", read_err );
 		return NULL;
 	}
 
-	data[ stats.size ] = 0;
+	data[ stats.st_size ] = 0;
 
 	program *p = program_allocate();
 
 	strcpy( p->path, path );
 
-	program_load_data( p, data, stats.size );
+	program_load_data( p, data, stats.st_size );
 
 	kfree(data);
 

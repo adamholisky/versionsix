@@ -1,0 +1,38 @@
+QEMU_COMMON = 	-device ahci,id=ahci \
+				\
+				-drive id=main_drive,format=raw,if=none,file=$(ROOT_DIR)/$(KERNEL_BOOT_IMG) \
+				-device ide-hd,drive=main_drive,bus=ahci.0 \
+				\
+				-drive id=secondary_drive,format=raw,if=none,file=$(ROOT_DIR)/$(ASVFS_DATA_DRIVE) \
+				-device ide-hd,drive=secondary_drive,bus=ahci.1 \
+				\
+				-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
+				\
+				-netdev user,id=private_net,ipv6=off,ipv4=on,restrict=off \
+				-device e1000,netdev=private_net,mac=12:34:56:78:9A:BC \
+				\
+				-object filter-dump,id=f1,netdev=private_net,file=$(ROOT_DIR)/build_support/logs/packets.dat \
+				\
+				-m 8G \
+				\
+				-device loader,file=$(ROOT_DIR)/os_root/usr/share/fonts/NotoSans-Regular.ttf,addr=0x2800000,force-raw=on \
+				-device loader,file=$(ROOT_DIR)/os_root/usr/share/fonts/zap-ext-vga16.psf,addr=0x2900000,force-raw=on \
+				\
+				-serial stdio \
+				-serial null \
+				-serial null \
+				-serial file:$(ROOT_DIR)/build_support/logs/serial_out.txt \
+				\
+				-d cpu_reset \
+				\
+				-chardev socket,id=mon1,path=$(ROOT_DIR)/build_support/logs/qmp_sock,server=on,wait=off \
+				-mon chardev=mon1,mode=control,pretty=on \
+				\
+				-chardev socket,id=mon2,host=plato.marsdev.io,port=58005,server=on,wait=off \
+				-mon chardev=mon2,mode=control,pretty=on \
+				\
+				--enable-kvm \
+				\
+				-no-reboot \
+				\
+				-pidfile ${ROOT_DIR}/build_support/logs/qemu_pid

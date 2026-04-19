@@ -4,6 +4,9 @@
 extern "C" {
 #endif
 
+#include <kernel_common.h>
+#include <kmemory.h>
+
 #include "vit.h"
 #include "vui/font.h"
 

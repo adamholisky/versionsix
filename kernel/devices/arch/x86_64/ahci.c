@@ -466,6 +466,8 @@ bool ahci_read_at_byte_offset_512_chunks( uint32_t offset, uint32_t size, uint8_
 				size_left = size_left - (512 - internal_offset);
 				mem_to_copy = 512 - internal_offset; 
 			}
+
+			//klog( LOG_DEBUG, "buff: %X  global_buffer: %X, int_offset: %X", buffer, global_buffer, internal_offset );
 			
 			memcpy( buffer, (uint8_t *)global_buffer + internal_offset, mem_to_copy);
 		} else {
@@ -483,6 +485,10 @@ bool ahci_read_at_byte_offset_512_chunks( uint32_t offset, uint32_t size, uint8_
 		}
 		
 	}
+
+	//kdebug_peek_at_n(global_buffer + internal_offset, 6 );
+
+	//kdebug_peek_at_n(buffer, 6 );
 
 	#ifdef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
 	int z = 0;

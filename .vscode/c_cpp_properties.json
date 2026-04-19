@@ -4,11 +4,12 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/local/osdev/versions/vi/kernel/include",
-                "/usr/local/osdev/versions/libcvv/libc/include"
+                "/usr/local/osdev/source/versionsix/kernel/include",
+                "/usr/local/osdev/source/versionsix/vi_klibc_static/include"
             ],
             "defines": [
-                "VI_ENV_OS"
+                "VI_ENV_OS",
+                "VIOS"
             ],
             "compilerPath": "/usr/local/osdev/bin/x86_64-elf-g++",
             "cStandard": "c17",

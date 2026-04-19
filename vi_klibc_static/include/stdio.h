@@ -156,7 +156,7 @@ int vprintf(const char* __restrict, __isoc_va_list);
 void perror(const char*);
 
 int wprintf(const wchar_t* __restrict, ...);
-int fprintf(FILE* __restrict, const char* __restrict, ...);
+//int fprintf(FILE* __restrict, const char* __restrict, ...);
 int vfprintf(FILE* __restrict, const char* __restrict, __isoc_va_list);
 int vsprintf(char* __restrict, const char* __restrict, __isoc_va_list);
 int fwprintf(FILE* __restrict, const wchar_t* __restrict, ...);

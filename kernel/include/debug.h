@@ -4,6 +4,11 @@
 extern "C" {
 #endif
 
+#define LOG_INFO 0      // General info
+#define LOG_DEBUG 1     // Debug output, very verbose
+#define LOG_ERROR 2     // General error, kernel can continue
+#define LOG_PANIC 3     // Kernel panic, exec halted or will be halted
+
 static const char * bit_array[16] = {
     [ 0] = "0000", [ 1] = "0001", [ 2] = "0010", [ 3] = "0011",
     [ 4] = "0100", [ 5] = "0101", [ 6] = "0110", [ 7] = "0111",
@@ -17,6 +22,8 @@ static const char * bit_array[16] = {
 #define df( ... ) debugf( __VA_ARGS__ )
 #define dfv( v ) debugf_val( v )
 #define dpf( ... ) debugf( __VA_ARGS__ ); printf( __VA_ARGS__ );
+
+#define klog( level, ... ) klog_stage2( level, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__ )
 
 #define log_entry_enter() debugf( "Enter\n" )
 #define log_entry_exit() debugf( "Exit\n" );
@@ -50,6 +57,7 @@ void kdebug_peek_at( uint64_t addr );
 char * kdebug_peek_at_n( uint64_t addr, int n );
 char peek_char( char c );
 char * kernel_symbols_get_function_at( uint64_t addr );
+void klog_stage2( int level, char *file_name, char *function_name, int line_number, char * message, ... );
 
 #ifdef __cplusplus
 }

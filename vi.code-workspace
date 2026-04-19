@@ -15,10 +15,6 @@
         {
             "name": "VI UI",
             "path": "../viui"
-        },
-        {
-            "name": "VI CNC",
-            "path": "../vicnc"
         }
     ],
     "settings": {

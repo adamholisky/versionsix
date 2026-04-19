@@ -3,6 +3,7 @@
 #include <vfs.h>
 #include <rfs.h>
 #include <ksymbols.h>
+#include <kmemory.h>
 
 char device_registerfunc_ident[] = "device_register_";
 
@@ -38,18 +39,19 @@ void devices_populate_fs( void ) {
 		memset( &name, 0, 50 );
 		strcpy( name, head->dev->major_id );
 		strcat( name, head->dev->minor_id );
-		inode_id id = vfs_create( VFS_INODE_TYPE_DEVICE, "/dev", name );
+		//inode_id id = vfs_create( VFS_INODE_TYPE_DEVICE, "/dev", name );
 		
-		vfs_inode *ino = vfs_lookup_inode_ptr_by_id(id);
-		if( ino == NULL ) {
-			debugf( "ino returned null!\n" );
-			return;
+		char pathname[255];
+		memset( pathname, 0, 255 );
+		strcpy( pathname, "/dev/" );
+		strcat( pathname, name );
+		int cr_err = vfs_create( pathname, 0 );
+
+		if( cr_err != VFS_ERROR_NONE ) {
+			klog( LOG_ERROR, "vfs_create error on \"%s\": %d", pathname, cr_err );
+		} else {
+			klog( LOG_INFO, "created device: \"%s\"", pathname );
 		}
-
-		// TODO: This should live in vfs_create code
-		ino->dev = kmalloc( sizeof(vfs_device) );
-
-		ino->dev->data = head->dev;
 
 		head = head->next;
 	} while( head != NULL );

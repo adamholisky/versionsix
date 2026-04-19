@@ -133,23 +133,33 @@ void vui_font_get_bounding_box( char *text, vui_font *font, uint16_t *width, uin
 
 void vui_font_load_ttf( vui_font *font ) {
 	#ifdef VI_ENV_OS
-	vfs_stat_data stats;
+	file_stats stats;
 	uint32_t file_size;
 
-	int stat_error = vfs_stat( vfs_lookup_inode(font->info.path), &stats );
+	/* int stat_error = vfs_getattr( font->info.path, &stats );
 	if( stat_error != VFS_ERROR_NONE ) {
 		debugf( "Error: %d\n", stat_error );
 		return;
 	}
 
-	file_size = stats.size;
+	file_size = stats.st_size;
+
+	klog( LOG_INFO, "font file size: %d", stats.st_size );
 
 	uint8_t *data = vmalloc( file_size );
-	int read_err = vfs_read( vfs_lookup_inode(font->info.path), data, file_size, 0 );
+	int read_err = vfs_read( font->info.path, data, file_size, 0 );
 	if( read_err < VFS_ERROR_NONE ) {
 		debugf( "Error when reading: %d\n", read_err );
 		return;
-	}
+	} */
+
+	// Forcing because I broke the file system lol
+	file_size = 418820;
+	//uint8_t *data = kmalloc( file_size );
+	//memcpy( data, (void *)0xFFFFFFFF40000000, file_size );
+	uint8_t *data = (void *)0xFFFFFFFF40000000;
+
+	klog( LOG_INFO, "data: %d %d %d %d", data[0], data[1], data[2], data[3] );
 	#else
 	FILE *f = fopen( font->info.path, "r" );
 
@@ -267,23 +277,31 @@ void vui_font_load_ttf( vui_font *font ) {
 bool vui_font_load_psf( vui_font *font ) {
 
 	#ifdef VI_ENV_OS
-	vfs_stat_data stats;
+	file_stats stats;
 	uint32_t file_size;
 
-	int stat_error = vfs_stat( vfs_lookup_inode(font->info.path), &stats );
+	/* int stat_error = vfs_getattr( font->info.path, &stats );
 	if( stat_error != VFS_ERROR_NONE ) {
 		debugf( "Error: %d\n", stat_error );
 		return false;
 	}
 
-	file_size = stats.size;
+	file_size = stats.st_size;
 
 	uint8_t *data = vmalloc( file_size );
-	int read_err = vfs_read( vfs_lookup_inode(font->info.path), data, file_size, 0 );
+	int read_err = vfs_read( font->info.path, data, file_size, 0 );
 	if( read_err < VFS_ERROR_NONE ) {
 		debugf( "Error when reading: %d\n", read_err );
 		return false;
-	}
+	} */
+
+	file_size = 10634;
+	//uint8_t *data = kmalloc( file_size );
+	//memcpy( data, (void *)0xFFFFFFFF50000000, file_size );
+
+	uint8_t *data = (void *)0xFFFFFFFF50000000;
+
+	klog( LOG_INFO, "data: %d %d %d %d", data[0], data[1], data[2], data[3] );
 	#else
 	FILE *f = fopen( font->info.path, "r" );
 

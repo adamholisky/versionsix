@@ -7,7 +7,7 @@ KSHELL_COMMAND( ls, kshell_app_ls_main )
 char empty_string[] = "";
 
 int kshell_app_ls_main( int argc, char *argv[] ) {
-	char *path = NULL;
+	/* char *path = NULL;
 
 	if( argc == 2 ) {
 		path = argv[1];
@@ -32,24 +32,8 @@ int kshell_app_ls_main( int argc, char *argv[] ) {
 		char dir_char = (n->type == VFS_INODE_TYPE_DIR ? '/' : ' ');
 
 		printf( "%s%c    ", dir_list->entry[i].name, dir_char );
-		// old way, ressurect this at some point
-		/* char *type = NULL;
-
-		vfs_inode *n = vfs_lookup_inode_ptr_by_id( dir_list->entry[i].id );
-		switch( n->type ) {
-			case VFS_INODE_TYPE_DIR:
-				type = type_dir;
-				break;
-			case VFS_INODE_TYPE_FILE:
-				type = type_file;
-				break;
-			default:
-				type = type_unknown;
-		}
-
-		printf( "    %03ld %s %s\n", dir_list->entry[i].id, type, dir_list->entry[i].name ); */
 	}
 
-	printf( "\n" );
+	printf( "\n" ); */
 	return 0;
 }

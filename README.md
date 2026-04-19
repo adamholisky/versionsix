@@ -38,6 +38,20 @@ The "Big Goal" for right now is to laser focus on getting a Telnet connection es
 | Telnet | 🟠 | Working in a very basic way |
 | HTTP/Json | 🔴 | Not started |
 
+### Port List
+
+58000 - VIOS C&C Dashboard
+58001 - QEMU GDB
+58002 - QEMU VNC
+58003 - QEMU VNC over Websocket
+58004 - QEMU Monitor over telnet
+58005 - QEMU QCP over telnet
+58006 - AVS Dev API Websocket
+58020 - VS Code Web
+58021 - Webssh2 websocket tunnel
+58022 - GDB Frontend Web
+
+
 ### Future Goals
 
 | Goal | Status | Comments |

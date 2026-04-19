@@ -253,8 +253,8 @@ int asvfs_getattr( char *pathname, struct stat *stbuff ) {
 	stbuff->st_atime = stbuff->st_ctime = stbuff->st_mtime = 1767268800;
 	//stbuff->st_atimensec = stbuff->st_ctimensec = stbuff->st_mtimensec = 0;
 
-	klog( LOG_INFO, "pn=%s  md.name=%s  st_size=%d", pathname, meta_data.name, meta_data.file_size );
-	kdebug_peek_at( &meta_data );
+	//klog( LOG_INFO, "pn=%s  md.name=%s  st_size=%d", pathname, meta_data.name, meta_data.file_size );
+	//kdebug_peek_at( &meta_data );
 
 	switch( meta_data.block_type ) {
 		case ASVFS_BLOCK_TYPE_DIRECTORY:

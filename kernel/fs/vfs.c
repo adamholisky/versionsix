@@ -206,7 +206,7 @@ int vfs_getattr( const char *pathname, file_stats *stbuff ) {
 /** VFS->HW Interfaces */
 
 int vfs_disk_read( uint64_t drive, uint64_t offset, uint64_t length, uint8_t *data ) {
-	klog( LOG_DEBUG, "vfs_read_from_disk: drive=%d offset=%X length=%X data=%X", drive, offset, length, data );
+	//klog( LOG_DEBUG, "vfs_read_from_disk: drive=%d offset=%X length=%X data=%X", drive, offset, length, data );
 	return vfs_disk_read_no_cache( drive, offset, length, data );
 }
 

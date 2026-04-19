@@ -6,17 +6,17 @@
 
 extern void asm_refresh_cr3( void );
 
-uint16_t *global_buffer;
+uint16_t* global_buffer;
 uint64_t global_buffer_phys;
 
-uint32_t *global_port_page;
+uint32_t* global_port_page;
 uint64_t global_port_page_phys;
 
-uint32_t *global_port_clb;
-uint32_t *global_port_fis;
-HBA_CMD_HEADER *global_cmd_header;
+uint32_t* global_port_clb;
+uint32_t* global_port_fis;
+HBA_CMD_HEADER* global_cmd_header;
 
-HBA_MEM * abar;
+HBA_MEM* abar;
 mmio_config ahci_mmio;
 int num_cmd_slots;
 
@@ -24,93 +24,93 @@ int num_cmd_slots;
 void ahci_initalize( void ) {
 	log_entry_enter();
 
-	pci_header *pci_ahci_drive = pci_get_header_by_device_id( 0x2922 );
+	pci_header* pci_ahci_drive = pci_get_header_by_device_id( 0x2922 );
 	pci_dump_header( pci_ahci_drive );
 
 	mmio_initalize( &ahci_mmio, pci_ahci_drive->bar5 );
-	abar = (HBA_MEM *)(pci_ahci_drive->bar5 + ADDR_IDENTITY_MAP);
+	abar = (HBA_MEM*)( pci_ahci_drive->bar5 + ADDR_IDENTITY_MAP );
 
 	// TODO: use the results to handle whatever drive is attached, for now we hard code
 	ahci_probe_port( abar );
 
 	// Get the number of command slots
-	num_cmd_slots = (abar->cap & 0x0f00) >> 8;
+	num_cmd_slots = ( abar->cap & 0x0f00 ) >> 8;
 
 	// port_page gets the port control 
-	global_port_page = page_allocate_kernel_mmio(1);
+	global_port_page = page_allocate_kernel_mmio( 1 );
 	global_port_page_phys = paging_virtual_to_physical( global_port_page );
 	memset( global_port_page, 0, PAGE_SIZE );
 
-	#ifdef KDEBUG_AHCI_INIT
+#ifdef KDEBUG_AHCI_INIT
 	debugf( "global_port_page virt: %llX\n", global_port_page );
 	debugf( "global_port_page Phys: %llX\n", global_port_page_phys );
-	#endif
+#endif
 
 	// TODO: Remove hard coding for "1" here
 	ahci_port_rebase( &abar->ports[1], 1, global_port_page, global_port_page_phys );
 
-	global_buffer = page_allocate_kernel_mmio(2);
+	global_buffer = page_allocate_kernel_mmio( 2 );
 	global_buffer_phys = paging_virtual_to_physical( global_buffer );
 
-	#ifdef KDEBUG_AHCI_INIT
+#ifdef KDEBUG_AHCI_INIT
 	debugf( "global_buffer virt: %llX\n", global_buffer );
 	debugf( "global_buffer phys: %llX\n", global_buffer_phys );
-	#endif
+#endif
 
-	bool read_result = read_ahci( &abar->ports[1], 0,0,16, (uint16_t *)global_buffer_phys );
+	bool read_result = read_ahci( &abar->ports[1], 0, 0, 16, (uint16_t*)global_buffer_phys );
 
-	#ifdef KDEBUG_AHCI_INIT
+#ifdef KDEBUG_AHCI_INIT
 	debugf( "Read_result: %d\n", read_result );
-	#endif
+#endif
 
 	debugf( "Buffer: \n" );
-	
+
 	int z = 0;
-	for( int b = 0; b < 50; b++ ) {
-		if (z == 0) {
+	for ( int b = 0; b < 50; b++ ) {
+		if ( z == 0 ) {
 			debugf_raw( "\n%04X    ", b * 2 );
 		}
-		
-		debugf_raw( "%02X %02X  ", ( 0x00FF ) & *(global_buffer + b), ((0xFF00) & *(global_buffer + b))>>8 );
+
+		debugf_raw( "%02X %02X  ", ( 0x00FF ) & *( global_buffer + b ), ( ( 0xFF00 ) & *( global_buffer + b ) ) >> 8 );
 
 		z++;
 
-		if( z == 0x8 ) {
+		if ( z == 0x8 ) {
 			z = 0;
 		}
-	} 
- 	
+	}
+
 	log_entry_exit();
 }
 
 /**
  * @brief Probe the AHCI memory for what ports have a device attached, including what type it is
- * 
+ *
  * @param abar Pointer to the AHCI ABAR
  */
-void ahci_probe_port( HBA_MEM *abar ) {
+void ahci_probe_port( HBA_MEM* abar ) {
 	uint32_t pi = abar->pi; // Ports implemented
-	
+
 	// Max of 32 ports
-	for( uint8_t i; i < 32; i++ ) {
+	for ( uint8_t i; i < 32; i++ ) {
 		// If the bit is set, then the port is available for use
-		if( pi & 1 ) {
+		if ( pi & 1 ) {
 			uint8_t dt = ahci_check_type( &abar->ports[i] );
 
-			if( dt == AHCI_DEV_SATA ) {
-				debugf("SATA drive found at port %d\n", i);
+			if ( dt == AHCI_DEV_SATA ) {
+				debugf( "SATA drive found at port %d\n", i );
 			}
 			else if ( dt == AHCI_DEV_SATAPI ) {
-				debugf("SATAPI drive found at port %d\n", i);
+				debugf( "SATAPI drive found at port %d\n", i );
 			}
-			else if ( dt == AHCI_DEV_SEMB )	{
-				debugf("SEMB drive found at port %d\n", i);
+			else if ( dt == AHCI_DEV_SEMB ) {
+				debugf( "SEMB drive found at port %d\n", i );
 			}
 			else if ( dt == AHCI_DEV_PM ) {
-				debugf("PM drive found at port %d\n", i);
+				debugf( "PM drive found at port %d\n", i );
 			}
 			else {
-				debugf("No drive found at port %d\n", i);
+				debugf( "No drive found at port %d\n", i );
 			}
 		}
 
@@ -118,238 +118,233 @@ void ahci_probe_port( HBA_MEM *abar ) {
 		pi >>= 1;
 	}
 }
- 
+
 /**
  * @brief Returns the type of drive attached to the supplied port
- * 
+ *
  * @param port Pointer to the HBA_PORT to query
  * @return uint8_t Type of drive attached, or NULL is nothing
  */
-uint8_t ahci_check_type( HBA_PORT *port ) {
+uint8_t ahci_check_type( HBA_PORT* port ) {
 	uint32_t ssts = port->ssts; // SATA status
- 
-	uint8_t ipm = (ssts >> 8) & 0x0F; // Interface power management, bits 8, 9, 10, 11
+
+	uint8_t ipm = ( ssts >> 8 ) & 0x0F; // Interface power management, bits 8, 9, 10, 11
 	uint8_t det = ssts & 0x0F; // Device detection, bits 0, 1, 2, 3
-	
+
 	// Ensure the drive is present and active
-	if( det != HBA_PORT_DET_PRESENT ) {
+	if ( det != HBA_PORT_DET_PRESENT ) {
 		return AHCI_DEV_NULL;
 	}
-	
-	if (ipm != HBA_PORT_IPM_ACTIVE) {
+
+	if ( ipm != HBA_PORT_IPM_ACTIVE ) {
 		return AHCI_DEV_NULL;
 	}
-	
+
 	// Return what's in the signature
-	switch( port->sig )	{
-		case SATA_SIG_ATAPI:
-			return AHCI_DEV_SATAPI;
-		case SATA_SIG_SEMB:
-			return AHCI_DEV_SEMB;
-		case SATA_SIG_PM:
-			return AHCI_DEV_PM;
-		default:
-			return AHCI_DEV_SATA;
+	switch ( port->sig ) {
+	case SATA_SIG_ATAPI:
+		return AHCI_DEV_SATAPI;
+	case SATA_SIG_SEMB:
+		return AHCI_DEV_SEMB;
+	case SATA_SIG_PM:
+		return AHCI_DEV_PM;
+	default:
+		return AHCI_DEV_SATA;
 	}
 }
 
 /**
  * @brief Rebase the given port to usable memory that we've set up
- * 
+ *
  * @param port pointer to the HBA_PORT
- * @param portno port number (device number) 
+ * @param portno port number (device number)
  * @param new_page_virt_addr virtaul address of the new port's memory
  * @param new_base_phys_addr physical address of the new port's memory
  */
-void ahci_port_rebase( HBA_PORT *port, int portno, uint64_t new_page_virt_addr, uint32_t new_base_phys_addr ) {
+void ahci_port_rebase( HBA_PORT* port, int portno, uint64_t new_page_virt_addr, uint32_t new_base_phys_addr ) {
 	ahci_stop_cmd( port );
- 
+
 	// Setup the command list -- this assumes physical addr is within 32-bit memory space
 	// Overall size of the command list is 1024 bytes (0x400)
 	port->clb = new_base_phys_addr;
 	port->clbu = 0;
 	global_port_clb = new_page_virt_addr;
- 
+
 	// Setup the fis space -- this assumes physical addr is within 32-bit memory space
 	// Overall size of the FIS is 256 bytes (0x100)
 	port->fb = new_base_phys_addr + 0x400;
 	port->fbu = 0;
 	global_port_fis = new_page_virt_addr + 0x400;
- 
+
 	// Set up the command table
 	// Offset is 0x500 (clb + cmd_table_start + fis size) + 8 PRDTS from previous iteration
 	// command tables start after 32 cmd_headers == 0x100 (8 bytes * 32)
 	// 256 bytes (0x100) per command table
-	global_cmd_header = (HBA_CMD_HEADER *)(global_port_clb);
-	for( int i = 0; i < 32; i++ ) {
+	global_cmd_header = (HBA_CMD_HEADER*)( global_port_clb );
+	for ( int i = 0; i < 32; i++ ) {
 		global_cmd_header[i].prdtl = 8;
-		global_cmd_header[i].ctba = new_base_phys_addr + 0x500 + 0x100 + (i * 0x100);
+		global_cmd_header[i].ctba = new_base_phys_addr + 0x500 + 0x100 + ( i * 0x100 );
 		global_cmd_header[i].ctbau = 0;
 	}
- 
+
 	ahci_start_cmd( port );
 }
- 
+
 /**
  * @brief Allow commands for the given port
- * 
+ *
  * @param port pointer to the port
  */
-void ahci_start_cmd( HBA_PORT *port ) {
+void ahci_start_cmd( HBA_PORT* port ) {
 	// Wait until the command register is cleared
-	while( port->cmd & HBA_PxCMD_CR ){
+	while ( port->cmd & HBA_PxCMD_CR ) {
 		;
 	}
 
 	port->cmd |= HBA_PxCMD_FRE; // Enable port receiving 
 	port->cmd |= HBA_PxCMD_ST; // Set the start bit, allowing processing of the command list
 }
- 
+
 /**
  * @brief Stop allowing commands for the given port
- * 
+ *
  * @param port pointer to the port
  */
-void ahci_stop_cmd( HBA_PORT *port ) {
+void ahci_stop_cmd( HBA_PORT* port ) {
 	port->cmd &= ~HBA_PxCMD_ST; // Disable the start bit, disallowing processing of the command list
 	port->cmd &= ~HBA_PxCMD_FRE; // Diable port receiving
- 
+
 	// Wait until FR (FIS receiving happening) and CR (command list running) are cleared
-	while( 1 ) {
-		if (port->cmd & HBA_PxCMD_FR) {
+	while ( 1 ) {
+		if ( port->cmd & HBA_PxCMD_FR ) {
 			continue;
 		}
-			
-		if (port->cmd & HBA_PxCMD_CR) {
+
+		if ( port->cmd & HBA_PxCMD_CR ) {
 			continue;
 		}
-			
+
 		break;
 	}
- 
+
 }
 
 #undef KDEBUG_READ_AHCI
-bool read_ahci( HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint16_t *buf ) {
-	port->is = (uint32_t) -1;		// Clear pending interrupt bits
+bool read_ahci( HBA_PORT* port, uint32_t startl, uint32_t starth, uint32_t count, uint16_t* buf ) {
+	port->is = (uint32_t)-1;		// Clear pending interrupt bits
 	int spin = 0; // Spin lock timeout counter
-	int slot = find_cmdslot(port);
-	if (slot == -1)
+	int slot = find_cmdslot( port );
+	if ( slot == -1 )
 		return false;
 
-	#ifdef KDEBUG_READ_AHCI
+#ifdef KDEBUG_READ_AHCI
 	debugf( "clb virt: %llx\n", global_port_clb );
 	debugf( "clb phys: %X\n", port->clb );
 	debugf( "cmd slot: %d\n", slot );
-	#endif
+#endif
 
-	HBA_CMD_HEADER *cmd_header = global_cmd_header;
-	
-	#ifdef KDEBUG_READ_AHCI
+	HBA_CMD_HEADER* cmd_header = global_cmd_header;
+
+#ifdef KDEBUG_READ_AHCI
 	debugf( "cmd_header: %X\n", cmd_header );
-	#endif
+#endif
 
 	cmd_header += slot;
-	cmd_header->cfl = sizeof(FIS_REG_H2D)/sizeof(uint32_t);	// Command FIS size
+	cmd_header->cfl = sizeof( FIS_REG_H2D ) / sizeof( uint32_t );	// Command FIS size
 	cmd_header->w = 0;		// Read from device
-	cmd_header->prdtl = (uint16_t)((count-1)>>4) + 1;	// PRDT entries count
-	
+	cmd_header->prdtl = (uint16_t)( ( count - 1 ) >> 4 ) + 1;	// PRDT entries count
+
 	// the command table's physical addr is located at cmd_header->ctba 
 	// table's offset is ctba - global_port_page_phys (ctba starts at the top of the page)
 	// virtual address is global_clb + offset
 	uint32_t cmd_table_offset = cmd_header->ctba - global_port_page_phys;
-	HBA_CMD_TBL *cmd_tbl = (HBA_CMD_TBL*)((uint8_t *)global_port_clb + cmd_table_offset);
+	HBA_CMD_TBL* cmd_tbl = (HBA_CMD_TBL*)( (uint8_t*)global_port_clb + cmd_table_offset );
 
-	#ifdef KDEBUG_READ_AHCI
+#ifdef KDEBUG_READ_AHCI
 	debugf( "cmd_header->cfl: %llX\n", cmd_header->cfl );
 	debugf( "cmd_header->ctba: %llX\n", cmd_header->ctba );
 	debugf( "cmd_header->prdtl: %d\n", cmd_header->prdtl );
 	debugf( "cmd_table_offset: %llX\n", cmd_table_offset );
 	debugf( "cmd_table: %X\n", cmd_tbl );
-	#endif
+#endif
 
-	memset(cmd_tbl, 0, sizeof(HBA_CMD_TBL) + (cmd_header->prdtl-1)*sizeof(HBA_PRDT_ENTRY));
+	memset( cmd_tbl, 0, sizeof( HBA_CMD_TBL ) + ( cmd_header->prdtl - 1 ) * sizeof( HBA_PRDT_ENTRY ) );
 
 	// 8K bytes (16 sectors) per PRDT
 	int i;
-	for (i=0; i<cmd_header->prdtl-1; i++)
-	{
+	for ( i = 0; i < cmd_header->prdtl - 1; i++ ) {
 		cmd_tbl->prdt_entry[i].dba = (uint32_t)global_buffer_phys;
-		cmd_tbl->prdt_entry[i].dbc = 8*1024-1;	// 8K bytes (this value should always be set to 1 less than the actual value)
+		cmd_tbl->prdt_entry[i].dbc = 8 * 1024 - 1;	// 8K bytes (this value should always be set to 1 less than the actual value)
 		cmd_tbl->prdt_entry[i].i = 1;
-		buf += 4*1024;	// 4K words
+		buf += 4 * 1024;	// 4K words
 		count -= 16;	// 16 sectors
 	}
 	// Last entry
 	cmd_tbl->prdt_entry[i].dba = (uint32_t)global_buffer_phys;
-	cmd_tbl->prdt_entry[i].dbc = (count<<9)-1;	// 512 bytes per sector
+	cmd_tbl->prdt_entry[i].dbc = ( count << 9 ) - 1;	// 512 bytes per sector
 	cmd_tbl->prdt_entry[i].i = 1;
- 
+
 	//debugf( "cmd_tbl->cfis: %llX\n", cmd_tbl->cfis );
 	// Setup command
-	FIS_REG_H2D *cmdfis = (FIS_REG_H2D*)(&cmd_tbl->cfis);
+	FIS_REG_H2D* cmdfis = (FIS_REG_H2D*)( &cmd_tbl->cfis );
 	cmdfis->fis_type = FIS_TYPE_REG_H2D;
 	cmdfis->c = 1;	// Command
 	cmdfis->command = ATA_CMD_READ_DMA_EX;
- 
-	cmdfis->lba0 = (uint8_t)startl;
-	cmdfis->lba1 = (uint8_t)(startl>>8);
-	cmdfis->lba2 = (uint8_t)(startl>>16);
-	cmdfis->device = 1<<6;	// LBA mode
- 
-	cmdfis->lba3 = (uint8_t)(startl>>24);
-	cmdfis->lba4 = (uint8_t)starth;
-	cmdfis->lba5 = (uint8_t)(starth>>8);
- 
-	cmdfis->countl = count & 0xFF;
-	cmdfis->counth = (count >> 8) & 0xFF;
 
-	
- 
+	cmdfis->lba0 = (uint8_t)startl;
+	cmdfis->lba1 = (uint8_t)( startl >> 8 );
+	cmdfis->lba2 = (uint8_t)( startl >> 16 );
+	cmdfis->device = 1 << 6;	// LBA mode
+
+	cmdfis->lba3 = (uint8_t)( startl >> 24 );
+	cmdfis->lba4 = (uint8_t)starth;
+	cmdfis->lba5 = (uint8_t)( starth >> 8 );
+
+	cmdfis->countl = count & 0xFF;
+	cmdfis->counth = ( count >> 8 ) & 0xFF;
+
+
+
 	// The below loop waits until the port is no longer busy before issuing a new command
-	while ((port->tfd & (ATA_DEV_BUSY | ATA_DEV_DRQ)) && spin < 1000000)
-	{
+	while ( ( port->tfd & ( ATA_DEV_BUSY | ATA_DEV_DRQ ) ) && spin < 1000000 ) {
 		spin++;
 	}
-	if (spin == 1000000)
-	{
-		debugf("Port is hung\n");
+	if ( spin == 1000000 ) {
+		debugf( "Port is hung\n" );
 		return false;
 	}
- 
-	port->ci = 1<<slot;	// Issue command
- 
+
+	port->ci = 1 << slot;	// Issue command
+
 	// Wait for completion
-	while (1)
-	{
+	while ( 1 ) {
 		//debugf( "#" );
 		// In some longer duration reads, it may be helpful to spin on the DPS bit 
 		// in the PxIS port field as well (1 << 5)
-		if ((port->ci & (1<<slot)) == 0) 
+		if ( ( port->ci & ( 1 << slot ) ) == 0 )
 			break;
-		if (port->is & HBA_PxIS_TFES)	// Task file error
+		if ( port->is & HBA_PxIS_TFES )	// Task file error
 		{
-			debugf("Read disk error\n");
+			debugf( "Read disk error\n" );
 			return false;
 		}
 	}
 
 	// Check again
-	if (port->is & HBA_PxIS_TFES)
-	{
-		debugf("Read disk error\n");
+	if ( port->is & HBA_PxIS_TFES ) {
+		debugf( "Read disk error\n" );
 		return false;
 	}
 
 	return true;
 }
 
-bool ahci_read_sector( uint32_t sector, uint32_t *buffer ) {
+bool ahci_read_sector( uint32_t sector, uint32_t* buffer ) {
 	bool read_result = false;
 
-	read_result = read_ahci( &abar->ports[1], sector, 0, 1, (uint16_t *)global_buffer_phys );
+	read_result = read_ahci( &abar->ports[1], sector, 0, 1, (uint16_t*)global_buffer_phys );
 
-	if( !read_result ) {
+	if ( !read_result ) {
 		debugf( "Read failed. sector = %X\n", sector );
 		return false;
 	}
@@ -360,7 +355,7 @@ bool ahci_read_sector( uint32_t sector, uint32_t *buffer ) {
 }
 
 #undef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
-bool ahci_read_at_byte_offset( uint32_t offset, uint32_t size, uint8_t *buffer ) {
+bool ahci_read_at_byte_offset( uint32_t offset, uint32_t size, uint8_t* buffer ) {
 	debugf( "offset = 0x%08X, size = 0x%08X, buffer=0x%llx\n", offset, size, buffer );
 
 	bool read_result = false;
@@ -369,38 +364,38 @@ bool ahci_read_at_byte_offset( uint32_t offset, uint32_t size, uint8_t *buffer )
 	uint32_t internal_offset = 0;
 
 	sector = offset / 512;
-	internal_offset = offset - (sector * 512);
-	count = (size / 512) + 2;
+	internal_offset = offset - ( sector * 512 );
+	count = ( size / 512 ) + 2;
 
-	#ifdef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
+#ifdef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
 	debugf( "read: offset -- %X, size %X\n", offset, size );
 	debugf( "read at offset -- sector = %X, count = %X, internal_offset = %X\n", sector, count, internal_offset );
 
-	memset( global_buffer, 0xDD, 4096*2 );
-	#endif
+	memset( global_buffer, 0xDD, 4096 * 2 );
+#endif
 
-	read_result = read_ahci( &abar->ports[1], sector, 0, count, (uint16_t *)global_buffer_phys );
+	read_result = read_ahci( &abar->ports[1], sector, 0, count, (uint16_t*)global_buffer_phys );
 
-	if( !read_result ) {
+	if ( !read_result ) {
 		debugf( "Read failed. sector = %X\n", sector );
 		return false;
 	}
-	
-	memcpy( buffer, (uint8_t *)global_buffer + internal_offset, size );
 
-	#ifdef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
+	memcpy( buffer, (uint8_t*)global_buffer + internal_offset, size );
+
+#ifdef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
 	int z = 0;
-	for( int b = 0; b < (size / 2); b++ ) {
-		if (z == 0) {
+	for ( int b = 0; b < ( size / 2 ); b++ ) {
+		if ( z == 0 ) {
 			//debugf( "\n%04X    ", b * 2 );
 		}
-		
+
 
 		//debugf( "%02X %02X  ", ( 0x00FF ) & *(buffer + b), ((0xFF00) & *(buffer + b))>>8 );
 
 		z++;
 
-		if( z == 0x8 ) {
+		if ( z == 0x8 ) {
 			z = 0;
 		}
 	}
@@ -410,99 +405,121 @@ bool ahci_read_at_byte_offset( uint32_t offset, uint32_t size, uint8_t *buffer )
 	//kdebug_peek_at_n(global_buffer, 300 );
 
 	//kdebug_peek_at_n(buffer, 300 );
-	#endif
+#endif
 
-	
+
 
 	return true;
 }
 
-bool ahci_read_at_byte_offset_512_chunks( uint32_t offset, uint32_t size, uint8_t *buffer ) {
+#undef KDEBUG_AHCI_READ_AT_BYTE_OFFSET_512_CHUNKS
+bool ahci_read_at_byte_offset_512_chunks( uint32_t offset, uint32_t size, uint8_t* buffer ) {
 	bool read_result = false;
 	uint32_t sector = 0;
 	uint32_t count = 0;
 	uint32_t internal_offset = 0;
 
-	sector = offset / 512;
-	internal_offset = offset - (sector * 512);
+	sector = offset / 512;							// Sector number on the disk
+	internal_offset = offset - ( sector * 512 ); 	// Offset within the sector (aka: internal, to the sector, offset)
 
-	if( size < 512 ) {
+	if ( size < 512 ) {
 		count = 1;
-	} else {
-		count = (size / 512);
+	}
+	else {
+		count = ( size / 512 );
 
-		if( ((size + internal_offset) % 512) != 0 ) {
-			count++; 
+		if ( ( ( size + internal_offset ) % 512 ) != 0 ) {
+			count++;
 		}
 	}
 
-	#ifdef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
+#ifdef KDEBUG_AHCI_READ_AT_BYTE_OFFSET_512_CHUNKS
+if( offset > 0x7700 ) {
 	debugf( "read: offset -- %X, size %X\n", offset, size );
 	debugf( "read at offset -- sector = %X, count = %X, internal_offset = %X\n", sector, count, internal_offset );
 
-	memset( global_buffer, 0xDD, 2*4096 );
-	#endif
+	memset( global_buffer, 0xDD, 2 * 4096 );
+}
+#endif
 
 	uint32_t size_left = size;
 	//debugf( "starting size_left: %d\n", size_left );
 
-	for( int i = 0; i < count; i++ ) {
-		memset( global_buffer, 0x00, 2*4096 );
+	for ( int i = 0; i < count; i++ ) {
+		memset( global_buffer, 0x00, 2 * 4096 );
 
-		read_result = read_ahci( &abar->ports[1], sector + i, 0, 1, (uint16_t *)(global_buffer_phys) );
+		read_result = read_ahci( &abar->ports[1], sector + i, 0, 1, (uint16_t*)( global_buffer_phys ) );
 
-		if( !read_result ) {
+		if ( !read_result ) {
 			//debugf( "Read failed. sector = %X\n", sector );
 			return false;
 		}
 
-		if( i == 0 ) {
+		if ( i == 0 ) {
 			int mem_to_copy = 0;
 
 			// First run is |0 ...... internal_offset .... 512|. total bytes is 512 - internal_offset.
-			if( size_left < 512 ) {
+			if ( size_left < 512 ) {
 				mem_to_copy = size_left;
-			} else {
-				size_left = size_left - (512 - internal_offset);
-				mem_to_copy = 512 - internal_offset; 
+			}
+			else {
+				size_left = size_left - ( 512 - internal_offset );
+				mem_to_copy = 512 - internal_offset;
 			}
 
 			//klog( LOG_DEBUG, "buff: %X  global_buffer: %X, int_offset: %X", buffer, global_buffer, internal_offset );
-			
-			memcpy( buffer, (uint8_t *)global_buffer + internal_offset, mem_to_copy);
-		} else {
+
+			memcpy( buffer, (uint8_t*)global_buffer + internal_offset, mem_to_copy );
+		}
+		else {
 			//debugf( "size_left = %d\n", size_left );
-			
+
 			int mem_to_copy = 512;
 
-			if( size_left < 512 ) {
+			if ( size_left < 512 ) {
 				mem_to_copy = size_left;
-			} else {
+			}
+			else {
 				size_left = size_left - 512;
 			}
 			//debugf( "memcpy: dest = 0x%016llX, src = 0x%016llx, size = 0x%X (%d)\n", buffer + (i*512) - internal_offset, global_buffer, mem_to_copy );
-			memcpy( buffer + (i*512) - internal_offset, (uint8_t *)global_buffer, mem_to_copy );
+			memcpy( buffer + ( i * 512 ) - internal_offset, (uint8_t*)global_buffer, mem_to_copy );
 		}
-		
+
+	}
+
+	// If we've crossed a sector boundry, do this again, but read from the start of the new sector, adjusting the offset and memory location accordingly
+	if( count == 1 ) {
+		if( internal_offset + size > 512 ) {
+			//klog( LOG_INFO, "Doing sector boundry adjustment" );
+
+			bool second_read_success = ahci_read_at_byte_offset_512_chunks( (sector + 1) * 512, size - (512 - internal_offset), buffer + (512 - internal_offset) );
+
+			/* if( offset > 0x7700 ) {
+				kdebug_peek_at_n(buffer, 15 );
+			} */
+			
+			return second_read_success;
+		}
 	}
 
 	//kdebug_peek_at_n(global_buffer + internal_offset, 6 );
 
 	//kdebug_peek_at_n(buffer, 6 );
 
-	#ifdef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
+#ifdef KDEBUG_AHCI_READ_AT_BYTE_OFFSET
 	int z = 0;
-	for( int b = 0; b < (size / 2); b++ ) {
-		if (z == 0) {
+	for ( int b = 0; b < ( size / 2 ); b++ ) {
+		if ( z == 0 ) {
 			//debugf( "\n%04X    ", b * 2 );
 		}
-		
+
 
 		//debugf( "%02X %02X  ", ( 0x00FF ) & *(buffer + b), ((0xFF00) & *(buffer + b))>>8 );
 
 		z++;
 
-		if( z == 0x8 ) {
+		if ( z == 0x8 ) {
 			z = 0;
 		}
 	}
@@ -512,9 +529,9 @@ bool ahci_read_at_byte_offset_512_chunks( uint32_t offset, uint32_t size, uint8_
 	//kdebug_peek_at_n(global_buffer, 300 );
 
 	//kdebug_peek_at_n(buffer, 300 );
-	#endif
+#endif
 
-	
+
 
 	return true;
 }
@@ -524,18 +541,16 @@ bool ahci_read_at_byte_offset_512_chunks( uint32_t offset, uint32_t size, uint8_
 
 
 
- 
+
 // Find a free command list slot
-int find_cmdslot(HBA_PORT *port)
-{
+int find_cmdslot( HBA_PORT* port ) {
 	// If not set in SACT and CI, the slot is free
-	uint32_t slots = (port->sact | port->ci);
-	for (int i=0; i< num_cmd_slots; i++)
-	{
-		if ((slots&1) == 0)
+	uint32_t slots = ( port->sact | port->ci );
+	for ( int i = 0; i < num_cmd_slots; i++ ) {
+		if ( ( slots & 1 ) == 0 )
 			return i;
 		slots >>= 1;
 	}
-	debugf("Cannot find free command list entry\n");
+	debugf( "Cannot find free command list entry\n" );
 	return -1;
 }

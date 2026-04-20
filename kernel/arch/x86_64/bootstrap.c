@@ -4,6 +4,7 @@
 #include "kmemory.h"
 #include <kernel_common.h>
 #include <ksymbols.h>
+#include <device.h>
 
 bool profiling_ok = false;
 bool profiling_first_call = false;
@@ -15,6 +16,24 @@ bool profiling_first_call = false;
  */
 char * k_bs_line_read() {
 	return 0;
+}
+
+char kgetc( void ) {
+	char c;
+
+	device *dev_std_in = device_get_major_minor_device( "stdin", "0" );
+
+	dev_std_in->read(0, &c, 1, 1 );
+
+	if( c == 13 ) {
+		c = '\n';
+	}
+
+	return c;
+}
+
+void kputc( char c ) {
+
 }
 
 void term_put_char( char c ) {

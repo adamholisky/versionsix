@@ -95,9 +95,11 @@ void kshell_main_loop( void ) {
 		/* Step 1: Get the line, put it into current_line */
 		do {
 			//main_console_set_cursor_visiblity( false );
-			scancode = keyboard_get_scancode();
-			c = keyboard_scancode_to_char( scancode );	// this checks for scancode under 0x81, otherwise returns 0
+			//scancode = keyboard_get_scancode();
+			//c = keyboard_scancode_to_char( scancode );	// this checks for scancode under 0x81, otherwise returns 0
 			
+			c = kgetc();
+
 			if( c != 0 ) {
 				if( c == '\n' ) {
 					get_next_key = false;

@@ -1,13 +1,14 @@
 #include <kernel_common.h>
 #include <kshell_app.h>
 #include <fs.h>
+#include <vfs.h>
 
 KSHELL_COMMAND( ls, kshell_app_ls_main )
 
 char empty_string[] = "";
 
 int kshell_app_ls_main( int argc, char *argv[] ) {
-	/* char *path = NULL;
+	char *path = NULL;
 
 	if( argc == 2 ) {
 		path = argv[1];
@@ -19,21 +20,23 @@ int kshell_app_ls_main( int argc, char *argv[] ) {
 	char type_file[] = "FILE";
 	char type_unknown[] = "????";
 
-	vfs_directory_list *dir_list = vfs_malloc( sizeof(vfs_directory_list) );
-	vfs_get_directory_list( vfs_lookup_inode(path), dir_list );
+	if( strcmp( path, "" ) == 0 ) {
+		strcpy( path, "/" );
+	}
 
-	if( dir_list == NULL ) {
+	vfs_dir *d = vfs_opendir( path );
+	if( d == NULL ) {
 		printf( "Directory not found.\n" );
 		return 1;
 	}
 
-	for( int i = 0; i < dir_list->count; i++ ) {
-		vfs_inode *n = vfs_lookup_inode_ptr_by_id( dir_list->entry[i].id );
-		char dir_char = (n->type == VFS_INODE_TYPE_DIR ? '/' : ' ');
-
-		printf( "%s%c    ", dir_list->entry[i].name, dir_char );
+	vfs_dirent *entry;
+	while( (entry = vfs_readdir(d)) != NULL ) {
+		printf( "%s%c    ", entry->name, (entry->type == VFS_INODE_TYPE_DIR ? '/' : ' ') );
 	}
 
-	printf( "\n" ); */
+	printf( "\n" );
+
+	vfs_closedir( d );
 	return 0;
 }

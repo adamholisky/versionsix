@@ -16,7 +16,7 @@ int32_t data_buffer_task;
 bool data_ready;
 bool serial_cr_recvd;
 
-device serial4;
+
 
 void serial_initalize(void)
 {
@@ -28,45 +28,10 @@ void serial_initalize(void)
 
 	// DO NOT PUT KLOG FUNCTIONS HERE
 	serial_setup_port(COM1);
+	serial_setup_port(COM3);
 	serial_setup_port(COM4);
 
 	default_port = COM1;
-}
-
-device *device_register_serial4( void ) {
-	memset( &serial4, 0, sizeof(device) );
-
-	strcpy( serial4.major_id, "serial" );
-	strcpy( serial4.minor_id, "4" );
-
-	serial4.close = serial4_close;
-	serial4.open = serial4_open;
-	serial4.read = serial4_read;
-	serial4.write = serial4_write;
-
-	device_register( &serial4 );
-}
-
-void serial4_open( inode_id id ) {
-	// Intentionally blank
-}
-
-void serial4_close( inode_id id ) {
-	// Intentionally blank
-}
-
-uint8_t serial4_read( inode_id id, uint8_t *buff, uint64_t count, uint64_t offset ) {
-	return 0;
-}
-
-void serial4_write( inode_id id, void *buff, size_t count, size_t offset ) {
-	char *char_buff = (char *)buff;
-	char *char_buff_end = (char *)buff + count;
-
-	while (char_buff != char_buff_end) {
-		serial_write_port(*char_buff, COM4);
-		char_buff++;
-	}
 }
 
 void serial_setup_port(uint32_t port)

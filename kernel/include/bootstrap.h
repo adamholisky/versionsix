@@ -81,6 +81,8 @@ extern void sse_initalize( void );
 //#define vios_fprintf( dest, message, ... ) fprintf_stage2_hack( dest, message, __VA_ARGS__ )
 
 int vios_fprintf( int dest, char *message, ... );
+char kgetc( void );
+void kputc( char c );
 
 #ifdef __cplusplus
 }

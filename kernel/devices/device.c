@@ -4,15 +4,15 @@
 #include <rfs.h>
 #include <ksymbols.h>
 #include <kmemory.h>
+#include <lib/list.h>
 
 char device_registerfunc_ident[] = "device_register_";
 
 bool devices_setup_status = false;
-device_list device_head;
+avs_list *device_list;
 
 void device_initalize( void ) {
-	device_head.dev = NULL;
-	device_head.next = NULL;
+	device_list = avs_list_init();
 
 	// Find all symbols that start wtih "kshell_app_add_command" and call them each
 	symbol_collection *ksym = get_ksyms_object();
@@ -31,30 +31,36 @@ void device_initalize( void ) {
 }
 
 void devices_populate_fs( void ) {
-	device_list *head = &device_head;
+	avs_list_for_each( device_list, device_list_populate_for_each_callback );
+}
 
-	do {
-		char name[50];
+void device_list_populate_for_each_callback( avs_node *n ) {
+	device *dev = n->data;
 
-		memset( &name, 0, 50 );
-		strcpy( name, head->dev->major_id );
-		strcat( name, head->dev->minor_id );
-		//inode_id id = vfs_create( VFS_INODE_TYPE_DEVICE, "/dev", name );
-		
-		char pathname[255];
-		memset( pathname, 0, 255 );
-		strcpy( pathname, "/dev/" );
-		strcat( pathname, name );
-		int cr_err = vfs_create( pathname, 0 );
+	if( dev == NULL ) {
+		return;
+	}
 
-		if( cr_err != VFS_ERROR_NONE ) {
-			klog( LOG_ERROR, "vfs_create error on \"%s\": %d", pathname, cr_err );
-		} else {
-			klog( LOG_INFO, "created device: \"%s\"", pathname );
-		}
+	char name[50];
 
-		head = head->next;
-	} while( head != NULL );
+	memset( &name, 0, 50 );
+	strcpy( name, dev->major_id );
+	
+	if( dev->minor_id[0] != '0' ) {
+		strcat( name, dev->minor_id );
+	}
+
+	char pathname[255];
+	memset( pathname, 0, 255 );
+	strcpy( pathname, "/dev/" );
+	strcat( pathname, name );
+	int cr_err = vfs_create( pathname, 0 );
+
+	if( cr_err != VFS_ERROR_NONE ) {
+		klog( LOG_ERROR, "vfs_create error on \"%s\": %d", pathname, cr_err );
+	} else {
+		klog( LOG_INFO, "created device: \"%s\"", pathname );
+	}
 }
 
 /**
@@ -68,57 +74,31 @@ bool devices_setup( void ) {
 }
 
 void device_register( device *d ) {
-	device_list *head = &device_head;
-	device_list *tail = NULL;
-	device_list *dl = NULL;
-	bool found = false;
-
-	do {
-		if( head->dev == NULL ) {
-			dl = head;
-			found = true;
-		} else {
-			if( head->next != NULL ) {
-				head = head->next;
-			} else {
-				head->next = kmalloc( sizeof(device_list) );
-				dl = head->next;
-				found = true;
-			}
-		}
-		tail = head;
-		head = head->next;
-	} while( head != NULL && !found );
-
-	if( dl == NULL ) {
-		debugf( "Cannot find free device.\n" );
-		return;
-	}
-
-	dl->dev = d;
-	dl->next = NULL;
+	avs_list_append( device_list, d );
 }
 
 device *device_get_major_minor_device( char *major, char *minor ) {
-	device_list *head = &device_head;
-	device_list *dl = NULL;
+	avs_node *h = device_list->head;
 	bool found = false;
+	device *d = NULL;
 
 	do {
-		if( strcmp(head->dev->major_id, major) == 0 ) {
-			if( strcmp(head->dev->minor_id, minor) == 0 ) {
+		device *d_temp = (device *)h->data;
+		if( strcmp(d_temp->major_id, major) == 0 ) {
+			if( strcmp(d_temp->minor_id, minor) == 0 ) {
 				found = true;
-				dl = head;
+				d = d_temp;
 			}
 		}
 
-		head = head->next;
-	} while( head != NULL && !found );
-
+		h = h->next;
+	} while( h != NULL && !found );
+	
 	if( found == false ) {
 		debugf( "Cannot find device %s,%s\n", major, minor );
 		return NULL;
 	}
-
-	return dl->dev;
+	
+	return d;
 }
+

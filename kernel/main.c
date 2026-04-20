@@ -33,20 +33,23 @@
 #include <tests.h>
 #include <sys_info.h>
 
-
 #undef ENABLE_NETWORKING
+
+
+#ifdef ENABLE_GUI
+extern vui_core vui;
+vui_handle main_console_handle;
+vui_console *main_console;
+
+void load_font_stuff( void );
+void load_gui_stuff( void );
+#endif
 
 sys_info system_information;
 kinfo kernel_info;
 net_info networking_info;
-extern vui_core vui;
-
-vui_handle main_console_handle;
-vui_console *main_console;
 
 extern void tcp_test( void );
-void load_font_stuff( void );
-void load_gui_stuff( void );
 
 char fxsave_region[512] __attribute__((aligned(16)));
 
@@ -75,7 +78,11 @@ void kernel_main( void ) {
 	#ifdef VIOS_ENABLE_PROFILING
 	profiling_initalize();
 	#endif
+
+	#ifdef ENABLE_GUI
 	framebuffer_initalize();
+	#endif
+
 	pci_initalize();
 	ahci_initalize();
 
@@ -95,6 +102,7 @@ void kernel_main( void ) {
 	system_information.version = 1;
 	memcpy( &system_information.kernel_info, &kernel_info, sizeof(kinfo) );
 
+	#ifdef ENABLE_GUI
 	// Next setup the main console for use. From here on out, printf is okay.
 	vui_init( (uint32_t *)kernel_info.framebuffer_info.address, 1024, 768 );
 
@@ -109,8 +117,7 @@ void kernel_main( void ) {
 
 	load_font_stuff();
 	load_gui_stuff();
-
-	
+	#endif
 		
 	
 	printf( "Versions OS VI\n" );
@@ -140,6 +147,8 @@ void kernel_main( void ) {
 	printf( "Ending happy.\n" );
 	do_immediate_shutdown();
 }
+
+#ifdef ENABLE_GUI
 
 void load_gui_stuff( void ) {
 	vui_theme *theme = vui_get_active_theme();
@@ -191,6 +200,20 @@ void main_console_set_cursor_visiblity( bool visible ) {
 void main_console_blink_cursor( void ) {
 	//vui_console_blink_cursor( main_console );
 }
+
+#else
+	void main_console_putc( uint8_t c ) {
+		serial_write_port( c, COM3 );
+	}
+
+	void main_console_set_cursor_visiblity( bool visible ) {
+		//main_console->show_cursor = visible;
+	}
+
+	void main_console_blink_cursor( void ) {
+		//vui_console_blink_cursor( main_console );
+	}
+#endif
 
 void task_chain_a( void ) {
 	task_chain_b();

@@ -202,6 +202,49 @@ int vfs_getattr( const char *pathname, file_stats *stbuff ) {
 	return asvfs_getattr( pathname, stbuff );
 }
 
+vfs_dir *vfs_opendir( char *pathname ) {
+	file_stats st;
+	int getattr_err = asvfs_getattr( pathname, &st );
+	if(  getattr_err != VFS_ERROR_NONE ) {
+		klog( LOG_ERROR, "Getattr returned an error: %d", getattr_err );
+		return NULL;
+	}
+
+	vfs_dir *dirp = kmalloc( sizeof(vfs_dir) );
+
+	int get_dir_list_err = asvfs_get_dir_list_glue( pathname, dirp );
+	if( get_dir_list_err != VFS_ERROR_NONE ) {
+		klog( LOG_ERROR, "asvfs_get_dir_list_glue returned an error: %d", get_dir_list_err );
+
+		kfree( dirp );
+		return NULL;
+	}
+
+	dirp->next = 0;
+
+	return dirp;
+}
+
+void vfs_closedir( vfs_dir *dirp ) {
+	int close_dir_err = asvfs_close_dir_list_glue( dirp );
+	if( close_dir_err != VFS_ERROR_NONE ) {
+		klog( LOG_ERROR, "asvfs_close_dir_list_glue returned an error: %d", close_dir_err );
+	}
+
+	kfree( dirp );
+}
+
+vfs_dirent *vfs_readdir( vfs_dir *dirp ) {
+	avs_node *n = avs_list_at_index_node( dirp->dir_list, dirp->next );
+	if( n == NULL ) {
+		return NULL;
+	}
+
+	dirp->next++;
+
+	return (vfs_dirent *)n->data;
+}
+
 
 /** VFS->HW Interfaces */
 

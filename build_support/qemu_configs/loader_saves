@@ -1,0 +1,11 @@
+[device]
+driver = "loader"
+file = "os_root/usr/share/fonts/NotoSans-Regular.ttf"
+addr = "0x2800000"
+force-raw = "on"
+
+[device]
+driver = "loader"
+file = "os_root/usr/share/fonts/zap-ext-vga16.psf"
+addr = "0x2900000"
+force-raw = "on"

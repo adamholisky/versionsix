@@ -118,6 +118,19 @@ typedef struct {
 	vfs_filesystem *fs;
 } vfs_mount_point;
 
+typedef struct {
+	inode_id	ino;		// inode number of the file
+	uint8_t		type;		// file type
+	uint32_t	size;		// file size
+	char		name[256];	// file name
+} vfs_dirent;
+
+typedef struct {
+	uint16_t	count;
+	uint16_t	next;
+	avs_list	*dir_list;
+} vfs_dir;
+
 /**
  * @brief Lists directory item names with associated inode ptr. 
  * 
@@ -204,6 +217,10 @@ int vfs_create( const char *pathname, mode_t mode );
 int vfs_write( const char *pathname, char *buff, off_t offset, size_t length );
 int vfs_read( const char *pathname, char *buff, off_t offset, size_t length );
 int vfs_getattr( const char *pathname, file_stats *stbuff );
+
+vfs_dir *vfs_opendir( char *pathname );
+void vfs_closedir( vfs_dir *dirp );
+vfs_dirent *vfs_readdir( vfs_dir *dirp );
 
 /** VFS->HW Interfaces */
 

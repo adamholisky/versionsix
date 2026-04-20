@@ -153,7 +153,7 @@ void vui_font_load_ttf( vui_font *font ) {
 		return;
 	}
 
-	//klog( LOG_INFO, "data: %d %d %d %d", data[0], data[1], data[2], data[3] );
+	klog( LOG_INFO, "data: %d %d %d %d", data[0], data[1], data[2], data[3] );
 	#else
 	FILE *f = fopen( font->info.path, "r" );
 

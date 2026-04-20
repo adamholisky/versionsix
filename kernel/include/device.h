@@ -16,18 +16,15 @@ typedef struct {
 	int (*read)( inode_id, uint8_t *, uint64_t, uint64_t );
 	int (*stat)( inode_id, vfs_stat_data * );
 	int (*write)( inode_id, uint8_t *, size_t, size_t );
+	int (*interrupt_handler)();
 } device;
-
-typedef struct {
-	device *dev;
-	void *next;
-} device_list;
 
 void device_initalize( void );
 void devices_populate_fs( void );
 bool devices_setup( void );
 void device_register( device *d );
 device *device_get_major_minor_device( char *major, char *minor );
+void device_list_populate_for_each_callback( avs_node *n );
 
 #ifdef __cplusplus
 }

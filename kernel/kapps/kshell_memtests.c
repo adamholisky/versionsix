@@ -20,14 +20,17 @@ int kshell_app_mem_main( int argc, char *argv[] ) {
 
 	if( argc >= 2 ) {
 		if( strcmp(argv[1], "test") == 0 ) {
-			if( argc == 3 ) {
-				if( strcmp(argv[1], "phys") == 0 ) {
+			full_test = true;
+			tests();
+
+			/* if( argc == 2 ) {
+				if( strcmp(argv[2], "phys") == 0 ) {
 					test_physical_limit = true;
 					tests();
-				} else if( strcmp(argv[1], "virt") == 0 ) {
+				} else if( strcmp(argv[2], "virt") == 0 ) {
 					test_virtual_limit = true;
 					tests();
-				} else if( strcmp(argv[3], "full") == 0 ) {
+				} else if( strcmp(argv[2], "full") == 0 ) {
 					full_test = true;
 					tests();
 				} else {
@@ -35,7 +38,7 @@ int kshell_app_mem_main( int argc, char *argv[] ) {
 				}
 			} else {
 				display_help();
-			}
+			} */
 		} else if( strcmp(argv[1], "stats") == 0 ) {
 			stats();
 		}

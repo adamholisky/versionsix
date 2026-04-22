@@ -58,6 +58,8 @@ struct stat {
 	syscall_ulong_t st_mtimensec;	/* Nsecs of last modification.  */
 	time_t st_ctime;			/* Time of last status change.  */
 	syscall_ulong_t st_ctimensec;	/* Nsecs of last status change.  */
+
+	uint8_t type;
 };
 
 typedef struct stat file_stats;

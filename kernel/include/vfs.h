@@ -85,6 +85,11 @@ typedef struct {
 } vfs_directory_list;
 
 typedef struct {
+	char major[25];
+	char minor[25];
+} vfs_device_data;
+
+typedef struct {
 	int (*getattr) (const char *, struct stat *);
 	int (*mknod) (const char *, mode_t, dev_t);
 	int (*mkdir) (const char *, mode_t);
@@ -215,7 +220,8 @@ int avs_list_compare_fs_type( void *a, void *b );
 int vfs_mount( char* fs_type, char* mount_path, int drive_id );
 int vfs_create( const char *pathname, mode_t mode );
 int vfs_write( const char *pathname, char *buff, off_t offset, size_t length );
-int vfs_read( const char *pathname, char *buff, off_t offset, size_t length );
+int vfs_write_device_meta( char *pathname, char *major_id, char *minor_id );
+int vfs_read( const char *pathname, char *buff, size_t size, off_t offset );
 int vfs_getattr( const char *pathname, file_stats *stbuff );
 
 vfs_dir *vfs_opendir( char *pathname );
@@ -224,10 +230,12 @@ vfs_dirent *vfs_readdir( vfs_dir *dirp );
 
 /** VFS->HW Interfaces */
 
-int vfs_disk_read( uint64_t drive, uint64_t offset, uint64_t length, uint8_t *data );
-int vfs_disk_read_no_cache( uint64_t drive, uint64_t offset, uint64_t length, uint8_t *data );
-uint8_t *vfs_disk_write( uint64_t drive, uint64_t offset, uint64_t length, uint8_t *data );
-uint8_t *vfs_disk_write_no_cache( uint64_t drive, uint64_t offset, uint64_t length, uint8_t *data );
+int vfs_disk_read( uint64_t drive, uint8_t *buff, size_t size, off_t offset );
+int vfs_disk_read_no_cache( uint64_t drive, uint8_t *buff, size_t size, off_t offset );
+uint8_t *vfs_disk_write( uint64_t drive, uint8_t *buff, size_t size, off_t offset );
+uint8_t *vfs_disk_write_no_cache( uint64_t drive, uint8_t *buff, size_t size, off_t offset );
+
+void vfs_dump_mount_points( void );
 
 
 /* // File system management

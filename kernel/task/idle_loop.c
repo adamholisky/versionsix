@@ -3,6 +3,10 @@
 
 uint64_t i;
 
+int kernel_idle_loop_entry( int argc, char *argv[] ) {
+	kernel_idle_loop();
+}
+
 void kernel_idle_loop( void ) {
     i = 0;
 

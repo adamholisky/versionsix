@@ -54,13 +54,15 @@ void device_list_populate_for_each_callback( avs_node *n ) {
 	memset( pathname, 0, 255 );
 	strcpy( pathname, "/dev/" );
 	strcat( pathname, name );
-	int cr_err = vfs_create( pathname, 0 );
+	int cr_err = vfs_create( pathname, VFS_INODE_TYPE_DEVICE );
 
 	if( cr_err != VFS_ERROR_NONE ) {
 		klog( LOG_ERROR, "vfs_create error on \"%s\": %d", pathname, cr_err );
 	} else {
 		klog( LOG_INFO, "created device: \"%s\"", pathname );
 	}
+
+	vfs_write_device_meta( pathname, dev->major_id, dev->minor_id );
 }
 
 /**

@@ -215,11 +215,11 @@ typedef struct {
 
 typedef struct {
 	int (*read)(const char *, char *, size_t, off_t);
-	int (*read_from_disk)(uint64_t, uint64_t, uint64_t, uint8_t *);
+	int (*read_from_disk)(uint64_t, uint8_t *, uint64_t, uint64_t );
 	int (*write_to_disk)(uint32_t, off_t, size_t, char *); 
 } asvfs_drive_ops;
 
-#define asvfs_drive_read( drive, offset, size, data ) asvfs_instance_data.drive_ops.read_from_disk( drive, offset, size, data )
+#define asvfs_drive_read( drive, data, size, offset ) asvfs_instance_data.drive_ops.read_from_disk( drive, data, size, offset )
 //#define asvfs_drive_write( block_id, size, data ) asvfs_instance.drive_ops.write_to_disk( block_id, size, data )
 
 typedef struct {
@@ -230,9 +230,9 @@ typedef struct {
 int asvfs_initalize( asvfs_drive_ops *ops );
 int asvfs_open( char *pathname, int flags, mode_t mode );
 int asvfs_getattr( char *pathname, struct stat *stbuff );
-int asvfs_read( char *pathname, char *buf, off_t offset, size_t length );
+int asvfs_read( char *pathname, char *buf, size_t size, off_t offset );
 int asvfs_read_file_block_id( uint32_t block_id, char *buf, off_t offset, size_t length );
-int asvfs_read_block( uint32_t block_id, size_t size, char *data );
+int asvfs_read_block( uint32_t block_id, size_t size, char *data ); // TODO: Update param order
 int asvfs_readdir(uint32_t block_id, asvfs_dir_t_entries *dir_entries);
 int asvfs_get_meta_data(uint32_t block_id, asvfs_block_meta_data *data);
 uint32_t asvfs_get_block_id_from_pathname( char *pathname );

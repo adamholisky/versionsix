@@ -35,7 +35,7 @@ uint8_t stdin_read( inode_id id, uint8_t * buff, uint64_t count, uint64_t offset
 		device *com3 = device_get_major_minor_device( "serial", "3" );
 		c = com3->read( id, buff, count, offset );
 		//c = keyboard_scancode_to_char( scancode );
-		debugf( "got c: %c (%d)", c, (int)c );
+		//debugf( "got c: %c (%d)", c, (int)c );
 		*buff = c;
 	#else 
 		scancode = keyboard_get_scancode();

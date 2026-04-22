@@ -266,7 +266,7 @@ void task_set_task_status( uint16_t task_id, uint8_t status ) {
 	task *t = get_task_data( task_id );
 
 	if( t == NULL ) {
-		debugf( "Setting task status for non-existant task: %d\n", task_id );
+		debugf( "Cannot find task. id=%d  status_to_set=%d", task_id, status);
 		return;
 	}
 
@@ -296,7 +296,7 @@ void task_exit( uint16_t task_id, uint16_t parent_task_id ) {
 	
 	task_set_yield_to_next( parent_task_id );
 	
-	//debugf( "Yielding to task id: %d\n", parent_task_id );
+	klog( LOG_DEBUG, "Yielding to task id: %d", parent_task_id );
 	
 	syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 }
@@ -328,7 +328,7 @@ void task_environment_preamble( void ) {
 
 	//dfv( task_id );
 
-	task_exit( task_id, t->parent_task_id );
+	task_exit( task_id, parent_task_id );
 }
 
 uint64_t task_get_exit_code( uint16_t task_id ) {

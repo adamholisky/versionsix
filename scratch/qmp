@@ -1,0 +1,5 @@
+{ "execute": "qmp_capabilities" }
+{ "execute": "qmp_capabilities", "arguments": { "enable": ["oob"] } }
+{ "execute": "query-vnc" }
+{ "execute": "query-qmp-schema" }
+s

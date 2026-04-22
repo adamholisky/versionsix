@@ -33,6 +33,8 @@
 #include <tests.h>
 #include <sys_info.h>
 
+#include <process.h>
+
 #undef ENABLE_NETWORKING
 
 
@@ -75,7 +77,7 @@ void kernel_main( void ) {
 	kernel_symbols_initalize();
 	paging_initalize_page_groups();
 
-	#ifdef VIOS_ENABLE_PROFILING
+	#ifdef ENABLE_PROFILING
 	profiling_initalize();
 	#endif
 
@@ -131,11 +133,19 @@ void kernel_main( void ) {
 
 	char test_message[] = "Test FS write to device?\n";
 	int len = strlen( test_message );
-	//vfs_write( vfs_lookup_inode("/dev/stderr0"), test_message, len, 0 );
+	vfs_write( "/dev/stderr", test_message, 0, len );
 
-/* 	task_create( TASK_TYPE_KERNEL_THREAD, TASK_GENERATOR_DEV, "Task Chain", (uint64_t *)task_chain_a );
+	printf( "Initalizing process system and loading first exec...\n" );
 
-	tests_run_tests();		*/
+	process_initalize();
+
+	process_start_root_process();
+	
+	do_immediate_shutdown();
+
+	/* task_create( TASK_TYPE_KERNEL_THREAD, TASK_GENERATOR_DEV, "Task Chain", (uint64_t *)task_chain_a );
+
+	tests_run_tests();
 
 	task_create( TASK_TYPE_KERNEL_THREAD, TASK_GENERATOR_DEV, "KShell", (uint64_t *)kshell_initalize );
 	syscall( SYSCALL_SCHED_YIELD, 0, NULL );
@@ -145,7 +155,7 @@ void kernel_main( void ) {
 
 	debugf( "Ending happy.\n" );
 	printf( "Ending happy.\n" );
-	do_immediate_shutdown();
+	do_immediate_shutdown(); */
 }
 
 #ifdef ENABLE_GUI
@@ -216,18 +226,22 @@ void main_console_blink_cursor( void ) {
 #endif
 
 void task_chain_a( void ) {
+	printf( "In A\n" );
 	task_chain_b();
 }
 
 void task_chain_b( void ) {
+	printf( "In B\n" );
 	task_chain_c();
 }
 
 void task_chain_c( void ) {
+	printf( "In C\n" );
 	task_chain_d();
 }
 
 void task_chain_d( void ) {
+	printf( "In D\n" );
 	do {
 		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 	} while (1);

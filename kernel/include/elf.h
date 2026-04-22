@@ -179,6 +179,7 @@ Elf64_Phdr *get_program_header_by_index( elf_file *elf, uint8_t index );
 
 Elf64_Sym* elf_get_symtab( elf_file *elf );
 char *elf_get_symbol_name_from_symbol_index( elf_file *elf, uint32_t index );
+uint64_t elf_get_symbol_addr_from_symbol_name( elf_file *elf, char *name );
 
 int elf_load_symbols( elf_file *elf );
 

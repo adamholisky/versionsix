@@ -5,9 +5,7 @@
 
 #include <asvfs.h>
 
-KSHELL_COMMAND( ls, kshell_app_ls_main )
-
-int kshell_app_ls_main( int argc, char *argv[] ) {
+int main( int argc, char *argv[] ) {
 	char path[1024];
 	
 	memset( path, 0, 1024 );
@@ -27,19 +25,19 @@ int kshell_app_ls_main( int argc, char *argv[] ) {
 	file_stats st;
 	int getattr_err = asvfs_getattr( path, &st );
 
-	/* vfs_dir *d = vfs_opendir( path );
+	vfs_dir *d = vfs_opendir( path );
 	if( d == NULL ) {
 		printf( "Directory not found.\n" );
 		return 1;
-	} */
+	}
 
-	/*vfs_dirent *entry;
+	vfs_dirent *entry;
 	while( (entry = vfs_readdir(d)) != NULL ) {
 		printf( "%s%c    ", entry->name, (entry->type == VFS_INODE_TYPE_DIR ? '/' : ' ') );
 	}
 
-	printf( "\n" );*/
+	printf( "\n" );
 
-	//vfs_closedir( d );
+	vfs_closedir( d );
 	return 0;
 }

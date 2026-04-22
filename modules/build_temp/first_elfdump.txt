@@ -8,16 +8,16 @@ ELF Header:
   Type:                              DYN (Shared object file)
   Machine:                           Advanced Micro Devices X86-64
   Version:                           0x1
-  Entry point address:               0x200
+  Entry point address:               0x710
   Start of program headers:          64 (bytes into file)
-  Start of section headers:          3072 (bytes into file)
+  Start of section headers:          5760 (bytes into file)
   Flags:                             0x0
   Size of this header:               64 (bytes)
   Size of program headers:           56 (bytes)
   Number of program headers:         3
   Size of section headers:           64 (bytes)
-  Number of section headers:         26
-  Section header string table index: 25
+  Number of section headers:         24
+  Section header string table index: 23
 
 Section Headers:
   [Nr] Name              Type             Address           Offset
@@ -25,55 +25,51 @@ Section Headers:
   [ 0]                   NULL             0000000000000000  00000000
        0000000000000000  0000000000000000           0     0     0
   [ 1] .hash             HASH             00000000000000e8  000000e8
-       0000000000000028  0000000000000004   A       2     0     8
-  [ 2] .dynsym           DYNSYM           0000000000000110  00000110
-       0000000000000078  0000000000000018   A       3     1     8
-  [ 3] .dynstr           STRTAB           0000000000000188  00000188
-       000000000000001c  0000000000000000   A       0     0     1
-  [ 4] .rela.dyn         RELA             00000000000001a8  000001a8
-       0000000000000018  0000000000000018   A       2     0     8
-  [ 5] .rela.plt         RELA             00000000000001c0  000001c0
-       0000000000000018  0000000000000018  AI       2    12     8
-  [ 6] .plt              PROGBITS         00000000000001e0  000001e0
-       0000000000000020  0000000000000010  AX       0     0     16
-  [ 7] .text             PROGBITS         0000000000000200  00000200
-       0000000000000028  0000000000000000  AX       0     0     16
-  [ 8] .rodata           PROGBITS         0000000000000228  00000228
-       000000000000000f  0000000000000001 AMS       0     0     1
-  [ 9] .eh_frame         PROGBITS         0000000000000238  00000238
-       0000000000000074  0000000000000000   A       0     0     8
-  [10] .dynamic          DYNAMIC          00000000002002b0  000002b0
+       0000000000000034  0000000000000004   A       2     0     8
+  [ 2] .dynsym           DYNSYM           0000000000000120  00000120
+       00000000000000c0  0000000000000018   A       3     1     8
+  [ 3] .dynstr           STRTAB           00000000000001e0  000001e0
+       0000000000000042  0000000000000000   A       0     0     1
+  [ 4] .rela.dyn         RELA             0000000000000228  00000228
+       0000000000000408  0000000000000018   A       2     0     8
+  [ 5] .rela.plt         RELA             0000000000000630  00000630
+       0000000000000078  0000000000000018  AI       2    12     8
+  [ 6] .plt              PROGBITS         00000000000006b0  000006b0
+       0000000000000060  0000000000000010  AX       0     0     16
+  [ 7] .text             PROGBITS         0000000000000710  00000710
+       0000000000000089  0000000000000000  AX       0     0     1
+  [ 8] .rodata           PROGBITS         0000000000000799  00000799
+       00000000000001fb  0000000000000000   A       0     0     1
+  [ 9] .eh_frame         PROGBITS         0000000000000998  00000998
+       0000000000000080  0000000000000000   A       0     0     8
+  [10] .dynamic          DYNAMIC          0000000000001a18  00000a18
        0000000000000130  0000000000000010  WA       3     0     8
-  [11] .got              PROGBITS         00000000002003e0  000003e0
+  [11] .got              PROGBITS         0000000000001b48  00000b48
        0000000000000008  0000000000000008  WA       0     0     8
-  [12] .got.plt          PROGBITS         00000000002003e8  000003e8
-       0000000000000020  0000000000000008  WA       0     0     8
-  [13] .data             PROGBITS         0000000000200410  00000410
-       0000000000000013  0000000000000000  WA       0     0     16
-  [14] .comment          PROGBITS         0000000000000000  00000423
+  [12] .got.plt          PROGBITS         0000000000001b50  00000b50
+       0000000000000040  0000000000000008  WA       0     0     8
+  [13] .data             PROGBITS         0000000000001ba0  00000ba0
+       0000000000000188  0000000000000000  WA       0     0     32
+  [14] .comment          PROGBITS         0000000000000000  00000d28
        0000000000000012  0000000000000001  MS       0     0     1
-  [15] .debug_aranges    PROGBITS         0000000000000000  00000435
-       0000000000000040  0000000000000000           0     0     1
-  [16] .debug_info       PROGBITS         0000000000000000  00000475
-       00000000000001b2  0000000000000000           0     0     1
-  [17] .debug_abbrev     PROGBITS         0000000000000000  00000627
-       00000000000000f2  0000000000000000           0     0     1
-  [18] .debug_line       PROGBITS         0000000000000000  00000719
-       000000000000009e  0000000000000000           0     0     1
-  [19] .debug_str        PROGBITS         0000000000000000  000007b7
-       000000000000011f  0000000000000001  MS       0     0     1
-  [20] .debug_line_str   PROGBITS         0000000000000000  000008d6
-       00000000000000b4  0000000000000001  MS       0     0     1
-  [21] .debug_loclists   PROGBITS         0000000000000000  0000098a
-       0000000000000042  0000000000000000           0     0     1
-  [22] .debug_rnglists   PROGBITS         0000000000000000  000009cc
-       0000000000000021  0000000000000000           0     0     1
-  [23] .symtab           SYMTAB           0000000000000000  000009f0
-       00000000000000d8  0000000000000018          24     5     8
-  [24] .strtab           STRTAB           0000000000000000  00000ac8
-       000000000000003f  0000000000000000           0     0     1
-  [25] .shstrtab         STRTAB           0000000000000000  00000b07
+  [15] .debug_aranges    PROGBITS         0000000000000000  00000d40
+       0000000000000060  0000000000000000           0     0     16
+  [16] .debug_info       PROGBITS         0000000000000000  00000da0
+       00000000000001d7  0000000000000000           0     0     1
+  [17] .debug_abbrev     PROGBITS         0000000000000000  00000f77
        00000000000000f3  0000000000000000           0     0     1
+  [18] .debug_line       PROGBITS         0000000000000000  0000106a
+       00000000000000db  0000000000000000           0     0     1
+  [19] .debug_str        PROGBITS         0000000000000000  00001145
+       0000000000000195  0000000000000001  MS       0     0     1
+  [20] .debug_line_str   PROGBITS         0000000000000000  000012da
+       00000000000000d4  0000000000000001  MS       0     0     1
+  [21] .symtab           SYMTAB           0000000000000000  000013b0
+       0000000000000168  0000000000000018          22     8     8
+  [22] .strtab           STRTAB           0000000000000000  00001518
+       000000000000008e  0000000000000000           0     0     1
+  [23] .shstrtab         STRTAB           0000000000000000  000015a6
+       00000000000000d3  0000000000000000           0     0     1
 Key to Flags:
   W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
   L (link order), O (extra OS processing required), G (group), T (TLS),
@@ -86,10 +82,10 @@ Program Headers:
   Type           Offset             VirtAddr           PhysAddr
                  FileSiz            MemSiz              Flags  Align
   LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000
-                 0x00000000000002ac 0x00000000000002ac  R E    0x1000
-  LOAD           0x00000000000002b0 0x00000000002002b0 0x00000000002002b0
-                 0x0000000000000173 0x0000000000000173  RW     0x1000
-  DYNAMIC        0x00000000000002b0 0x00000000002002b0 0x00000000002002b0
+                 0x0000000000000a18 0x0000000000000a18  R E    0x1000
+  LOAD           0x0000000000000a18 0x0000000000001a18 0x0000000000001a18
+                 0x0000000000000310 0x0000000000000310  RW     0x1000
+  DYNAMIC        0x0000000000000a18 0x0000000000001a18 0x0000000000001a18
                  0x0000000000000130 0x0000000000000130  RW     0x8
 
  Section to Segment mapping:
@@ -98,58 +94,114 @@ Program Headers:
    01     .dynamic .got .got.plt .data 
    02     .dynamic 
 
-Dynamic section at offset 0x2b0 contains 14 entries:
+Dynamic section at offset 0xa18 contains 15 entries:
   Tag        Type                         Name/Value
  0x000000007ffffffd (AUXILIARY)          Auxiliary library: [PIC]
  0x0000000000000004 (HASH)               0xe8
- 0x0000000000000005 (STRTAB)             0x188
- 0x0000000000000006 (SYMTAB)             0x110
- 0x000000000000000a (STRSZ)              28 (bytes)
+ 0x0000000000000005 (STRTAB)             0x1e0
+ 0x0000000000000006 (SYMTAB)             0x120
+ 0x000000000000000a (STRSZ)              66 (bytes)
  0x000000000000000b (SYMENT)             24 (bytes)
- 0x0000000000000003 (PLTGOT)             0x2003e8
- 0x0000000000000002 (PLTRELSZ)           24 (bytes)
+ 0x0000000000000003 (PLTGOT)             0x1b50
+ 0x0000000000000002 (PLTRELSZ)           120 (bytes)
  0x0000000000000014 (PLTREL)             RELA
- 0x0000000000000017 (JMPREL)             0x1c0
- 0x0000000000000007 (RELA)               0x1a8
- 0x0000000000000008 (RELASZ)             24 (bytes)
+ 0x0000000000000017 (JMPREL)             0x630
+ 0x0000000000000007 (RELA)               0x228
+ 0x0000000000000008 (RELASZ)             1032 (bytes)
  0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x000000006ffffff9 (RELACOUNT)          42
  0x0000000000000000 (NULL)               0x0
 
-Relocation section '.rela.dyn' at offset 0x1a8 contains 1 entry:
+Relocation section '.rela.dyn' at offset 0x228 contains 43 entries:
   Offset          Info           Type           Sym. Value    Sym. Name + Addend
-0000002003e0  000200000006 R_X86_64_GLOB_DAT 0000000000200410 hello + 0
+000000001bc0  000000000008 R_X86_64_RELATIVE                    799
+000000001bc8  000000000008 R_X86_64_RELATIVE                    7a8
+000000001bd0  000000000008 R_X86_64_RELATIVE                    7ae
+000000001bd8  000000000008 R_X86_64_RELATIVE                    7b2
+000000001be0  000000000008 R_X86_64_RELATIVE                    7bd
+000000001be8  000000000008 R_X86_64_RELATIVE                    7c6
+000000001bf0  000000000008 R_X86_64_RELATIVE                    7db
+000000001bf8  000000000008 R_X86_64_RELATIVE                    7ea
+000000001c00  000000000008 R_X86_64_RELATIVE                    7ff
+000000001c08  000000000008 R_X86_64_RELATIVE                    80c
+000000001c10  000000000008 R_X86_64_RELATIVE                    828
+000000001c18  000000000008 R_X86_64_RELATIVE                    834
+000000001c20  000000000008 R_X86_64_RELATIVE                    848
+000000001c28  000000000008 R_X86_64_RELATIVE                    85c
+000000001c30  000000000008 R_X86_64_RELATIVE                    875
+000000001c38  000000000008 R_X86_64_RELATIVE                    880
+000000001c40  000000000008 R_X86_64_RELATIVE                    889
+000000001c48  000000000008 R_X86_64_RELATIVE                    8a6
+000000001c50  000000000008 R_X86_64_RELATIVE                    8b6
+000000001c58  000000000008 R_X86_64_RELATIVE                    8c4
+000000001c60  000000000008 R_X86_64_RELATIVE                    8e2
+000000001c80  000000000008 R_X86_64_RELATIVE                    8fb
+000000001c88  000000000008 R_X86_64_RELATIVE                    900
+000000001c90  000000000008 R_X86_64_RELATIVE                    905
+000000001c98  000000000008 R_X86_64_RELATIVE                    90a
+000000001ca0  000000000008 R_X86_64_RELATIVE                    90f
+000000001ca8  000000000008 R_X86_64_RELATIVE                    914
+000000001cb0  000000000008 R_X86_64_RELATIVE                    919
+000000001cb8  000000000008 R_X86_64_RELATIVE                    91e
+000000001cc0  000000000008 R_X86_64_RELATIVE                    923
+000000001cc8  000000000008 R_X86_64_RELATIVE                    928
+000000001cd0  000000000008 R_X86_64_RELATIVE                    92d
+000000001cd8  000000000008 R_X86_64_RELATIVE                    932
+000000001ce0  000000000008 R_X86_64_RELATIVE                    937
+000000001ce8  000000000008 R_X86_64_RELATIVE                    93c
+000000001cf0  000000000008 R_X86_64_RELATIVE                    941
+000000001cf8  000000000008 R_X86_64_RELATIVE                    946
+000000001d00  000000000008 R_X86_64_RELATIVE                    94b
+000000001d08  000000000008 R_X86_64_RELATIVE                    950
+000000001d10  000000000008 R_X86_64_RELATIVE                    958
+000000001d18  000000000008 R_X86_64_RELATIVE                    95d
+000000001d20  000000000008 R_X86_64_RELATIVE                    96e
+000000001b48  000200000006 R_X86_64_GLOB_DAT 0000000000001ba0 hello + 0
 
-Relocation section '.rela.plt' at offset 0x1c0 contains 1 entry:
+Relocation section '.rela.plt' at offset 0x630 contains 5 entries:
   Offset          Info           Type           Sym. Value    Sym. Name + Addend
-000000200400  000400000007 R_X86_64_JUMP_SLO 0000000000000000 printf_ + 0
+000000001b68  000100000007 R_X86_64_JUMP_SLO 000000000000078c get_hello + 0
+000000001b70  000300000007 R_X86_64_JUMP_SLO 0000000000000000 process_env_setup + 0
+000000001b78  000400000007 R_X86_64_JUMP_SLO 0000000000000000 process_exit + 0
+000000001b80  000600000007 R_X86_64_JUMP_SLO 000000000000072f main + 0
+000000001b88  000700000007 R_X86_64_JUMP_SLO 0000000000000000 printf_ + 0
 No processor specific unwind information to decode
 
-Symbol table '.dynsym' contains 5 entries:
+Symbol table '.dynsym' contains 8 entries:
    Num:    Value          Size Type    Bind   Vis      Ndx Name
      0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND 
-     1: 0000000000000220     8 FUNC    GLOBAL DEFAULT    7 get_hello
-     2: 0000000000200410    19 OBJECT  GLOBAL DEFAULT   13 hello
-     3: 0000000000000200    22 FUNC    GLOBAL DEFAULT    7 main
-     4: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND printf_
+     1: 000000000000078c    13 FUNC    GLOBAL DEFAULT    7 get_hello
+     2: 0000000000001ba0    28 OBJECT  GLOBAL DEFAULT   13 hello
+     3: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND process_env_setup
+     4: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND process_exit
+     5: 0000000000000710    31 NOTYPE  GLOBAL DEFAULT    7 _start
+     6: 000000000000072f    93 FUNC    GLOBAL DEFAULT    7 main
+     7: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND printf_
 
-Symbol table '.symtab' contains 9 entries:
+Symbol table '.symtab' contains 15 entries:
    Num:    Value          Size Type    Bind   Vis      Ndx Name
      0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND 
      1: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS first.c
-     2: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS 
-     3: 00000000002002b0     0 OBJECT  LOCAL  DEFAULT   10 _DYNAMIC
-     4: 00000000002003e8     0 OBJECT  LOCAL  DEFAULT   12 _GLOBAL_OFFSET_TABLE_
-     5: 0000000000000220     8 FUNC    GLOBAL DEFAULT    7 get_hello
-     6: 0000000000200410    19 OBJECT  GLOBAL DEFAULT   13 hello
-     7: 0000000000000200    22 FUNC    GLOBAL DEFAULT    7 main
-     8: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND printf_
+     2: 0000000000001bc0   168 OBJECT  LOCAL  DEFAULT   13 intel_exceptions
+     3: 0000000000001c80   128 OBJECT  LOCAL  DEFAULT   13 bit_array
+     4: 0000000000001d00    40 OBJECT  LOCAL  DEFAULT   13 error_strings
+     5: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS 
+     6: 0000000000001a18     0 OBJECT  LOCAL  DEFAULT   10 _DYNAMIC
+     7: 0000000000001b50     0 OBJECT  LOCAL  DEFAULT   12 _GLOBAL_OFFSET_TABLE_
+     8: 000000000000078c    13 FUNC    GLOBAL DEFAULT    7 get_hello
+     9: 0000000000001ba0    28 OBJECT  GLOBAL DEFAULT   13 hello
+    10: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND process_env_setup
+    11: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND process_exit
+    12: 0000000000000710    31 NOTYPE  GLOBAL DEFAULT    7 _start
+    13: 000000000000072f    93 FUNC    GLOBAL DEFAULT    7 main
+    14: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND printf_
 
 Histogram for bucket list length (total of 3 buckets):
  Length  Number     % of total  Coverage
-      0  2          ( 66.7%)
+      0  1          ( 33.3%)
       1  0          (  0.0%)      0.0%
       2  0          (  0.0%)      0.0%
-      3  0          (  0.0%)      0.0%
+      3  1          ( 33.3%)     42.9%
       4  1          ( 33.3%)    100.0%
 
 No version information found in this file.

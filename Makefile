@@ -14,10 +14,11 @@ OBJECTS_ASMS = $(patsubst %.S, build/%.o, $(shell ls kernel/**/*.S | xargs -n 1 
 all: debug_dump install
 
 #$(CC) -T build_support/linker.ld -o build/versionvi.bin $(CFLAGS) ../libcvv/libc/vvlibc.o $(OBJECTS_C) $(OBJECTS_ASMS) $(CFLAGS_END)
+#	$(OBJDUMP) -x -D -S build/versionvi.bin > build_support/logs/objdump.txt
+
 
 build/versionvi.bin: $(OBJECTS_C) $(OBJECTS_ASMS)
 	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/control/linker.ld -o build/versionvi.bin build_support/klibc/vvlibc.o $(OBJECTS_C) $(OBJECTS_ASMS)
-	$(OBJDUMP) -x -D -S build/versionvi.bin > build_support/logs/objdump.txt
 	readelf -W -a build/versionvi.bin > build_support/logs/elfdump.txt
 	@>&2 printf "[Build] Done\n"
 
@@ -102,14 +103,14 @@ run-no-install:
 run-term-no-install:
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_CURSES) $(QEMU_DEBUG_LOGGING) 
 
-run_debug: install
-	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_COMMON) $(QEMU_DEBUG_LOGGING)
+run-debug: install
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NONE) $(QEMU_DEBUG_COMMON) $(QEMU_DEBUG_LOGGING)
 
 gdb:
 	gdb -q --command=$(ROOT_DIR)/build_support/gdb_control/tui.gdb
 
 gdbseer:
-	seergdb --connect localhost:5894 /usr/local/osdev/versions/versionsix/build/versionvi.bin
+	seergdb --connect localhost:$(PORT_GDB) $(ROOT_DIR)/build/versionvi.bin
 
 gdbfrontend:
 	gdbfrontend -G "--command=$(ROOT_DIR)/build_support/gdb_control/commands.gdb"

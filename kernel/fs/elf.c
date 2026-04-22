@@ -28,6 +28,7 @@ void elf_file_initalize( elf_file *elf, uint64_t *file_start ) {
 	#ifdef DEBUG_ELF_FILE_CONST
 	debugf( "file_base: %016llx\n", elf->file_base );
 	debugf( "elf ident: 0x%02X %c %c %c\n", elf->elf_header->e_ident[0], elf->elf_header->e_ident[1], elf->elf_header->e_ident[2], elf->elf_header->e_ident[3] );
+	debugf( "elf header type: %d\n", elf->elf_header->e_type );
 	debugf( "Section Header Offset: 0x%llx\n", elf->elf_header->e_shoff );
 	debugf( "section headers: %016llx\n", elf->section_headers );
 	debugf( "Symbol table: %016llX\n", elf->symbol_table );
@@ -138,10 +139,23 @@ char *elf_get_symbol_name_from_symbol_index( elf_file *elf, uint32_t index ) {
 
 	char *ret = (char *)( (uint8_t *)elf->file_base + sect_dynstr->sh_offset + sym->st_name );
 
-	debugf( "sym name: %s\n", ret );
+	//debugf( "sym name: %s\n", ret );
 
 	return ret;
 }
+
+uint64_t elf_get_symbol_addr_from_symbol_name( elf_file *elf, char *name ) {
+	uint64_t sym_addr = 0;
+
+	for( int i = 0; i < elf->num_symbols; i++ ) {
+		if( strcmp( name, elf->symbols->symbols[i].name ) == 0 ) {
+			sym_addr = elf->symbols->symbols[i].addr;
+		}
+	}
+
+	return sym_addr;
+}
+
 
 /**
  * @brief 

@@ -4,6 +4,7 @@
 #include <fs.h>
 #include <vfs.h>
 #include <lib/list.h>
+#include <device.h>
 
 // TODO: Remove this, testing only
 #include <asvfs.h>
@@ -76,6 +77,8 @@ int vfs_mount( char* fs_type, char* mount_path, int drive_id ) {
 		klog( LOG_ERROR, "couldn't find fs data for fs_type \"%s\"", fs_type );
 	}
 
+	klog( LOG_INFO, "Appended mount point. fs_type=%s    mount_path=%s    drive_id=%d", mp->fs_type, mp->root, mp->drive_id );
+
 	avs_list_append( mount_points, mp );
 }
 
@@ -145,17 +148,15 @@ vfs_mount_point* vfs_get_mount_point_from_path( char* pathname ) {
 
 			avs_node *n_mp = avs_list_find_data( mount_points, "/", avs_list_compare_mount_point_roots );
 
-			farthest_mount_point == n_mp->data;
+			farthest_mount_point = (vfs_mount_point *)n_mp->data;
 		} else {
 			avs_node *n_mp = avs_list_find_data( mount_points, path_to_test, avs_list_compare_mount_point_roots );
 
 			if( n_mp != NULL ) {
-				farthest_mount_point = n_mp->data;
+				farthest_mount_point = (vfs_mount_point *)n_mp->data;
 				strcpy( farthest_mount_point_path, path_to_test );
 			}
 		}
-
-		//debugf( "n: %d  ptt: \"%s\"  fmpp: \"%s\"  fmp: %X\n", n, path_to_test, farthest_mount_point_path, farthest_mount_point );
 
 		if( n + 1 < current_path_ele_index ) {
 			if( n > 0 ) {
@@ -191,11 +192,62 @@ int vfs_create( const char *pathname, mode_t mode ) {
 }
 
 int vfs_write( const char *pathname, char *buff, off_t offset, size_t length ) {
-	return asvfs_write( pathname, buff, offset, length );
+	vfs_mount_point *mp = vfs_get_mount_point_from_path( pathname );
+
+	if( mp == NULL ) {
+		klog( LOG_ERROR, "MP is null. pathname=%s buff=%X, offset=%d, len=%d", pathname, buff, offset, length );
+		return -1;
+	}
+
+	// device hooks
+	file_stats stats;
+	memset( &stats, 0, sizeof(file_stats) );
+
+	mp->fs->op.getattr( pathname, &stats );
+	if( stats.type == VFS_INODE_TYPE_DEVICE ) {
+		vfs_device_data device_data;
+
+		mp->fs->op.read( pathname, &device_data, 0, sizeof(vfs_device_data) );
+		device *dev = device_get_major_minor_device( device_data.major, device_data.minor );
+
+		klog( LOG_DEBUG, "major: %s  minor: %s", device_data.major, device_data.minor );
+
+		return dev->write( 0, buff, length, offset );
+	}
+
+	return mp->fs->op.write( pathname, buff, offset, length );
 }
 
-int vfs_read( const char *pathname, char *buff, off_t offset, size_t length ) {
-	return asvfs_read( pathname, buff, offset, length );
+int vfs_write_device_meta( char *pathname, char *major_id, char *minor_id ) {
+	vfs_mount_point *mp = vfs_get_mount_point_from_path( pathname );
+
+	if( mp == NULL ) {
+		klog( LOG_ERROR, "MP is null. pathname=%s major_id=%s, minor_id=%s", pathname, major_id, minor_id );
+		return -1;
+	}
+
+	// device hooks
+	file_stats stats;
+	memset( &stats, 0, sizeof(file_stats) );
+
+	vfs_device_data device_data;
+	strcpy( device_data.major, major_id );
+	strcpy( device_data.minor, minor_id );
+
+	//klog( LOG_INFO, "Wrote device_data: major=%s  minor=%s. fs=%s", device_data.major, device_data.minor, mp->fs->name );
+
+	return mp->fs->op.write( pathname, &device_data, 0, sizeof(vfs_device_data) );
+}
+
+int vfs_read( const char *pathname, char *buff, size_t size, off_t offset ) {
+	vfs_mount_point *mp = vfs_get_mount_point_from_path( pathname );
+
+	if( mp == NULL ) {
+		klog( LOG_ERROR, "MP is null. pathname=%s buff=%X, size=%d, offset=%d", pathname, buff, size, offset );
+		return -1;
+	}
+
+	return mp->fs->op.read( pathname, buff, size, offset );
 }
 
 int vfs_getattr( const char *pathname, file_stats *stbuff ) {
@@ -205,14 +257,17 @@ int vfs_getattr( const char *pathname, file_stats *stbuff ) {
 vfs_dir *vfs_opendir( char *pathname ) {
 	file_stats st;
 	int getattr_err = asvfs_getattr( pathname, &st );
-	if(  getattr_err != VFS_ERROR_NONE ) {
+	if( getattr_err != VFS_ERROR_NONE ) {
 		klog( LOG_ERROR, "Getattr returned an error: %d", getattr_err );
 		return NULL;
 	}
 
-	vfs_dir *dirp = kmalloc( sizeof(vfs_dir) );
+	vfs_dir *dirp = NULL;
 
-	int get_dir_list_err = asvfs_get_dir_list_glue( pathname, dirp );
+	/* vfs_dir *dirp = kmalloc( sizeof(vfs_dir) );
+	dirp->count = 0; */
+
+	/* int get_dir_list_err = asvfs_get_dir_list_glue( pathname, dirp );
 	if( get_dir_list_err != VFS_ERROR_NONE ) {
 		klog( LOG_ERROR, "asvfs_get_dir_list_glue returned an error: %d", get_dir_list_err );
 
@@ -221,6 +276,7 @@ vfs_dir *vfs_opendir( char *pathname ) {
 	}
 
 	dirp->next = 0;
+	*/
 
 	return dirp;
 }
@@ -248,13 +304,13 @@ vfs_dirent *vfs_readdir( vfs_dir *dirp ) {
 
 /** VFS->HW Interfaces */
 
-int vfs_disk_read( uint64_t drive, uint64_t offset, uint64_t length, uint8_t *data ) {
+int vfs_disk_read( uint64_t drive, uint8_t *buff, size_t size, off_t offset ) {
 	//klog( LOG_DEBUG, "vfs_read_from_disk: drive=%d offset=%X length=%X data=%X", drive, offset, length, data );
-	return vfs_disk_read_no_cache( drive, offset, length, data );
+	return vfs_disk_read_no_cache( drive, buff, size, offset );
 }
 
-int vfs_disk_read_no_cache( uint64_t drive, uint64_t offset, uint64_t length, uint8_t *data ) {
-	if( !ahci_read_at_byte_offset_512_chunks( offset, length, data ) ) {
+int vfs_disk_read_no_cache( uint64_t drive, uint8_t *buff, size_t size, off_t offset ) {
+	if( !ahci_read_at_byte_offset_512_chunks( offset, size, buff ) ) {
 		klog( LOG_ERROR, "Could not read from ahci drive.\n" );
 		return VFS_ERROR_UNKNOWN;
 	}
@@ -262,10 +318,20 @@ int vfs_disk_read_no_cache( uint64_t drive, uint64_t offset, uint64_t length, ui
 	return VFS_ERROR_NONE;
 }
 
-uint8_t *vfs_disk_write( uint64_t drive, uint64_t offset, uint64_t length, uint8_t *data ) {
-	return vfs_disk_write_no_cache( drive, offset, length, data );
+uint8_t *vfs_disk_write( uint64_t drive, uint8_t *buff, size_t size, off_t offset ) {
+	return vfs_disk_write_no_cache( drive, buff, size, offset );
 }
 
-uint8_t *vfs_disk_write_no_cache( uint64_t drive, uint64_t offset, uint64_t length, uint8_t *data ) {
+uint8_t *vfs_disk_write_no_cache( uint64_t drive, uint8_t *buff, size_t size, off_t offset ) {
 	return 0;
+}
+
+/** Debug functions */
+
+void vfs_dump_mount_points( void ) {
+	for(int i = 0; i < mount_points->size; i++ ) {
+		vfs_mount_point *mp = (vfs_mount_point *)avs_list_at_index_data( mount_points, i );
+
+		printf( "Mount point %d:    root=%s    type=%s\n", i, mp->root, mp->fs_type );
+	}
 }

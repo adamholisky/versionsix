@@ -32,6 +32,9 @@ build/%.o: %.S
 	$(eval OBJNAME := $(shell basename $@))
 	$(CC) $(AFLAGS) -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
 
+dumpobjs:
+	$(OBJDUMP) -x -D -S build/versionvi.bin > build_support/logs/objdump.txt 
+
 cp: cp_fs cp_vit
 
 cp_fs:
@@ -113,7 +116,7 @@ gdbseer:
 	seergdb --connect localhost:$(PORT_GDB) $(ROOT_DIR)/build/versionvi.bin
 
 gdbfrontend:
-	gdbfrontend -G "--command=$(ROOT_DIR)/build_support/gdb_control/commands.gdb"
+	/home/adam/code/gdb-frontend/gdbfrontend --host=plato.marsdev.io --listen=plato.marsdev.io --port=58022 --dontopenuionstartup -G "--command=$(ROOT_DIR)/build_support/gdb_control/commands.gdb"
 
 debug_dump:
 	@>&2 echo [Build] Makefile Debug Dump

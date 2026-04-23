@@ -1,8 +1,8 @@
 #./configure --prefix=/usr/local/osdev --enable-tui
 set disassembly-flavor att
 
-file /usr/local/osdev/versions/vi/build/versionvi.bin
-directory /usr/local/osdev/versions/vi/kernel
+file /usr/local/osdev/source/versionsix/build/versionvi.bin
+directory /usr/local/osdev/source/versionsix/build/versionvi.bin
 
 define qq
   set confirm off
@@ -27,6 +27,6 @@ define dm
   eval "x/%d%c %d", $i, 'x', $arg0
 end
 
-source /usr/local/osdev/versions/vi/build_support/gdb_control/breakpoints.gdb
+source /usr/local/osdev/source/versionsix/build_support/gdb_control/breakpoints.gdb
 
-target remote localhost:5894
+target remote localhost:58001

@@ -1,3 +1,7 @@
+.section .data
+
+dyn_linker_func_ret_addr: .quad 0x0
+
 .section .text
 
 .global get_cr0
@@ -57,4 +61,58 @@ sse_initalize:
 	ldmxcsr (%rsp)
 	fxsave fxsave_region
 	pop %rax
+	ret
+
+.extern elf_loader_dynamic_linker
+.global elf_dynamic_linker_preamble
+.type elf_dynamic_linker_preamble, @function
+elf_dynamic_linker_preamble:
+	push %r15
+	push %r14
+	push %r13
+	push %r12
+	push %r11
+	push %r10
+	push %r9
+	push %r8
+		push %rbp
+		push %rdi
+		push %rsi
+			push %rdx
+			push %rcx
+			push %rbx
+			push %rax
+				push %rsp
+					movq 128(%rsp), %rdi
+					movq 136(%rsp), %rsi
+					call elf_loader_dynamic_linker
+					movq %rax, dyn_linker_func_ret_addr
+				pop %rsp
+			pop %rax
+			pop %rbx
+			pop %rcx
+			pop %rdx
+		pop %rsi
+		pop %rdi
+		pop %rbp
+	pop %r8
+	pop %r9
+	pop %r10
+	pop %r11
+	pop %r12
+	pop %r13
+	pop %r14
+	pop %r15
+
+	add $16, %rsp
+	push dyn_linker_func_ret_addr
+	ret
+
+old_preamble:
+	movq (%rsp), %rdi
+	movq 8(%rsp), %rsi
+	add $8, %rsp
+	add $8, %rsp
+	call elf_loader_dynamic_linker
+	push %rax
 	ret

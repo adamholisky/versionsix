@@ -51,6 +51,8 @@ The "Big Goal" for right now is to laser focus on getting a Telnet connection es
 58021 - Webssh2 websocket tunnel
 58022 - GDB Frontend Web
 
+flatpak run org.radare.iaito
+
 
 ### Future Goals
 

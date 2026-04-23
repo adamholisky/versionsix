@@ -50,6 +50,10 @@ void process_initalize( void ) {
 	for( int i = 0; i < root_pd->text_section_count; i++ ) {
 		page_map( root_pd->text_sections[i].virt, root_pd->text_sections[i].phys );
 	}
+
+	kdebug_peek_at_n( root_pd->text_sections[0].virt, 200 );
+
+	kdebug_peek_at_n( root_pd->data_sections[0].virt, 250 );
 }
 
 void process_start_root_process( void ) {
@@ -57,6 +61,8 @@ void process_start_root_process( void ) {
 
 	int (*f)(int, char *) = root_pd->entry;
 	f( 0, NULL );
+
+	debugf( "Ending very happy!\n" );
 
 	do_immediate_shutdown();
 }
@@ -69,6 +75,10 @@ pid_t process_create( void ) {
 	avs_list_append( process_list, p );
 
 	return p->pid;
+}
+
+process_data *process_get_current( void ) {
+	return current_process;
 }
 
 void process_destroy( pid_t pid ) {
@@ -93,7 +103,9 @@ void process_env_setup( void ) {
 
 void process_exit( int ret_code ) {
 	klog( LOG_INFO, "in exit for pid %d: ret_code=%d", current_process->pid, ret_code );
-	printf( "DONE" );
+	printf( "DONE\n" );
+
+	do_immediate_shutdown();
 }
 
 pid_t vios_fork( void ) {

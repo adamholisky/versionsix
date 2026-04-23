@@ -10,6 +10,8 @@
 
 #include <elf_loader.h>
 
+extern void elf_dynamic_linker_preamble( void );
+
 int elf_loader_load( process_data* p, uint8_t* data ) {
 	klog( LOG_INFO, "Loding an ELF object: path=%s    data: 0x%016llX    size: 0x%llX \n", p->path, data, p->exec_size );
 
@@ -60,6 +62,8 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 	klog( LOG_INFO, "Loading ELF Binary. pid=%d    path=%s    data=0x%016llX", p->pid, p->path, data );
 
 	elf_file* elf_f = (elf_file*)p->binary_format_data;
+
+	uint64_t page_count_from_prev_headers = 0;
 
 	for ( int i = 0; i < elf_f->num_program_headers; i++ ) {
 		Elf64_Phdr* pheader = get_program_header_by_index( elf_f, i );
@@ -116,11 +120,16 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 				pages[j].virt = actual_virt_address + ( j * PAGE_SIZE );
 				pages[j].phys = paging_virtual_to_physical( pages[j].kern_virt );
 
-				debugf( "    kern_virt: %X    virt: %X    phys: %X\n", pages[j].kern_virt, pages[j].virt, pages[j].phys );
+				debugf( "    kern_virt: 0x%llX    virt: 0x%llX    phys: 0x%llX\n", pages[j].kern_virt, pages[j].virt, pages[j].phys );
 			}
 			
 			//TODO: START HERE, THIS IS WRONG
+			debugf( "loading to (virt) 0x%X from (phys) 0x%X for 0x%X bytes.\n", virt_offset, pheader->p_offset, pheader->p_filesz );
 			memcpy( pages[0].kern_virt + virt_offset, (uint8_t*)data + pheader->p_offset, pheader->p_filesz );
+
+			kdebug_peek_at_n( pages[0].kern_virt + virt_offset, 50 );
+
+			page_count_from_prev_headers += num_pages;
 		}
 	}
 
@@ -142,25 +151,56 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 		debugf( "Could not find .rel.plt section.\n" );
 	}
 
-	Elf64_Shdr* got_plt = elf_get_section_header_by_name( elf_f, ".got.plt" );
-	if ( got_plt != NULL ) {
-		uint8_t* got_plt_data = (uint8_t*)data + got_plt->sh_offset;
+	Elf64_Shdr *sect_dynsym = elf_get_section_header_by_name( elf_f, ".dynsym" );
+	Elf64_Shdr *sect_dynstr = elf_get_section_header_by_name( elf_f, ".dynstr" );
+	p->num_dyn_syms = sect_dynsym->sh_size / sect_dynsym->sh_entsize;
+	p->dyn_sym_index = kmalloc( sizeof(symbol_index) * p->num_dyn_syms );
 
-#ifdef KDEBUG_PROGRAM_LOAD_ELF_LIBRARY
-		debugf( ".got.plt out:\n" );
-		for ( int j = 0; j < ( got_plt->sh_size ); j++ ) {
-			debugf_raw( "%02X ", *( got_plt_data + j ) );
-		}
-		debugf( "\n\n" );
-#endif
+	debugf( "number dyn_syms: %d\n", p->num_dyn_syms );
+
+	for( int i = 0; i < p->num_dyn_syms; i++ ) {
+		Elf64_Sym *sym = (Elf64_Sym *)((uint8_t *)elf_f->file_base + sect_dynsym->sh_offset + (sizeof(Elf64_Sym) * i));
+		strcpy( p->dyn_sym_index[i].name, (char *)( (uint8_t *)elf_f->file_base + sect_dynstr->sh_offset + sym->st_name ) );
+		p->dyn_sym_index[i].value = sym->st_value;
+		p->dyn_sym_index[i].size = sym->st_size;
+
+		debugf( "dyn_sym[%d] name=%s    value=0x%016llX\n", i, p->dyn_sym_index[i].name, p->dyn_sym_index[i].value );
 	}
-	else {
-		debugf( "Could not find .got.plt section\n" );
+
+	Elf64_Shdr *elf_got_section = elf_get_section_header_by_name( elf_f, ".got.plt" );
+	if( elf_got_section != NULL ) {
+		uint8_t* got_data = (uint8_t *)p->data_sections[0].kern_virt + elf_got_section->sh_offset;
+
+		debugf( ".got out pre:\n" );
+		for ( int j = 0; j < ( elf_got_section->sh_size ); j++ ) {
+			debugf_raw( "%02X ", *( got_data + j ) );
+		}
+		debugf_raw( "\n\n" );
+
+		//*(got_data + 0x10) = elf_loader_dynamic_linker;
+		uint64_t *got64_t = (uint64_t *)got_data;
+		
+
+		debugf( "got:             0x%llX\n", got64_t );
+		debugf( "got + 0x10:      0x%llX (data: 0x%llX)\n", (got64_t + 1), *(got64_t + 1) );
+		debugf( "elfload_dyn_lnk: 0x%llX\n", elf_dynamic_linker_preamble );
+		
+		//*(uint64_t *)(got_data + 0x08) = p->data_sections[0].virt + elf_got_section->sh_offset;
+		*(uint64_t *)(got_data + 0x08) = p->text_sections[0].virt + rel_plt->sh_offset;
+		*(uint64_t *)(got_data + 0x10) = elf_dynamic_linker_preamble;
+		//*(got64_t + 0x3) = elf_loader_dynamic_linker;
+
+		debugf( "got + 0x10:      0x%llX (data: 0x%llX)\n", (got64_t + 1), *(got64_t + 1) );
+	} else {
+		debugf( "Could not locate .got section. Failing hard.\n" );
+		do_immediate_shutdown();
 	}
 
 	debugf( "\n" );
 	int num_of_rel_plt_entries = ( rel_plt->sh_size / ( sizeof( Elf64_Rela ) ) );
 	debugf( "running symbol resolution %d times\n\n", num_of_rel_plt_entries );
+
+	p->rela_sym_index = kmalloc( sizeof(symbol_index) * num_of_rel_plt_entries );
 
 	for ( int rel_num = 0; rel_num < num_of_rel_plt_entries; rel_num++ ) {
 		debugf( "Symbol resolution #%d:\n", rel_num );
@@ -180,57 +220,39 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 			elf_get_symbol_name_from_symbol_index( elf_f, ELF64_R_SYM( elf_rel->r_info ) )
 		);
 
-		if ( sym == NULL ) {
-			debugf( "  Symbol not found, searching local...\n" );
-
-			uint64_t local_sym_addr = elf_get_symbol_addr_from_symbol_name( elf_f, elf_get_symbol_name_from_symbol_index(elf_f, ELF64_R_SYM( elf_rel->r_info)) );
-
-			if( local_sym_addr != 0 ) {
-				debugf( "  found local symbol with an address, using it: 0x%X\n", local_sym_addr );
-
-				uint8_t* data_pages_start = (uint8_t*)p->data_sections[0].kern_virt;
-				uint64_t* got_entry = (uint64_t*)( data_pages_start + elf_rel->r_offset - p->data_sections[0].virt );
-
-				debugf( "  got entry pre:  %llx\n", *got_entry );
-
-				*got_entry = local_sym_addr;
-
-				debugf( "  got entry post: %llx\n", *got_entry );
-			} else {
-				debugf( "  Local symbol not found. Big fail?\n" );
-			}
-		} else {
-			// Symbol is a kernel symbol, use the kernel symbol table
-			debugf( "  ksym: name: \"%s\"    addr: 0x%016llX\n", sym->name, sym->addr );
-
-			debugf( "  Found symbol: %s at %llX\n", elf_get_symbol_name_from_symbol_index( elf_f, ELF64_R_SYM( elf_rel->r_info ) ), sym->addr );
-
-			uint8_t* data_pages_start = (uint8_t*)p->data_sections[0].kern_virt;
-			debugf( "  0x%016llx\n", data_pages_start + elf_rel->r_offset - p->data_sections[0].virt );
-			uint64_t* got_entry = (uint64_t*)( data_pages_start + elf_rel->r_offset - p->data_sections[0].virt );
-
-			debugf( "  got entry pre:  %llx\n", *got_entry );
-
-			*got_entry = sym->addr;
-
-			debugf( "  got entry post: %llx\n", *got_entry );
-
-			//*got_entry = (uint64_t)kdebug_get_symbol_addr( elf_get_sym_name_from_index((uint32_t*)dl.base, elf_header, ELF32_R_SYM(elf_rel->r_info)) );
-		}
-
-		
-
-#ifdef KDEBUG_PROGRAM_LOAD_ELF_LIBRARY
-		debugf( "GOT entry: 0x%llX\n", *got_entry );
-		//debugf( "rel sym: 0x%08X, %d, %d, %X, %s\n", elf_rel->r_offset, ELF32_R_TYPE(elf_rel->r_info), ELF32_R_SYM(elf_rel->r_info),  elf_get_sym_shndx_from_index((uint32_t*)dl.base, elf_header, ELF32_R_SYM(elf_rel->r_info)), elf_get_sym_name_from_index((uint32_t*)dl.base, elf_header, ELF32_R_SYM(elf_rel->r_info)) );
-#endif
-/* } else {
-	klog( "Should not go here.\n" );
-	// Link main -- I think I'm doing something wrong by having to do this, maybe not handling got right?
-	uint32_t *got_entry = (uint32_t*)(dl.base + elf_rel->r_offset);
-
-	*got_entry = (uint32_t)elf_get_sym_value_from_index((uint32_t*)dl.base, elf_header, ELF32_R_SYM(elf_rel->r_info));
-} */
+		p->rela_sym_index[ rel_num ].elf_index = rel_num;
+		strcpy( p->rela_sym_index[ rel_num ].name, elf_get_symbol_name_from_symbol_index(elf_f, ELF64_R_SYM( elf_rel->r_info )) );
+		p->rela_sym_index[ rel_num ].info = elf_rel->r_info;
+		p->rela_sym_index[ rel_num ].offset = elf_rel->r_offset;
 	}
 
+}
+
+void* elf_loader_dynamic_linker( uint64_t got_table_data, uint8_t got_index ) {
+	debugf( "dynamic linker, yay! got_table_data=0x%016llX    got_index=%02llX\n", got_table_data, got_index );
+	void *function_addr = 0;
+
+	process_data *p = process_get_current();
+
+	symbol* sym = symbols_get_symbol( get_ksyms_object(), p->rela_sym_index[got_index].name );
+	function_addr = sym->addr;
+
+	if( function_addr == NULL ) {
+		for( int i = 0; i < p->num_dyn_syms; i++ ) {
+			if( strcmp( p->rela_sym_index[got_index].name , p->dyn_sym_index[i].name ) == 0 ) {
+				function_addr = p->dyn_sym_index[i].value;
+				break;
+			}
+		}
+	}
+
+	if( function_addr == NULL ) {
+		klog( LOG_ERROR, "Returning NULL. got_index=%d pid=%d path=%s", got_index, p->pid, p->path );
+	}
+	
+	return function_addr;
+}
+
+void linker_test_func( void ) {
+	debugf( "in test func fun!\n" );
 }

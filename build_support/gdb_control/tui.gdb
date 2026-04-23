@@ -5,4 +5,4 @@ layout main
 winheight src -5 
 focus cmd
 
-source /usr/local/osdev/versions/vi/build_support/gdb_control/commands.gdb
+source /usr/local/osdev/source/versionsix/build_support/gdb_control/commands.gdb

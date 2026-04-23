@@ -9,6 +9,7 @@ extern "C"
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <ksymbols.h>
 
 #define ROOT_PROCESS_ID 0
 
@@ -19,6 +20,15 @@ typedef struct {
 	uint64_t virt;
 	uint64_t kern_virt;
 } process_exec_section;
+
+typedef struct {
+	uint16_t elf_index;
+	char name[255];
+	uint64_t value;
+	uint64_t offset;
+	uint64_t info;
+	uint64_t size;
+} symbol_index;
 
 typedef struct {
 	pid_t pid;
@@ -36,11 +46,16 @@ typedef struct {
 	process_exec_section *data_sections;
 	uint64_t data_section_virt_start;
 
+	symbol_index *rela_sym_index;
+	symbol_index *dyn_sym_index;
+	uint16_t num_dyn_syms;
+
 	void *binary_format_data;
 } process_data;
 
 void process_initalize( void );
 pid_t process_create( void );
+process_data *process_get_current( void );
 void process_start_root_process( void );
 
 void process_env_setup( void );

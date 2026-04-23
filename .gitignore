@@ -4,6 +4,7 @@ build_support/logs/*
 *.bin
 *.d
 *.gz
+*.exec
 build.log
 boot_drive.img.old
 boot_drive.img.old.2

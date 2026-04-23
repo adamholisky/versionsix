@@ -19,6 +19,10 @@ extern "C" {
 
 #define VIFS_OS
 
+#ifndef BUILD_NUM
+    #define BUILD_NUM 0
+#endif
+
 // From helper_asm.S
 extern uint64_t get_cr0( void );
 extern uint64_t get_cr2( void );

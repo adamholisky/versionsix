@@ -59,6 +59,7 @@ void kernel_main( void ) {
 	// Begin with boostrap services
 	serial_initalize();
 	debugf( "Versions OS VI Debug Out\n" );
+	debugf( "Build Number: %d\n", BUILD_NUM );
 	load_limine_info();
 	rtc_initalize();
 	acpi_initalize();
@@ -123,6 +124,7 @@ void kernel_main( void ) {
 		
 	
 	printf( "Versions OS VI\n" );
+	printf( "Build %d\n", BUILD_NUM );
 
 	// Service startup order from here onwards really shouldn't matter too much
 	#ifdef ENABLE_NETWORKING

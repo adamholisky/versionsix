@@ -1,9 +1,30 @@
 .DEFAULT_GOAL := all
 
+# ROOT_DIR needs to be defined in the primary Makefile up top
 ROOT_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-DEFINES = -DVIFS_OS_ENV -DVI_ENV_OS -DVIOS -DSTDIO_SERIAL_3
 
-include $(ROOT_DIR)/build_support/control/paths.mk 
+# Makefile build supporter functions/vars
+include $(ROOT_DIR)/build_support/control/build_helpers.mk
+
+# Path import
+include $(ROOT_DIR)/build_support/control/paths.mk
+
+# Build number 
+# Incrementing lives under rule "increment_build_number"
+ifeq ( $(MAKECMDGOALS), 'build/versionvi.bin' )
+	$(shell make increment_build_number)
+endif
+
+$(eval BUILD_NUMBER = $(shell echo $$(($$(cat $(BUILD_NUMBER_FILE)) + 1))))
+
+# Defines
+DEFINES = -DVIFS_OS_ENV 
+DEFINES += -DVI_ENV_OS 
+DEFINES += -DVIOS 
+DEFINES += -DSTDIO_SERIAL_3 
+DEFINES += -DBUILD_NUM=$(BUILD_NUMBER)
+
+# Toolchain import
 include $(ROOT_DIR)/build_support/control/toolchain.mk 
 
 SOURCES_C = $(shell ls kernel/**/*.c)
@@ -11,24 +32,20 @@ SOURCES_ASMS = $(shell ls kernel/**/*.S)
 OBJECTS_C = $(patsubst %.c, build/%.o, $(shell ls kernel/**/*.c | xargs -n 1 basename))
 OBJECTS_ASMS = $(patsubst %.S, build/%.o, $(shell ls kernel/**/*.S | xargs -n 1 basename))
 
-all: debug_dump install
+all: install
 
-#$(CC) -T build_support/linker.ld -o build/versionvi.bin $(CFLAGS) ../libcvv/libc/vvlibc.o $(OBJECTS_C) $(OBJECTS_ASMS) $(CFLAGS_END)
-#	$(OBJDUMP) -x -D -S build/versionvi.bin > build_support/logs/objdump.txt
-
-
-build/versionvi.bin: $(OBJECTS_C) $(OBJECTS_ASMS)
+build/versionvi.bin: increment_build_number $(OBJECTS_C) $(OBJECTS_ASMS)
 	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/control/linker.ld -o build/versionvi.bin build_support/klibc/vvlibc.o $(OBJECTS_C) $(OBJECTS_ASMS)
 	readelf -W -a build/versionvi.bin > build_support/logs/elfdump.txt
-	@>&2 printf "[Build] Done\n"
+	@>&2 $(call echo_tag_green,Build, Done making version $(BUILD_NUMBER))
 
 build/%.o: %.c
-	@>&2 printf "[Build] $<\n"
+	@>&2 $(call echo_tag_green,Build, $<)
 	$(eval OBJNAME := $(shell basename $@))
 	$(CC) $(CFLAGS) $(CFLAGS_END) -std=c11 -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
 
 build/%.o: %.S
-	@>&2 printf "[Build] $<\n"
+	@>&2 $(call echo_tag_green,Build, $<)
 	$(eval OBJNAME := $(shell basename $@))
 	$(CC) $(AFLAGS) -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
 
@@ -86,10 +103,11 @@ cp_vit:
 
 install:
 	@make install_stage2 >> $(BUILD_LOG)
-	@>&2 printf "[Install] Done\n"
+	@>&2 $(call echo_tag_green,Install, Build $(BUILD_NUMBER) is now installed)
+	@>&2 $(call echo_tag_green,Install, Done)
 
 install_stage2: build/versionvi.bin
-	@>&2 echo [Install] Installing to $(KERNEL_BOOT_IMG)
+	@>&2 $(call echo_tag_green,Install, Installing to $(KERNEL_BOOT_IMG))
 	@mcopy -D o -i $(ROOT_DIR)/$(KERNEL_BOOT_IMG)@@1M $(ROOT_DIR)/build_support/boot_files/limine.conf ::/boot/limine
 	@mcopy -D o -i $(ROOT_DIR)/$(KERNEL_BOOT_IMG)@@1M $(ROOT_DIR)/build/versionvi.bin ::/boot
 
@@ -171,14 +189,21 @@ drive:
 	@$(ROOT_DIR)/../vifs/vifs cpdir $(ROOT_DIR)/os_root / -afs $(ROOT_DIR)/afs.img >> $(BUILD_LOG)
 	@>&2 echo [Make AFS Drive] Done
 
+.PHONY: increment_build_number
+increment_build_number:
+	$(eval $(shell echo $(BUILD_NUMBER) > $(BUILD_NUMBER_FILE)))
+
+.PHONY: clean
 clean:
+	@$(call echo_tag_yellow,Clean, Starting cleanup)
 	@rm -rf build_support/logs/build.log
 	@make clean_stage_2 >> $(BUILD_LOG)
+	@$(call echo_tag_yellow,Clean, Done)
 
+.PHONY: clean_stage_2
 clean_stage_2:
 	rm -rf build/*.o 
 	rm -rf build/*.bin 
 	rm -rf build_support/logs/objdump.txt 
 	rm -rf build_support/logs/elfdump.txt
 	rm -rf build_support/logs/qemu_debug_log.txt
-	@>&2 echo [Clean] Done

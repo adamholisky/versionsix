@@ -1,6 +1,5 @@
 #include <kernel_common.h>
 #include <kshell_app.h>
-#include <task.h>
 #include <stacktrace.h>
 #include <ksymbols.h>
 

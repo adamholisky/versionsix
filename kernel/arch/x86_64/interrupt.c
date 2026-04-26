@@ -3,7 +3,6 @@
 #include <timer.h>
 #include <ksymbols.h>
 #include <stacktrace.h>
-#include <task.h>
 #include <process.h>
 
 interrupt_descriptor_table main_idtr;

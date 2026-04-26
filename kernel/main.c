@@ -8,11 +8,9 @@
 #include <timer.h>
 #include <page.h>
 #include <kmemory.h>
-#include <kshell.h>
 #include <ksymbols.h>
 #include <pci.h>
 #include <e1000.h>
-#include <task.h>
 #include <elf.h>
 #include <net/arp.h>
 #include <net/ethernet.h>
@@ -32,7 +30,6 @@
 #include <vui/menubar.h>
 #include <tests.h>
 #include <sys_info.h>
-
 #include <process.h>
 
 #undef ENABLE_NETWORKING
@@ -95,12 +92,13 @@ void kernel_main( void ) {
 	fs_initalize_part2();
 	devices_populate_fs();
 
-	klog( LOG_INFO, "Out of fs and dev setup" );
+	// Printf is now okay
 
-	task_initalize();
+	printf( "Versions OS VI\n" );
+	printf( "Build %d\n", BUILD_NUM );
+
 	keyboard_initalize();
-
-	klog( LOG_INFO, "Out of task and kb setup" );
+	process_initalize();
 
 	system_information.version = 1;
 	memcpy( &system_information.kernel_info, &kernel_info, sizeof(kinfo) );
@@ -122,10 +120,6 @@ void kernel_main( void ) {
 	load_gui_stuff();
 	#endif
 		
-	
-	printf( "Versions OS VI\n" );
-	printf( "Build %d\n", BUILD_NUM );
-
 	// Service startup order from here onwards really shouldn't matter too much
 	#ifdef ENABLE_NETWORKING
 	memset( &networking_info, 0, sizeof( net_info ) );
@@ -133,13 +127,11 @@ void kernel_main( void ) {
 	dhcp_start();
 	#endif
 
-	char test_message[] = "Test FS write to device?\n";
-	int len = strlen( test_message );
-	vfs_write( "/dev/stderr", test_message, 0, len );
+	/* 	char test_message[] = "Test FS write to device?\n";
+		int len = strlen( test_message );
+		vfs_write( "/dev/stderr", test_message, 0, len ); */
 
 	printf( "Initalizing process system and loading first exec...\n" );
-
-	process_initalize();
 
 	process_setup_init();
 
@@ -149,20 +141,6 @@ void kernel_main( void ) {
 	debugf( "Idle loop has ended.\n" );
 	
 	do_immediate_shutdown();
-
-	/* task_create( TASK_TYPE_KERNEL_THREAD, TASK_GENERATOR_DEV, "Task Chain", (uint64_t *)task_chain_a );
-
-	tests_run_tests();
-
-	task_create( TASK_TYPE_KERNEL_THREAD, TASK_GENERATOR_DEV, "KShell", (uint64_t *)kshell_initalize );
-	syscall( SYSCALL_SCHED_YIELD, 0, NULL );
-
-	// This is the "kernel idle task". We want to just check if someone has data ready, and if so, activate the task
-	kernel_idle_loop();	
-
-	debugf( "Ending happy.\n" );
-	printf( "Ending happy.\n" );
-	do_immediate_shutdown(); */
 }
 
 #ifdef ENABLE_GUI
@@ -231,25 +209,3 @@ void main_console_blink_cursor( void ) {
 		//vui_console_blink_cursor( main_console );
 	}
 #endif
-
-void task_chain_a( void ) {
-	printf( "In A\n" );
-	task_chain_b();
-}
-
-void task_chain_b( void ) {
-	printf( "In B\n" );
-	task_chain_c();
-}
-
-void task_chain_c( void ) {
-	printf( "In C\n" );
-	task_chain_d();
-}
-
-void task_chain_d( void ) {
-	printf( "In D\n" );
-	do {
-		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
-	} while (1);
-}

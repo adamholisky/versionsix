@@ -3,7 +3,6 @@
 #include <program.h>
 #include <page.h>
 #include <page_group.h>
-#include <task.h>
 #include <kmemory.h>
 #include <stdlib.h>
 
@@ -11,23 +10,6 @@ extern uint64_t system_count;
 extern vui_core vui;
 
 void test_page_group( void );
-
-void tests_run_tests( void ) {
-	//test_page_group();
-	//tests_fps();
-	//tests_run_program();
-
-	random_seed( system_count );
-	//animation_bouncing_square();
-
-	/* debugf( "End of run tests. Shutting down.\n" );
-	do_immediate_shutdown(); */
-}
-
-void tests_run_program( void ) {
-	program *p = program_load( "/modules/first.o" );
-	task_create_from_program( p );
-}
 
 void test_page_group( void ) {
 	extern page_group main_page_group;

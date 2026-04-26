@@ -2,6 +2,9 @@
 #include <interrupt.h>
 #include <syscall.h>
 #include <task.h>
+#include <process.h>
+
+extern pid_t fork_syscall_handler( registers **context );
 
 void syscall_initalize( void ) {
 	interrupt_add_irq_handler( 0xFE - 0x20, syscall_handler );
@@ -71,8 +74,11 @@ uint64_t syscall( uint64_t call_num, uint8_t num_args, syscall_args *args ) {
 void syscall_handler( registers **_context ) {
 	registers *context = *_context;
 	switch( context->rax ) {
+		case SYSCALL_FORK:
+			fork_syscall_handler( _context );
+			break;
 		case SYSCALL_SCHED_YIELD:
-			task_sched_yield( _context );
+			process_sched_yield( _context );
 			break;
 		case SYSCALL_EXEC:
 			task_exec_syscall_handler( _context, (uint16_t)context->rdi, context->rsi, (char **)context->rdx );

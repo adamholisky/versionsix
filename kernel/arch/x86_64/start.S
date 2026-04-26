@@ -8,7 +8,7 @@
 
 	.skip 65536
 kernel_stack:
-	.skip 1024
+	.skip 65536
 
 
 .section .text

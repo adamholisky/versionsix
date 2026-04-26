@@ -4,18 +4,6 @@
             "name": "Version VI",
             "path": "."
         },
-        {
-            "name": "VI klibc",
-            "path": "../viklibc"
-        },
-        {
-            "name": "VI File System",
-            "path": "../vifs"
-        },
-        {
-            "name": "VI UI",
-            "path": "../viui"
-        }
     ],
     "settings": {
         "save-gdb-breakpoints.savePath": "${workspaceFolder}/build_support/gdb_control/breakpoints.gdb",

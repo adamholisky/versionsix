@@ -121,13 +121,18 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 				pages[j].phys = paging_virtual_to_physical( pages[j].kern_virt );
 
 				debugf( "    kern_virt: 0x%llX    virt: 0x%llX    phys: 0x%llX\n", pages[j].kern_virt, pages[j].virt, pages[j].phys );
-			}
+			} 
 			
 			//TODO: START HERE, THIS IS WRONG
 			debugf( "loading to (virt) 0x%X from (phys) 0x%X for 0x%X bytes.\n", virt_offset, pheader->p_offset, pheader->p_filesz );
-			memcpy( pages[0].kern_virt + virt_offset, (uint8_t*)data + pheader->p_offset, pheader->p_filesz );
 
-			kdebug_peek_at_n( pages[0].kern_virt + virt_offset, 50 );
+			void *kern_virt_data_start = pages[0].kern_virt;
+			kern_virt_data_start = kern_virt_data_start + virt_offset;
+
+			debugf( "kvds: 0x%016llX\n", kern_virt_data_start );
+			memcpy( kern_virt_data_start, (uint8_t*)data + pheader->p_offset, pheader->p_filesz );
+
+			kdebug_peek_at_n( kern_virt_data_start, 50 );
 
 			page_count_from_prev_headers += num_pages;
 		}
@@ -229,7 +234,7 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 }
 
 void* elf_loader_dynamic_linker( uint64_t got_table_data, uint8_t got_index ) {
-	debugf( "dynamic linker, yay! got_table_data=0x%016llX    got_index=%02llX\n", got_table_data, got_index );
+	//debugf( "dynamic linker, yay! got_table_data=0x%016llX    got_index=%02llX\n", got_table_data, got_index );
 	void *function_addr = 0;
 
 	process_data *p = process_get_current();

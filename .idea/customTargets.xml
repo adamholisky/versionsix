@@ -11,5 +11,15 @@
         </clean>
       </configuration>
     </target>
+    <target id="9f0053ac-63ce-4cc8-ab83-1f9eb834d1ee" name="Make install" defaultType="MAKE">
+      <configuration id="a55bda98-beef-416b-a78c-a872dc632025" name="Make install">
+        <build type="MAKE">
+          <make targetName="install" />
+        </build>
+        <clean type="MAKE">
+          <make targetName="clean" />
+        </clean>
+      </configuration>
+    </target>
   </component>
 </project>

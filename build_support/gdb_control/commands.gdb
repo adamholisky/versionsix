@@ -27,6 +27,22 @@ define dm
   eval "x/%d%c %d", $i, 'x', $arg0
 end
 
+define ps 
+  set $num_procs = *(avs_list *)global_proc_data.process_list.size
+  set $head = *(avs_list *)global_proc_data.process_list.head
+  set $i = 0
+
+  print $num_procs
+  print $head
+
+end
+
+set print pretty on
+
 source /usr/local/osdev/source/versionsix/build_support/gdb_control/breakpoints.gdb
+
+set logging file /usr/local/osdev/source/versionsix/build_support/logs/gdb.log
+set logging overwrite on
+set logging enabled on
 
 target remote localhost:58001

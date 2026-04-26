@@ -17,25 +17,32 @@
 #include <debug.h>
 
 char debugf_buff[4096];
+char klog_message[1024];
 char klog_buff[4096];
+char start_buff[1024];
+char end_buff[1024];
 
 void klog_stage2( int level, char *file_name, char *function_name, int line_number, char * message, ... ) {
 	va_list args;
 	int len = 0;
-	char start[1024];
-	char end[1024];
+	
+	memset( klog_buff, 0, 4096 );
+	memset( klog_message, 0, 4096 );
+	memset( start_buff, 0, 1024 );
+	memset( end_buff, 0, 1024 );
 
 	va_start( args, message );
-	len = vsnprintf( debugf_buff, 1024, message, args );
+	len = vsnprintf( klog_message, 1024, message, args );
 	va_end( args );
 
-	sprintf( start, "<LogEntry level=\"%s\" file=\"%s\" function=\"%s\" line_number=%d >\n\t", "Debug", file_name, function_name, line_number );
-	sprintf( end, "\n</LogEntry>\n" );
+	sprintf( start_buff, "<LogEntry level=\"%s\" file=\"%s\" function=\"%s\" line_number=%d >\n\t", "Debug", file_name, function_name, line_number );
+	sprintf( end_buff, "\n</LogEntry>\n" );
 
-	memset( klog_buff, 0, 4096 );
-	strcpy( klog_buff, start );
-	strcat( klog_buff, debugf_buff );
-	strcat( klog_buff, end );
+	strcpy( klog_buff, start_buff );
+	memcpy( klog_buff + strlen(start_buff), klog_message, len );
+	strcat( klog_buff, end_buff );
+
+	//debugf( "!!! len == %d !!!\n", len );
 
 	write( FD_STDERR, klog_buff, strlen( klog_buff ) );
 }

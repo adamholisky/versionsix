@@ -4,12 +4,15 @@
 #include <ksymbols.h>
 #include <stacktrace.h>
 #include <task.h>
+#include <process.h>
 
 interrupt_descriptor_table main_idtr;
 interrupt_gate_descriptor IDT[256];
 irq_handler irq_handlers[256];
 uint8_t pic1_irq_mask;
 uint8_t pic2_irq_mask;
+
+extern void kbugs_main( void );
 
 void interrupt_initalize( void ) {
 	// First: Setup the PIC
@@ -124,6 +127,8 @@ void interrupt_setup_exception_handler( int num, uint64_t handler ) {
 void interrupt_handler_stage_2( registers **_reg ) {
 	registers *reg = *_reg;
 
+	//process_load_process_context( KERNEL_PROCESS_ID );
+
 	uint64_t interrupt_number_at_entry = reg->interrupt_no;
 
 	#ifdef DEBUG_INTERRUPT_HANDLER_STAGE_2
@@ -134,11 +139,11 @@ void interrupt_handler_stage_2( registers **_reg ) {
 
 	if( reg->interrupt_no < 21 ) {
 		uint64_t *stack = (uint64_t *)reg->rsp;
-		uint16_t current_task_id = task_get_current_task_id();
+		uint16_t current_pid = process_get_current_proc_id();
 
 		debugf_raw( "================================================================================\n" );
 		debugf_raw( "Exception %d: %s \n", reg->interrupt_no, intel_exceptions[reg->interrupt_no] );
-		debugf_raw( "    task: %d\n", current_task_id );
+		debugf_raw( "    task: %d\n", current_pid );
 		debugf_raw( "    rip:  0x%016llX (%s)\n", reg->rip, kernel_symbols_get_function_name_at(reg->rip) );
 		debugf_raw( "    rax:  0x%016llX  rbx:  0x%016llX  rcx:  0x%016llX\n", reg->rax, reg->rbx, reg->rcx );
 		debugf_raw( "    rdx:  0x%016llX  rsi:  0x%016llX  rdi:  0x%016llX\n", reg->rdx, reg->rsi, reg->rdi );
@@ -152,19 +157,31 @@ void interrupt_handler_stage_2( registers **_reg ) {
 
 		debugf_raw( "================================================================================\n" );
 
-		if( current_task_id == 0 ) {
-			debugf_raw( "\nKernel task generated exception. Halting.\n" );
+		if( current_pid == 0 ) {
+			debugf_raw( "\nKernel task generated exception. Kbugs then halting.\n" );
+
+			kbugs_main();
 
 			while( 1 ) {
 				__asm__ volatile( "nop" );
 			}
 		} else {
-			task *t = get_task_data( current_task_id );
+			process_data *p = process_get_current();
+			p->exit_code = 1;
+			debugf_raw( "Ending process %d, switching to kbugs, then yielding to kernel\n", current_pid, KERNEL_PROCESS_ID );
+			
+			kbugs_main();
+
+			process_sched_set_next_yield( 0 );
+			process_sched_yield( _reg );
+
+
+			/* task *t = get_task_data( current_task_id );
 			t->exit_code = 1;
 			debugf_raw( "Ending task %d, switching to parent id %d\n", current_task_id, t->parent_task_id );
 			task_set_task_status( current_task_id, TASK_STATUS_DEAD );
 			task_set_yield_to_next( t->parent_task_id );
-			task_sched_yield( _reg );
+			task_sched_yield( _reg ); */
 		}
 	} else {
 		if( irq_handlers[reg->interrupt_no - 0x20].in_use == true ) {

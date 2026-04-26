@@ -43,6 +43,8 @@ finished/%.exec: build/%.o
 	@$(eval OBJNAME := $(shell basename $@))
 	@>&2 printf "[Link] $(OBJNAME)\n"
 	$(LD) -shared -E -Bsymbolic -z max-page-size=0x1000 -o finished/$(OBJNAME) glue/crt0.o $<  >> $(BUILD_LOG)
+	readelf -W -a finished/$(OBJNAME) > build_temp/elfdump-$(OBJNAME).txt
+	$(OBJDUMP) -x -D -S finished/$(OBJNAME) > build_temp/objdump-$(OBJNAME).txt
 
 build/%.o: %.c
 	@$(eval OBJNAME := $(shell basename $@))

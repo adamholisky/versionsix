@@ -141,7 +141,9 @@ void kernel_main( void ) {
 
 	process_initalize();
 
-	process_start_root_process();
+	process_setup_init();
+
+	kernel_idle_loop();
 	
 	do_immediate_shutdown();
 

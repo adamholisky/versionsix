@@ -14,6 +14,7 @@ extern "C" {
 #define SYSCALL_CLOSE 3
 #define SYSCALL_SCHED_YIELD 4
 #define SYSCALL_EXEC 5
+#define SYSCALL_FORK 6
 
 typedef struct {
 	uint64_t	arg_1;

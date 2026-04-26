@@ -14,6 +14,8 @@
 #include <kmemory.h>
 #include <lib/list.h>
 
+#include <kernel_common.h>
+
 /**
  * @brief Initalize an AVS list
  * 
@@ -144,23 +146,28 @@ avs_list* avs_list_insert_after( avs_list *list, avs_node *after_node, void *dat
     // after_node being NULL means add to end of list
     // OR if after_node is set to the list's tail
     if( after_node == NULL || after_node == list->tail ) {
+        //debugf( "part 1" );
         if( list->tail == NULL ) {
+           // debugf( "part 2" );
             list->head = node;
         } else {
+            //debugf( "part 3" );
             list->tail->next = node;
             node->prev = list->tail;
         }
 
         list->tail = node;
     } else {
+       // debugf( "part 4" );
         node->next = after_node->next;
         node->next->prev = node;
         node->prev = after_node;
         after_node->next = node;
-        printf("..");
+       // printf("..");
     }
 
     list->size++;
+  //  debugf( "part 5" );
 
     return list;
 }
@@ -222,8 +229,6 @@ void *avs_list_at_index_data( avs_list *list, int index ) {
 avs_node *avs_list_at_index_node( avs_list *list, int index ) {
     if( index > (list->size - 1) ) {
         return NULL;
-    } else if( index == (list->size - 1) ) {
-        return list->tail;
     } else if( index < 0 ) {
         return NULL;
     } else {

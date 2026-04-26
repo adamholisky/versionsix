@@ -48,7 +48,10 @@ typedef struct {
 	int exit_code;
 	char name[256];
 	registers context;
-	void *proc_stack;
+	bool first_run;
+	void *proc_stack_kvirt;
+	void *proc_stack_virt;
+	void *proc_stack_phys;
 	uint32_t stack_size;
 	
 	int argc;

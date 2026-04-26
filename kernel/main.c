@@ -144,6 +144,9 @@ void kernel_main( void ) {
 	process_setup_init();
 
 	kernel_idle_loop();
+
+	printf( "Idle loop has ended.\n" );
+	debugf( "Idle loop has ended.\n" );
 	
 	do_immediate_shutdown();
 

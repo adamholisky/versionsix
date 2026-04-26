@@ -2,7 +2,7 @@
 # To load this file, run `source <path-to-this-file>` in GDB
 
 # break elf_loader.c:236
-# break process.c:90
-# break process.c:140
-# break process.c:182
-break process.c:278
+# break process.c:91
+# break process.c:142
+# break process.c:184
+break fork.c:132

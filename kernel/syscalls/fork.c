@@ -36,7 +36,8 @@ pid_t fork_syscall_handler( registers **context ) {
 	p_child->binary_format_data = p_parent->binary_format_data;
 	p_child->exec_size = p_parent->exec_size;
 	p_child->has_own_addr_space = p_parent->has_own_addr_space;
-	p_child->pid_parent = p_parent->pid;
+	p_child->pid_parent = p_parent->pid;\
+	p_child->first_run = false;
 
 	
 
@@ -51,20 +52,23 @@ pid_t fork_syscall_handler( registers **context ) {
 	//p_child->proc_stack = kmalloc(p_parent->stack_size);
 	//p_child->stack_size = p_parent->stack_size;
 
-	
-
-	p_child->proc_stack = page_allocate_kernel(1);
+	p_child->proc_stack_virt = 0x00000000A0000000;
+	p_child->proc_stack_kvirt = page_allocate_kernel(1);
+	p_child->proc_stack_phys = paging_virtual_to_physical( p_child->proc_stack_kvirt );
 	p_child->stack_size = 0x1000;
-	memcpy( p_child->proc_stack, p_parent->proc_stack, p_parent->stack_size );
-	uint64_t stack_offset = (uint64_t)p_parent->proc_stack - (uint64_t)p_parent->context.rsp;
-	p_child->context.rsp = p_child->proc_stack + stack_offset;
+	memcpy( p_child->proc_stack_kvirt, p_parent->proc_stack_kvirt, p_parent->stack_size );
+/* 	uint64_t stack_offset = (uint64_t)p_parent->proc_stack - (uint64_t)p_parent->context.rsp;
+
+	debugf( "stack offset: 0x%016llX\n", stack_offset );
+	p_child->context.rsp = p_child->proc_stack + stack_offset; */
 
 	// RBP setup.
 	// TODO: I'm not sure of this, research and verify
-	//uint64_t parent_rbp_offset = p_parent->context.rbp - p_parent->context.rsp;
-	//p_child->context.rbp = p_child->context.rsp + parent_rbp_offset;
+	/* uint64_t parent_rbp_offset = p_parent->context.rbp - p_parent->context.rsp;
+	p_child->context.rbp = p_child->context.rsp + parent_rbp_offset;
 
-	//processes_diagnostic_dump();
+	debugf( "rbp offset: 0x%016llX\n", parent_rbp_offset ); */
+	processes_diagnostic_dump();
 
 	// Data section setup
 	p_child->data_section_count = p_parent->data_section_count;

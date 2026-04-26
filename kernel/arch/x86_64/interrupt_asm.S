@@ -1,3 +1,10 @@
+.section .data
+.skip 4096
+syscall_stack_bottom:
+.skip 4096
+syscall_stack_top:
+.skip 4096
+
 .section .text
 
 .extern interrupt_handler_stage_2
@@ -99,4 +106,58 @@ isr_without_error_code 45
 isr_without_error_code 46
 isr_without_error_code 47
 
-isr_without_error_code 254  # Syscall
+# isr_without_error_code 254  # Syscall
+
+# Syscall gets a special ISR to handle context switches
+.extern syscall_handler
+.global isr_254
+isr_254:
+	mov %rsp, %r13	# r13 has process rsp. 0(rsp) == interrupt number
+	mov $syscall_stack_top, %rsp
+
+	push 32(%r13)	# ss
+	push 24(%r13)	# rsp
+	push 16(%r13)	# rflags
+	push 8(%r13)	# cs
+	push (%r13)	# rip
+	push $0			# err no (d/n exist, but align with context frame)
+	push $254 		# interrupt number
+	push %r15
+	push %r14
+	push %r13
+	push %r12
+	push %r11
+	push %r10
+	push %r9
+	push %r8
+		push %rbp
+		push %rdi
+		push %rsi
+			push %rdx
+			push %rcx
+			push %rbx
+			push %rax
+				push %rsp
+				mov %rsp, %rdi
+
+				call syscall_handler
+				pop %rsp
+			pop %rax
+			pop %rbx
+			pop %rcx
+			pop %rdx
+		pop %rsi
+		pop %rdi
+		pop %rbp
+	pop %r8
+	pop %r9
+	pop %r10
+	pop %r11
+	pop %r12
+	pop %r13
+	pop %r14
+	pop %r15
+
+	add $16, %rsp
+
+	iretq

@@ -73,12 +73,19 @@ void process_setup_init( void ) {
 	memset( &global_proc_data.root_pd->context, 0, sizeof(registers) );
 	global_proc_data.root_pd->context.cs = 0x28;
 	global_proc_data.root_pd->context.rflags = 0x200;
+	global_proc_data.root_pd->context.ss = 0x30;
 	global_proc_data.root_pd->stack_size = 0x1000;
-	global_proc_data.root_pd->proc_stack = page_allocate_kernel(1);
+	global_proc_data.root_pd->proc_stack_virt = 0x00000000A0000000;
+	global_proc_data.root_pd->proc_stack_kvirt= page_allocate_kernel(1);
+	global_proc_data.root_pd->proc_stack_phys = paging_virtual_to_physical( global_proc_data.root_pd->proc_stack_kvirt );
 	//global_proc_data.root_pd->proc_stack = kmalloc( global_proc_data.root_pd->stack_size );
-	global_proc_data.root_pd->context.rsp = (uint64_t)global_proc_data.root_pd->proc_stack;
+	global_proc_data.root_pd->context.rsp = global_proc_data.root_pd->proc_stack_virt + global_proc_data.root_pd->stack_size;
 	global_proc_data.root_pd->context.rip = (uint64_t)global_proc_data.root_pd->entry;
 	global_proc_data.root_pd->status = PROCESS_STATUS_INACTIVE;
+
+	printf( "proc_stack_virt: 0x%016llX    _kvirt: 0x%016llX    phys: 0x%016llX\n", global_proc_data.root_pd->proc_stack_virt, global_proc_data.root_pd->proc_stack_kvirt, global_proc_data.root_pd->proc_stack_phys );
+
+	page_map( global_proc_data.root_pd->proc_stack_virt, global_proc_data.root_pd->proc_stack_phys );
 
 	kfree(buff);
 }
@@ -94,6 +101,7 @@ pid_t process_get_new_process( void ) {
 
 	p->pid = global_proc_data.pid_next++;
 	p->status = PROCESS_STATUS_IN_SETUP;
+	p->first_run = true;
 
 	avs_list_append( global_proc_data.process_list, p );
 
@@ -269,6 +277,19 @@ int process_sched_yield( registers **context ) {
 			page_map( new_p->text_sections[i].virt, new_p->text_sections[i].phys );
 			klog( LOG_DEBUG, "For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid, new_p->text_sections[i].virt, new_p->text_sections[i].phys );
 		}
+
+		if( new_p->first_run ) {
+			memcpy( new_p->proc_stack_kvirt, &new_p->context, sizeof(registers) );
+			*context = new_p->proc_stack_virt;
+		}
+	
+		debugf( "AAAAAAAAAA\n" );
+		page_map( new_p->proc_stack_virt, new_p->proc_stack_phys );
+		debugf( "BBBBBBBBBB\n" );
+	}
+
+	if( new_p->first_run ) {
+		new_p->first_run = false;
 	}
 
 	new_p->status = PROCESS_STATUS_ACTIVE;
@@ -297,7 +318,7 @@ void processes_diagnostic_dump( void ) {
 
 		printf( "PID %d (%s) proc_data @ 0x%016llX\n", p->pid, p->name, p);
 		printf( "    Status=%d     exit_code=0x%016llX    rip: 0x%016llX\n", p->status, p->exit_code, p->context.rip );
-		printf( "    entry=0x%016llX    proc_stack: 0x%016llX    stack_size=0x%X\n", p->entry,  p->proc_stack, p->stack_size );
+		printf( "    proc_stac_virt: 0x%016llX  _kvirt: 0x%016llX  _phys: 0x%016llX  size=0x%X\n", p->proc_stack_virt, p->proc_stack_kvirt, p->proc_stack_phys, p->stack_size );
 		printf( "    argc=0x%X    argv=0x%016llX    working_dir=\"%s\"\n", p->argc, p->argv, p->working_dir );
 		printf( "    entry=0x%016llX    path=\"%s\"    exec_size=0x%X    has_own_addrs: %d\n", p->entry, p->path, p->exec_size, p->has_own_addr_space );
 		printf( "    ts_count: %X    ts_virt_start: 0x%016llX\n", p->text_section_count, p->text_secton_virt_start );

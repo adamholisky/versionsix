@@ -86,4 +86,8 @@ void syscall_handler( registers **_context ) {
 		default:
 			debugf( "Unhandled syscall number: %d\n", context->rax );
 	}
+
+	// Because syscall handler is special
+	outportb( PIC_SECONDARY_COMMAND, PIC_EOI );
+	outportb( PIC_PRIMARY_COMMAND, PIC_EOI );
 }

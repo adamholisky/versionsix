@@ -1,6 +1,5 @@
 #include <kernel_common.h>
 #include <tests.h>
-#include <program.h>
 #include <page.h>
 #include <page_group.h>
 #include <kmemory.h>

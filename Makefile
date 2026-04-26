@@ -4,10 +4,10 @@
 ROOT_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 # Makefile build supporter functions/vars
-include $(ROOT_DIR)/build_support/control/build_helpers.mk
+include $(ROOT_DIR)/build_support/make_files/build_helpers.mk
 
 # Path import
-include $(ROOT_DIR)/build_support/control/paths.mk
+include $(ROOT_DIR)/build_support/make_files/paths.mk
 
 # Build number 
 # Incrementing lives under rule "increment_build_number"
@@ -22,7 +22,8 @@ DEFINES = -DVIFS_OS_ENV
 DEFINES += -DVI_ENV_OS 
 DEFINES += -DVIOS 
 DEFINES += -DSTDIO_SERIAL_3 
-DEFINES += -DBUILD_NUM=$(BUILD_NUMBER)
+DEFINES += -DBUILD_NUM=$(BUILD_NUMBER) 
+
 
 # Toolchain
 CC = /usr/local/osdev/bin/x86_64-elf-gcc
@@ -64,13 +65,13 @@ QEMU_COMMON = 	-readconfig ${ROOT_DIR}/build_support/qemu_configs/x86_64_primary
 				\
 				-no-reboot \
 				\
-				-pidfile ${ROOT_DIR}/build_support/logs/qemu_pid
+				-pidfile ${ROOT_DIR}/logs/qemu_pid
 QEMU_DISPLAY_NONE =	-display none
 QEMU_DISPLAY_CURSES = -display curses
 QEMU_DISPLAY_NORMAL = -vga std -display gtk,gl=on
 QEMU_DISPLAY_VNC = -vnc 0.0.0.0:52102,websocket=58003
 QEMU_DEBUG_COMMON = -S -gdb tcp::$(PORT_GDB)
-QEMU_DEBUG_LOGGING = -D $(ROOT_DIR)/build_support/logs/qemu_debug_log.txt
+QEMU_DEBUG_LOGGING = -D $(ROOT_DIR)/logs/qemu_debug_log.txt
 
 
 SOURCES_C = $(shell ls kernel/**/*.c)
@@ -81,8 +82,8 @@ OBJECTS_ASMS = $(patsubst %.S, build/%.o, $(shell ls kernel/**/*.S | xargs -n 1 
 all: install
 
 build/versionvi.bin: increment_build_number $(OBJECTS_C) $(OBJECTS_ASMS)
-	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/control/linker.ld -o build/versionvi.bin build_support/klibc/vvlibc.o $(OBJECTS_C) $(OBJECTS_ASMS)
-	readelf -W -a build/versionvi.bin > build_support/logs/elfdump.txt
+	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/linker.ld -o build/versionvi.bin build_support/klibc/vvlibc.o $(OBJECTS_C) $(OBJECTS_ASMS)
+	readelf -W -a build/versionvi.bin > logs/elfdump.txt
 	@>&2 $(call echo_tag_green,Build, Done making version $(BUILD_NUMBER))
 
 build/%.o: %.c
@@ -250,6 +251,6 @@ clean:
 clean_stage_2:
 	rm -rf build/*.o 
 	rm -rf build/*.bin 
-	rm -rf build_support/logs/objdump.txt 
-	rm -rf build_support/logs/elfdump.txt
-	rm -rf build_support/logs/qemu_debug_log.txt
+	rm -rf logs/objdump.txt 
+	rm -rf logs/elfdump.txt
+	rm -rf logs/qemu_debug_log.txt

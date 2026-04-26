@@ -32,23 +32,24 @@
 #include <sys_info.h>
 #include <process.h>
 
-#undef ENABLE_NETWORKING
-
+#ifdef ENABLE_NETWORKING
+void enable_networking();
+#endif
 
 #ifdef ENABLE_GUI
 extern vui_core vui;
 vui_handle main_console_handle;
 vui_console *main_console;
 
+void enable_gui( void );
 void load_font_stuff( void );
 void load_gui_stuff( void );
+extern void tcp_test( void );
 #endif
 
 sys_info system_information;
 kinfo kernel_info;
 net_info networking_info;
-
-extern void tcp_test( void );
 
 char fxsave_region[512] __attribute__((aligned(16)));
 
@@ -79,10 +80,6 @@ void kernel_main( void ) {
 	profiling_initalize();
 	#endif
 
-	#ifdef ENABLE_GUI
-	framebuffer_initalize();
-	#endif
-
 	pci_initalize();
 	ahci_initalize();
 
@@ -92,8 +89,12 @@ void kernel_main( void ) {
 	fs_initalize_part2();
 	devices_populate_fs();
 
-	// Printf is now okay
+	// GUI gets enabled here, or terminal redirects to.... ?
+	#ifdef ENABLE_GUI
+		enable_gui();
+	#endif
 
+	// Printf is now okay
 	printf( "Versions OS VI\n" );
 	printf( "Build %d\n", BUILD_NUM );
 
@@ -103,7 +104,34 @@ void kernel_main( void ) {
 	system_information.version = 1;
 	memcpy( &system_information.kernel_info, &kernel_info, sizeof(kinfo) );
 
-	#ifdef ENABLE_GUI
+	#ifdef ENABLE_NETWORKING
+	enable_networking();
+	#endif
+			
+	printf( "Initalizing process system and loading first exec...\n" );
+
+	process_setup_init();
+
+	kernel_idle_loop();
+
+	printf( "Idle loop has ended.\n" );
+	debugf( "Idle loop has ended.\n" );
+	
+	do_immediate_shutdown();
+}
+
+#ifdef ENABLE_NETWORKING
+void enable_networking( void ) {
+	memset( &networking_info, 0, sizeof( net_info ) );
+	e1000_initalize();	
+	dhcp_start();
+}
+#endif
+
+#ifdef ENABLE_GUI
+void enable_gui( void ) {
+	framebuffer_initalize();
+
 	// Next setup the main console for use. From here on out, printf is okay.
 	vui_init( (uint32_t *)kernel_info.framebuffer_info.address, 1024, 768 );
 
@@ -118,32 +146,7 @@ void kernel_main( void ) {
 
 	load_font_stuff();
 	load_gui_stuff();
-	#endif
-		
-	// Service startup order from here onwards really shouldn't matter too much
-	#ifdef ENABLE_NETWORKING
-	memset( &networking_info, 0, sizeof( net_info ) );
-	e1000_initalize();	
-	dhcp_start();
-	#endif
-
-	/* 	char test_message[] = "Test FS write to device?\n";
-		int len = strlen( test_message );
-		vfs_write( "/dev/stderr", test_message, 0, len ); */
-
-	printf( "Initalizing process system and loading first exec...\n" );
-
-	process_setup_init();
-
-	kernel_idle_loop();
-
-	printf( "Idle loop has ended.\n" );
-	debugf( "Idle loop has ended.\n" );
-	
-	do_immediate_shutdown();
 }
-
-#ifdef ENABLE_GUI
 
 void load_gui_stuff( void ) {
 	vui_theme *theme = vui_get_active_theme();

@@ -12,18 +12,20 @@ int main( int argc, char *argv[] ) {
 	pid_t pid = 0;
 	uint64_t ret = 0;
 
-	debugf("A\n");
+	printf( "This is immediately before fork.\n" );
+
 	pid = (pid_t)syscall( SYSCALL_FORK, 0, NULL );
-	debugf("B\n");
+	
+	printf( "This is immediately after fork.\n" );
 
 	uint64_t yield_syscall_num = SYSCALL_SCHED_YIELD;
 
 	switch( pid ) {
 		case -1:
-			printf( "fork failure\n" );
+			printf( "Fork faid somehow?\n" );
 			break;
 		case 0:
-			printf( "Child process!\n" );
+			printf( "I'm the child process, fork() returned a pid of %d. My real pid is %d.\n", pid, process_get_current_proc_id() );
 
 			while( true ) {
 				//printf( "A" );
@@ -39,7 +41,7 @@ int main( int argc, char *argv[] ) {
 			}
 			break;
 		default:
-			printf( "Parent process! Child pid is %d.\n", pid );
+			printf( "I'm the parent process, fork() returned a pid of %d. My real pid is %d.\n", pid, process_get_current_proc_id() );
 			while( true ) {
 				//
 				//proc_syscall( SYSCALL_SCHED_YIELD, 0, NULL );

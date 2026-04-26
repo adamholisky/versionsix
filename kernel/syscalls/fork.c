@@ -12,24 +12,14 @@ pid_t fork_syscall_handler( registers **context ) {
 	process_data *p_parent = process_get_current();
 	pid_t pid_parent = p_parent->pid;
 
-	printf( "pid_parent: %d\n", pid_parent );
-
 	pid_t pid_child = process_get_new_process();
 
-	printf( "pid_child: %d\n", pid_child );
-	
-
 	process_data *p_child = process_get_data_from_pid( pid_child );
-
-	printf( "pid_child: %d\n", pid_child );
-	printf( "p_child: %016llX\n", p_child );
 
 	if( p_child == NULL ) {
 		klog( LOG_PANIC, "p_child is null." );
 		do_immediate_shutdown();
 	}
-
-	
 
 	p_child->argc = p_parent->argc;
 	p_child->argv = p_parent->argv;
@@ -38,8 +28,6 @@ pid_t fork_syscall_handler( registers **context ) {
 	p_child->has_own_addr_space = p_parent->has_own_addr_space;
 	p_child->pid_parent = p_parent->pid;\
 	p_child->first_run = false;
-
-	
 
 	strcpy( p_child->path, p_parent->path );
 	strcpy( p_child->name, p_parent->name );
@@ -68,7 +56,7 @@ pid_t fork_syscall_handler( registers **context ) {
 	p_child->context.rbp = p_child->context.rsp + parent_rbp_offset;
 
 	debugf( "rbp offset: 0x%016llX\n", parent_rbp_offset ); */
-	processes_diagnostic_dump();
+	//processes_diagnostic_dump();
 
 	// Data section setup
 	p_child->data_section_count = p_parent->data_section_count;
@@ -122,11 +110,11 @@ pid_t fork_syscall_handler( registers **context ) {
 	(*context)->rax = pid_child;
 
 
-	printf( "Parent context:\n" );
+	/* printf( "Parent context:\n" );
 	process_diagnostic_context( *context );
 
 	printf( "Child context:\n" );
-	process_diagnostic_context( &p_child->context );	
+	process_diagnostic_context( &p_child->context ); */	
 
 	return pid_child;
 }

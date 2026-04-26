@@ -83,7 +83,7 @@ void process_setup_init( void ) {
 	global_proc_data.root_pd->context.rip = (uint64_t)global_proc_data.root_pd->entry;
 	global_proc_data.root_pd->status = PROCESS_STATUS_INACTIVE;
 
-	printf( "proc_stack_virt: 0x%016llX    _kvirt: 0x%016llX    phys: 0x%016llX\n", global_proc_data.root_pd->proc_stack_virt, global_proc_data.root_pd->proc_stack_kvirt, global_proc_data.root_pd->proc_stack_phys );
+	//printf( "proc_stack_virt: 0x%016llX    _kvirt: 0x%016llX    phys: 0x%016llX\n", global_proc_data.root_pd->proc_stack_virt, global_proc_data.root_pd->proc_stack_kvirt, global_proc_data.root_pd->proc_stack_phys );
 
 	page_map( global_proc_data.root_pd->proc_stack_virt, global_proc_data.root_pd->proc_stack_phys );
 
@@ -283,9 +283,7 @@ int process_sched_yield( registers **context ) {
 			*context = new_p->proc_stack_virt;
 		}
 	
-		debugf( "AAAAAAAAAA\n" );
 		page_map( new_p->proc_stack_virt, new_p->proc_stack_phys );
-		debugf( "BBBBBBBBBB\n" );
 	}
 
 	if( new_p->first_run ) {

@@ -25,6 +25,10 @@ char end_buff[1024];
 void klog_stage2( int level, char *file_name, char *function_name, int line_number, char * message, ... ) {
 	va_list args;
 	int len = 0;
+
+	if( level != LOG_PANIC ) {
+		return;
+	}
 	
 	memset( klog_buff, 0, 4096 );
 	memset( klog_message, 0, 4096 );

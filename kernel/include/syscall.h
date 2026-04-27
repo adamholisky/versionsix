@@ -13,7 +13,7 @@ extern "C" {
 #define SYSCALL_OPEN 2
 #define SYSCALL_CLOSE 3
 #define SYSCALL_SCHED_YIELD 4
-#define SYSCALL_EXEC 5
+#define SYSCALL_EXECVE 5
 #define SYSCALL_FORK 6
 
 typedef struct {
@@ -25,11 +25,19 @@ typedef struct {
 	uint64_t	arg_6;
 } syscall_args;
 
-void syscall_initalize( void );
+// User facing
 uint64_t syscall( uint64_t call_num, uint8_t num_args, syscall_args *args );
+
+// Kernel facing
+void syscall_initalize( void );
 void syscall_handler( registers **_context );
 
+// Glue
 size_t write( int fd, void *buff, size_t count );
+int execve( char *path, char *argv[], char *envp[] );
+
+// Handlers
+int execve_syscall_handler( registers **_context, char *path, char *argv[], char *envp[] );
 
 #ifdef __cplusplus
 }

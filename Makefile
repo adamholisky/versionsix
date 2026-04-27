@@ -82,7 +82,7 @@ OBJECTS_ASMS = $(patsubst %.S, build/%.o, $(shell ls kernel/**/*.S | xargs -n 1 
 all: install
 
 build/versionvi.bin: increment_build_number $(OBJECTS_C) $(OBJECTS_ASMS)
-	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/linker.ld -o build/versionvi.bin build_support/klibc/vvlibc.o $(OBJECTS_C) $(OBJECTS_ASMS)
+	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/linker.ld -o build/versionvi.bin vi_klibc_static/vklibc.o $(OBJECTS_C) $(OBJECTS_ASMS)
 	readelf -W -a build/versionvi.bin > logs/elfdump.txt
 	@>&2 $(call echo_tag_green,Build, Done making version $(BUILD_NUMBER))
 

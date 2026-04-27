@@ -9,6 +9,7 @@ extern "C"
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <process.h>
 
 int elf_loader_load( process_data *p, uint8_t *data );
 int elf_loader_load_binary( process_data *p, uint8_t *data );

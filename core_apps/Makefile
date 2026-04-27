@@ -27,6 +27,7 @@ CFLAGS_REDUCED = $(DEFINES) -Wno-write-strings \
 	-g \
 	-I$(ROOT_DIR)/../kernel/include \
 	-I$(ROOT_DIR)/../vi_klibc_static/include \
+	-I$(ROOT_DIR)/src \
     -m64                 \
     -march=x86-64        \
     -mabi=sysv           \

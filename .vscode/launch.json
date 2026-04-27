@@ -9,7 +9,7 @@
             "request": "attach",
             "name": "Attach to gdbserver",
             "executable": "${workspaceRoot}/build/versionvi.bin",
-            "target": ":5894",
+            "target": ":58001",
             "remote": true,
             "cwd": "${workspaceRoot}",
             "valuesFormatting": "parseText"

@@ -25,9 +25,11 @@ char end_buff[1024];
 void klog_stage2( int level, char *file_name, char *function_name, int line_number, char * message, ... ) {
 	va_list args;
 	int len = 0;
-
-	if( level != LOG_PANIC ) {
-		return;
+	
+	if( strcmp(file_name, "kernel/syscalls/execve.c") != 0 ) {
+		if( level != LOG_PANIC ) {
+			return;
+		}
 	}
 	
 	memset( klog_buff, 0, 4096 );
@@ -39,8 +41,8 @@ void klog_stage2( int level, char *file_name, char *function_name, int line_numb
 	len = vsnprintf( klog_message, 1024, message, args );
 	va_end( args );
 
-	sprintf( start_buff, "<LogEntry level=\"%s\" file=\"%s\" function=\"%s\" line_number=%d >\n\t", "Debug", file_name, function_name, line_number );
-	sprintf( end_buff, "\n</LogEntry>\n" );
+	sprintf( start_buff, "<LogEntry level=\"%s\" file=\"%s\" function=\"%s\" line_number=%d >", klog_level_to_string(level), file_name, function_name, line_number );
+	sprintf( end_buff, "</LogEntry>\n" );
 
 	strcpy( klog_buff, start_buff );
 	memcpy( klog_buff + strlen(start_buff), klog_message, len );
@@ -105,4 +107,29 @@ char peek_char( char c ) {
 	} else {
 		return '.';
 	}
+}
+
+char *klog_level_to_string( int level ) {
+	static char ret_val[10];
+
+	memset( ret_val, 0, 10 );
+
+	switch( level ) {
+		case LOG_DEBUG:
+			strcpy( ret_val, "Debug" );
+			break;
+		case LOG_INFO:
+			strcpy( ret_val, "Info" );
+			break;
+		case LOG_ERROR:
+			strcpy( ret_val, "Error" );
+			break;
+		case LOG_PANIC:
+			strcpy( ret_val, "Panic" );
+			break;
+		default:
+			strcpy( ret_val, "Unknown" );
+	}
+
+	return ret_val;
 }

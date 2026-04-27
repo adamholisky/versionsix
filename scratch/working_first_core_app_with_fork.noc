@@ -8,8 +8,12 @@ int main( int argc, char *argv[] ) {
 	pid_t pid = 0;
 	uint64_t ret = 0;
 
+	printf( "This is immediately before fork.\n" );
+
 	pid = (pid_t)syscall( SYSCALL_FORK, 0, NULL );
 	
+	printf( "This is immediately after fork.\n" );
+
 	uint64_t yield_syscall_num = SYSCALL_SCHED_YIELD;
 
 	// Do user space setup stuff here
@@ -21,7 +25,10 @@ int main( int argc, char *argv[] ) {
 			printf( "Fork faid somehow?\n" );
 			break;
 		case 0:
-			printf( "Running /bin/avsshell.exec\n" );
+			printf( "I'm the child process, fork() returned a pid of %d. My real pid is %d.\n", pid, process_get_current_proc_id() );
+
+			printf( "Running shell... Maybe?\n" );
+
 			execve( "/bin/avsshell.exec", NULL, NULL );
 
 			printf( "Done running shell? Looping.\n" );
@@ -38,7 +45,7 @@ int main( int argc, char *argv[] ) {
 			}
 			break;
 		default:
-			
+			printf( "I'm the parent process, fork() returned a pid of %d. My real pid is %d.\n", pid, process_get_current_proc_id() );
 			while( true ) {
 				//
 				//proc_syscall( SYSCALL_SCHED_YIELD, 0, NULL );

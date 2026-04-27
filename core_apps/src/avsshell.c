@@ -15,10 +15,8 @@ kshell_env_var_list env_vars;
 
 int main( int argc, char *argv[] ) {
 
-	printf( "We're in the shell. Stopping.\n" );
-	while (true ) {
-		;
-	}
+	printf( "A Very Simply Shell is now running.\n" );
+	
 	// Setup first command
 	kshell_commands.cmd = kshell_command_create( "hw", (void *)kshell_command_hello_world );
 	kshell_commands.next = NULL;

@@ -157,9 +157,9 @@ int asvfs_get_meta_data(uint32_t block_id, asvfs_block_meta_data *data) {
 
 uint32_t asvfs_get_block_id_from_pathname( char *pathname ) {
 	uint32_t current_dir_block_id = 0;
-	uint32_t path_length = strlen( pathname );
+	uint32_t path_length = kstrlen( pathname );
 
-	if( strcmp( pathname, "/" ) == 0 ) {
+	if( kstrcmp( pathname, "/" ) == 0 ) {
 		return asvfs_main_drive->root_directory;
 	}
 

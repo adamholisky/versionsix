@@ -50,7 +50,12 @@ static inline void out_port_long( uint16_t port, uint32_t value) {
 #define do_immediate_shutdown() outportb( 0xF4, 0x00 )
 
 void delay( uint32_t count );
-int kstrlen( char *s );
+size_t kstrlen( const char *s );
+char *kstrcpy(char *dest, const char *src);
+char *kstrncpy(char *dest, const char *src, size_t count);
+char *kstrcat(char *dest, const char *src);
+char *kstrncat(char *dest, const char *src, size_t count);
+int kstrcmp(const char *cs, const char *ct);
 
 #ifdef VIOS_ENABLE_PROFILING
 void profiling_initalize( void );

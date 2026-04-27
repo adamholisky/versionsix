@@ -12,7 +12,7 @@
             "target": ":58001",
             "remote": true,
             "cwd": "${workspaceRoot}",
-            "valuesFormatting": "parseText"
+            "valuesFormatting": "prettyPrinters"
         }
         
 

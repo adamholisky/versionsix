@@ -19,11 +19,11 @@ int execve( char *path, char *argv[], char *envp[] ) {
 }
 
 int execve_syscall_handler(  registers **_context, char *path, char *argv[], char *envp[] ) {
-	klog( LOG_DEBUG, "In execve handler." );
+	klog( LOG_DEBUG, "In execve handler. path=\"%s\"", path );
 
 	// Initial sanity checks
-	file_stats fstats;
-	int getattr_err = vfs_getattr( path, &fstats );
+	file_stats st;
+	int getattr_err = vfs_getattr( path, &st );
 	if( getattr_err != VFS_ERROR_NONE ) {
 		klog( LOG_ERROR, "Could not open %s", path );
 		return -1;
@@ -34,15 +34,15 @@ int execve_syscall_handler(  registers **_context, char *path, char *argv[], cha
 	process_data *p = process_get_current();
 
 	// Read the file
-	uint8_t* buff = kmalloc( fstats.st_size ) ;
-	int bytes_read = vfs_read( path, buff, fstats.st_size, 0 );
+	uint8_t* buff = kmalloc( st.st_size ) ;
+	int bytes_read = vfs_read( path, buff, st.st_size, 0 );
 
 	// Load ELF information
 	int loadelf_err = elf_loader_load( p, buff );
 
 	// Setup admin vars
 	p->status = PROCESS_STATUS_IN_SETUP;
-	p->exec_size = fstats.st_size;
+	p->exec_size = st.st_size;
 	strcpy( p->path, path );
 	strcpy( p->name, path ); // TODO: basename
 	p->argv = argv;
@@ -54,6 +54,7 @@ int execve_syscall_handler(  registers **_context, char *path, char *argv[], cha
 	p->proc_stack_virt = 0x00000000A0000000;
 	p->proc_stack_kvirt= page_allocate_kernel(1);
 	p->proc_stack_phys = paging_virtual_to_physical( p->proc_stack_kvirt );
+	page_map( p->proc_stack_virt, p->proc_stack_phys );
 	
 	// Code segmnet setup
 	for( int i = 0; i < p->text_section_count; i++ ) {
@@ -74,7 +75,16 @@ int execve_syscall_handler(  registers **_context, char *path, char *argv[], cha
 	p->context.ss = 0x30;
 
 	// Final setup
-	p->status = PROCESS_STATUS_INACTIVE;
+	p->status = PROCESS_STATUS_ACTIVE;
+	process_set_next_up( p );
+	
+	/* printf( "Before: \n" );
+	process_diagnostic_context(*_context); */
+
+	memcpy( &(**_context), &p->context, sizeof(registers) );
+
+	/* printf( "After:\n" );
+	process_diagnostic_context(*_context); */
 
 	kfree(buff);
 

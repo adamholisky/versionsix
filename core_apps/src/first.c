@@ -34,7 +34,14 @@ int main( int argc, char *argv[] ) {
 			printf( "Done running shell? Looping.\n" );
 
 			while( true ) {
-				
+				__asm__	__volatile__ ( 
+					"movq %1, %%rax \n"
+					"int %2 \n"
+					"movq %%rax, %0"
+					:"=r"(ret)
+					:"r"(yield_syscall_num), "i"(0xFE)
+					:"%rax" 
+				);
 			}
 			break;
 		default:

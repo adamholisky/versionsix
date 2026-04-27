@@ -187,8 +187,8 @@ int avs_list_compare_pids( void *a, void *b ) {
 	return pid_a == pid_b ? 0 : -1;
 }
 
-pid_t vios_fork( void ) {
-	
+void process_set_next_up( process_data *p ) {
+	global_proc_data.process_next_up = p;
 }
 
 int process_sched_yield( registers **context ) {

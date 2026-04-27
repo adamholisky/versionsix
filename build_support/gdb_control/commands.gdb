@@ -41,7 +41,7 @@ set print pretty on
 
 source /usr/local/osdev/source/versionsix/build_support/gdb_control/breakpoints.gdb
 
-set logging file /usr/local/osdev/source/versionsix/build_support/logs/gdb.log
+set logging file /usr/local/osdev/source/versionsix/logs/gdb.log
 set logging overwrite on
 set logging enabled on
 

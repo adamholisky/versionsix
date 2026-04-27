@@ -32,7 +32,7 @@ int asvfs_initalize( asvfs_drive_ops *ops ) {
 	}
 
 	//klog( LOG_DEBUG, "header: %X", asvfs_instance_data.header );
-	asvfs_drive_read( 0, (uint8_t *)asvfs_instance_data.header, sizeof(asvfs_header), 0 );
+	asvfs_instance_data.drive_ops.read_from_disk( 0, (uint8_t *)asvfs_instance_data.header, sizeof(asvfs_header), 0 );
 
 	// verify header, bail if doesn't match
 	if( asvfs_instance_data.header->magic[0] == 'A' && asvfs_instance_data.header->magic[1] == 'F' && asvfs_instance_data.header->magic[2] == 'S' ) {
@@ -65,7 +65,7 @@ int asvfs_initalize( asvfs_drive_ops *ops ) {
 		return ASVFS_ERROR_MEMORY;
 	}
 
-	asvfs_drive_read( 0, (uint8_t *)drive_block_meta_data, length_of_block_meta, sizeof(asvfs_header) );
+	asvfs_instance_data.drive_ops.read_from_disk( 0, (uint8_t *)drive_block_meta_data, length_of_block_meta, sizeof(asvfs_header) );
 
 	#ifdef ASVFS_DEBUG
 /* 	asvfs_log( "asvfs_header:\n" );
@@ -150,7 +150,7 @@ asvfs_header *asvfs_get_header( void ) {
 int asvfs_get_meta_data(uint32_t block_id, asvfs_block_meta_data *data) {
 	uint64_t offset = sizeof(asvfs_header);
 	offset = offset + (sizeof(asvfs_block_meta_data) * block_id);
-	asvfs_drive_read( 0, (uint8_t*)data, sizeof(asvfs_block_meta_data), offset );
+	asvfs_instance_data.drive_ops.read_from_disk( 0, (uint8_t*)data, sizeof(asvfs_block_meta_data), offset );
 
 	return ASVFS_ERROR_NONE;
 }
@@ -307,7 +307,7 @@ int asvfs_read( char *pathname, char *buf, size_t size, off_t offset ) {
 
 	uint32_t drive_offset = (block_id * asvfs_instance_data.header->block_size) + offset;
 
-	return asvfs_drive_read( 0, (uint8_t *)buf, size, drive_offset );
+	return asvfs_instance_data.drive_ops.read_from_disk( 0, (uint8_t *)buf, size, drive_offset );
 }
 
 int asvfs_read_file_block_id( uint32_t block_id, char *buf, off_t offset, size_t length ) {
@@ -318,7 +318,7 @@ int asvfs_read_file_block_id( uint32_t block_id, char *buf, off_t offset, size_t
 
 	uint32_t drive_offset = (block_id * asvfs_instance_data.header->block_size) + offset;
 
-	return asvfs_instance_data.drive_ops.read_from_disk( 0, drive_offset, length, (uint8_t *)buf );
+	return asvfs_instance_data.drive_ops.read_from_disk( 0, (uint8_t *)buf, length, drive_offset );
 }
 
 /**
@@ -334,7 +334,7 @@ int asvfs_read_block( uint32_t block_id, size_t size, char *data ) {
 
 	//data = vfs_disk_read( 0, (block_id * drive->block_size), size, data );
 	//int err = asvfs_instance_data.drive_ops.read_from_disk( 0, block_id * 4096, size, data );
-	int err = asvfs_drive_read( 0, data, size, block_id * 4096 );
+	int err = asvfs_instance_data.drive_ops.read_from_disk( 0, data, size, block_id * 4096 );
 
 	if( err != ASVFS_ERROR_NONE ) {
 		klog( LOG_ERROR, "Error on asvfs_block_read: %d\n", err );

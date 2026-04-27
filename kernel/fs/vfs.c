@@ -65,8 +65,8 @@ vfs_filesystem* vfs_register_fs( char* fs_name, vfs_operations* fs_ops ) {
 int vfs_mount( char* fs_type, char* mount_path, int drive_id ) {
 	vfs_mount_point* mp = kmalloc( sizeof( vfs_mount_point ) );
 
-	strcpy( mp->fs_type, fs_type );
-	strcpy( mp->root, mount_path );
+	kstrcpy( mp->fs_type, fs_type );
+	kstrcpy( mp->root, mount_path );
 	mp->drive_id = drive_id;
 
 	avs_node *n = avs_list_find_data( file_systems, fs_type, avs_list_compare_fs_type );
@@ -77,7 +77,7 @@ int vfs_mount( char* fs_type, char* mount_path, int drive_id ) {
 		klog( LOG_ERROR, "couldn't find fs data for fs_type \"%s\"", fs_type );
 	}
 
-	klog( LOG_INFO, "Appended mount point. fs_type=%s    mount_path=%s    drive_id=%d", mp->fs_type, mp->root, mp->drive_id );
+	klog( LOG_INFO, "Appended mount point. fs_type=%s  mount_path=\"%s\"  drive_id=%d", mp->fs_type, mp->root, mp->drive_id );
 
 	avs_list_append( mount_points, mp );
 }
@@ -98,7 +98,7 @@ vfs_mount_point* vfs_get_mount_point_from_path( char* pathname ) {
 	bool keep_going_main = true;
 	bool keep_going_secondary = true;
 	char* c = pathname;
-	int path_length = strlen( c );
+	int path_length = kstrlen( c );
 
 	memset( path_elements, 0, 25 * 256 );
 
@@ -122,15 +122,14 @@ vfs_mount_point* vfs_get_mount_point_from_path( char* pathname ) {
 				path_index++;
 			}
 		} while ( keep_going_secondary );
-
-		c++;
+		
 		path_index++;
-		//printf( "path_elements[%d] = %s\n", current_path_ele_index - 1, path_elements[current_path_ele_index - 1] );
 
 		if ( path_index >= path_length ) {
 			keep_going_main = false;
 		}
 		else {
+			c++;
 			keep_going_secondary = true;
 		}
 	} while ( keep_going_main );
@@ -140,7 +139,7 @@ vfs_mount_point* vfs_get_mount_point_from_path( char* pathname ) {
 	vfs_mount_point *farthest_mount_point = NULL;
 	
 	memset( path_to_test, 0, 255 );
-	strcpy( path_to_test, path_elements[0] );
+	kstrcpy( path_to_test, path_elements[0] );
 
 	for( int n = 0; n < current_path_ele_index; n++ ) {
 		if( n == 0 && path_to_test[0] == '/' ) {
@@ -148,22 +147,28 @@ vfs_mount_point* vfs_get_mount_point_from_path( char* pathname ) {
 
 			avs_node *n_mp = avs_list_find_data( mount_points, "/", avs_list_compare_mount_point_roots );
 
+			if( n_mp == NULL ) {
+				//klog( LOG_ERROR, "mount points var is null" );
+				printf( "mount points var is null\n" );
+				return NULL;
+			}
+
 			farthest_mount_point = (vfs_mount_point *)n_mp->data;
 		} else {
 			avs_node *n_mp = avs_list_find_data( mount_points, path_to_test, avs_list_compare_mount_point_roots );
 
 			if( n_mp != NULL ) {
 				farthest_mount_point = (vfs_mount_point *)n_mp->data;
-				strcpy( farthest_mount_point_path, path_to_test );
+				kstrcpy( farthest_mount_point_path, path_to_test );
 			}
 		}
 
 		if( n + 1 < current_path_ele_index ) {
 			if( n > 0 ) {
-				strcat( path_to_test, "/" );
+				kstrcat( path_to_test, "/" );
 			}
 
-			strcat( path_to_test, path_elements[n + 1] );
+			kstrcat( path_to_test, path_elements[n + 1] );
 		}
 	}
 
@@ -177,7 +182,9 @@ int avs_list_compare_fs_type( void *a, void *b ) {
 int avs_list_compare_mount_point_roots( void *a, void *b ) {
 	//klog( LOG_INFO, "comparing a=\"%s\"  b=\"%s\"", (char *)a, ((vfs_mount_point *)b)->root );
 
-	return strcmp( (char *)a, ((vfs_mount_point *)b)->root );
+	char *path_to_test = a;
+	vfs_mount_point *mp_to_test_again = b;
+	return kstrcmp( path_to_test, mp_to_test_again->root );
 }
 
 int vfs_create( const char *pathname, mode_t mode ) {

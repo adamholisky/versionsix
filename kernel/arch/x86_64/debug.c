@@ -22,15 +22,22 @@ char klog_buff[4096];
 char start_buff[1024];
 char end_buff[1024];
 
+char *klog_levels[] = {
+	"Info",
+	"Debug",
+	"Error",
+	"Panic"
+};
+
 void klog_stage2( int level, char *file_name, char *function_name, int line_number, char * message, ... ) {
 	va_list args;
 	int len = 0;
 	
-	if( strcmp(file_name, "kernel/syscalls/execve.c") != 0 ) {
+	/* if( strcmp(file_name, "kernel/syscalls/execve.c") != 0 ) {
 		if( level != LOG_PANIC ) {
 			return;
 		}
-	}
+	} */
 	
 	memset( klog_buff, 0, 4096 );
 	memset( klog_message, 0, 4096 );
@@ -38,20 +45,22 @@ void klog_stage2( int level, char *file_name, char *function_name, int line_numb
 	memset( end_buff, 0, 1024 );
 
 	va_start( args, message );
-	len = vsnprintf( klog_message, 1024, message, args );
+	vsnprintf( klog_message, 1024, message, args );
 	va_end( args );
 
-	sprintf( start_buff, "<LogEntry level=\"%s\" file=\"%s\" function=\"%s\" line_number=%d >", klog_level_to_string(level), file_name, function_name, line_number );
+	sprintf( start_buff, "<LogEntry level=\"%s\" file=\"%s\" function=\"%s\" line_number=%d >", klog_levels[level], file_name, function_name, line_number );
 	sprintf( end_buff, "</LogEntry>\n" );
 
-	strcpy( klog_buff, start_buff );
-	memcpy( klog_buff + strlen(start_buff), klog_message, len );
-	strcat( klog_buff, end_buff );
+	int start_len = kstrlen(start_buff);
+	char *msg_start = klog_buff + start_len;
 
-	//debugf( "!!! len == %d !!!\n", len );
+	kstrncpy( klog_buff, start_buff, kstrlen(start_buff) );
+	kstrncat( klog_buff, klog_message, kstrlen(klog_message) );
+	kstrncat( klog_buff, end_buff, kstrlen(end_buff) );
 
-	write( FD_STDERR, klog_buff, strlen( klog_buff ) );
+	write( FD_STDERR, klog_buff, kstrlen( klog_buff ) );
 }
+
 
 void debugf_stage2( char * message, ... ) {
     va_list args;
@@ -107,29 +116,4 @@ char peek_char( char c ) {
 	} else {
 		return '.';
 	}
-}
-
-char *klog_level_to_string( int level ) {
-	static char ret_val[10];
-
-	memset( ret_val, 0, 10 );
-
-	switch( level ) {
-		case LOG_DEBUG:
-			strcpy( ret_val, "Debug" );
-			break;
-		case LOG_INFO:
-			strcpy( ret_val, "Info" );
-			break;
-		case LOG_ERROR:
-			strcpy( ret_val, "Error" );
-			break;
-		case LOG_PANIC:
-			strcpy( ret_val, "Panic" );
-			break;
-		default:
-			strcpy( ret_val, "Unknown" );
-	}
-
-	return ret_val;
 }

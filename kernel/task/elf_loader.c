@@ -13,7 +13,8 @@
 extern void elf_dynamic_linker_preamble( void );
 
 int elf_loader_load( process_data* p, uint8_t* data ) {
-	klog( LOG_INFO, "Loding an ELF object: path=%s    data: 0x%016llX    size: 0x%llX \n", p->path, data, p->exec_size );
+	klog( LOG_INFO, "Loding an ELF object: path=%s  data: 0x%016llX  size: 0x%llX \n", p->path, data, p->exec_size );
+	debugf( "ELF Loader in.\n" );
 
 	if ( data[0] == 0x7F ) {
 		Elf64_Ehdr* elf_header = data;
@@ -53,9 +54,12 @@ int elf_loader_load( process_data* p, uint8_t* data ) {
 	}
 	else {
 		klog( LOG_ERROR, "Program header missing ELF magic" );
+		debugf( "Header magic missing.\n" );
 	}
 
-	
+	debugf( "elf loader out\n" );
+
+	return 0;
 }
 
 int elf_loader_load_binary( process_data* p, uint8_t* data ) {
@@ -81,11 +85,15 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 			uint64_t virt_offset = 0;
 
 			if ( pheader->p_vaddr != 0x0 ) {
+				// actual_virt_address gets the _programs_ virtual address that we start loading at. We align it to a 4k page. The integer divide forces whole numbers.
 				actual_virt_address = ( pheader->p_vaddr / 4096 ) * 4096;
 
 				num_pages++; // Fix this, should be based off size of program entry + page size to account for an extra page in the vaddr is over page size
 
 				virt_offset = pheader->p_vaddr - actual_virt_address;
+
+				debugf( "Actual virtual address: 0x%016llX\n", actual_virt_address );
+				debugf( "Virtual offset:         0x%016llx\n", virt_offset );
 			}
 
 
@@ -104,6 +112,7 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 				p->data_sections = kmalloc( sizeof( process_exec_section ) * num_pages );
 				p->data_section_count = num_pages;
 				p->data_section_virt_start = pheader->p_vaddr;
+				p->data_section_ava = actual_virt_address;
 
 				pages = p->data_sections;
 			}
@@ -124,15 +133,19 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 			} 
 			
 			//TODO: START HERE, THIS IS WRONG
-			debugf( "loading to (virt) 0x%X from (phys) 0x%X for 0x%X bytes.\n", virt_offset, pheader->p_offset, pheader->p_filesz );
+			//debugf( "loading to (virt) 0x%X from (phys) 0x%X for 0x%X bytes.\n", virt_offset, pheader->p_offset, pheader->p_filesz );
+
+			debugf( "loading to (virt) 0x%X from (phys) 0x%X for 0x%X bytes.\n", pheader->p_vaddr, pheader->p_offset, pheader->p_filesz );
 
 			void *kern_virt_data_start = pages[0].kern_virt;
+			
 			kern_virt_data_start = kern_virt_data_start + virt_offset;
 
-			debugf( "kvds: 0x%016llX\n", kern_virt_data_start );
+			debugf( "kern virt data start: 0x%016llX\n", kern_virt_data_start );
+			debugf( "proc virt data start: 0x%016llX\n", pages[0].virt + virt_offset );
 			memcpy( kern_virt_data_start, (uint8_t*)data + pheader->p_offset, pheader->p_filesz );
 
-			kdebug_peek_at_n( kern_virt_data_start, 50 );
+			//kdebug_peek_at_n( kern_virt_data_start, (pheader->p_filesz / 0x10) + 10 );
 
 			page_count_from_prev_headers += num_pages;
 		}
@@ -174,28 +187,36 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 
 	Elf64_Shdr *elf_got_section = elf_get_section_header_by_name( elf_f, ".got.plt" );
 	if( elf_got_section != NULL ) {
-		uint8_t* got_data = (uint8_t *)p->data_sections[0].kern_virt + elf_got_section->sh_offset;
+		//uint8_t* got_data = (uint8_t *)p->data_sections[0].kern_virt + elf_got_section->sh_offset;
+		uint8_t* got_data = (uint8_t *)p->data_sections[0].kern_virt + elf_got_section->sh_addr - p->data_section_ava ;
 
-		debugf( ".got out pre:\n" );
+
+		/* debugf( ".got out pre:\n" );
 		for ( int j = 0; j < ( elf_got_section->sh_size ); j++ ) {
 			debugf_raw( "%02X ", *( got_data + j ) );
 		}
-		debugf_raw( "\n\n" );
+		debugf_raw( "\n\n" ); */
 
 		//*(got_data + 0x10) = elf_loader_dynamic_linker;
 		uint64_t *got64_t = (uint64_t *)got_data;
 		
 
-		debugf( "got:             0x%llX\n", got64_t );
+		/* debugf( "got:             0x%llX\n", got64_t );
 		debugf( "got + 0x10:      0x%llX (data: 0x%llX)\n", (got64_t + 1), *(got64_t + 1) );
-		debugf( "elfload_dyn_lnk: 0x%llX\n", elf_dynamic_linker_preamble );
+		debugf( "elfload_dyn_lnk: 0x%llX\n", elf_dynamic_linker_preamble ); */
 		
 		//*(uint64_t *)(got_data + 0x08) = p->data_sections[0].virt + elf_got_section->sh_offset;
 		*(uint64_t *)(got_data + 0x08) = p->text_sections[0].virt + rel_plt->sh_offset;
 		*(uint64_t *)(got_data + 0x10) = elf_dynamic_linker_preamble;
 		//*(got64_t + 0x3) = elf_loader_dynamic_linker;
 
-		debugf( "got + 0x10:      0x%llX (data: 0x%llX)\n", (got64_t + 1), *(got64_t + 1) );
+		/* debugf( "got + 0x10:      0x%llX (data: 0x%llX)\n", (got64_t + 1), *(got64_t + 1) );
+
+		debugf( ".got out post:\n" );
+		for ( int j = 0; j < ( elf_got_section->sh_size ); j++ ) {
+			debugf_raw( "%02X ", *( got_data + j ) );
+		}
+		debugf_raw( "\n\n" ); */
 	} else {
 		debugf( "Could not locate .got section. Failing hard.\n" );
 		do_immediate_shutdown();
@@ -235,6 +256,7 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 
 void* elf_loader_dynamic_linker( uint64_t got_table_data, uint8_t got_index ) {
 	//debugf( "dynamic linker, yay! got_table_data=0x%016llX    got_index=%02llX\n", got_table_data, got_index );
+	//klog( LOG_INFO, "Linking symbol at index %d", got_index );
 	void *function_addr = 0;
 
 	process_data *p = process_get_current();

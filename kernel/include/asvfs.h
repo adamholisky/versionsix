@@ -203,14 +203,14 @@ typedef struct {
 } asvfs_inode;
 
 typedef struct {
-	char name[256];
+	char name[ASVFS_MAX_NAME_SIZE];
 	uint8_t type;
 	uint32_t block_id;
 } asvfs_dir_t_entry;
 
 typedef struct {
 	int8_t size;
-	asvfs_dir_t_entry dir_entry[256];
+	asvfs_dir_t_entry dir_entry[100];
 } asvfs_dir_t_entries;
 
 typedef struct {

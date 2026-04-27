@@ -70,6 +70,7 @@ typedef struct {
 	uint16_t data_section_count;
 	process_exec_section *data_sections;
 	uint64_t data_section_virt_start;
+	uint64_t data_section_ava;
 
 	symbol_index *rela_sym_index;
 	symbol_index *dyn_sym_index;
@@ -104,11 +105,11 @@ int process_idle_loop_entry( int argc, char *argv[] );
 void process_idle_loop( void );
 int process_sched_yield( registers **context );
 void process_sched_set_next_yield( pid_t pid );
-
-pid_t vios_fork( void );
+void process_set_next_up( process_data *p );
 
 void processes_diagnostic_dump( void );
 void process_diagnostic_context( registers *context );
+
 
 #ifdef __cplusplus
 }

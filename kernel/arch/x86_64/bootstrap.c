@@ -46,7 +46,7 @@ void delay( uint32_t count ) {
 	}
 }
 
-int kstrlen( char *s ) {
+/* int kstrlen( char *s ) {
 	int len = 0;
 
 	while( *(s++) ) {
@@ -54,7 +54,24 @@ int kstrlen( char *s ) {
 	}
 
 	return len;
+} */
+
+/**
+ * @brief Kernel debug strlen
+ * 
+ * Pulled from linux lib/string.c
+ * 
+ * @param s 
+ * @return size_t 
+ */
+size_t kstrlen(const char *s) {
+	const char *sc;
+
+	for (sc = s; *sc != '\0'; ++sc)
+		/* nothing */;
+	return sc - s;
 }
+
 
 int vios_fprintf( int dest, char *message, ... ) {
 	char buff[1024];
@@ -70,6 +87,115 @@ int vios_fprintf( int dest, char *message, ... ) {
 	} else if( dest == vios_stdout ) {
 		write( FD_STDOUT, buff, len );
 	}
+}
+
+/**
+ * @brief strcpy
+ * 
+ * Pulled from linux kerenl lib/string.c
+ * 
+ * @param dest 
+ * @param src 
+ * @return char* 
+ */
+char *kstrcpy(char *dest, const char *src)
+{
+	char *tmp = dest;
+
+	while ((*dest++ = *src++) != '\0')
+		/* nothing */;
+	return tmp;
+}
+
+/**
+ * @brief strcat
+ * 
+ * Pulled from linux kernel lib/string.c
+ * 
+ * @param dest 
+ * @param src 
+ * @return char* 
+ */
+char *kstrcat(char *dest, const char *src)
+{
+	char *tmp = dest;
+
+	while (*dest)
+		dest++;
+	while ((*dest++ = *src++) != '\0')
+		;
+	return tmp;
+}
+
+
+/**
+ * @brief strncat
+ * 
+ * Pulled form linux kernel lib/string.c
+ * 
+ * @param dest 
+ * @param src 
+ * @param count 
+ * @return char* 
+ */
+char *kstrncat(char *dest, const char *src, size_t count)
+{
+	char *tmp = dest;
+
+	if (count) {
+		while (*dest)
+			dest++;
+		while ((*dest++ = *src++) != 0) {
+			if (--count == 0) {
+				*dest = '\0';
+				break;
+			}
+		}
+	}
+	return tmp;
+}
+
+/**
+ * @brief kstrncpy
+ * 
+ * Pulled from linux kernel lib/string.c
+ * 
+ * @param dest 
+ * @param src 
+ * @param count 
+ * @return char* 
+ */
+char *kstrncpy(char *dest, const char *src, size_t count)
+{
+	char *tmp = dest;
+
+	while (count) {
+		if ((*tmp = *src) != 0)
+			src++;
+		tmp++;
+		count--;
+	}
+	return dest;
+}
+
+/**
+ * @brief kstrcmp
+ * 
+ * Pulled from linux kernel lib/string.c
+ */
+int kstrcmp(const char *cs, const char *ct)
+{
+	unsigned char c1, c2;
+
+	while (1) {
+		c1 = *cs++;
+		c2 = *ct++;
+		if (c1 != c2)
+			return c1 < c2 ? -1 : 1;
+		if (!c1)
+			break;
+	}
+	return 0;
 }
 
 #ifdef VIOS_ENABLE_PROFILING

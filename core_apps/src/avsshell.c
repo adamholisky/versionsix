@@ -13,6 +13,8 @@ kshell_command_list kshell_commands;
 
 kshell_env_var_list env_vars;
 
+char cmd[100];
+
 int main( int argc, char *argv[] ) {
 
 	printf( "A Very Simply Shell is now running.\n" );
@@ -200,9 +202,29 @@ void kshell_main_loop( void ) {
 
 		/* Step 4: TODO! Query the file system for the command */
 
+		
+		memset( cmd, 0, 100 );
+
+		kstrcpy( cmd, "/bin/" );
+		kstrcat( cmd, argv_builder[0] );
+		kstrcat( cmd, ".exec" );
+
+		printf( "Now looking for %s\n", cmd );
+
+		file_stats st;
+		int attrerr = vfs_getattr( cmd, &st );
+
+		if( attrerr == VFS_ERROR_NONE ) {
+			printf( "Will run %s\n", cmd );
+		} else {
+			printf( "Command not found.\n" );
+
+		}
+
+
 		/* Step 5: Run the command, or fail*/
 
-		int cmd_return_value = 0;
+		/* int cmd_return_value = 0;
 
 		if( to_run != NULL ) {
 			cmd_return_value = kshell_command_run( to_run, num_args, argv_builder );
@@ -212,9 +234,10 @@ void kshell_main_loop( void ) {
 
 		/* Step 6: For now display any non-zero return code */
 
+		/*
 		if( cmd_return_value != 0 ) {
 			printf( "%s: Error %d\n", argv_builder[0], cmd_return_value );
-		}
+		} */
 
 		//syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 	}

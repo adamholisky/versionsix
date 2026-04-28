@@ -4,42 +4,78 @@ Version 6 is a hobbist operating system designed to let one mess with underlying
 
 All code is open sourced, written by Adam Holisky in his spare time unless otherwise noted.
 
-Contact me VIA: Email adam.holisky@gmail.com -- Twitter [@adamholisky](https://x.com/AdamHolisky) -- BlueSky [@adamholisky.bsky.social](https://bsky.app/profile/adamholisky.bsky.social)
+Contact me VIA: Email adam.holisky@gmail.com -- BlueSky [@adamholisky.bsky.social](https://bsky.app/profile/adam.holisky.com)
 
-## What is Version 6
+## Project Details
 
 ### Vision
 
-A small, lean operating system/supervisor that allows direct hardware interfacing useful for tinkering with different aspects of modern technology. Runs on x86 and ARM processors with an abstracted technology layer, masking differences between architectures. 
+A small, lean operating system/supervisor that allows direct hardware interfacing useful for tinkering with different aspects of modern technology. Runs on x86 with an abstracted technology layer, masking differences between architectures. 
 
-### Current Goals
+### Project Goals
 
 The "Big Goal" for right now is to laser focus on getting a Telnet connection established via TCP/IP over an emulated Ethernet device and network. 
 
 | Goal | Status | Comments |
 | ---- | ---- | ---- |
 | Keep it simple | 🟢 | Prefer readablity over optimization whenever possible |
-| C++, C, Assembly | 🟢 | Prefer C++ when possible, otherwise C and Assembly as needed |
+| C++, C, Assembly | 🟢 | Core OS in C. Assembly as needed. |
 | Clean build system | 🟢 | Don't over-complicated the build system, but don't shy away from advanced topics |
 | Completely in x86_64, no 32bit code  | 🟢 | Loaded via [Limine](https://github.com/limine-bootloader/limine/blob/v7.x/README.md) |
-| Basic paging | 🟡 | Allocating and page maping with own page tables |
-| Basic memory management | 🟡 | Linear allocator |
-| Basic interrupts | 🟡 | Enough to handle exceptions, timer, etc... |
-| I/O via Serial | 🟢 | Debug out and stdio via QEMU's serial ports works |
-| In-OS sanity checks | 🟡 | Some sanity checks run regardless, more run when debugging is enabled for specific code blocks |
-| Basic console on framebuffer  | 🟡 | Good enough, maybe | 
-| PCI | 🟡 | Good enough to get basic info for devices |
+| Tool integration | 🟢 | Where appropriate use third-party tools and code to make things interesting |
+
+## Technical Details
+
+### Subsystem Support
+
+Version 6 is made up of a lot of different systems working together. They're all in different states of maturity.
+
+| Core System | Status | |
+| ---- | ---- | ---- |
+| Console | 🟢 | GUI and serial | 
+| Paging | 🟢 | Allocating and page maping with own page tables, it works more or less |
+| Memory Management | 🟢 | Implemented third party allocator, functions as expected |
+| Processes | 🟢 | Intit, relocation, elf loader, scheduler (yield), fork, execve |
+| File System | 🟢 | VFS, home-brewed custom file system, works with linux/fuse, read/write/etc work as expected |
+| Interrupts | 🟢 | Handles most cases. Context manipulation mature enough to allow devices, debugging, and processes. |
+| Devices | 🟢 | /dev file system, r/w on devices, virtual and real devices, keyboard, timers, etc... |
+| I/O via Serial | 🟢 | Multiple I/O channels configured to work with QEMU. |
+| Syscalls | 🟢 | Basics are working, expandable and quick |
+| GUI | 🟢 | Modular, direct FB, working with TTF fonts, console, basic things | 
+| In-OS sanity checks | 🟢 | Panics and attention-grabbing errors present thorughout |
+| PCI | 🟢 | Good enough to get basic info for devices |
+| libc | 🟢 | Good enough, compiled on its own |
+| klib | 🟡 | Starting to bring in other library routines for better data structure and routine support |
 | Ethernet | 🟡 | Good enough, maybe |
 | ARP | 🟡 | Protocol works, need to do dictionary |
 | IP | 🟡 | Good enough, maybe |
 | DHCP | 🟡 | Good enough, maybe |
 | TCP | 🟡 | Working in a PoC stage |
-| Task Management | 🟡 | Yielding-based, handles crashes |
 | Telnet | 🟠 | Working in a very basic way |
-| HTTP/Json | 🔴 | Not started |
+
+### Directory Info
+
+There's lots of files here. This is how they're all laid out.
+
+| Directory | Use |
+| ---- | ---- |
+| `/build` | All compiled objects/output goes in here. |
+| `/build/boot_files` | Limine config, to be copied into boot drives | 
+| `/build/gdb_control` | GDB commands and configuration files |
+| `/build/img_mount_point` | Local point for mounting virtual drive images | 
+| `/make_files` | Makefile support files |
+| `/qemu_configs` | QEMU system configuration files |
+| `/core_apps` | Externally compiled apps to be put on FS and used in OS |
+| `/kernel` | Source directory for the code, inside is self explanatory |
+| `/logs` | All logs go here. There can be a lot. |
+| `/os_root` | Root directory structure for the OS data drive |
+| `/vi_klibc_static` | Home-brewed libc object file(s) and headers |
+| `/scratch` | I don't believe in deleting anything, so stuff goes here | 
 
 ### Port List
 
+QEMU and the overall dev enivornment exposes (and needs exposed) certain ports to function.
+```
 58000 - VIOS C&C Dashboard
 58001 - QEMU GDB
 58002 - QEMU VNC
@@ -50,11 +86,9 @@ The "Big Goal" for right now is to laser focus on getting a Telnet connection es
 58020 - VS Code Web
 58021 - Webssh2 websocket tunnel
 58022 - GDB Frontend Web
+```
 
-flatpak run org.radare.iaito
-
-
-### Future Goals
+### Future Tech Goals
 
 | Goal | Status | Comments |
 | ---- | ---- | ---- |
@@ -78,44 +112,21 @@ Makefile targets are clearly outlined in the `Makefile`, with supported includes
 
 ### Compling 
 
-`make` run by itself in the root directory will build the system.
+`make` run by itself in the root directory will build the system. Hard coded paths are in the root Makefile.
 
 ### Running
 
 From the root directory, do a `make run` to execute the OS's normal operation path. 
 
 For normal execution, the Makefile and QEMU are configured to send data accordingly:
-- `build_support/logs/build.log` Output for the build commands 
-- `build_support/logs/elfdump.txt` ELF information for compiled kernel
-- `build_support/logs/objdump.txt` Full disassembly for compiled kernel, including final addresses via the linker
-- `build_support/logs/serial_out.txt` Running serial log from OS's COM4 port output 
-- `build_support/logs/qemu_debug_log.txt` has a bunch of detailed output from QEMU, very useful for tripple faults
-- `stderr` Error output from G++, etc...
-- `stdin/stdout` QEMU's "terminal" in/out, sending to/from in OS's COM1 port I/O
+- `logs/build.log` Output for the build commands 
+- `logs/elfdump.txt` ELF information for compiled kernel
+- `logs/objdump.txt` Full disassembly for compiled kernel, including final addresses via the linker
+- `ogs/serial_out.txt` Running serial log from OS's COM4 port output 
+- `logs/qemu_debug_log.txt` has a bunch of detailed output from QEMU, very useful for tripple faults
+- `stdin/stdout` QEMU's "terminal" in/out, sending to/from in OS's COM3e port I/O
 
-### Debugger 
+### Debugging 
 
-From the root directory, run `make run_debug` to boot the OS with QEMU accepting remote connections to port 5984. Run `make gdb` to run GDB using the configuration in the `build_support/gdb_control/commands.gdb` file (TUI, some shortcuts, etc...)
+From the root directory, run `make run-debug` to boot the OS with QEMU accepting remote connections to port 58001. Run `make gdb` to run GDB using the basic configuration in the `build_support/gdb_control/commands.gdb` file. TUI support included in `tui.gdb`, and breakpoints added in `breakpoints.gdb`.
 
-Breakpoints are manually listed in the `commands.gdb` file.
-
-## Kanban Task List
-This is genereally the order that I'm going to build things.
-
-1. ~~Limine boot into x86 64bit~~
-1. ~~Makefile cleanup, logging~~
-1. ~~Serial out~~
-1. ~~Port the libc back to 64bit and verify it basically works~~
-1. ~~Debug logging~~
-1. ~~Find paging data from limine, use it or my own entirely~~
-1. ~~Interrupts~~
-1. ~~Interrupt debug display~~
-1. ~~Page allocation and allocator~~
-1. ~~Linear memory allocator~~
-1. ~~Kernel symbols loaded via ELF processing, used in crash handling~~
-1. Stackframe back trace
-1. PCI
-1. Ethernet
-1. ARP
-1. Ping
-1. Telnet

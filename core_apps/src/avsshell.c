@@ -5,6 +5,7 @@
 #include <kmemory.h>
 #include <ksymbols.h>
 #include <process.h>
+#include <syscall.h>
 
 #include <avsshell.h>
 
@@ -98,8 +99,6 @@ void kshell_main_loop( void ) {
 	char *user_name = kshell_get_env_var( "USER" );
 	char *host = kshell_get_env_var( "HOST" );
 
-	debugf( "um?\n" );
-
 	while( main_shell.keep_going ) {
 		uint8_t scancode = 0;
 		char c = 0;
@@ -114,12 +113,10 @@ void kshell_main_loop( void ) {
 		/* Step 1: Get the line, put it into current_line */
 		do {
 			//main_console_set_cursor_visiblity( false );
-			//scancode = keyboard_get_scancode();
-			//c = keyboard_scancode_to_char( scancode );	// this checks for scancode under 0x81, otherwise returns 0
+			scancode = keyboard_get_scancode();
+			c = keyboard_scancode_to_char( scancode );	// this checks for scancode under 0x81, otherwise returns 0
 			
-			c = kgetc();
-
-			debugf( "bet it's here...\n" );
+			//c = kgetc();
 
 			if( c != 0 ) {
 				if( c == '\n' ) {
@@ -169,6 +166,8 @@ void kshell_main_loop( void ) {
 		int num_args = 0;
 		int i = 0;
 		int j = 0;
+
+		memset( args, 0, KSHELL_MAX_ARGS * KSHELL_MAX_LINESIZE );
 
 		do {
 			if( *char_to_process != ' ' && *char_to_process != 0 ) {
@@ -227,11 +226,32 @@ void kshell_main_loop( void ) {
 		file_stats st;
 		int attrerr = vfs_getattr( cmd, &st );
 
-		if( attrerr == VFS_ERROR_NONE ) {
-			printf( "Will run %s\n", cmd );
-		} else {
-			printf( "Command not found.\n" );
+		uint64_t yield_syscall_num = SYSCALL_SCHED_YIELD;
+		uint64_t ret = 0;
 
+		if( attrerr != VFS_ERROR_NONE ) {
+			printf( "Command not found.\n" );
+		} else {
+			printf( "Executing %s...\n", cmd );
+			
+			pid_t child_pid = (pid_t)syscall( SYSCALL_FORK, 0, NULL );
+
+			printf( "cpid: %d\n", child_pid );
+			if( child_pid == 0 ) {
+				execve( cmd, NULL, NULL );
+			} else {
+				// just loop for now
+				while( true ) {
+					__asm__	__volatile__ ( 
+						"movq %1, %%rax \n"
+						"int %2 \n"
+						"movq %%rax, %0"
+						:"=r"(ret)
+						:"r"(yield_syscall_num), "i"(0xFE)
+						:"%rax" 
+					);
+				}
+			}
 		}
 
 

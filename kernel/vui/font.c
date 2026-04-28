@@ -147,7 +147,7 @@ void vui_font_load_ttf( vui_font *font ) {
 	//klog( LOG_INFO, "font file size: %d", stats.st_size );
 
 	uint8_t *data = vmalloc( file_size );
-	int read_err = vfs_read( font->info.path, data, 0, file_size );
+	int read_err = vfs_read( font->info.path, data, file_size, 0 );
 	if( read_err < VFS_ERROR_NONE ) {
 		debugf( "Error when reading: %d\n", read_err );
 		return;
@@ -283,7 +283,7 @@ bool vui_font_load_psf( vui_font *font ) {
 	file_size = stats.st_size;
 
 	uint8_t *data = vmalloc( file_size );
-	int read_err = vfs_read( font->info.path, data, 0, file_size );
+	int read_err = vfs_read( font->info.path, data, file_size, 0 );
 	if( read_err < VFS_ERROR_NONE ) {
 		debugf( "Error when reading: %d\n", read_err );
 		return false;

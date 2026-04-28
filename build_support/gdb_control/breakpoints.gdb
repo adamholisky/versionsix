@@ -2,3 +2,5 @@
 # To load this file, run `source <path-to-this-file>` in GDB
 
 # break asvfs.c:96
+break console.c:91
+break vui.c:230

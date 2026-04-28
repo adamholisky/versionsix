@@ -4,7 +4,7 @@ Version 6 is a hobbist operating system designed to let one mess with underlying
 
 All code is open sourced, written by Adam Holisky in his spare time unless otherwise noted.
 
-Contact me VIA: Email adam.holisky@gmail.com -- BlueSky [@adamholisky.bsky.social](https://bsky.app/profile/adam.holisky.com)
+Contact me VIA: Email adam.holisky@gmail.com -- BlueSky [@adam.holisky.com](https://bsky.app/profile/adam.holisky.com)
 
 ## Project Details
 

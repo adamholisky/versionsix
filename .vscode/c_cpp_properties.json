@@ -10,7 +10,8 @@
             "defines": [
                 "VI_ENV_OS",
                 "VIOS",
-                "STDIO_SERIAL_3"
+                "STDIO_SERIAL_3",
+                "ENABLE_GUI"
             ],
             "compilerPath": "/usr/local/osdev/bin/x86_64-elf-g++",
             "cStandard": "c17",

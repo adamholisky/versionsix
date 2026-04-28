@@ -153,14 +153,14 @@ void enable_gui( void ) {
 	vui_init( (uint32_t *)kernel_info.framebuffer_info.address, 1024, 768 );
 
 	// Forcing the font load b/c the FS is messed up. TODO: Remove
-	for( int i = 0; i < (418820/0x1000) + 1; i++ ) {
+	/* for( int i = 0; i < (418820/0x1000) + 1; i++ ) {
 		page_map( 0xFFFFFFFF40000000 + (0x1000 * i), 0x2800000 + (0x1000 * i) );
 	}
 
 	for( int i = 0; i < (10634/0x1000) + 1; i++ ) {
 		page_map( 0xFFFFFFFF50000000 + (0x1000 * i), 0x2900000 + (0x1000 * i) );
 	}
-
+ */
 	load_font_stuff();
 	load_gui_stuff();
 }
@@ -194,12 +194,12 @@ void load_gui_stuff( void ) {
 void load_font_stuff( void ) {
 	vui_font_initalize();
 	//vui_font_load( VUI_FONT_TYPE_PSF, "zap-light", "/usr/share/zap-light20.psf" );
-	vui_font_load( VUI_FONT_TYPE_PSF, "zap-vga", "/usr/share/zap-ext-vga16.psf" );
+	vui_font_load( VUI_FONT_TYPE_PSF, "zap-vga", "/share/fonts/zap-ext-vga16.psf" );
 /* 	vui_font_load( VUI_FONT_TYPE_TTF, "dejavu-sans", "/usr/share/fonts/DejaVuSans.ttf" );
 	vui_font_load( VUI_FONT_TYPE_TTF, "dejavu-sans-bold", "/usr/share/fonts/DejaVuSans-Bold.ttf" );
 	vui_font_load( VUI_FONT_TYPE_TTF, "dejavu-sans-italic", "/usr/share/fonts/DejaVuSans-Oblique.ttf" ); */
-	vui_font_load( VUI_FONT_TYPE_TTF, "noto-sans", "/usr/share/NotoSans-Regular.ttf" );
-	vui_font_load( VUI_FONT_TYPE_TTF, "noto-sans-bold", "/usr/share/NotoSans-SemiBold.ttf" );
+	vui_font_load( VUI_FONT_TYPE_TTF, "noto-sans", "/share/fonts/NotoSans-Regular.ttf" );
+	vui_font_load( VUI_FONT_TYPE_TTF, "noto-sans-bold", "/share/fonts/NotoSans-SemiBold.ttf" );
 }
 
 void main_console_putc( uint8_t c ) {

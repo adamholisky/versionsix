@@ -19,6 +19,7 @@ $(eval BUILD_NUMBER = $(shell echo $$(($$(cat $(BUILD_NUMBER_FILE)) + 1))))
 
 # Defines
 DEFINES = -DVIFS_OS_ENV 
+DEFINES += -DENABLE_GUI
 DEFINES += -DVI_ENV_OS 
 DEFINES += -DVIOS 
 DEFINES += -DSTDIO_SERIAL_3 
@@ -160,7 +161,7 @@ install_stage2: build/versionvi.bin
 
 #& /mnt/c/"Program Files"/TightVNC/tvnviewer.exe :0
 run: install
-	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NONE) $(QEMU_DEBUG_LOGGING)
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING)
 
 run-vnc: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_VNC) $(QEMU_DEBUG_LOGGING)

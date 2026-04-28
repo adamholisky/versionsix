@@ -61,10 +61,10 @@ void kernel_main( void ) {
 	debugf( "Versions OS VI Debug Out\n" );
 	debugf( "Build Number: %d\n", BUILD_NUM );
 
-	debugf( "Kernel stack top:                 0x%016llX\n", &kernel_stack );
+/* 	debugf( "Kernel stack top:                 0x%016llX\n", &kernel_stack );
 	uint64_t rbp_value;
 	__asm__ volatile ("mov %%rbp, %0" : "=r"(rbp_value));
-	debugf( "Kernel rbp at early exec:         0x%016llX\n", rbp_value );
+	debugf( "Kernel rbp at early exec:         0x%016llX\n", rbp_value ); */
 	
 
 	load_limine_info();

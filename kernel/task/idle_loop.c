@@ -15,7 +15,7 @@ void kernel_idle_loop( void ) {
 	do {
 		i++; // Keep track of how many times we loop
 
-		klog( LOG_DEBUG, "Idle Count: %d", i );
+		//klog( LOG_DEBUG, "Idle Count: %d", i );
 
 		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 	} while( 1 );

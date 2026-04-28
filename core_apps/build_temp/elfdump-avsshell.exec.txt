@@ -8,9 +8,9 @@ ELF Header:
   Type:                              DYN (Shared object file)
   Machine:                           Advanced Micro Devices X86-64
   Version:                           0x1
-  Entry point address:               0xcf0
+  Entry point address:               0xd10
   Start of program headers:          64 (bytes into file)
-  Start of section headers:          17608 (bytes into file)
+  Start of section headers:          17752 (bytes into file)
   Flags:                             0x0
   Size of this header:               64 (bytes)
   Size of program headers:           56 (bytes)
@@ -22,29 +22,29 @@ ELF Header:
 Section Headers:
   [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al
   [ 0]                   NULL            0000000000000000 000000 000000 00      0   0  0
-  [ 1] .hash             HASH            00000000000000e8 0000e8 0000cc 04   A  2   0  8
-  [ 2] .dynsym           DYNSYM          00000000000001b8 0001b8 000300 18   A  3   1  8
-  [ 3] .dynstr           STRTAB          00000000000004b8 0004b8 0001ae 00   A  0   0  1
-  [ 4] .rela.dyn         RELA            0000000000000668 000668 0003f0 18   A  2   0  8
-  [ 5] .rela.plt         RELA            0000000000000a58 000a58 000180 18  AI  2  11  8
-  [ 6] .plt              PROGBITS        0000000000000be0 000be0 000110 10  AX  0   0 16
-  [ 7] .text             PROGBITS        0000000000000cf0 000cf0 000a33 00  AX  0   0  1
-  [ 8] .rodata           PROGBITS        0000000000001730 001730 000313 00   A  0   0 16
-  [ 9] .eh_frame         PROGBITS        0000000000001a48 001a48 0001c0 00   A  0   0  8
+  [ 1] .hash             HASH            00000000000000e8 0000e8 0000d0 04   A  2   0  8
+  [ 2] .dynsym           DYNSYM          00000000000001b8 0001b8 000318 18   A  3   1  8
+  [ 3] .dynstr           STRTAB          00000000000004d0 0004d0 0001b2 00   A  0   0  1
+  [ 4] .rela.dyn         RELA            0000000000000688 000688 0003f0 18   A  2   0  8
+  [ 5] .rela.plt         RELA            0000000000000a78 000a78 000180 18  AI  2  11  8
+  [ 6] .plt              PROGBITS        0000000000000c00 000c00 000110 10  AX  0   0 16
+  [ 7] .text             PROGBITS        0000000000000d10 000d10 000aef 00  AX  0   0  1
+  [ 8] .rodata           PROGBITS        0000000000001800 001800 000363 00   A  0   0 16
+  [ 9] .eh_frame         PROGBITS        0000000000001b68 001b68 0001c0 00   A  0   0  8
   [10] .dynamic          DYNAMIC         0000000000002000 002000 000130 10  WA  3   0  8
   [11] .got.plt          PROGBITS        0000000000002130 002130 000098 08  WA  0   0  8
   [12] .data             PROGBITS        00000000000021e0 0021e0 000168 00  WA  0   0 32
-  [13] .bss              NOBITS          0000000000002360 002348 000100 00  WA  0   0 32
+  [13] .bss              NOBITS          0000000000002360 002348 000168 00  WA  0   0 32
   [14] .comment          PROGBITS        0000000000000000 002348 000012 01  MS  0   0  1
   [15] .debug_aranges    PROGBITS        0000000000000000 002360 000060 00      0   0 16
-  [16] .debug_info       PROGBITS        0000000000000000 0023c0 000bc4 00      0   0  1
-  [17] .debug_abbrev     PROGBITS        0000000000000000 002f84 0002bf 00      0   0  1
-  [18] .debug_line       PROGBITS        0000000000000000 003243 000417 00      0   0  1
-  [19] .debug_str        PROGBITS        0000000000000000 00365a 000585 01  MS  0   0  1
-  [20] .debug_line_str   PROGBITS        0000000000000000 003bdf 0001f2 01  MS  0   0  1
-  [21] .symtab           SYMTAB          0000000000000000 003dd8 0003f0 18     22  11  8
-  [22] .strtab           STRTAB          0000000000000000 0041c8 000228 00      0   0  1
-  [23] .shstrtab         STRTAB          0000000000000000 0043f0 0000d3 00      0   0  1
+  [16] .debug_info       PROGBITS        0000000000000000 0023c0 000be5 00      0   0  1
+  [17] .debug_abbrev     PROGBITS        0000000000000000 002fa5 0002d1 00      0   0  1
+  [18] .debug_line       PROGBITS        0000000000000000 003276 000442 00      0   0  1
+  [19] .debug_str        PROGBITS        0000000000000000 0036b8 00057a 01  MS  0   0  1
+  [20] .debug_line_str   PROGBITS        0000000000000000 003c32 0001f2 01  MS  0   0  1
+  [21] .symtab           SYMTAB          0000000000000000 003e28 000420 18     22  12  8
+  [22] .strtab           STRTAB          0000000000000000 004248 00023b 00      0   0  1
+  [23] .shstrtab         STRTAB          0000000000000000 004483 0000d3 00      0   0  1
 Key to Flags:
   W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
   L (link order), O (extra OS processing required), G (group), T (TLS),
@@ -55,8 +55,8 @@ There are no section groups in this file.
 
 Program Headers:
   Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align
-  LOAD           0x000000 0x0000000000000000 0x0000000000000000 0x001c08 0x001c08 R E 0x1000
-  LOAD           0x002000 0x0000000000002000 0x0000000000002000 0x000348 0x000460 RW  0x1000
+  LOAD           0x000000 0x0000000000000000 0x0000000000000000 0x001d28 0x001d28 R E 0x1000
+  LOAD           0x002000 0x0000000000002000 0x0000000000002000 0x000348 0x0004c8 RW  0x1000
   DYNAMIC        0x002000 0x0000000000002000 0x0000000000002000 0x000130 0x000130 RW  0x8
 
  Section to Segment mapping:
@@ -69,66 +69,66 @@ Dynamic section at offset 0x2000 contains 15 entries:
   Tag        Type                         Name/Value
  0x0000000000000010 (SYMBOLIC)           0x0
  0x0000000000000004 (HASH)               0xe8
- 0x0000000000000005 (STRTAB)             0x4b8
+ 0x0000000000000005 (STRTAB)             0x4d0
  0x0000000000000006 (SYMTAB)             0x1b8
- 0x000000000000000a (STRSZ)              430 (bytes)
+ 0x000000000000000a (STRSZ)              434 (bytes)
  0x000000000000000b (SYMENT)             24 (bytes)
  0x0000000000000003 (PLTGOT)             0x2130
  0x0000000000000002 (PLTRELSZ)           384 (bytes)
  0x0000000000000014 (PLTREL)             RELA
- 0x0000000000000017 (JMPREL)             0xa58
- 0x0000000000000007 (RELA)               0x668
+ 0x0000000000000017 (JMPREL)             0xa78
+ 0x0000000000000007 (RELA)               0x688
  0x0000000000000008 (RELASZ)             1008 (bytes)
  0x0000000000000009 (RELAENT)            24 (bytes)
  0x000000006ffffff9 (RELACOUNT)          42
  0x0000000000000000 (NULL)               0x0
 
-Relocation section '.rela.dyn' at offset 0x668 contains 42 entries:
+Relocation section '.rela.dyn' at offset 0x688 contains 42 entries:
     Offset             Info             Type               Symbol's Value  Symbol's Name + Addend
-00000000000021e0  0000000000000008 R_X86_64_RELATIVE                         1730
-00000000000021e8  0000000000000008 R_X86_64_RELATIVE                         173f
-00000000000021f0  0000000000000008 R_X86_64_RELATIVE                         1745
-00000000000021f8  0000000000000008 R_X86_64_RELATIVE                         1749
-0000000000002200  0000000000000008 R_X86_64_RELATIVE                         1754
-0000000000002208  0000000000000008 R_X86_64_RELATIVE                         175d
-0000000000002210  0000000000000008 R_X86_64_RELATIVE                         1772
-0000000000002218  0000000000000008 R_X86_64_RELATIVE                         1781
-0000000000002220  0000000000000008 R_X86_64_RELATIVE                         1796
-0000000000002228  0000000000000008 R_X86_64_RELATIVE                         17a3
-0000000000002230  0000000000000008 R_X86_64_RELATIVE                         17bf
-0000000000002238  0000000000000008 R_X86_64_RELATIVE                         17cb
-0000000000002240  0000000000000008 R_X86_64_RELATIVE                         17df
-0000000000002248  0000000000000008 R_X86_64_RELATIVE                         17f3
-0000000000002250  0000000000000008 R_X86_64_RELATIVE                         180c
-0000000000002258  0000000000000008 R_X86_64_RELATIVE                         1817
-0000000000002260  0000000000000008 R_X86_64_RELATIVE                         1820
-0000000000002268  0000000000000008 R_X86_64_RELATIVE                         183d
-0000000000002270  0000000000000008 R_X86_64_RELATIVE                         184d
-0000000000002278  0000000000000008 R_X86_64_RELATIVE                         185b
-0000000000002280  0000000000000008 R_X86_64_RELATIVE                         1879
-00000000000022a0  0000000000000008 R_X86_64_RELATIVE                         1892
-00000000000022a8  0000000000000008 R_X86_64_RELATIVE                         1897
-00000000000022b0  0000000000000008 R_X86_64_RELATIVE                         189c
-00000000000022b8  0000000000000008 R_X86_64_RELATIVE                         18a1
-00000000000022c0  0000000000000008 R_X86_64_RELATIVE                         18a6
-00000000000022c8  0000000000000008 R_X86_64_RELATIVE                         18ab
-00000000000022d0  0000000000000008 R_X86_64_RELATIVE                         18b0
-00000000000022d8  0000000000000008 R_X86_64_RELATIVE                         18b5
-00000000000022e0  0000000000000008 R_X86_64_RELATIVE                         18ba
-00000000000022e8  0000000000000008 R_X86_64_RELATIVE                         18bf
-00000000000022f0  0000000000000008 R_X86_64_RELATIVE                         18c4
-00000000000022f8  0000000000000008 R_X86_64_RELATIVE                         18c9
-0000000000002300  0000000000000008 R_X86_64_RELATIVE                         18ce
-0000000000002308  0000000000000008 R_X86_64_RELATIVE                         18d3
-0000000000002310  0000000000000008 R_X86_64_RELATIVE                         18d8
-0000000000002318  0000000000000008 R_X86_64_RELATIVE                         18dd
-0000000000002320  0000000000000008 R_X86_64_RELATIVE                         18e2
-0000000000002328  0000000000000008 R_X86_64_RELATIVE                         18e7
-0000000000002330  0000000000000008 R_X86_64_RELATIVE                         18ef
-0000000000002338  0000000000000008 R_X86_64_RELATIVE                         18f4
-0000000000002340  0000000000000008 R_X86_64_RELATIVE                         1905
+00000000000021e0  0000000000000008 R_X86_64_RELATIVE                         1800
+00000000000021e8  0000000000000008 R_X86_64_RELATIVE                         180f
+00000000000021f0  0000000000000008 R_X86_64_RELATIVE                         1815
+00000000000021f8  0000000000000008 R_X86_64_RELATIVE                         1819
+0000000000002200  0000000000000008 R_X86_64_RELATIVE                         1824
+0000000000002208  0000000000000008 R_X86_64_RELATIVE                         182d
+0000000000002210  0000000000000008 R_X86_64_RELATIVE                         1842
+0000000000002218  0000000000000008 R_X86_64_RELATIVE                         1851
+0000000000002220  0000000000000008 R_X86_64_RELATIVE                         1866
+0000000000002228  0000000000000008 R_X86_64_RELATIVE                         1873
+0000000000002230  0000000000000008 R_X86_64_RELATIVE                         188f
+0000000000002238  0000000000000008 R_X86_64_RELATIVE                         189b
+0000000000002240  0000000000000008 R_X86_64_RELATIVE                         18af
+0000000000002248  0000000000000008 R_X86_64_RELATIVE                         18c3
+0000000000002250  0000000000000008 R_X86_64_RELATIVE                         18dc
+0000000000002258  0000000000000008 R_X86_64_RELATIVE                         18e7
+0000000000002260  0000000000000008 R_X86_64_RELATIVE                         18f0
+0000000000002268  0000000000000008 R_X86_64_RELATIVE                         190d
+0000000000002270  0000000000000008 R_X86_64_RELATIVE                         191d
+0000000000002278  0000000000000008 R_X86_64_RELATIVE                         192b
+0000000000002280  0000000000000008 R_X86_64_RELATIVE                         1949
+00000000000022a0  0000000000000008 R_X86_64_RELATIVE                         1962
+00000000000022a8  0000000000000008 R_X86_64_RELATIVE                         1967
+00000000000022b0  0000000000000008 R_X86_64_RELATIVE                         196c
+00000000000022b8  0000000000000008 R_X86_64_RELATIVE                         1971
+00000000000022c0  0000000000000008 R_X86_64_RELATIVE                         1976
+00000000000022c8  0000000000000008 R_X86_64_RELATIVE                         197b
+00000000000022d0  0000000000000008 R_X86_64_RELATIVE                         1980
+00000000000022d8  0000000000000008 R_X86_64_RELATIVE                         1985
+00000000000022e0  0000000000000008 R_X86_64_RELATIVE                         198a
+00000000000022e8  0000000000000008 R_X86_64_RELATIVE                         198f
+00000000000022f0  0000000000000008 R_X86_64_RELATIVE                         1994
+00000000000022f8  0000000000000008 R_X86_64_RELATIVE                         1999
+0000000000002300  0000000000000008 R_X86_64_RELATIVE                         199e
+0000000000002308  0000000000000008 R_X86_64_RELATIVE                         19a3
+0000000000002310  0000000000000008 R_X86_64_RELATIVE                         19a8
+0000000000002318  0000000000000008 R_X86_64_RELATIVE                         19ad
+0000000000002320  0000000000000008 R_X86_64_RELATIVE                         19b2
+0000000000002328  0000000000000008 R_X86_64_RELATIVE                         19b7
+0000000000002330  0000000000000008 R_X86_64_RELATIVE                         19bf
+0000000000002338  0000000000000008 R_X86_64_RELATIVE                         19c4
+0000000000002340  0000000000000008 R_X86_64_RELATIVE                         19d5
 
-Relocation section '.rela.plt' at offset 0xa58 contains 16 entries:
+Relocation section '.rela.plt' at offset 0xa78 contains 16 entries:
     Offset             Info             Type               Symbol's Value  Symbol's Name + Addend
 0000000000002148  0000000100000007 R_X86_64_JUMP_SLOT     0000000000000000 strcpy + 0
 0000000000002150  0000000200000007 R_X86_64_JUMP_SLOT     0000000000000000 kgetc + 0
@@ -148,7 +148,7 @@ Relocation section '.rela.plt' at offset 0xa58 contains 16 entries:
 00000000000021c0  0000001e00000007 R_X86_64_JUMP_SLOT     0000000000000000 kmalloc + 0
 No processor specific unwind information to decode
 
-Symbol table '.dynsym' contains 32 entries:
+Symbol table '.dynsym' contains 33 entries:
    Num:    Value          Size Type    Bind   Vis      Ndx Name
      0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND 
      1: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND strcpy
@@ -157,83 +157,86 @@ Symbol table '.dynsym' contains 32 entries:
      4: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND vfs_getattr
      5: 0000000000002450    16 OBJECT  GLOBAL DEFAULT   13 env_vars
      6: 0000000000002440    16 OBJECT  GLOBAL DEFAULT   13 kshell_commands
-     7: 0000000000001684   159 FUNC    GLOBAL DEFAULT    7 kshell_set_env_var
+     7: 0000000000001760   159 FUNC    GLOBAL DEFAULT    7 kshell_set_env_var
      8: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND kstrcat
      9: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND process_env_setup
-    10: 0000000000001629    91 FUNC    GLOBAL DEFAULT    7 kshell_get_env_var
-    11: 0000000000001562   199 FUNC    GLOBAL DEFAULT    7 kshell_add_command
-    12: 0000000000000fc5    32 FUNC    GLOBAL DEFAULT    7 kshell_stop
-    13: 00000000000014b3    55 FUNC    GLOBAL DEFAULT    7 kshell_handle_special_keypress
+    10: 0000000000001705    91 FUNC    GLOBAL DEFAULT    7 kshell_get_env_var
+    11: 000000000000163e   199 FUNC    GLOBAL DEFAULT    7 kshell_add_command
+    12: 00000000000010c1    32 FUNC    GLOBAL DEFAULT    7 kshell_stop
+    13: 000000000000158f    55 FUNC    GLOBAL DEFAULT    7 kshell_handle_special_keypress
     14: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND process_exit
-    15: 0000000000000cf0    31 NOTYPE  GLOBAL DEFAULT    7 _start
+    15: 0000000000000d10    31 NOTYPE  GLOBAL DEFAULT    7 _start
     16: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND get_ksyms_object
     17: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND symbols_get_symbol_array
     18: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND kstrcpy
     19: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND strncmp
-    20: 00000000000014ea    64 FUNC    GLOBAL DEFAULT    7 kshell_command_create
-    21: 000000000000152a    18 FUNC    GLOBAL DEFAULT    7 kshell_command_run
+    20: 00000000000015c6    64 FUNC    GLOBAL DEFAULT    7 kshell_command_create
+    21: 0000000000001606    18 FUNC    GLOBAL DEFAULT    7 kshell_command_run
     22: 0000000000000000     0 NOTYPE  WEAK   DEFAULT  UND memset
-    23: 0000000000000d26   634 FUNC    GLOBAL DEFAULT    7 main
+    23: 0000000000000d46   854 FUNC    GLOBAL DEFAULT    7 main
     24: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND strcmp
     25: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND symbols_get_total_symbols
-    26: 000000000000153c    38 FUNC    GLOBAL DEFAULT    7 kshell_command_hello_world
+    26: 0000000000001618    38 FUNC    GLOBAL DEFAULT    7 kshell_command_hello_world
     27: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND printf_
-    28: 0000000000000fa0    37 FUNC    GLOBAL DEFAULT    7 kshell_run
+    28: 000000000000109c    37 FUNC    GLOBAL DEFAULT    7 kshell_run
     29: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND debugf_stage2
     30: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND kmalloc
-    31: 0000000000000fe5  1230 FUNC    GLOBAL DEFAULT    7 kshell_main_loop
+    31: 00000000000010e1  1198 FUNC    GLOBAL DEFAULT    7 kshell_main_loop
+    32: 0000000000002460   100 OBJECT  GLOBAL DEFAULT   13 cmd
 
-Symbol table '.symtab' contains 42 entries:
+Symbol table '.symtab' contains 44 entries:
    Num:    Value          Size Type    Bind   Vis      Ndx Name
      0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND 
      1: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS avsshell.c
-     2: 0000000000000d0f    23 FUNC    LOCAL  DEFAULT    7 outportb
+     2: 0000000000000d2f    23 FUNC    LOCAL  DEFAULT    7 outportb
      3: 00000000000021e0   168 OBJECT  LOCAL  DEFAULT   12 intel_exceptions
      4: 00000000000022a0   128 OBJECT  LOCAL  DEFAULT   12 bit_array
      5: 0000000000002320    40 OBJECT  LOCAL  DEFAULT   12 error_strings
-     6: 0000000000001a23     5 OBJECT  LOCAL  DEFAULT    8 __FUNCTION__.1
-     7: 0000000000001a30    19 OBJECT  LOCAL  DEFAULT    8 __FUNCTION__.0
-     8: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS 
-     9: 0000000000002000     0 OBJECT  LOCAL  DEFAULT   10 _DYNAMIC
-    10: 0000000000002130     0 OBJECT  LOCAL  DEFAULT   11 _GLOBAL_OFFSET_TABLE_
-    11: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND strcpy
-    12: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND kgetc
-    13: 0000000000002360   224 OBJECT  GLOBAL DEFAULT   13 main_shell
-    14: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND vfs_getattr
-    15: 0000000000002450    16 OBJECT  GLOBAL DEFAULT   13 env_vars
-    16: 0000000000002440    16 OBJECT  GLOBAL DEFAULT   13 kshell_commands
-    17: 0000000000001684   159 FUNC    GLOBAL DEFAULT    7 kshell_set_env_var
-    18: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND kstrcat
-    19: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND process_env_setup
-    20: 0000000000001629    91 FUNC    GLOBAL DEFAULT    7 kshell_get_env_var
-    21: 0000000000001562   199 FUNC    GLOBAL DEFAULT    7 kshell_add_command
-    22: 0000000000000fc5    32 FUNC    GLOBAL DEFAULT    7 kshell_stop
-    23: 00000000000014b3    55 FUNC    GLOBAL DEFAULT    7 kshell_handle_special_keypress
-    24: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND process_exit
-    25: 0000000000000cf0    31 NOTYPE  GLOBAL DEFAULT    7 _start
-    26: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND get_ksyms_object
-    27: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND symbols_get_symbol_array
-    28: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND kstrcpy
-    29: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND strncmp
-    30: 00000000000014ea    64 FUNC    GLOBAL DEFAULT    7 kshell_command_create
-    31: 000000000000152a    18 FUNC    GLOBAL DEFAULT    7 kshell_command_run
-    32: 0000000000000000     0 NOTYPE  WEAK   DEFAULT  UND memset
-    33: 0000000000000d26   634 FUNC    GLOBAL DEFAULT    7 main
-    34: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND strcmp
-    35: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND symbols_get_total_symbols
-    36: 000000000000153c    38 FUNC    GLOBAL DEFAULT    7 kshell_command_hello_world
-    37: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND printf_
-    38: 0000000000000fa0    37 FUNC    GLOBAL DEFAULT    7 kshell_run
-    39: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND debugf_stage2
-    40: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND kmalloc
-    41: 0000000000000fe5  1230 FUNC    GLOBAL DEFAULT    7 kshell_main_loop
+     6: 0000000000001b2b     5 OBJECT  LOCAL  DEFAULT    8 __FUNCTION__.2
+     7: 0000000000001b30    17 OBJECT  LOCAL  DEFAULT    8 __FUNCTION__.1
+     8: 0000000000001b50    19 OBJECT  LOCAL  DEFAULT    8 __FUNCTION__.0
+     9: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS 
+    10: 0000000000002000     0 OBJECT  LOCAL  DEFAULT   10 _DYNAMIC
+    11: 0000000000002130     0 OBJECT  LOCAL  DEFAULT   11 _GLOBAL_OFFSET_TABLE_
+    12: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND strcpy
+    13: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND kgetc
+    14: 0000000000002360   224 OBJECT  GLOBAL DEFAULT   13 main_shell
+    15: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND vfs_getattr
+    16: 0000000000002450    16 OBJECT  GLOBAL DEFAULT   13 env_vars
+    17: 0000000000002440    16 OBJECT  GLOBAL DEFAULT   13 kshell_commands
+    18: 0000000000001760   159 FUNC    GLOBAL DEFAULT    7 kshell_set_env_var
+    19: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND kstrcat
+    20: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND process_env_setup
+    21: 0000000000001705    91 FUNC    GLOBAL DEFAULT    7 kshell_get_env_var
+    22: 000000000000163e   199 FUNC    GLOBAL DEFAULT    7 kshell_add_command
+    23: 00000000000010c1    32 FUNC    GLOBAL DEFAULT    7 kshell_stop
+    24: 000000000000158f    55 FUNC    GLOBAL DEFAULT    7 kshell_handle_special_keypress
+    25: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND process_exit
+    26: 0000000000000d10    31 NOTYPE  GLOBAL DEFAULT    7 _start
+    27: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND get_ksyms_object
+    28: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND symbols_get_symbol_array
+    29: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND kstrcpy
+    30: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND strncmp
+    31: 00000000000015c6    64 FUNC    GLOBAL DEFAULT    7 kshell_command_create
+    32: 0000000000001606    18 FUNC    GLOBAL DEFAULT    7 kshell_command_run
+    33: 0000000000000000     0 NOTYPE  WEAK   DEFAULT  UND memset
+    34: 0000000000000d46   854 FUNC    GLOBAL DEFAULT    7 main
+    35: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND strcmp
+    36: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND symbols_get_total_symbols
+    37: 0000000000001618    38 FUNC    GLOBAL DEFAULT    7 kshell_command_hello_world
+    38: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND printf_
+    39: 000000000000109c    37 FUNC    GLOBAL DEFAULT    7 kshell_run
+    40: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND debugf_stage2
+    41: 0000000000000000     0 NOTYPE  GLOBAL DEFAULT  UND kmalloc
+    42: 00000000000010e1  1198 FUNC    GLOBAL DEFAULT    7 kshell_main_loop
+    43: 0000000000002460   100 OBJECT  GLOBAL DEFAULT   13 cmd
 
 Histogram for bucket list length (total of 17 buckets):
  Length  Number     % of total  Coverage
-      0  3          ( 17.6%)
-      1  4          ( 23.5%)     12.9%
-      2  4          ( 23.5%)     38.7%
-      3  5          ( 29.4%)     87.1%
+      0  2          ( 11.8%)
+      1  5          ( 29.4%)     15.6%
+      2  4          ( 23.5%)     40.6%
+      3  5          ( 29.4%)     87.5%
       4  1          (  5.9%)    100.0%
 
 No version information found in this file.

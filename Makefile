@@ -68,10 +68,10 @@ QEMU_COMMON = 	-readconfig ${ROOT_DIR}/build_support/qemu_configs/x86_64_primary
 				-pidfile ${ROOT_DIR}/logs/qemu_pid
 QEMU_DISPLAY_NONE =	-display none
 QEMU_DISPLAY_CURSES = -display curses
-QEMU_DISPLAY_NORMAL = -vga std -display gtk,gl=on
+QEMU_DISPLAY_NORMAL = -vga std -no-shutdown
 QEMU_DISPLAY_VNC = -vnc 0.0.0.0:52102,websocket=58003
 QEMU_DEBUG_COMMON = -S -gdb tcp::$(PORT_GDB)
-QEMU_DEBUG_LOGGING = -D $(ROOT_DIR)/logs/qemu_debug_log.txt
+QEMU_DEBUG_LOGGING = -d cpu_reset -D $(ROOT_DIR)/logs/qemu_debug_log.txt
 
 
 SOURCES_C = $(shell ls kernel/**/*.c)

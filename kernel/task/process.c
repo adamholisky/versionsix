@@ -74,9 +74,9 @@ void process_setup_init( void ) {
 	global_proc_data.root_pd->context.cs = 0x28;
 	global_proc_data.root_pd->context.rflags = 0x200;
 	global_proc_data.root_pd->context.ss = 0x30;
-	global_proc_data.root_pd->stack_size = 0x1000;
+	global_proc_data.root_pd->stack_size = PROCESS_DEFAULT_STACK_SIZE;
 	global_proc_data.root_pd->proc_stack_virt = 0x00000000A0000000;
-	global_proc_data.root_pd->proc_stack_kvirt= page_allocate_kernel(1);
+	global_proc_data.root_pd->proc_stack_kvirt= page_allocate_kernel( PROCESS_DEFAULT_STACK_PAGES );
 	global_proc_data.root_pd->proc_stack_phys = paging_virtual_to_physical( global_proc_data.root_pd->proc_stack_kvirt );
 	//global_proc_data.root_pd->proc_stack = kmalloc( global_proc_data.root_pd->stack_size );
 	global_proc_data.root_pd->context.rsp = global_proc_data.root_pd->proc_stack_virt + global_proc_data.root_pd->stack_size;
@@ -85,7 +85,7 @@ void process_setup_init( void ) {
 
 	//printf( "proc_stack_virt: 0x%016llX    _kvirt: 0x%016llX    phys: 0x%016llX\n", global_proc_data.root_pd->proc_stack_virt, global_proc_data.root_pd->proc_stack_kvirt, global_proc_data.root_pd->proc_stack_phys );
 
-	page_map( global_proc_data.root_pd->proc_stack_virt, global_proc_data.root_pd->proc_stack_phys );
+	//page_map( global_proc_data.root_pd->proc_stack_virt, global_proc_data.root_pd->proc_stack_phys );
 
 	kfree(buff);
 }
@@ -132,6 +132,8 @@ void process_idle_loop( void ) {
 
 void process_env_setup( void ) {
 	klog( LOG_INFO, "in setup for pid: %d", global_proc_data.current_process->pid );
+
+	return;
 }
 
 void process_exit( int ret_code ) {
@@ -194,7 +196,7 @@ void process_set_next_up( process_data *p ) {
 int process_sched_yield( registers **context ) {
 	static int num_sched_called = 0;
 
-	klog( LOG_DEBUG, "In yield." );
+	//klog( LOG_DEBUG, "In yield." );
 
 	process_data *old_p = global_proc_data.current_process;
 	process_data *new_p = NULL;
@@ -270,20 +272,23 @@ int process_sched_yield( registers **context ) {
 		
 		for( int i = 0; i < new_p->data_section_count; i++ ) {
 			page_map( new_p->data_sections[i].virt, new_p->data_sections[i].phys );
-			klog( LOG_DEBUG, "For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid, new_p->data_sections[i].virt, new_p->data_sections[i].phys );
+			//klog( LOG_DEBUG, "For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid, new_p->data_sections[i].virt, new_p->data_sections[i].phys );
 		}
 
 		for( int i = 0; i < new_p->text_section_count; i++ ) {
 			page_map( new_p->text_sections[i].virt, new_p->text_sections[i].phys );
-			klog( LOG_DEBUG, "For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid, new_p->text_sections[i].virt, new_p->text_sections[i].phys );
+			//klog( LOG_DEBUG, "For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid, new_p->text_sections[i].virt, new_p->text_sections[i].phys );
 		}
 
 		if( new_p->first_run ) {
 			memcpy( new_p->proc_stack_kvirt, &new_p->context, sizeof(registers) );
 			*context = new_p->proc_stack_virt;
 		}
-	
-		page_map( new_p->proc_stack_virt, new_p->proc_stack_phys );
+	}
+
+	for( int i = 0; i < PROCESS_DEFAULT_STACK_PAGES; i++ ) {
+		page_map( new_p->proc_stack_virt + (i * PAGE_SIZE), new_p->proc_stack_phys + (i * PAGE_SIZE) );
+		//klog( LOG_DEBUG, "[STACK] For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid,  new_p->proc_stack_virt + (i * PAGE_SIZE), new_p->proc_stack_phys + (i * PAGE_SIZE) );
 	}
 
 	if( new_p->first_run ) {
@@ -292,7 +297,7 @@ int process_sched_yield( registers **context ) {
 
 	new_p->status = PROCESS_STATUS_ACTIVE;
 
-	klog( LOG_DEBUG, "Out yield. New PID: %d    New RIP: virt=0x%016llX phys=0x%016llX", new_p->pid, new_p->context.rip, paging_virtual_to_physical( new_p->context.rip ) );
+	//klog( LOG_DEBUG, "Out yield. New PID: %d    New RIP: virt=0x%016llX phys=0x%016llX", new_p->pid, new_p->context.rip, paging_virtual_to_physical( new_p->context.rip ) );
 
 	return 0;
 }

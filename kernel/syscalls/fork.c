@@ -41,9 +41,9 @@ pid_t fork_syscall_handler( registers **context ) {
 	//p_child->stack_size = p_parent->stack_size;
 
 	p_child->proc_stack_virt = 0x00000000A0000000;
-	p_child->proc_stack_kvirt = page_allocate_kernel(1);
+	p_child->proc_stack_kvirt = page_allocate_kernel( PROCESS_DEFAULT_STACK_PAGES );
 	p_child->proc_stack_phys = paging_virtual_to_physical( p_child->proc_stack_kvirt );
-	p_child->stack_size = 0x1000;
+	p_child->stack_size = PROCESS_DEFAULT_STACK_SIZE;
 	memcpy( p_child->proc_stack_kvirt, p_parent->proc_stack_kvirt, p_parent->stack_size );
 /* 	uint64_t stack_offset = (uint64_t)p_parent->proc_stack - (uint64_t)p_parent->context.rsp;
 

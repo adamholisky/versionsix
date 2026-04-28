@@ -23,7 +23,7 @@ char kgetc( void ) {
 
 	device *dev_std_in = device_get_major_minor_device( "stdin", "0" );
 
-	dev_std_in->read(0, &c, 1, 1 );
+	dev_std_in->read(0, &c, 1, 0 );
 
 	if( c == 13 ) {
 		c = '\n';
@@ -45,16 +45,6 @@ void delay( uint32_t count ) {
 		__asm__ __volatile__ ( "nop" );
 	}
 }
-
-/* int kstrlen( char *s ) {
-	int len = 0;
-
-	while( *(s++) ) {
-		len++;
-	}
-
-	return len;
-} */
 
 /**
  * @brief Kernel debug strlen

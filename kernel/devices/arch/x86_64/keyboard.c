@@ -139,7 +139,7 @@ void keyboard_add_scancode_to_queue( uint8_t code ) {
 		//task_set_has_data_ready( main_keyboard.waiting_task_id, true );
 	}
 
-	//debugf( "added 0x%X\n", code );
+	debugf( "added 0x%X\n", code );
 }
 
 uint8_t keyboard_get_next_scancode( void ) {
@@ -283,10 +283,10 @@ uint8_t keyboard_get_scancode( void ) {
 		ret_value = keyboard_get_next_scancode();
 
 		// Yield if we don't have a scancode available
-		/* if( ret_value == 0 ) {
-			task_set_task_status( task_get_current_task_id(), TASK_STATUS_WAIT );
-			syscall( SYSCALL_SCHED_YIELD, 0, NULL );
-		} */
+		if( ret_value == 0 ) {
+			//task_set_task_status( task_get_current_task_id(), TASK_STATUS_WAIT );
+			//syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+		}
 	} while( ret_value == 0 );
 
 /* 	task_set_has_data_ready( main_keyboard.waiting_task_id, false );

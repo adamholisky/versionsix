@@ -1696,9 +1696,7 @@ Disassembly of section .debug_info:
  1b5:	04 69                	add    $0x69,%al
  1b7:	00 00                	add    %al,(%rax)
  1b9:	00 09                	add    %cl,(%rcx)
- 1bb:	1a 12                	sbb    (%rdx),%dl
- 1bd:	51                   	push   %rcx
- 1be:	00 00                	add    %al,(%rax)
+ 1bb:	1d 12 51 00 00       	sbb    $0x5112,%eax
  1c0:	00 05 88 01 00 00    	add    %al,0x188(%rip)        # 34e <syscall@plt-0x352>
  1c6:	09 59 00             	or     %ebx,0x0(%rcx)
  1c9:	00 00                	add    %al,(%rax)

@@ -36,11 +36,15 @@ int main( int argc, char *argv[] ) {
 		}
 	}
 
+	dA
+
 	for( int i = 0; i < KSHELL_MAX_HISTORY; i++ ) {
 		main_shell.lines[i] = (char *)kmalloc( KSHELL_MAX_LINESIZE );
 	}
 
 	main_shell.current_line = (char *)kmalloc( KSHELL_MAX_LINESIZE );
+
+	dB
 
 	env_vars.num_vars = 1;
 	env_vars.top = kmalloc( sizeof(kshell_env_var) );
@@ -48,9 +52,13 @@ int main( int argc, char *argv[] ) {
 	strcpy( env_vars.top->value, "/" );
 	env_vars.top->next = NULL;
 
+	dC
+
 	kshell_set_env_var( "PATH", "/bin" );
 	kshell_set_env_var( "HOST", "qemu1" );
 	kshell_set_env_var( "USER", "root" );
+
+	dD
 
 	kshell_run();
 	return 0;
@@ -90,6 +98,8 @@ void kshell_main_loop( void ) {
 	char *user_name = kshell_get_env_var( "USER" );
 	char *host = kshell_get_env_var( "HOST" );
 
+	debugf( "um?\n" );
+
 	while( main_shell.keep_going ) {
 		uint8_t scancode = 0;
 		char c = 0;
@@ -97,8 +107,9 @@ void kshell_main_loop( void ) {
 		main_shell.line_index = 0;
 		bool do_extra_newline = true;
 
-		memset( main_shell.current_line, 0, KSHELL_MAX_LINESIZE );
-		printf( "[VVI %s@%s %s]: ", user_name, host, kshell_get_env_var("WD") );
+		//memset( main_shell.current_line, 0, KSHELL_MAX_LINESIZE );
+		printf( "> " );
+		//printf( "[AVSOS %s@%s %s]: ", user_name, host, kshell_get_env_var("WD") );
 
 		/* Step 1: Get the line, put it into current_line */
 		do {
@@ -107,6 +118,8 @@ void kshell_main_loop( void ) {
 			//c = keyboard_scancode_to_char( scancode );	// this checks for scancode under 0x81, otherwise returns 0
 			
 			c = kgetc();
+
+			debugf( "bet it's here...\n" );
 
 			if( c != 0 ) {
 				if( c == '\n' ) {

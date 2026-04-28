@@ -138,11 +138,13 @@ void interrupt_handler_stage_2( registers **_reg ) {
 
 	if( reg->interrupt_no < 21 ) {
 		uint64_t *stack = (uint64_t *)reg->rsp;
-		uint16_t current_pid = process_get_current_proc_id();
+
+		process_data *p = process_get_current();
+		uint16_t current_pid = p->pid;
 
 		debugf_raw( "================================================================================\n" );
 		debugf_raw( "Exception %d: %s \n", reg->interrupt_no, intel_exceptions[reg->interrupt_no] );
-		debugf_raw( "    task: %d\n", current_pid );
+		debugf_raw( "    pid:  %d %s\n", current_pid, p->path );
 		debugf_raw( "    rip:  0x%016llX (%s)\n", reg->rip, kernel_symbols_get_function_name_at(reg->rip) );
 		debugf_raw( "    rax:  0x%016llX  rbx:  0x%016llX  rcx:  0x%016llX\n", reg->rax, reg->rbx, reg->rcx );
 		debugf_raw( "    rdx:  0x%016llX  rsi:  0x%016llX  rdi:  0x%016llX\n", reg->rdx, reg->rsi, reg->rdi );

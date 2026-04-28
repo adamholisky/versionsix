@@ -52,7 +52,7 @@ int execve_syscall_handler(  registers **_context, char *path, char *argv[], cha
 
 	// Stack setup
 	p->proc_stack_virt = 0x00000000A0000000;
-	p->proc_stack_kvirt= page_allocate_kernel(1);
+	p->proc_stack_kvirt= page_allocate_kernel( PROCESS_DEFAULT_STACK_PAGES );
 	p->proc_stack_phys = paging_virtual_to_physical( p->proc_stack_kvirt );
 	page_map( p->proc_stack_virt, p->proc_stack_phys );
 	

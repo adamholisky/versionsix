@@ -1,20 +1,25 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
     "configurations": [
-        {
-            "type": "gdb",
-            "request": "attach",
-            "name": "Attach to gdbserver",
-            "executable": "${workspaceRoot}/build/versionvi.bin",
-            "target": ":58001",
-            "remote": true,
-            "cwd": "${workspaceRoot}",
-            "valuesFormatting": "prettyPrinters"
-        }
-        
-
+    {
+        "name": "Attach to QEMU",
+        "type": "cppdbg",
+        "request": "launch",
+        "miDebuggerServerAddress": "plato.marsdev.io:58001",
+        "cwd": "${workspaceFolder}",
+        "program": "${workspaceFolder}/build/versionvi.bin",
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Set Disassembly Flavor to Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ]
+    }
     ]
 }

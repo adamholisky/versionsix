@@ -51,6 +51,8 @@ sys_info system_information;
 kinfo kernel_info;
 net_info networking_info;
 
+extern void *kernel_stack;
+
 char fxsave_region[512] __attribute__((aligned(16)));
 
 void kernel_main( void ) {
@@ -58,6 +60,13 @@ void kernel_main( void ) {
 	serial_initalize();
 	debugf( "Versions OS VI Debug Out\n" );
 	debugf( "Build Number: %d\n", BUILD_NUM );
+
+	debugf( "Kernel stack top:                 0x%016llX\n", &kernel_stack );
+	uint64_t rbp_value;
+	__asm__ volatile ("mov %%rbp, %0" : "=r"(rbp_value));
+	debugf( "Kernel rbp at early exec:         0x%016llX\n", rbp_value );
+	
+
 	load_limine_info();
 	rtc_initalize();
 	acpi_initalize();
@@ -108,9 +117,8 @@ void kernel_main( void ) {
 	enable_networking();
 	#endif
 
-	uint64_t rbp_value;
-	__asm__ volatile ("mov %%rbp, %0" : "=r"(rbp_value));
-	printf( "Kernel stack base:        0x%016llX\n", rbp_value ); 
+	
+	
 
 	extern uint64_t kernel_heap_virtual_memory_next;
 	printf( "kmalloc() heap at now:    0x%016llX\n", kernel_heap_virtual_memory_next);
@@ -149,18 +157,8 @@ void enable_networking( void ) {
 void enable_gui( void ) {
 	framebuffer_initalize();
 
-	// Next setup the main console for use. From here on out, printf is okay.
 	vui_init( (uint32_t *)kernel_info.framebuffer_info.address, 1024, 768 );
 
-	// Forcing the font load b/c the FS is messed up. TODO: Remove
-	/* for( int i = 0; i < (418820/0x1000) + 1; i++ ) {
-		page_map( 0xFFFFFFFF40000000 + (0x1000 * i), 0x2800000 + (0x1000 * i) );
-	}
-
-	for( int i = 0; i < (10634/0x1000) + 1; i++ ) {
-		page_map( 0xFFFFFFFF50000000 + (0x1000 * i), 0x2900000 + (0x1000 * i) );
-	}
- */
 	load_font_stuff();
 	load_gui_stuff();
 }
@@ -185,6 +183,8 @@ void load_gui_stuff( void ) {
 	main_console_handle = vui_console_create( win_s->inner_x, win_s->inner_y, win_s->inner_width, win_s->inner_height, win );
 	main_console = vui_get_handle_data( main_console_handle );
 	vui_add_to_parent( win, main_console_handle );
+
+	klog( LOG_INFO, "Drawing" );
 
 	vui_draw( menubar );
 	vui_draw( desktop );

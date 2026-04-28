@@ -201,6 +201,8 @@ bool vui_is_dispatcher( uint16_t type ) {
 	return false;
 }
 
+char vui_etts_str[50];
+
 char *vui_event_type_to_string( uint16_t type ) {
 	switch( type ) {
 		case VUI_EVENT_MOUSE_UP:
@@ -222,8 +224,8 @@ char *vui_event_type_to_string( uint16_t type ) {
 			return "Mouse Exit";
 			break;
 		default:
-			char str[50];
-			sprintf( str, "Unknown Event Type %d", type );
-			return str;
+			
+			sprintf( vui_etts_str, "Unknown Event Type %d", type );
+			return vui_etts_str;
 	}
 }

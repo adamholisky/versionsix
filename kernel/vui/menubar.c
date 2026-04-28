@@ -30,10 +30,12 @@ void vui_menubar_draw( vui_handle H ) {
 
 	vui_draw_rect( 0, 0, vui.width, 25, theme->menubar_background );
 	
-	char str[255];
+	char *str = kmalloc(255);
 
 	sprintf( str, " File     Edit     Tests     Debug    Windows"	 );
 	vui_draw_string_ttf( str, 5, 5, theme->menubar_foreground, theme->menubar_background, vui_font_get_font("noto-sans-bold"), 13, VUI_DRAW_FLAGS_NONE );
+
+	kfree(str);
 
 }
 

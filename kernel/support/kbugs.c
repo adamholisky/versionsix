@@ -2,6 +2,7 @@
 #include <serial.h>
 #include <process.h>
 #include <lib/list.h>
+#include <keyboard.h>
 
 bool keep_running;
 

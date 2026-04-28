@@ -85,6 +85,10 @@ void vui_create_cleanup( vui_handle H ) {
 		return;
 	}
 
+	// set basics things here we expect all vui common elements to have
+	vc->children.H = 0;
+	vc->children.next = NULL;
+
 	if( vui_is_dispatcher(vc->type) ) {
 		vui_sort_list_by_priority( &vui.dispatchers );
 	}
@@ -109,7 +113,7 @@ uint16_t vui_get_type_from_master_list( vui_handle H ) {
 void vui_handle_set_name( vui_handle H, char *name ) {
 	vui_common *vc = vui_get_handle_data(H);
 
-	strcpy(vc->name, name);
+	kstrcpy(vc->name, name);
 }
 
 /**
@@ -143,6 +147,8 @@ void vui_draw( vui_handle H ) {
 	// Step 1: Draw the container
 	vui_draw_handle(H);
 
+	dA
+
 	// Step 2: Iterate through children, draw each
 	vui_common *parent_st = vui_get_handle_data(H);
 
@@ -152,6 +158,8 @@ void vui_draw( vui_handle H ) {
 	}
 
 	vui_handle_list *top = &parent_st->children;
+
+	dB
 
 	do {
 		if( top->H != 0 ) {
@@ -189,6 +197,10 @@ bool vui_handle_list_add( vui_handle_list *list, vui_handle handle_to_add ) {
 
 			free_node_found = true;
 		} else {
+			if( top == NULL ) {
+				klog( LOG_PANIC, "Top is null. Failing.\n" );
+				return false;
+			}
 			top = top->next;
 		}
 	} while( top != NULL && !free_node_found );

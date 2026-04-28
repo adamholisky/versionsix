@@ -28,16 +28,22 @@ static const char * bit_array[16] = {
 #define log_entry_enter() debugf( "Enter\n" )
 #define log_entry_exit() debugf( "Exit\n" );
 
-#define dbA() debugf( "A" )
-#define dbB() debugf( "B" )
-#define dbC() debugf( "C" )
-#define dbD() debugf( "D" )
-#define dbE() debugf( "E" )
+#define dbA() debugf( "\n----------> A\n" )
+#define dbB() debugf( "\n----------> B\n" )
+#define dbC() debugf( "\n----------> C\n" )
+#define dbD() debugf( "\n----------> D\n" )
+#define dbE() debugf( "\n----------> E\n" )
 #define db1() debugf( "1\n" )
 #define db2() debugf( "2\n" )
 #define db3() debugf( "3\n" )
 #define db4() debugf( "4\n" )
 #define db5() debugf( "5\n" )
+
+#define dA dbA();
+#define dB dbB();
+#define dC dbC();
+#define dD dbD();
+#define dE dbE();
 
 #define debugf_bit_array( x ) debugf_raw( "flags: %s %s %s %s %s %s %s %s -- 0x%08X\n", \
         bit_array[ 0xF & (x >> 28) ], \

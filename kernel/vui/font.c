@@ -104,7 +104,7 @@ vui_font *vui_font_get_font( char *name ) {
 	vui_font *font = &fonts;
 
 	do {
-		if( strcmp(font->info.name, name) == 0 ) {
+		if( kstrcmp(font->info.name, name) == 0 ) {
 			return font;
 		}
 

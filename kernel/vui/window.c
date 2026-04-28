@@ -14,6 +14,8 @@ vui_handle vui_window_create( uint16_t x, uint16_t y, uint16_t width, uint16_t h
 	window->handle = H;
 	window->type = VUI_HANDLE_TYPE_WINDOW;
 	window->flags = flags;
+	window->parent = 0;
+	memset( window->name, 0, 50 );
 
 	window->width = width;
 	window->height = height;
@@ -95,5 +97,5 @@ void vui_window_set_background_color( vui_handle H, uint32_t color ) {
 void vui_window_set_title( vui_handle H, char *title ) {
 	vui_window *w = vui_get_handle_data(H);
 
-	strncpy( w->title, title, VUI_WINDOW_TITLE_MAX );
+	kstrncpy( w->title, title, VUI_WINDOW_TITLE_MAX );
 }

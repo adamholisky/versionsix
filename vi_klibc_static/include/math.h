@@ -7,6 +7,8 @@ extern "C"
 {
 #endif
 
+#include <stdint.h>
+
 #define FP_ILOGBNAN (-1-0x7fffffff)
 #define FP_ILOGB0 FP_ILOGBNAN
 
@@ -15,6 +17,9 @@ extern "C"
 #define FP_ZERO      2
 #define FP_SUBNORMAL 3
 #define FP_NORMAL    4
+
+#define NAN       (0.0f/0.0f)
+#define INFINITY  1e5000f
 
 #define DBL_EPSILON 2.22044604925031308085e-16
 
@@ -111,6 +116,45 @@ double fabs(double x);
 double ceil(double x);
 double nextafter(double x, double y);
 double floor(double x);
+double log(double x);
+double __math_divzero(uint32_t sign);
+double __math_invalid(double x);
+double __math_xflow(uint32_t sign, double y);
+double __math_uflow(uint32_t sign);
+double __math_oflow(uint32_t sign);
+double pow(double x, double y);
+
+
+#define asuint(f) ((union{float _f; uint32_t _i;}){f})._i
+#define asfloat(i) ((union{uint32_t _i; float _f;}){i})._f
+#define asuint64(f) ((union{double _f; uint64_t _i;}){f})._i
+#define asdouble(i) ((union{uint64_t _i; double _f;}){i})._f
+#define predict_true(x) __builtin_expect(!!(x), 1)
+#define predict_false(x) __builtin_expect(x, 0)
+#define issignalingf_inline(x) 0
+#define issignaling_inline(x) 0
+
+static inline float eval_as_float(float x)
+{
+	float y = x;
+	return y;
+}
+
+static inline double eval_as_double(double x)
+{
+	double y = x;
+	return y;
+}
+
+static inline double fp_barrier(double x)
+{
+	volatile double y = x;
+	return y;
+}
+
+
+
+#define WANT_ROUNDING 1
 
 #ifdef __cplusplus
 }

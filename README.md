@@ -83,6 +83,7 @@ QEMU and the overall dev enivornment exposes (and needs exposed) certain ports t
 58004 - QEMU Monitor over telnet
 58005 - QEMU QCP over telnet
 58006 - AVS Dev API Websocket
+58007 - QEMU/COM3 -> Dev API
 58020 - VS Code Web
 58021 - Webssh2 websocket tunnel
 58022 - GDB Frontend Web

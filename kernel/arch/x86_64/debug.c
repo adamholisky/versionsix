@@ -16,6 +16,9 @@
 #include "file.h"
 #include <debug.h>
 
+#define KLOG_USE_ELASTIC_INGEST
+#define KLOG_SERIAL_PORT 0x2F8 // COM2
+
 char debugf_buff[4096];
 char klog_message[1024];
 char klog_buff[4096];
@@ -29,6 +32,58 @@ char *klog_levels[] = {
 	"Panic"
 };
 
+
+#ifdef KLOG_USE_ELASTIC_INGEST
+/* Sending klog output to a serial port, which is then configured to send to some json ingest service. Initial development was done on elastic's stack.
+
+Raw ingest:
+
+curl -X POST "republic.marsdev.io:50000" -H 'Content-Type: application/json' -d '{ "level": "PANIC", file_name: "main.c", function_name: "do_things_in_a_func()", line_number: "2033", message: "This is output. It has stuff! Like \"quotes\" that have been escaped. yay?" }'
+
+ES API ingest
+
+POST /klog/_doc HTTP/1.1\nHost: republic.marsdev.io\nContent-Type: application/json\nContent-Length: 45\n\n{ "level": "PANIC", file_name: "main.c", function_name: "do_things_in_a_func()", line_number: "2033", message: "This is output. It has stuff! Like \"quotes\" that have been escaped. yay?" }
+ */
+
+void klog_write_str_to_serial_port( char *s, int len );
+
+void klog_stage2( int level, char *file_name, char *function_name, int line_number, char * message, ... ) {
+	va_list args;
+	int len = 0;
+	
+	memset( klog_buff, 0, 4096 );
+	memset( klog_message, 0, 4096 );
+	memset( start_buff, 0, 1024 );
+	memset( end_buff, 0, 1024 );
+
+	va_start( args, message );
+	vsnprintf( klog_message, 1024, message, args );
+	va_end( args );
+
+	sprintf( start_buff, "<klog level=\"%s\" file=\"%s\" function=\"%s\" line_number=%d >", klog_levels[level], file_name, function_name, line_number );
+	sprintf( end_buff, "</klog>\n" );
+
+	int start_len = kstrlen(start_buff);
+	char *msg_start = klog_buff + start_len;
+
+	kstrncpy( klog_buff, start_buff, kstrlen(start_buff) );
+	kstrncat( klog_buff, klog_message, kstrlen(klog_message) );
+	kstrncat( klog_buff, end_buff, kstrlen(end_buff) );
+
+	klog_write_str_to_serial_port( klog_buff, kstrlen( klog_buff ) );
+}
+
+void klog_write_str_to_serial_port( char *s, int len ) {
+	for( int i = 0; i < len; i++ ) {
+		while((inportb(KLOG_SERIAL_PORT + 5) & 0x20) == 0) {
+			;
+		}
+
+		outportb( KLOG_SERIAL_PORT, *s++ );
+	}
+}
+
+#else
 void klog_stage2( int level, char *file_name, char *function_name, int line_number, char * message, ... ) {
 	va_list args;
 	int len = 0;
@@ -60,6 +115,8 @@ void klog_stage2( int level, char *file_name, char *function_name, int line_numb
 
 	write( FD_STDERR, klog_buff, kstrlen( klog_buff ) );
 }
+#endif
+
 
 
 void debugf_stage2( char * message, ... ) {

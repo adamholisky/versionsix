@@ -237,7 +237,7 @@ int process_sched_yield( registers **context ) {
 				case PROCESS_STATUS_ACTIVE:
 				case PROCESS_STATUS_WAITING:
 				case PROCESS_STATUS_SLEEP:
-					//klog( LOG_DEBUG, "found. pid: %d", p_candidate->pid );
+					klog( LOG_DEBUG, "Candidate found. pid: %d", p_candidate->pid );
 					next_process_found = true;
 					break;
 				default:
@@ -297,7 +297,8 @@ int process_sched_yield( registers **context ) {
 
 	new_p->status = PROCESS_STATUS_ACTIVE;
 
-	//klog( LOG_DEBUG, "Out yield. New PID: %d    New RIP: virt=0x%016llX phys=0x%016llX", new_p->pid, new_p->context.rip, paging_virtual_to_physical( new_p->context.rip ) );
+	process_diagnostic_context( &new_p->context );
+	klog( LOG_DEBUG, "Out yield. New PID: %d  New RIP=0x%016llX  phys=0x%016llX", new_p->pid, new_p->context.rip, paging_virtual_to_physical( new_p->context.rip ) );
 
 	return 0;
 }

@@ -76,6 +76,9 @@ void task_chain_d( void );
 void main_console_set_cursor_visiblity( bool visible );
 void main_console_blink_cursor( void );
 
+void do_a_thing( void );
+int do_a_thing_main( int argc, char *argv[] );
+
 #ifdef __cplusplus
 }
 #endif

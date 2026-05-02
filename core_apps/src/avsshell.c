@@ -113,10 +113,10 @@ void kshell_main_loop( void ) {
 		/* Step 1: Get the line, put it into current_line */
 		do {
 			//main_console_set_cursor_visiblity( false );
-			scancode = keyboard_get_scancode();
-			c = keyboard_scancode_to_char( scancode );	// this checks for scancode under 0x81, otherwise returns 0
+			//scancode = keyboard_get_scancode();
+			//c = keyboard_scancode_to_char( scancode );	// this checks for scancode under 0x81, otherwise returns 0
 			
-			//c = kgetc();
+			c = kgetc();
 
 			if( c != 0 ) {
 				if( c == '\n' ) {
@@ -238,18 +238,21 @@ void kshell_main_loop( void ) {
 
 			printf( "cpid: %d\n", child_pid );
 			if( child_pid == 0 ) {
+				klog( LOG_DEBUG, "In child, execve-ing" );
 				execve( cmd, NULL, NULL );
 			} else {
+				klog( LOG_DEBUG, "In parent, looping" );
 				// just loop for now
 				while( true ) {
-					__asm__	__volatile__ ( 
+					syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+					/* __asm__	__volatile__ ( 
 						"movq %1, %%rax \n"
 						"int %2 \n"
 						"movq %%rax, %0"
 						:"=r"(ret)
 						:"r"(yield_syscall_num), "i"(0xFE)
 						:"%rax" 
-					);
+					); */
 				}
 			}
 		}

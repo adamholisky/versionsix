@@ -13,7 +13,7 @@
 extern void elf_dynamic_linker_preamble( void );
 
 int elf_loader_load( process_data* p, uint8_t* data ) {
-	klog( LOG_INFO, "Loding an ELF object: path=%s  data: 0x%016llX  size: 0x%llX \n", p->path, data, p->exec_size );
+	klog( LOG_INFO, "Loding an ELF object: path=%s  data: 0x%016llX  size: 0x%llX", p->path, data, p->exec_size );
 	debugf( "ELF Loader in.\n" );
 
 	if ( data[0] == 0x7F ) {

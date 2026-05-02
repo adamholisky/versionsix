@@ -10,7 +10,9 @@
             "defines": [
                 "VI_ENV_OS",
                 "VIOS",
-                "ENABLE_GUI"
+                "ENABLE_GUI",
+                "GDBSTUB_X86_64",
+                "GDBSTUB_IMPLEMENTATION"
             ],
             "compilerPath": "/usr/local/osdev/bin/x86_64-elf-g++",
             "cStandard": "c17",

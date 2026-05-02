@@ -1,0 +1,62 @@
+#include <kernel_common.h>
+#include "gdbstub.h"
+
+/*
+ * Write one character to the debugging stream.
+ */
+int gdb_sys_putchar(struct gdb_state *state, int ch)
+{
+#ifdef USE_STDIO
+    putchar(ch);
+#else
+    gdb_buf_write(&gdb_output, ch);
+#endif
+    return 0;
+}
+
+/*
+ * Read one character from the debugging stream.
+ */
+int gdb_sys_getc(struct gdb_state *state)
+{
+#ifdef USE_STDIO
+    int ch = getchar();
+    return ch == EOF ? GDB_EOF : ch;
+#else
+    return gdb_buf_read(&gdb_input);
+#endif
+}
+
+/*
+ * Read one byte from memory.
+ */
+int gdb_sys_mem_readb(struct gdb_state *state, address addr, char *val)
+{
+	*val = (char *)addr;
+    return 0;
+}
+
+/*
+ * Write one byte to memory.
+ */
+int gdb_sys_mem_writeb(struct gdb_state *state, address addr, char val)
+{
+	*(char *)(addr) = val;
+    return 0;
+}
+
+/*
+ * Continue program execution.
+ */
+int gdb_sys_continue(struct gdb_state *state)
+{
+    return 0;
+}
+
+/*
+ * Single step the next instruction.
+ */
+int gdb_sys_step(struct gdb_state *state)
+{
+    return 0;
+}

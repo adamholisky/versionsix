@@ -16,7 +16,6 @@
 #include "file.h"
 #include <debug.h>
 
-#define KLOG_USE_ELASTIC_INGEST
 #define KLOG_SERIAL_PORT 0x2F8 // COM2
 
 char debugf_buff[4096];
@@ -33,7 +32,7 @@ char *klog_levels[] = {
 };
 
 
-#ifdef KLOG_USE_ELASTIC_INGEST
+#ifdef KLOG_AVS_DEV_API_OUT
 /* Sending klog output to a serial port, which is then configured to send to some json ingest service. Initial development was done on elastic's stack.
 
 Raw ingest:
@@ -46,6 +45,9 @@ POST /klog/_doc HTTP/1.1\nHost: republic.marsdev.io\nContent-Type: application/j
  */
 
 void klog_write_str_to_serial_port( char *s, int len );
+void klog_string_escape_json( char *unescaped_str, char *escaped_str );
+
+char klog_escaped_str[4096];
 
 void klog_stage2( int level, char *file_name, char *function_name, int line_number, char * message, ... ) {
 	va_list args;
@@ -53,6 +55,7 @@ void klog_stage2( int level, char *file_name, char *function_name, int line_numb
 	
 	memset( klog_buff, 0, 4096 );
 	memset( klog_message, 0, 4096 );
+	memset( klog_escaped_str, 0, 4096 );
 	memset( start_buff, 0, 1024 );
 	memset( end_buff, 0, 1024 );
 
@@ -60,14 +63,16 @@ void klog_stage2( int level, char *file_name, char *function_name, int line_numb
 	vsnprintf( klog_message, 1024, message, args );
 	va_end( args );
 
-	sprintf( start_buff, "<klog level=\"%s\" file=\"%s\" function=\"%s\" line_number=%d >", klog_levels[level], file_name, function_name, line_number );
-	sprintf( end_buff, "</klog>\n" );
+	klog_string_escape_json( klog_message, klog_escaped_str );
+
+	sprintf( start_buff, "{ \"level\": \"%s\", \"file\": \"%s\", \"function\": \"%s\", \"line_number\": \"%d\", \"message\": \"", klog_levels[level], file_name, function_name, line_number );
+	sprintf( end_buff, "\" }\n" );
 
 	int start_len = kstrlen(start_buff);
 	char *msg_start = klog_buff + start_len;
 
 	kstrncpy( klog_buff, start_buff, kstrlen(start_buff) );
-	kstrncat( klog_buff, klog_message, kstrlen(klog_message) );
+	kstrncat( klog_buff, klog_escaped_str, kstrlen(klog_escaped_str) );
 	kstrncat( klog_buff, end_buff, kstrlen(end_buff) );
 
 	klog_write_str_to_serial_port( klog_buff, kstrlen( klog_buff ) );
@@ -80,6 +85,31 @@ void klog_write_str_to_serial_port( char *s, int len ) {
 		}
 
 		outportb( KLOG_SERIAL_PORT, *s++ );
+	}
+}
+
+void klog_string_escape_json( char *unescaped_str, char *escaped_str ) {
+	char *s = unescaped_str;
+	int esc_index = 0;
+
+	while(*s) {
+		switch( *s ) {
+			case '"':
+				escaped_str[esc_index] = '\\';
+				esc_index++;
+				escaped_str[esc_index] = '"';
+				break;
+			case '\n':
+				escaped_str[esc_index] = '\\';
+				esc_index++;
+				escaped_str[esc_index] = 'n';
+				break;
+			default:
+				escaped_str[esc_index] = *s;
+		}
+
+		esc_index++;
+		s++;
 	}
 }
 

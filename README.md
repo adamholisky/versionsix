@@ -79,7 +79,7 @@ QEMU and the overall dev enivornment exposes (and needs exposed) certain ports t
 58000 - VIOS C&C Dashboard
 58001 - QEMU GDB
 58002 - QEMU VNC
-58003 - QEMU VNC over Websocket
+58003 - Internal GDB Server serial output
 58004 - QEMU Monitor over telnet
 58005 - QEMU QCP over telnet
 58006 - AVS Dev API Websocket

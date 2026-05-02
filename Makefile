@@ -19,7 +19,9 @@ $(eval BUILD_NUMBER = $(shell echo $$(($$(cat $(BUILD_NUMBER_FILE)) + 1))))
 
 # Defines
 DEFINES = -DVIFS_OS_ENV 
-DEFINES += -DENABLE_GUI
+DEFINES += -DSTDIO_SERIAL_3
+#DEFINES += -DENABLE_GUI
+#DEFINES += -DKLOG_AVS_DEV_API_OUT
 DEFINES += -DVI_ENV_OS 
 DEFINES += -DVIOS 
 DEFINES += -DBUILD_NUM=$(BUILD_NUMBER) 
@@ -159,10 +161,14 @@ install_stage2: build/versionvi.bin
 	@mcopy -D o -i $(ROOT_DIR)/$(KERNEL_BOOT_IMG)@@1M $(ROOT_DIR)/build/versionvi.bin ::/boot
 
 #& /mnt/c/"Program Files"/TightVNC/tvnviewer.exe :0
-run:
+run: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING)
 
-run-vnc:
+run-term:  install
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NONE) $(QEMU_DEBUG_LOGGING)
+
+
+run-vnc:  install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_VNC) $(QEMU_DEBUG_LOGGING)
 
 run-no-install:
@@ -171,7 +177,7 @@ run-no-install:
 run-term-no-install:
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_CURSES) $(QEMU_DEBUG_LOGGING) 
 
-run-debug:
+run-debug: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_COMMON) $(QEMU_DEBUG_LOGGING)
 
 gdb:

@@ -37,9 +37,6 @@ int execve_syscall_handler(  registers **_context, char *path, char *argv[], cha
 	uint8_t* buff = kmalloc( st.st_size ) ;
 	int bytes_read = vfs_read( path, buff, st.st_size, 0 );
 
-	// Load ELF information
-	int loadelf_err = elf_loader_load( p, buff );
-
 	// Setup admin vars
 	p->status = PROCESS_STATUS_IN_SETUP;
 	p->exec_size = st.st_size;
@@ -49,6 +46,9 @@ int execve_syscall_handler(  registers **_context, char *path, char *argv[], cha
 	p->argc = 1;
 	strcpy( p->working_dir, "/" );
 	p->has_own_addr_space = true;
+
+	// Load ELF information
+	int loadelf_err = elf_loader_load( p, buff );
 
 	// Stack setup
 	p->proc_stack_virt = 0x00000000A0000000;
@@ -76,7 +76,7 @@ int execve_syscall_handler(  registers **_context, char *path, char *argv[], cha
 
 	// Final setup
 	p->status = PROCESS_STATUS_ACTIVE;
-	process_set_next_up( p );
+	//process_set_next_up( p );
 	
 	/* printf( "Before: \n" );
 	process_diagnostic_context(*_context); */

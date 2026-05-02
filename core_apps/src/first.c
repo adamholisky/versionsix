@@ -8,6 +8,9 @@ int main( int argc, char *argv[] ) {
 	pid_t pid = 0;
 	uint64_t ret = 0;
 
+	// Callback to the OS to see if we should Do A Thing
+	do_a_thing();
+
 	pid = (pid_t)syscall( SYSCALL_FORK, 0, NULL );
 	
 	uint64_t yield_syscall_num = SYSCALL_SCHED_YIELD;
@@ -18,7 +21,7 @@ int main( int argc, char *argv[] ) {
 
 	switch( pid ) {
 		case -1:
-			printf( "Fork faid somehow?\n" );
+			printf( "Fork failed somehow?\n" );
 			break;
 		case 0:
 			printf( "Running /bin/avsshell.exec\n" );

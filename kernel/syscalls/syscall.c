@@ -70,8 +70,11 @@ uint64_t syscall( uint64_t call_num, uint8_t num_args, syscall_args *args ) {
 	return ret;
 }
 
+char *syscall_log_msg_first = "In syscall. num=";
+
 void syscall_handler( registers **_context ) {
 	registers *context = *_context;
+
 	switch( context->rax ) {
 		case SYSCALL_FORK:
 			fork_syscall_handler( _context );
@@ -80,6 +83,7 @@ void syscall_handler( registers **_context ) {
 			process_sched_yield( _context );
 			break;
 		case SYSCALL_EXECVE:
+			klog( LOG_INFO, "%s%d path=\"%s\"  argv=0x%016llX evnp=0x%016llX", syscall_log_msg_first, context->rax, context->rdi, context->rsi, context->rdx );
 			execve_syscall_handler( _context, context->rdi, context->rsi, context->rdx );
 			break;
 		default:

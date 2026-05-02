@@ -1,8 +1,9 @@
 .section .data
 .skip 4096
-syscall_stack_bottom:
-.skip 4096
 syscall_stack_top:
+.skip 4096
+.global syscall_stack_top
+syscall_stack_bottom:
 .skip 4096
 
 .section .text

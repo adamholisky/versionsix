@@ -51,9 +51,11 @@ int execve_syscall_handler(  registers **_context, char *path, char *argv[], cha
 	int loadelf_err = elf_loader_load( p, buff );
 
 	// Stack setup
-	p->proc_stack_virt = 0x00000000A0000000;
+	p->proc_stack_virt = 0x00000000A0000000 + PROCESS_DEFAULT_STACK_SIZE;
 	p->proc_stack_kvirt= page_allocate_kernel( PROCESS_DEFAULT_STACK_PAGES );
 	p->proc_stack_phys = paging_virtual_to_physical( p->proc_stack_kvirt );
+	p->stack_size = PROCESS_DEFAULT_STACK_SIZE;
+
 	page_map( p->proc_stack_virt, p->proc_stack_phys );
 	
 	// Code segmnet setup
@@ -64,6 +66,11 @@ int execve_syscall_handler(  registers **_context, char *path, char *argv[], cha
 	// Data segment setup
 	for( int i = 0; i < p->data_section_count; i++ ) {
 		page_map( p->data_sections[i].virt, p->data_sections[i].phys );
+	}
+
+	for( int i = 0; i < PROCESS_DEFAULT_STACK_PAGES; i++ ) {
+		page_map( p->proc_stack_virt + (i * PAGE_SIZE), p->proc_stack_phys + (i * PAGE_SIZE) );
+		//klog( LOG_DEBUG, "[STACK] For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid,  new_p->proc_stack_virt + (i * PAGE_SIZE), new_p->proc_stack_phys + (i * PAGE_SIZE) );
 	}
 
 	// Context setup

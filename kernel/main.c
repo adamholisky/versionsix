@@ -126,16 +126,8 @@ void kernel_main( void ) {
 
 	extern uint64_t kernel_heap_virtual_memory_next;
 	printf( "kmalloc() heap at now:    0x%016llX\n", kernel_heap_virtual_memory_next );
-
-	extern avs_list* mount_points;
-	printf( "mount_points:             0x%016llX\n", mount_points );
-	vfs_mount_point* rootmp = mount_points->head->data;
-	vfs_mount_point* rfsmp = mount_points->tail->data;
-	printf( "root mp:                  0x%016llX\n", rootmp );
-	printf( "rfs mp:                   0x%016llX\n", rfsmp );
-	printf( "root mp fs:               0x%016llX\n", rootmp->fs );
-	printf( "root mp sanity:           %s\n", rootmp->root );
-	printf( "rfs mp sanity:            %s\n", rfsmp->root );
+	extern uint64_t syscall_stack_top;
+	printf( "syscall stack top:        0x%016llX\n", &syscall_stack_top );
 
 	printf( "Startup done. Handing to init process.\n\n" );
 

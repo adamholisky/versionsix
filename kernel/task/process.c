@@ -79,7 +79,7 @@ void process_setup_init( void ) {
 	global_proc_data.root_pd->proc_stack_kvirt= page_allocate_kernel( PROCESS_DEFAULT_STACK_PAGES );
 	global_proc_data.root_pd->proc_stack_phys = paging_virtual_to_physical( global_proc_data.root_pd->proc_stack_kvirt );
 	//global_proc_data.root_pd->proc_stack = kmalloc( global_proc_data.root_pd->stack_size );
-	global_proc_data.root_pd->context.rsp = global_proc_data.root_pd->proc_stack_virt + global_proc_data.root_pd->stack_size;
+	global_proc_data.root_pd->context.rsp = global_proc_data.root_pd->proc_stack_virt + PROCESS_DEFAULT_STACK_SIZE;
 	global_proc_data.root_pd->context.rip = (uint64_t)global_proc_data.root_pd->entry;
 	global_proc_data.root_pd->status = PROCESS_STATUS_INACTIVE;
 
@@ -280,15 +280,13 @@ int process_sched_yield( registers **context ) {
 			//klog( LOG_DEBUG, "For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid, new_p->text_sections[i].virt, new_p->text_sections[i].phys );
 		}
 
-		if( new_p->first_run ) {
-			memcpy( new_p->proc_stack_kvirt, &new_p->context, sizeof(registers) );
-			*context = new_p->proc_stack_virt;
-		}
+		//memcpy( new_p->proc_stack_kvirt, &new_p->context, sizeof(registers) );
+		//*context = new_p->proc_stack_virt;
 	}
 
 	for( int i = 0; i < PROCESS_DEFAULT_STACK_PAGES; i++ ) {
 		page_map( new_p->proc_stack_virt + (i * PAGE_SIZE), new_p->proc_stack_phys + (i * PAGE_SIZE) );
-		//klog( LOG_DEBUG, "[STACK] For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid,  new_p->proc_stack_virt + (i * PAGE_SIZE), new_p->proc_stack_phys + (i * PAGE_SIZE) );
+		klog( LOG_DEBUG, "[STACK] For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid,  new_p->proc_stack_virt + (i * PAGE_SIZE), new_p->proc_stack_phys + (i * PAGE_SIZE) );
 	}
 
 	if( new_p->first_run ) {
@@ -296,6 +294,16 @@ int process_sched_yield( registers **context ) {
 	}
 
 	new_p->status = PROCESS_STATUS_ACTIVE;
+
+	/* if( new_p->pid == 3 ) {
+		(*context)->rbx = 0xBBBB;
+		(*context)->rcx = 0xCCCC;
+		(*context)->rdx = 0xDDDD;
+		(*context)->rsi = 0x1111;
+		(*context)->rdi = 0x2222;
+		(*context)->rbp = 0x3333;
+		(*context)->error_no = 0x6535;
+	} */
 
 	process_diagnostic_context( &new_p->context );
 	klog( LOG_DEBUG, "Out yield. New PID: %d  New RIP=0x%016llX  phys=0x%016llX", new_p->pid, new_p->context.rip, paging_virtual_to_physical( new_p->context.rip ) );

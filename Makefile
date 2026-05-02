@@ -21,7 +21,7 @@ $(eval BUILD_NUMBER = $(shell echo $$(($$(cat $(BUILD_NUMBER_FILE)) + 1))))
 DEFINES = -DVIFS_OS_ENV 
 DEFINES += -DSTDIO_SERIAL_3
 #DEFINES += -DENABLE_GUI
-#DEFINES += -DKLOG_AVS_DEV_API_OUT
+DEFINES += -DKLOG_AVS_DEV_API_OUT
 DEFINES += -DVI_ENV_OS 
 DEFINES += -DVIOS 
 DEFINES += -DBUILD_NUM=$(BUILD_NUMBER) 
@@ -99,7 +99,7 @@ build/%.o: %.S
 	$(CC) $(AFLAGS) -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
 
 dumpobjs:
-	$(OBJDUMP) -x -D -S build/versionvi.bin > build_support/logs/objdump.txt 
+	$(OBJDUMP) -x -D -S build/versionvi.bin > logs/objdump.txt 
 
 cp: cp_fs cp_vit
 
@@ -179,6 +179,9 @@ run-term-no-install:
 
 run-debug: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_COMMON) $(QEMU_DEBUG_LOGGING)
+
+run-debug-term: install
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NONE) $(QEMU_DEBUG_COMMON) $(QEMU_DEBUG_LOGGING)
 
 gdb:
 	gdb -q --command=$(ROOT_DIR)/build_support/gdb_control/tui.gdb

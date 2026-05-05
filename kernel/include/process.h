@@ -52,6 +52,8 @@ typedef struct {
 	char name[256];
 	registers context;
 	bool first_run;
+	pid_t wait_for_pid;
+
 	void *proc_stack_kvirt;
 	void *proc_stack_virt;
 	void *proc_stack_phys;

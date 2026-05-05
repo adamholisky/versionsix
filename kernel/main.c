@@ -62,7 +62,7 @@ char fxsave_region[512] __attribute__( ( aligned( 16 ) ) );
 void kernel_main( void ) {
 	// Begin with boostrap services
 	serial_initalize();
-	debugf( "Versions OS VI Debug Out\n" );
+	debugf( "avsOS Debug Out\n" );
 	debugf( "Build Number: %d\n", BUILD_NUM );
 	klog( LOG_INFO, "---------------------> New Run <---------------------" );
 
@@ -109,7 +109,7 @@ void kernel_main( void ) {
 #endif
 
 	// Printf is now okay
-	printf( "Versions OS VI\n" );
+	printf( "avsOS\n" );
 	printf( "Build %d\n", BUILD_NUM );
 
 	keyboard_initalize();
@@ -167,12 +167,16 @@ void load_gui_stuff( void ) {
 	vui_handle_set_name( menubar, "main_menubar" );
 
 	vui_handle desktop = vui_desktop_create( 0, 25, vui.width, vui.height - 25, VUI_DESKTOP_FLAG_NONE );
-	vui_handle smooth_text = vui_label_create( 5, 768 - 25, "Versions OS 6.0.0.1", VUI_LABEL_FLAG_NONE, desktop );
+
+	char desktop_string[50];
+	memset( desktop_string, 0, 50 );
+	sprintf( desktop_string, "avsOS build %d", BUILD_NUM );
+	vui_handle smooth_text = vui_label_create( 5, 768 - 25, desktop_string, VUI_LABEL_FLAG_NONE, desktop );
 	vui_label_set_color( smooth_text, COLOR_RGB_WHITE, theme->desktop );
 	vui_handle_set_name( desktop, "desktop" );
 
 	vui_handle win = vui_window_create( 25, 40, 500, 400, VUI_WINDOW_FLAG_NONE );
-	vui_window_set_title( win, "ViOS 6" );
+	vui_window_set_title( win, "avsOS Shell" );
 	vui_handle_set_name( win, "window_console" );
 	vui_window* win_s = vui_get_handle_data( win );
 	vui_window_set_background_color( win, 0x232323 );

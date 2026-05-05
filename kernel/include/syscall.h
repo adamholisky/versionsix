@@ -38,6 +38,8 @@ void syscall_handler( registers **_context );
 // Glue
 size_t write( int fd, void *buff, size_t count );
 int execve( char *path, char *argv[], char *envp[] );
+pid_t wait( pid_t pid );
+void exit( int status );
 
 // Handlers
 int execve_syscall_handler( registers **_context, char *path, char *argv[], char *envp[] );

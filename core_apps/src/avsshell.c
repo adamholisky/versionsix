@@ -221,7 +221,7 @@ void kshell_main_loop( void ) {
 		kstrcat( cmd, argv_builder[0] );
 		kstrcat( cmd, ".exec" );
 
-		printf( "Now looking for %s\n", cmd );
+		//printf( "Now looking for %s\n", cmd );
 
 		file_stats st;
 		int attrerr = vfs_getattr( cmd, &st );
@@ -232,51 +232,22 @@ void kshell_main_loop( void ) {
 		if( attrerr != VFS_ERROR_NONE ) {
 			printf( "Command not found.\n" );
 		} else {
-			printf( "Executing %s...\n", cmd );
+			//printf( "Executing %s...\n", cmd );
 			
 			pid_t child_pid = (pid_t)syscall( SYSCALL_FORK, 0, NULL );
 
-			printf( "child process id: %d\n", child_pid );
+			//printf( "child process id: %d\n", child_pid );
 			if( child_pid == 0 ) {
-				klog( LOG_DEBUG, "In child, execve-ing" );
+				//klog( LOG_DEBUG, "In child, execve-ing" );
 				execve( cmd, NULL, NULL );
 			} else {
-				klog( LOG_DEBUG, "In parent, looping." );
-				// just loop for now
-				while( true ) {
-					printf( "%d", process_get_current_proc_id() );
-					syscall( SYSCALL_SCHED_YIELD, 0, NULL );
-					/* __asm__	__volatile__ ( 
-						"movq %1, %%rax \n"
-						"int %2 \n"
-						"movq %%rax, %0"
-						:"=r"(ret)
-						:"r"(yield_syscall_num), "i"(0xFE)
-						:"%rax" 
-					); */
-				}
+				//klog( LOG_DEBUG, "In parent, waiting for child process to exit." );
+				
+				wait( child_pid );
+
+				//printf( "Post wait.\n" );
 			}
 		}
-
-
-		/* Step 5: Run the command, or fail*/
-
-		/* int cmd_return_value = 0;
-
-		if( to_run != NULL ) {
-			cmd_return_value = kshell_command_run( to_run, num_args, argv_builder );
-		} else {
-			printf( "%s: command not found\n", argv_builder[0] );
-		}
-
-		/* Step 6: For now display any non-zero return code */
-
-		/*
-		if( cmd_return_value != 0 ) {
-			printf( "%s: Error %d\n", argv_builder[0], cmd_return_value );
-		} */
-
-		//syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 	}
 }
 

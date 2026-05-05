@@ -31,7 +31,6 @@ int asvfs_initalize( asvfs_drive_ops *ops ) {
 		return ASVFS_ERROR_MEMORY;
 	}
 
-	//klog( LOG_DEBUG, "header: %X", asvfs_instance_data.header );
 	asvfs_instance_data.drive_ops.read_from_disk( 0, (uint8_t *)asvfs_instance_data.header, sizeof(asvfs_header), 0 );
 
 	// verify header, bail if doesn't match
@@ -159,7 +158,7 @@ uint32_t asvfs_get_block_id_from_pathname( char *pathname ) {
 	uint32_t current_dir_block_id = 0;
 	uint32_t path_length = kstrlen( pathname );
 
-	if( kstrcmp( pathname, "/" ) == 0 ) {
+	if( asvfs_strcmp( pathname, "/" ) == 0 ) {
 		return asvfs_main_drive->root_directory;
 	}
 

@@ -137,7 +137,7 @@ void process_env_setup( void ) {
 }
 
 void process_exit( int ret_code ) {
-	syscall( SYSCALL_EXIT, 0, NULL );
+	exit( ret_code );
 }
 
 process_data* process_get_data_from_pid( pid_t pid ) {

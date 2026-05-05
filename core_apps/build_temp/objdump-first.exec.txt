@@ -1627,88 +1627,94 @@ Disassembly of section .debug_info:
   f6:	06                   	(bad)
   f7:	e2 00                	loop   f9 <syscall@plt-0x5e7>
   f9:	00 00                	add    %al,(%rax)
-  fb:	06                   	(bad)
+  fb:	07                   	(bad)
   fc:	1b 15 b9 00 00 00    	sbb    0xb9(%rip),%edx        # 1bb <syscall@plt-0x525>
  102:	09 03                	or     %eax,(%rbx)
  104:	60                   	(bad)
  105:	1c 00                	sbb    $0x0,%al
  107:	00 00                	add    %al,(%rax)
  109:	00 00                	add    %al,(%rax)
- 10b:	00 0f                	add    %cl,(%rdi)
- 10d:	30 05 13 09 30 01    	xor    %al,0x1300913(%rip)        # 1300a26 <error_strings+0x12fec86>
+ 10b:	00 05 9f 00 00 00    	add    %al,0x9f(%rip)        # 1b0 <syscall@plt-0x530>
+ 111:	04 69                	add    $0x69,%al
  113:	00 00                	add    %al,(%rax)
- 115:	03 9e 01 00 00 14    	add    0x14000001(%rsi),%ebx
- 11b:	64 00 00             	add    %al,%fs:(%rax)
- 11e:	00 00                	add    %al,(%rax)
- 120:	03 a4 01 00 00 15 64 	add    0x64150000(%rcx,%rax,1),%esp
- 127:	00 00                	add    %al,(%rax)
- 129:	00 08                	add    %cl,(%rax)
- 12b:	03 aa 01 00 00 16    	add    0x16000001(%rdx),%ebp
+ 115:	00 05 1d 12 51 00    	add    %al,0x51121d(%rip)        # 511338 <error_strings+0x50f598>
+ 11b:	00 00                	add    %al,(%rax)
+ 11d:	05 e4 00 00 00       	add    $0xe4,%eax
+ 122:	0f 30                	wrmsr
+ 124:	06                   	(bad)
+ 125:	16                   	(bad)
+ 126:	09 46 01             	or     %eax,0x1(%rsi)
+ 129:	00 00                	add    %al,(%rax)
+ 12b:	03 9e 01 00 00 17    	add    0x17000001(%rsi),%ebx
  131:	64 00 00             	add    %al,%fs:(%rax)
- 134:	00 10                	add    %dl,(%rax)
- 136:	03 b0 01 00 00 17    	add    0x17000001(%rax),%esi
- 13c:	64 00 00             	add    %al,%fs:(%rax)
- 13f:	00 18                	add    %bl,(%rax)
- 141:	03 45 00             	add    0x0(%rbp),%eax
- 144:	00 00                	add    %al,(%rax)
- 146:	18 64 00 00          	sbb    %ah,0x0(%rax,%rax,1)
- 14a:	00 20                	add    %ah,(%rax)
- 14c:	03 4b 00             	add    0x0(%rbx),%ecx
- 14f:	00 00                	add    %al,(%rax)
- 151:	19 64 00 00          	sbb    %esp,0x0(%rax,%rax,1)
- 155:	00 28                	add    %ch,(%rax)
- 157:	00 04 06             	add    %al,(%rsi,%rax,1)
- 15a:	01 00                	add    %eax,(%rax)
- 15c:	00 05 1a 03 e4 00    	add    %al,0xe4031a(%rip)        # e4047c <error_strings+0xe3e6dc>
- 162:	00 00                	add    %al,(%rax)
- 164:	07                   	(bad)
- 165:	c9                   	leave
- 166:	00 00                	add    %al,(%rax)
- 168:	00 4c 01 00          	add    %cl,0x0(%rcx,%rax,1)
- 16c:	00 08                	add    %cl,(%rax)
- 16e:	91                   	xchg   %eax,%ecx
- 16f:	00 00                	add    %al,(%rax)
- 171:	00 0f                	add    %cl,(%rdi)
- 173:	00 06                	add    %al,(%rsi)
- 175:	44 01 00             	add    %r8d,(%rax)
- 178:	00 07                	add    %al,(%rdi)
- 17a:	0c 15                	or     $0x15,%al
- 17c:	3c 01                	cmp    $0x1,%al
- 17e:	00 00                	add    %al,(%rax)
- 180:	09 03                	or     %eax,(%rbx)
- 182:	20 1d 00 00 00 00    	and    %bl,0x0(%rip)        # 188 <syscall@plt-0x558>
- 188:	00 00                	add    %al,(%rax)
- 18a:	07                   	(bad)
- 18b:	c9                   	leave
- 18c:	00 00                	add    %al,(%rax)
- 18e:	00 72 01             	add    %dh,0x1(%rdx)
- 191:	00 00                	add    %al,(%rax)
- 193:	08 91 00 00 00 04    	or     %dl,0x4000000(%rcx)
- 199:	00 06                	add    %al,(%rsi)
- 19b:	f8                   	clc
- 19c:	00 00                	add    %al,(%rax)
- 19e:	00 08                	add    %cl,(%rax)
- 1a0:	11 14 62             	adc    %edx,(%rdx,%riz,2)
- 1a3:	01 00                	add    %eax,(%rax)
- 1a5:	00 09                	add    %cl,(%rcx)
- 1a7:	03 a0 1d 00 00 00    	add    0x1d(%rax),%esp
- 1ad:	00 00                	add    %al,(%rax)
- 1af:	00 05 9f 00 00 00    	add    %al,0x9f(%rip)        # 254 <syscall@plt-0x48c>
- 1b5:	04 69                	add    $0x69,%al
- 1b7:	00 00                	add    %al,(%rax)
- 1b9:	00 09                	add    %cl,(%rcx)
- 1bb:	1d 12 51 00 00       	sbb    $0x5112,%eax
- 1c0:	00 05 88 01 00 00    	add    %al,0x188(%rip)        # 34e <syscall@plt-0x392>
- 1c6:	09 59 00             	or     %ebx,0x0(%rcx)
- 1c9:	00 00                	add    %al,(%rax)
- 1cb:	05 25 05 35 00       	add    $0x350525,%eax
- 1d0:	00 00                	add    %al,(%rax)
+ 134:	00 00                	add    %al,(%rax)
+ 136:	03 a4 01 00 00 18 64 	add    0x64180000(%rcx,%rax,1),%esp
+ 13d:	00 00                	add    %al,(%rax)
+ 13f:	00 08                	add    %cl,(%rax)
+ 141:	03 aa 01 00 00 19    	add    0x19000001(%rdx),%ebp
+ 147:	64 00 00             	add    %al,%fs:(%rax)
+ 14a:	00 10                	add    %dl,(%rax)
+ 14c:	03 b0 01 00 00 1a    	add    0x1a000001(%rax),%esi
+ 152:	64 00 00             	add    %al,%fs:(%rax)
+ 155:	00 18                	add    %bl,(%rax)
+ 157:	03 45 00             	add    0x0(%rbp),%eax
+ 15a:	00 00                	add    %al,(%rax)
+ 15c:	1b 64 00 00          	sbb    0x0(%rax,%rax,1),%esp
+ 160:	00 20                	add    %ah,(%rax)
+ 162:	03 4b 00             	add    0x0(%rbx),%ecx
+ 165:	00 00                	add    %al,(%rax)
+ 167:	1c 64                	sbb    $0x64,%al
+ 169:	00 00                	add    %al,(%rax)
+ 16b:	00 28                	add    %ch,(%rax)
+ 16d:	00 04 06             	add    %al,(%rsi,%rax,1)
+ 170:	01 00                	add    %eax,(%rax)
+ 172:	00 06                	add    %al,(%rsi)
+ 174:	1d 03 fa 00 00       	sbb    $0xfa03,%eax
+ 179:	00 07                	add    %al,(%rdi)
+ 17b:	c9                   	leave
+ 17c:	00 00                	add    %al,(%rax)
+ 17e:	00 62 01             	add    %ah,0x1(%rdx)
+ 181:	00 00                	add    %al,(%rax)
+ 183:	08 91 00 00 00 0f    	or     %dl,0xf000000(%rcx)
+ 189:	00 06                	add    %al,(%rsi)
+ 18b:	44 01 00             	add    %r8d,(%rax)
+ 18e:	00 08                	add    %cl,(%rax)
+ 190:	0c 15                	or     $0x15,%al
+ 192:	52                   	push   %rdx
+ 193:	01 00                	add    %eax,(%rax)
+ 195:	00 09                	add    %cl,(%rcx)
+ 197:	03 20                	add    (%rax),%esp
+ 199:	1d 00 00 00 00       	sbb    $0x0,%eax
+ 19e:	00 00                	add    %al,(%rax)
+ 1a0:	07                   	(bad)
+ 1a1:	c9                   	leave
+ 1a2:	00 00                	add    %al,(%rax)
+ 1a4:	00 88 01 00 00 08    	add    %cl,0x8000001(%rax)
+ 1aa:	91                   	xchg   %eax,%ecx
+ 1ab:	00 00                	add    %al,(%rax)
+ 1ad:	00 04 00             	add    %al,(%rax,%rax,1)
+ 1b0:	06                   	(bad)
+ 1b1:	f8                   	clc
+ 1b2:	00 00                	add    %al,(%rax)
+ 1b4:	00 09                	add    %cl,(%rcx)
+ 1b6:	11 14 78             	adc    %edx,(%rax,%rdi,2)
+ 1b9:	01 00                	add    %eax,(%rax)
+ 1bb:	00 09                	add    %cl,(%rcx)
+ 1bd:	03 a0 1d 00 00 00    	add    0x1d(%rax),%esp
+ 1c3:	00 00                	add    %al,(%rax)
+ 1c5:	00 09                	add    %cl,(%rcx)
+ 1c7:	59                   	pop    %rcx
+ 1c8:	00 00                	add    %al,(%rax)
+ 1ca:	00 06                	add    %al,(%rsi)
+ 1cc:	28 05 35 00 00 00    	sub    %al,0x35(%rip)        # 207 <syscall@plt-0x4d9>
  1d2:	be 01 00 00 02       	mov    $0x2000001,%esi
- 1d7:	88 01                	mov    %al,(%rcx)
+ 1d7:	e4 00                	in     $0x0,%al
  1d9:	00 00                	add    %al,(%rax)
- 1db:	02 99 01 00 00 02    	add    0x2000001(%rcx),%bl
- 1e1:	99                   	cltd
- 1e2:	01 00                	add    %eax,(%rax)
+ 1db:	02 f5                	add    %ch,%dh
+ 1dd:	00 00                	add    %al,(%rax)
+ 1df:	00 02                	add    %al,(%rdx)
+ 1e1:	f5                   	cmc
+ 1e2:	00 00                	add    %al,(%rax)
  1e4:	00 00                	add    %al,(%rax)
  1e6:	09 61 01             	or     %esp,0x1(%rcx)
  1e9:	00 00                	add    %al,(%rax)
@@ -1722,9 +1728,10 @@ Disassembly of section .debug_info:
  1fc:	00 09                	add    %cl,(%rcx)
  1fe:	51                   	push   %rcx
  1ff:	00 00                	add    %al,(%rax)
- 201:	00 05 1d 0a 64 00    	add    %al,0x640a1d(%rip)        # 640c24 <error_strings+0x63ee84>
- 207:	00 00                	add    %al,(%rax)
- 209:	f5                   	cmc
+ 201:	00 06                	add    %al,(%rsi)
+ 203:	20 0a                	and    %cl,(%rdx)
+ 205:	64 00 00             	add    %al,%fs:(%rax)
+ 208:	00 f5                	add    %dh,%ch
  20a:	01 00                	add    %eax,(%rax)
  20c:	00 02                	add    %al,(%rdx)
  20e:	64 00 00             	add    %al,%fs:(%rax)
@@ -1734,7 +1741,7 @@ Disassembly of section .debug_info:
  217:	02 f5                	add    %ch,%dh
  219:	01 00                	add    %eax,(%rax)
  21b:	00 00                	add    %al,(%rax)
- 21d:	05 30 01 00 00       	add    $0x130,%eax
+ 21d:	05 46 01 00 00       	add    $0x146,%eax
  222:	11 69 01             	adc    %ebp,0x1(%rcx)
  225:	00 00                	add    %al,(%rax)
  227:	0b 4f 06             	or     0x6(%rdi),%ecx
@@ -1759,11 +1766,15 @@ Disassembly of section .debug_info:
  253:	91                   	xchg   %eax,%ecx
  254:	4c 0a 7e 01          	rex.WR or 0x1(%rsi),%r15b
  258:	00 00                	add    %al,(%rax)
- 25a:	1b 99 01 00 00 02    	sbb    0x2000001(%rcx),%ebx
+ 25a:	1b f5                	sbb    %ebp,%esi
+ 25c:	00 00                	add    %al,(%rax)
+ 25e:	00 02                	add    %al,(%rdx)
  260:	91                   	xchg   %eax,%ecx
  261:	40 0b 70 69          	rex or 0x69(%rax),%esi
  265:	64 00 08             	add    %cl,%fs:(%rax)
- 268:	08 8d 01 00 00 02    	or     %cl,0x2000001(%rbp)
+ 268:	08 e9                	or     %ch,%cl
+ 26a:	00 00                	add    %al,(%rax)
+ 26c:	00 02                	add    %al,(%rdx)
  26e:	91                   	xchg   %eax,%ecx
  26f:	6c                   	insb   (%dx),(%rdi)
  270:	0b 72 65             	or     0x65(%rdx),%esi
@@ -1803,7 +1814,9 @@ Disassembly of section .debug_abbrev:
   1f:	02 05 00 49 13 00    	add    0x134900(%rip),%al        # 134925 <error_strings+0x132b85>
   25:	00 03                	add    %al,(%rbx)
   27:	0d 00 03 0e 3a       	or     $0x3a0e0300,%eax
-  2c:	21 05 3b 0b 39 21    	and    %eax,0x21390b3b(%rip)        # 21390b6d <error_strings+0x2138edcd>
+  2c:	21 06                	and    %eax,(%rsi)
+  2e:	3b 0b                	cmp    (%rbx),%ecx
+  30:	39 21                	cmp    %esp,(%rcx)
   32:	0b 49 13             	or     0x13(%rcx),%ecx
   35:	38 0b                	cmp    %cl,(%rbx)
   37:	00 00                	add    %al,(%rax)
@@ -1991,14 +2004,13 @@ Disassembly of section .debug_line:
   ac:	00 03                	add    %al,(%rbx)
   ae:	4c 01 00             	add    %r8,(%rax)
   b1:	00 03                	add    %al,(%rbx)
-  b3:	58                   	pop    %rax
+  b3:	56                   	push   %rsi
   b4:	01 00                	add    %eax,(%rax)
   b6:	00 03                	add    %al,(%rbx)
-  b8:	60                   	(bad)
-  b9:	01 00                	add    %eax,(%rax)
-  bb:	00 03                	add    %al,(%rbx)
-  bd:	68 01 00 00 03       	push   $0x3000001
-  c2:	72 01                	jb     c5 <syscall@plt-0x61b>
+  b8:	62 01 00 00 03       	(bad)
+  bd:	6a 01                	push   $0x1
+  bf:	00 00                	add    %al,(%rax)
+  c1:	03 72 01             	add    0x1(%rdx),%esi
   c4:	00 00                	add    %al,(%rax)
   c6:	04 7b                	add    $0x7b,%al
   c8:	01 00                	add    %eax,(%rax)
@@ -2365,21 +2377,21 @@ Disassembly of section .debug_line_str:
  13b:	74 38                	je     175 <syscall@plt-0x56b>
  13d:	5f                   	pop    %rdi
  13e:	74 2e                	je     16e <syscall@plt-0x572>
- 140:	68 00 73 79 73       	push   $0x73797300
- 145:	63 61 6c             	movsxd 0x6c(%rcx),%esp
- 148:	6c                   	insb   (%dx),(%rdi)
- 149:	2e 68 00 69 6e 74    	cs push $0x746e6900
- 14f:	65 72 72             	gs jb  1c4 <syscall@plt-0x51c>
- 152:	75 70                	jne    1c4 <syscall@plt-0x51c>
- 154:	74 2e                	je     184 <syscall@plt-0x55c>
- 156:	68 00 64 65 62       	push   $0x62656400
- 15b:	75 67                	jne    1c4 <syscall@plt-0x51c>
- 15d:	2e 68 00 65 72 72    	cs push $0x72726500
- 163:	6f                   	outsl  (%rsi),(%dx)
- 164:	72 2e                	jb     194 <syscall@plt-0x54c>
- 166:	68 00 70 72 6f       	push   $0x6f727000
- 16b:	63 65 73             	movsxd 0x73(%rbp),%esp
- 16e:	73 2e                	jae    19e <syscall@plt-0x542>
+ 140:	68 00 70 72 6f       	push   $0x6f727000
+ 145:	63 65 73             	movsxd 0x73(%rbp),%esp
+ 148:	73 2e                	jae    178 <syscall@plt-0x568>
+ 14a:	68 00 73 79 73       	push   $0x73797300
+ 14f:	63 61 6c             	movsxd 0x6c(%rcx),%esp
+ 152:	6c                   	insb   (%dx),(%rdi)
+ 153:	2e 68 00 69 6e 74    	cs push $0x746e6900
+ 159:	65 72 72             	gs jb  1ce <syscall@plt-0x512>
+ 15c:	75 70                	jne    1ce <syscall@plt-0x512>
+ 15e:	74 2e                	je     18e <syscall@plt-0x552>
+ 160:	68 00 64 65 62       	push   $0x62656400
+ 165:	75 67                	jne    1ce <syscall@plt-0x512>
+ 167:	2e 68 00 65 72 72    	cs push $0x72726500
+ 16d:	6f                   	outsl  (%rsi),(%dx)
+ 16e:	72 2e                	jb     19e <syscall@plt-0x542>
  170:	68 00 70 72 69       	push   $0x69727000
  175:	6e                   	outsb  (%rsi),(%dx)
  176:	74 66                	je     1de <syscall@plt-0x502>

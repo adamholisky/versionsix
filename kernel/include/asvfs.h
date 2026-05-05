@@ -107,13 +107,6 @@ Block Calculation
 #define O_WRONLY	     01
 #define O_RDWR		     02
  */
-#ifndef VIOS
-	#ifdef ASVFS_DEBUG
-		#define asvfs_log printf
-	#else
-		#define asvfs_log(...) syslog(LOG_DEBUG, __VA_ARGS__)
-	#endif
-#endif
 
 #ifdef VIOS
 	#include <kmemory.h>
@@ -124,6 +117,7 @@ Block Calculation
 	#define asvfs_realloc krealloc
 	#define asvfs_free kfree
 	#define asvfs_strlen kstrlen
+	#define asvfs_strcmp kstrcmp
 
 	#define asvfs_log(...) klog( LOG_DEBUG, __VA_ARGS__ )
 #else
@@ -133,6 +127,15 @@ Block Calculation
 	#define asvfs_realloc realloc
 	#define asvfs_free free
 	#define asvfs_strlen strlen
+	#define asvfs_strcmp strcmp
+#endif
+
+#ifndef VIOS
+	#ifdef ASVFS_DEBUG
+		#define asvfs_log printf
+	#else
+		#define asvfs_log(...) syslog(LOG_DEBUG, __VA_ARGS__)
+	#endif
 #endif
 
 typedef struct {

@@ -7,13 +7,29 @@
 #include <process.h>
 #include <debug.h>
 
-kernel_proc_data global_proc_data;
+extern kernel_proc_data global_proc_data;
+
+void exit( int status ) {
+	syscall_args args = {
+		.arg_1 = status
+	};
+
+	syscall( SYSCALL_EXIT, 1, &args );
+}
 
 void exit_syscall_handler( registers **context, int return_code ) {
 	klog( LOG_INFO, "Exit pid=%d  ret_code=%d", global_proc_data.current_process->pid, return_code );
 
 	global_proc_data.current_process->exit_code = return_code;
-	global_proc_data.current_process->status = PROCESS_STATUS_DEAD;
+	global_proc_data.current_process->status = PROCESS_STATUS_WAITING_FOR_DEATH;
 
-	syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+	process_data *p_parent = process_get_data_from_pid( global_proc_data.current_process->pid_parent );
+	p_parent->status = PROCESS_STATUS_INACTIVE;
+	p_parent->wait_for_pid = 0;
+
+	process_set_next_up( p_parent );
+
+	klog( LOG_INFO, "Exit syscall now yielding." );
+
+	process_sched_yield( context );
 }

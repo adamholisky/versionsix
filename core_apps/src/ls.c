@@ -27,7 +27,7 @@ int main( int argc, char *argv[] ) {
 
 	vfs_dir *d = vfs_opendir( path );
 	if( d == NULL ) {
-		printf( "Directory not found.\n" );
+		printf( "Directory not found: %s\n", path );
 		return 1;
 	}
 

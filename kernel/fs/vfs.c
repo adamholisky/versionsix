@@ -269,12 +269,10 @@ vfs_dir *vfs_opendir( char *pathname ) {
 		return NULL;
 	}
 
-	vfs_dir *dirp = NULL;
+	vfs_dir *dirp = kmalloc( sizeof(vfs_dir) );
+	dirp->count = 0;
 
-	/* vfs_dir *dirp = kmalloc( sizeof(vfs_dir) );
-	dirp->count = 0; */
-
-	/* int get_dir_list_err = asvfs_get_dir_list_glue( pathname, dirp );
+	int get_dir_list_err = asvfs_get_dir_list_glue( pathname, dirp );
 	if( get_dir_list_err != VFS_ERROR_NONE ) {
 		klog( LOG_ERROR, "asvfs_get_dir_list_glue returned an error: %d", get_dir_list_err );
 
@@ -283,8 +281,7 @@ vfs_dir *vfs_opendir( char *pathname ) {
 	}
 
 	dirp->next = 0;
-	*/
-
+	
 	return dirp;
 }
 

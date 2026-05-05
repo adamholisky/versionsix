@@ -26,7 +26,7 @@ pid_t fork_syscall_handler( registers **context ) {
 	p_child->binary_format_data = p_parent->binary_format_data;
 	p_child->exec_size = p_parent->exec_size;
 	p_child->has_own_addr_space = p_parent->has_own_addr_space;
-	p_child->pid_parent = p_parent->pid;\
+	p_child->pid_parent = p_parent->pid;
 	p_child->first_run = true;
 
 	strcpy( p_child->path, p_parent->path );

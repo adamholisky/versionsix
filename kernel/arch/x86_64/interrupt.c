@@ -142,6 +142,8 @@ void interrupt_handler_stage_2( registers **_reg ) {
 		process_data *p = process_get_current();
 		uint16_t current_pid = p->pid;
 
+		klog_crash( reg->rip, p );
+
 		debugf_raw( "================================================================================\n" );
 		debugf_raw( "Exception %d: %s \n", reg->interrupt_no, intel_exceptions[reg->interrupt_no] );
 		debugf_raw( "    pid:  %d %s\n", current_pid, p->path );

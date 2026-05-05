@@ -64,6 +64,7 @@ void kernel_main( void ) {
 	serial_initalize();
 	debugf( "Versions OS VI Debug Out\n" );
 	debugf( "Build Number: %d\n", BUILD_NUM );
+	klog( LOG_INFO, "---------------------> New Run <---------------------" );
 
 	/* 	debugf( "Kernel stack top:                 0x%016llX\n", &kernel_stack );
 		uint64_t rbp_value;

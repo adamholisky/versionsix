@@ -9,6 +9,7 @@
             ],
             "defines": [
                 "VI_ENV_OS",
+                "KLOG_AVS_DEV_API_OUT",
                 "VIOS",
                 "ENABLE_GUI",
                 "GDBSTUB_X86_64",

@@ -1,5 +1,5 @@
 tui enable
-tui new-layout main {-horizontal { {-horizontal src 3 asm 2} 4 cmd 1 } 5  regs 1 } 1 status 0
+tui new-layout main {-horizontal { {-horizontal src 2 asm 2} 4 regs 1 } 4 cmd 2 } 1 status 0
 set tui border-kind acs
 layout main
 winheight src -5 

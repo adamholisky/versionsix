@@ -64,6 +64,7 @@ char * kdebug_peek_at_n( uint64_t addr, int n );
 char peek_char( char c );
 char * kernel_symbols_get_function_at( uint64_t addr );
 void klog_stage2( int level, char *file_name, char *function_name, int line_number, char * message, ... );
+void klog_crash( uint64_t addr, void *p );
 
 #ifdef __cplusplus
 }

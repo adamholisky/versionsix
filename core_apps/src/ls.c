@@ -11,15 +11,15 @@ int main( int argc, char *argv[] ) {
 	memset( path, 0, 1024 );
 
 	if( argc == 2 ) {
-		strcpy( path, argv[1] );
+		kstrcpy( path, argv[1] );
 	}
 
 	char type_dir[] = "DIR ";
 	char type_file[] = "FILE";
 	char type_unknown[] = "????";
 
-	if( strcmp( path, "" ) == 0 ) {
-		strcpy( path, "/" );
+	if( kstrcmp( path, "" ) == 0 ) {
+		kstrcpy( path, "/" );
 	}
 
 	file_stats st;

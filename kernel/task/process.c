@@ -137,14 +137,7 @@ void process_env_setup( void ) {
 }
 
 void process_exit( int ret_code ) {
-	klog( LOG_INFO, "in exit for pid %d: ret_code=%d", global_proc_data.current_process->pid, ret_code );
-
-	global_proc_data.current_process->exit_code = ret_code;
-	global_proc_data.current_process->status = PROCESS_STATUS_DEAD;
-
-	printf( "DONE\n" );
-
-	syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+	syscall( SYSCALL_EXIT, 0, NULL );
 }
 
 process_data* process_get_data_from_pid( pid_t pid ) {
@@ -237,7 +230,7 @@ int process_sched_yield( registers **context ) {
 				case PROCESS_STATUS_ACTIVE:
 				case PROCESS_STATUS_WAITING:
 				case PROCESS_STATUS_SLEEP:
-					klog( LOG_DEBUG, "Candidate found. pid: %d", p_candidate->pid );
+					//klog( LOG_DEBUG, "Candidate found. pid: %d", p_candidate->pid );
 					next_process_found = true;
 					break;
 				default:
@@ -286,7 +279,7 @@ int process_sched_yield( registers **context ) {
 
 	for( int i = 0; i < PROCESS_DEFAULT_STACK_PAGES; i++ ) {
 		page_map( new_p->proc_stack_virt + (i * PAGE_SIZE), new_p->proc_stack_phys + (i * PAGE_SIZE) );
-		klog( LOG_DEBUG, "[STACK] For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid,  new_p->proc_stack_virt + (i * PAGE_SIZE), new_p->proc_stack_phys + (i * PAGE_SIZE) );
+		//klog( LOG_DEBUG, "[STACK] For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid,  new_p->proc_stack_virt + (i * PAGE_SIZE), new_p->proc_stack_phys + (i * PAGE_SIZE) );
 	}
 
 	if( new_p->first_run ) {
@@ -305,8 +298,10 @@ int process_sched_yield( registers **context ) {
 		(*context)->error_no = 0x6535;
 	} */
 
-	process_diagnostic_context( &new_p->context );
-	klog( LOG_DEBUG, "Out yield. New PID: %d  New RIP=0x%016llX  phys=0x%016llX", new_p->pid, new_p->context.rip, paging_virtual_to_physical( new_p->context.rip ) );
+	//process_diagnostic_context( &new_p->context );
+	//klog( LOG_DEBUG, "Out yield. New PID: %d  New RIP=0x%016llX  phys=0x%016llX", new_p->pid, new_p->context.rip, paging_virtual_to_physical( new_p->context.rip ) );
+	
+	//debugf( "%d", new_p->pid );
 
 	return 0;
 }

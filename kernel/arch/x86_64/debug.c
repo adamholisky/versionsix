@@ -15,6 +15,8 @@
 #include "syscall.h"
 #include "file.h"
 #include <debug.h>
+#include <process.h>
+#include <interrupt.h>
 
 #define KLOG_SERIAL_PORT 0x2F8 // COM2
 
@@ -76,6 +78,24 @@ void klog_stage2( int level, char *file_name, char *function_name, int line_numb
 	kstrncat( klog_buff, end_buff, kstrlen(end_buff) );
 
 	klog_write_str_to_serial_port( klog_buff, kstrlen( klog_buff ) );
+}
+
+void klog_crash( uint64_t addr, void *p ) {
+	process_data *pd = p;
+
+	memset( klog_buff, 0, 4096 );
+	memset( klog_message, 0, 4096 );
+	memset( klog_escaped_str, 0, 4096 );
+	memset( start_buff, 0, 1024 );
+	memset( end_buff, 0, 1024 );
+
+	sprintf( start_buff, "{ \"crash\": { \"address\": \"0x%016llX\", \"path\": \"%s\", \"payload\": \"", addr, pd->path );
+	sprintf( end_buff, "\" } }\n" );
+
+	kstrncpy( klog_buff, start_buff, kstrlen(start_buff) );
+	kstrncat( klog_buff, end_buff, kstrlen(end_buff) );
+
+	klog_write_str_to_serial_port( klog_buff, kstrlen(klog_buff) );
 }
 
 void klog_write_str_to_serial_port( char *s, int len ) {

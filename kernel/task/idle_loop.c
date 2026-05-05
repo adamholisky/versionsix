@@ -17,6 +17,13 @@ void kernel_idle_loop( void ) {
 
 		//klog( LOG_DEBUG, "Idle Count: %d", i );
 
+		if( i > 10000000 ) {
+			i = 0;
+			klog( LOG_DEBUG, "Idle million." );
+		} else {
+			printf( "." );
+		}
+
 		syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 	} while( 1 );
 }

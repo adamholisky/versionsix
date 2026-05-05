@@ -236,14 +236,15 @@ void kshell_main_loop( void ) {
 			
 			pid_t child_pid = (pid_t)syscall( SYSCALL_FORK, 0, NULL );
 
-			printf( "cpid: %d\n", child_pid );
+			printf( "child process id: %d\n", child_pid );
 			if( child_pid == 0 ) {
 				klog( LOG_DEBUG, "In child, execve-ing" );
 				execve( cmd, NULL, NULL );
 			} else {
-				klog( LOG_DEBUG, "In parent, looping" );
+				klog( LOG_DEBUG, "In parent, looping." );
 				// just loop for now
 				while( true ) {
+					printf( "%d", process_get_current_proc_id() );
 					syscall( SYSCALL_SCHED_YIELD, 0, NULL );
 					/* __asm__	__volatile__ ( 
 						"movq %1, %%rax \n"

@@ -7,6 +7,7 @@ extern "C" {
 #include <stdint.h>
 #include <interrupt.h>
 #include <stdbool.h>
+#include <process.h>
 
 #define SYSCALL_READ 0
 #define SYSCALL_WRITE 1
@@ -15,6 +16,8 @@ extern "C" {
 #define SYSCALL_SCHED_YIELD 4
 #define SYSCALL_EXECVE 5
 #define SYSCALL_FORK 6
+#define SYSCALL_EXIT 7
+#define SYSCALL_WAIT 8
 
 typedef struct {
 	uint64_t	arg_1;
@@ -38,6 +41,8 @@ int execve( char *path, char *argv[], char *envp[] );
 
 // Handlers
 int execve_syscall_handler( registers **_context, char *path, char *argv[], char *envp[] );
+void exit_syscall_handler( registers **context, int return_code );
+int wait_syscall_handler( registers **context, pid_t pid );
 
 #ifdef __cplusplus
 }

@@ -5,6 +5,8 @@
 #include <kernel_common.h>
 #include <ksymbols.h>
 #include <device.h>
+#include <serial.h>
+#include <stdlib.h>
 
 bool profiling_ok = false;
 bool profiling_first_call = false;
@@ -222,3 +224,4 @@ void __cyg_profile_func_exit  (void *this_fn, void *call_site) {
 	return;
 }
 #endif
+

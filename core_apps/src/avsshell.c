@@ -6,6 +6,7 @@
 #include <ksymbols.h>
 #include <process.h>
 #include <syscall.h>
+#include <avs_dev_api.h>
 
 #include <avsshell.h>
 
@@ -199,6 +200,14 @@ void kshell_main_loop( void ) {
 		} 
 
 		/* Step 3: See if we have the command in our special kernel list */
+
+		if( kstrcmp( argv_builder[0], "apirun" ) == 0 ) {
+			uint64_t size = 0;
+
+			size = avs_dev_api_get_size( "ls.exec" );
+
+			printf( "Got size back: %ld\n", size );
+		}
 
 		kshell_command_list *head = &kshell_commands;
 		kshell_command *to_run = NULL;

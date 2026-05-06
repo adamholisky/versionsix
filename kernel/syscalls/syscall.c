@@ -86,6 +86,9 @@ void syscall_handler( registers **_context ) {
 			klog( LOG_INFO, "%s%d path=\"%s\"  argv=0x%016llX evnp=0x%016llX", syscall_log_msg_first, context->rax, context->rdi, context->rsi, context->rdx );
 			execve_syscall_handler( _context, context->rdi, context->rsi, context->rdx );
 			break;
+		case SYSCALL_EXECM:
+			execm_syscall_handler( _context, context->rdi, context->rsi, context->rdx );
+			break;
 		case SYSCALL_EXIT:
 			exit_syscall_handler( _context, context->rdi );
 			break;

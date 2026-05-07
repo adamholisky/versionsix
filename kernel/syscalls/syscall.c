@@ -95,6 +95,12 @@ void syscall_handler( registers **_context ) {
 		case SYSCALL_WAIT:
 			wait_syscall_handler( _context, context->rdi );
 			break;
+		case SYSCALL_OPEN:
+			open_syscall_handler( _context, context->rdi, context->rsi, context->rdx );
+			break;
+		case SYSCALL_CLOSE:
+			close_syscall_handler( _context, context->rdi );
+			break;
 		default:
 			debugf( "Unhandled syscall number: %d\n", context->rax );
 	}

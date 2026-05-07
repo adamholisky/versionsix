@@ -11,6 +11,7 @@ extern "C"
 #include <stdbool.h>
 #include <ksymbols.h>
 #include <lib/list.h>
+#include <interrupt.h>
 
 #define KERNEL_PROCESS_ID 0
 #define ROOT_PROCESS_ID 1
@@ -25,6 +26,8 @@ extern "C"
 #define PROCESS_STATUS_SLEEP 4
 #define PROCESS_STATUS_WAITING_FOR_DEATH 5
 #define PROCESS_STATUS_DEAD 6
+
+#define PROCESS_MAX_FDS 25
 
 typedef uint32_t pid_t;
 
@@ -44,6 +47,15 @@ typedef struct {
 } symbol_index;
 
 typedef struct {
+	int id;
+	bool in_use;
+	bool was_used;
+	uint64_t pos;
+	char path[255];
+	int system_fd;
+} fd_process;
+
+typedef struct {
 	pid_t pid;
 	pid_t pid_parent;
 
@@ -53,6 +65,8 @@ typedef struct {
 	registers context;
 	bool first_run;
 	pid_t wait_for_pid;
+
+	fd_process file_descriptors[25];
 
 	void *proc_stack_kvirt;
 	void *proc_stack_virt;
@@ -115,6 +129,7 @@ void process_set_next_up( process_data *p );
 void processes_diagnostic_dump( void );
 void process_diagnostic_context( registers *context );
 
+int process_get_free_fd( process_data *p );
 
 #ifdef __cplusplus
 }

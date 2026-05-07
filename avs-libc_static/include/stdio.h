@@ -43,23 +43,29 @@ struct __sbuf
  * minimal fields allocated.  In __sinit() we really allocate the 3
  * standard streams, etc., and point away from this fake.
  */
-struct __sFILE_fake
-{
-	unsigned char* _p; /* current position in (some) buffer */
-	int _r; /* read space left for getc() */
-	int _w; /* write space left for putc() */
-	short _flags; /* flags, below; this FILE is free if 0 */
-	short _file; /* fileno, if Unix descriptor, else -1 */
-	struct __sbuf _bf; /* the buffer (at least 1 byte, if !NULL) */
-	int _lbfsize; /* 0 or -_bf._size, for inline putc */
+//struct __sFILE_fake
+//{
+//	unsigned char* _p; /* current position in (some) buffer */
+//	int _r; /* read space left for getc() */
+//	int _w; /* write space left for putc() */
+//	short _flags; /* flags, below; this FILE is free if 0 */
+//	short _file; /* fileno, if Unix descriptor, else -1 */
+//	struct __sbuf _bf; /* the buffer (at least 1 byte, if !NULL) */
+//	int _lbfsize; /* 0 or -_bf._size, for inline putc */
+//
+//	struct _reent* _data;
+//};
 
-	struct _reent* _data;
-};
+//#if !defined(__FILE_defined)
+//typedef struct __sFILE_fake FILE;
+//#define __FILE_defined
+//#endif
 
-#if !defined(__FILE_defined)
-typedef struct __sFILE_fake FILE;
-#define __FILE_defined
-#endif
+typedef struct {
+	int fd;
+	int mode;
+	unsigned char *pos;
+} FILE;
 
 #pragma mark - Supported Functions -
 

@@ -49,7 +49,7 @@ CFLAGS = $(DEFINES) -Wno-write-strings \
 	-O0 \
 	-g \
 	-I$(ROOT_DIR)/kernel/include \
-	-I$(ROOT_DIR)/vi_klibc_static/include \
+	-I$(ROOT_DIR)/avs-libc_static/include \
     -m64                 \
     -march=x86-64        \
     -mabi=sysv           \
@@ -84,7 +84,7 @@ OBJECTS_ASMS = $(patsubst %.S, build/%.o, $(shell ls kernel/**/*.S | xargs -n 1 
 all: install
 
 build/versionvi.bin: increment_build_number $(OBJECTS_C) $(OBJECTS_ASMS)
-	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/linker.ld -o build/versionvi.bin vi_klibc_static/vklibc.o $(OBJECTS_C) $(OBJECTS_ASMS)
+	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/linker.ld -o build/versionvi.bin avs-libc_static/avslibc.o $(OBJECTS_C) $(OBJECTS_ASMS)
 	readelf -W -a build/versionvi.bin > logs/elfdump.txt
 	@>&2 $(call echo_tag_green,Build, Done making version $(BUILD_NUMBER))
 

@@ -39,6 +39,8 @@ int vfs_initalize( void ) {
 	strcpy( root_mount_point.fs_type, "UNSET" );
 	root_mount_point.root[0] = '/';
 
+	vfs_fd_setup();
+
 	// vfs_cache_initalize();
 
 	return VFS_ERROR_NONE;
@@ -338,4 +340,42 @@ void vfs_dump_mount_points( void ) {
 
 		printf( "Mount point %d:    root=%s    type=%s\n", i, mp->root, mp->fs_type );
 	}
+}
+
+/** File Descriptors */
+
+
+
+vfs_fd global_fds[FD_SYSTEM_MAX];
+
+void vfs_fd_setup( void ) {
+	memset( &global_fds, 0, sizeof(vfs_fd) * FD_SYSTEM_MAX );
+
+	for( int i = 0; i < FD_SYSTEM_MAX; i++ ) {
+		global_fds[i].id = i;
+	}
+}
+
+vfs_fd *vfs_get_unused_fd( void ) {
+	vfs_fd *fd_free = NULL;
+
+	for( int i = 0; i < FD_SYSTEM_MAX; i++ ) {
+		if( global_fds[i].in_use == false ) {
+			fd_free = &global_fds[i];
+		}
+	}
+
+	return fd_free;
+}
+
+vfs_fd *vfs_get_fd_data( int fd ) {
+	if( fd >= FD_SYSTEM_MAX ) {
+		return NULL;
+	}
+
+	if( fd < 0 ) {
+		return NULL;
+	}
+
+	return &global_fds[fd];
 }

@@ -3,6 +3,8 @@
 
 #include <_types/_ptrdiff_t.h>
 #include <_types/_size_t.h>
+#include <_types/_uint16_t.h>
+#include <_types/_uint32_t.h>
 
 #pragma mark - NULL -
 
@@ -35,5 +37,12 @@
 /*! A type with alignment requirement as great as any other scalar type  */
 typedef long double max_align_t;
 #endif
+
+#ifndef MODE_T_DEFINED
+	#define MODE_T_DEFINED
+	typedef uint32_t mode_t;
+#endif
+
+typedef uint16_t umode_t;
 
 #endif // STDDEF_H_

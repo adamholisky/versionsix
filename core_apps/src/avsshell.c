@@ -199,15 +199,9 @@ void kshell_main_loop( void ) {
 			argv_builder[z] = args[z];
 		} 
 
+		argv_builder[num_args] = 0;
+
 		/* Step 3: See if we have the command in our special kernel list */
-
-		if( kstrcmp( argv_builder[0], "apirun" ) == 0 ) {
-			uint64_t size = 0;
-
-			size = avs_dev_api_get_size( "ls.exec" );
-
-			printf( "Got size back: %ld\n", size );
-		}
 
 		kshell_command_list *head = &kshell_commands;
 		kshell_command *to_run = NULL;
@@ -248,7 +242,7 @@ void kshell_main_loop( void ) {
 			//printf( "child process id: %d\n", child_pid );
 			if( child_pid == 0 ) {
 				//klog( LOG_DEBUG, "In child, execve-ing" );
-				execve( cmd, NULL, NULL );
+				execve( cmd, argv_builder, NULL );
 			} else {
 				//klog( LOG_DEBUG, "In parent, waiting for child process to exit." );
 				

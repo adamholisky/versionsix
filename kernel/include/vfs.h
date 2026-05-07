@@ -12,6 +12,7 @@ extern "C"
 
 #include <fs.h>
 #include <lib/list.h>
+#include <process.h>
 
 typedef uint64_t inode_id;
 
@@ -151,7 +152,11 @@ typedef struct {
 } vfs_directory_item;
 
 
-
+typedef struct {
+	int id;
+	char *path;
+	pid_t owner;
+} vfs_fd_entry;
 
 /**
  * @brief Stat structure, representing a file
@@ -209,6 +214,20 @@ typedef struct {
 	vfs_cache_item *tail;
 } vfs_cache_list;
 
+/** VFS File Descriptors
+ * 
+ */
+
+#define FD_SYSTEM_MAX 255
+
+typedef struct {
+	int id;
+	bool in_use;
+	uint64_t inode_id;
+	int process_fd;
+	int ref_count;
+} vfs_fd;
+
 // Initalizations
 int vfs_initalize( void );
 vfs_filesystem* vfs_register_fs( char* fs_name, vfs_operations* fs_ops );
@@ -237,6 +256,9 @@ uint8_t *vfs_disk_write_no_cache( uint64_t drive, uint8_t *buff, size_t size, of
 
 void vfs_dump_mount_points( void );
 
+void vfs_fd_setup( void );
+vfs_fd *vfs_get_unused_fd( void );
+vfs_fd *vfs_get_fd_data( int fd );
 
 /* // File system management
 int vfs_register_fs( vfs_filesystem **fs );

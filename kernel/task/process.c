@@ -103,6 +103,10 @@ pid_t process_get_new_process( void ) {
 	p->status = PROCESS_STATUS_IN_SETUP;
 	p->first_run = true;
 
+	for( int i = 0; i < PROCESS_MAX_FDS; i++ ) {
+		p->file_descriptors[i].id = i;
+	}
+
 	avs_list_append( global_proc_data.process_list, p );
 
 	//klog( LOG_INFO, "Created new process. pid=%d", p->pid );
@@ -353,4 +357,17 @@ void process_diagnostic_context( registers *context ) {
 	printf( "    cs:   0x%04X  num:  0x%08X  err:  0x%08X  flag: 0x%08X\n", reg->cs, 0, 0, reg->rflags);
 	printf( "================================================================================\n" );
 	printf( "\n" );
+}
+
+int process_get_free_fd( process_data *p ) {
+	int res = 0;
+
+	for( int i = 0; i < PROCESS_MAX_FDS; i++ ) {
+		if( p->file_descriptors[i].in_use == false ) { 
+			res = i;
+			break;
+		}
+	}
+
+	return res;
 }

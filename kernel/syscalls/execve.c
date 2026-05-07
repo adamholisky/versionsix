@@ -60,6 +60,38 @@ int execve_syscall_handler( registers **_context, char *path, char *argv[], char
 	// Load ELF information
 	int loadelf_err = elf_loader_load( p, buff );
 
+		// Handle argc, argv setup
+	int argc = 0;
+
+	printf( "argv: 0x%016llX\n", argv );
+
+	if( argv != NULL ) {
+		for( bool keep_going = true; keep_going == true ; ) {
+			if( argv[argc] == 0 ) {
+				keep_going = false;
+			} else {
+				argc++;
+			}
+		}
+
+		if( argc == 20 ) { argc = 0; }
+	}
+	
+
+	printf( "argc: %d\n", argc );
+
+	// reconstruct argv, ensuring it's not located in unaccessible pages to the child process
+	char **argv_new = kmalloc( argc * sizeof(char *) );
+	
+	for( int i = 0; i < argc; i++ ) {
+		argv_new[i] = kmalloc( kstrlen(argv[i]) );
+		kstrcpy( argv_new[i], argv[i] );
+
+		printf( "argv_n[%d] = 0x%016llX, \"%s\"\n", i, argv_new[i], argv_new[i] );
+	}
+
+	
+
 	// Stack setup
 	p->proc_stack_virt = 0x00000000A0000000;
 	p->proc_stack_kvirt= page_allocate_kernel( PROCESS_DEFAULT_STACK_PAGES );
@@ -90,6 +122,8 @@ int execve_syscall_handler( registers **_context, char *path, char *argv[], char
 	p->context.cs = 0x28;
 	p->context.rflags = 0x200;
 	p->context.ss = 0x30;
+	p->context.rdi = argc;
+	p->context.rsi = argv_new;
 
 	// Final setup
 	p->status = PROCESS_STATUS_ACTIVE;

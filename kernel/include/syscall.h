@@ -20,6 +20,8 @@ extern "C" {
 #define SYSCALL_WAIT 8
 #define SYSCALL_EXECM 9
 
+typedef uint16_t umode_t;
+
 typedef struct {
 	uint64_t	arg_1;
 	uint64_t	arg_2;
@@ -38,17 +40,23 @@ void syscall_handler( registers **_context );
 
 // Glue
 
+int close( int fd );
 int execve( char *path, char *argv[], char *envp[] );
 int execm( void *exec_data, char *argv[], char *envp[] );
 void exit( int status );
+int open( const char *path, int flags );
 pid_t wait( pid_t pid );
 size_t write( int fd, void *buff, size_t count );
+size_t read( int fd, void *buf, size_t count );
 
 // Handlers
+int close_syscall_handler( registers **context, int fd );
 int execve_syscall_handler( registers **_context, char *path, char *argv[], char *envp[] );
 int execm_syscall_handler( registers **_context, void *exec_data, char *argv[], char *envp[] );
 void exit_syscall_handler( registers **context, int return_code );
+int open_syscall_handler( registers **context, const char *path, int flags, umode_t mode  );
 int wait_syscall_handler( registers **context, pid_t pid );
+int read_syscall_handler( registers **context, int fd, void *buf, size_t count );
 
 #ifdef __cplusplus
 }

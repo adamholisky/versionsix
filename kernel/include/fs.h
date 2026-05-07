@@ -8,8 +8,12 @@ extern "C"
 
 #include <unistd.h>
 
-typedef uint32_t mode_t;
-typedef mode_t __mode_t;
+#ifndef MODE_T_DEFINED
+	#define MODE_T_DEFINED
+	typedef uint32_t mode_t;
+	typedef mode_t __mode_t;
+#endif
+
 typedef int __dev_t;
 typedef uint32_t __ino_t;
 typedef int __nlink_t;

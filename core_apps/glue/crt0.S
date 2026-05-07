@@ -6,12 +6,7 @@ _start:
 	pushq %rbp
 	pushq %rbp
 	movq %rsp, %rbp
-
-	call process_env_setup
-
-	popq %rdi
-	popq %rsi
-
+	
 	call main
 
 	movl %eax, %edi

@@ -1,5 +1,8 @@
 #include <kernel_common.h>
 #include <syscall.h>
+#include <vfs.h>
+
+extern kernel_proc_data global_proc_data;
 
 size_t read( int fd, void *buf, size_t count ) {
 	syscall_args args = {
@@ -13,5 +16,20 @@ size_t read( int fd, void *buf, size_t count ) {
 
 
 int read_syscall_handler( registers **context, int fd, void *buf, size_t count ) {
+	if( fd < 0 ) {
+		klog( "fd out of bounds: %d", fd );
+		return -1;
+	}
 
+	if( fd >= PROCESS_MAX_FDS ) {
+		klog( "fd out of bounds: %d", fd );
+		return -1;
+	}
+
+	if( !global_proc_data.current_process->file_descriptors[fd].in_use ) {
+		klog( "fd not in use: %d", fd );
+		return -1;
+	}
+
+	return vfs_read( global_proc_data.current_process->file_descriptors[fd].path, buf, count, global_proc_data.current_process->file_descriptors[fd].pos );
 }

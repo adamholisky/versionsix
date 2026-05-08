@@ -1,6 +1,7 @@
 #include <kernel_common.h>
 #include <syscall.h>
 #include <vfs.h>
+#include <keyboard.h>
 
 extern kernel_proc_data global_proc_data;
 
@@ -16,6 +17,8 @@ size_t read( int fd, void *buf, size_t count ) {
 
 
 int read_syscall_handler( registers **context, int fd, void *buf, size_t count ) {
+	int ret_val = 0;
+
 	if( fd < 0 ) {
 		klog( "fd out of bounds: %d", fd );
 		return -1;
@@ -31,5 +34,15 @@ int read_syscall_handler( registers **context, int fd, void *buf, size_t count )
 		return -1;
 	}
 
-	return vfs_read( global_proc_data.current_process->file_descriptors[fd].path, buf, count, global_proc_data.current_process->file_descriptors[fd].pos );
+	if( fd == STDIN_FILENO ) {
+		uint8_t scancode = keyboard_get_scancode();
+		char c = keyboard_scancode_to_char( scancode );
+
+		*(char *)buf = c;
+		ret_val = 1;
+	} else {
+		ret_val = vfs_read( global_proc_data.current_process->file_descriptors[fd].path, buf, count, global_proc_data.current_process->file_descriptors[fd].pos );
+	}
+
+	return ret_val;
 }

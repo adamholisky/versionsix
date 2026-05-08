@@ -177,7 +177,7 @@ void debugf_stage2( char * message, ... ) {
 	len = vsnprintf( debugf_buff, 1024, message, args ); 
 	va_end( args );
 
-    write( FD_STDERR, debugf_buff, len );
+    kwrite( FD_STDERR, debugf_buff, len );
 }
 
 void do_divide_by_zero( void ) {

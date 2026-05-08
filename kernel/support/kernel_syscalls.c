@@ -4,23 +4,12 @@
 #include "file.h"
 #include "serial.h"
 #include <device.h>
-#include <kernel_common.h>
 
 extern void main_console_putc( char c );
 
-device *stderr_dev = NULL;
+extern device *stderr_dev;
 
-size_t write( int fd, void *buff, size_t count ) {
-	syscall_args args = {
-		.arg_1 = fd,
-		.arg_2 = buff,
-		.arg_3 = count
-	};
-
-	return syscall( SYSCALL_WRITE, 3, &args );
-}
-
-void write_syscall_handler( registers **context, int fd, void *buff, size_t count ) {
+size_t kwrite(int fd, void *buff, size_t count) {
 	char *char_buff = (char *)buff;
 	char *char_buff_end = (char *)buff + count;
 
@@ -29,7 +18,9 @@ void write_syscall_handler( registers **context, int fd, void *buff, size_t coun
 			main_console_putc( *char_buff );
 			char_buff++;
 		}
-	} else if (fd == FD_STDERR) {
+	}
+
+	if (fd == FD_STDERR) {
 		if( stderr_dev == NULL ) {
 			if( devices_setup() ) {
 				stderr_dev = device_get_major_minor_device( "stderr", "0" );
@@ -46,7 +37,5 @@ void write_syscall_handler( registers **context, int fd, void *buff, size_t coun
 				char_buff++;
 			}
 		}
-	} else {
-		klog( LOG_ERROR, "Unimplemented write fd: %d", fd );
 	}
 }

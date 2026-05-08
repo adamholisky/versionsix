@@ -39,7 +39,7 @@ void kputc( char c ) {
 }
 
 void term_put_char( char c ) {
-    write( FD_STDOUT, &c, 1 );
+    kwrite( FD_STDOUT, &c, 1 );
 }
 
 void delay( uint32_t count ) {
@@ -75,9 +75,9 @@ int vios_fprintf( int dest, char *message, ... ) {
 	va_end( args );
 
 	if( dest == vios_stderr ) {
-		write( FD_STDERR, buff, len );
+		kwrite( FD_STDERR, buff, len );
 	} else if( dest == vios_stdout ) {
-		write( FD_STDOUT, buff, len );
+		kwrite( FD_STDOUT, buff, len );
 	}
 }
 

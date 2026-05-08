@@ -37,6 +37,7 @@ uint64_t syscall( uint64_t call_num, uint8_t num_args, syscall_args *args );
 // Kernel facing
 void syscall_initalize( void );
 void syscall_handler( registers **_context );
+size_t kwrite( int fd, void *buff, size_t count );
 
 // Glue
 
@@ -57,6 +58,7 @@ void exit_syscall_handler( registers **context, int return_code );
 int open_syscall_handler( registers **context, const char *path, int flags, umode_t mode  );
 int wait_syscall_handler( registers **context, pid_t pid );
 int read_syscall_handler( registers **context, int fd, void *buf, size_t count );
+void write_syscall_handler( registers **context, int fd, void *buff, size_t count );
 
 #ifdef __cplusplus
 }

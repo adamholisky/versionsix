@@ -3,20 +3,20 @@
 #include <devices/stdout.h>
 #include <keyboard.h>
 
-device stdout;
+device d_stdout;
 
 void device_register_stdout( void ) {
-	memset( &stdout, 0, sizeof(device) );
+	memset( &d_stdout, 0, sizeof(device) );
 
-	strcpy( stdout.major_id, "stdout" );
-	strcpy( stdout.minor_id, "0" );
+	strcpy( d_stdout.major_id, "stdout" );
+	strcpy( d_stdout.minor_id, "0" );
 
-	stdout.close = stdout_close;
-	stdout.open = stdout_open;
-	stdout.read = stdout_read;
-	stdout.write = stdout_write;
+	d_stdout.close = stdout_close;
+	d_stdout.open = stdout_open;
+	d_stdout.read = stdout_read;
+	d_stdout.write = stdout_write;
 
-	device_register( &stdout );
+	device_register( &d_stdout );
 }
 
 void stdout_close( inode_id id ) {

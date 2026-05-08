@@ -7,6 +7,7 @@ extern "C"
 #endif
 
 #include <unistd.h>
+#include <stdint.h>
 
 #ifndef MODE_T_DEFINED
 	#define MODE_T_DEFINED

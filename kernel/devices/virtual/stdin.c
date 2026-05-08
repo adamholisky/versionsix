@@ -3,20 +3,20 @@
 #include <devices/stdin.h>
 #include <keyboard.h>
 
-device stdin;
+device d_stdin;
 
 void device_register_stdin( void ) {
-	memset( &stdin, 0, sizeof(device) );
+	memset( &d_stdin, 0, sizeof(device) );
 
-	strcpy( stdin.major_id, "stdin" );
-	strcpy( stdin.minor_id, "0" );
+	strcpy( d_stdin.major_id, "stdin" );
+	strcpy( d_stdin.minor_id, "0" );
 
-	stdin.close = stdin_close;
-	stdin.open = stdin_open;
-	stdin.read = stdin_read;
-	stdin.write = stdin_write;
+	d_stdin.close = stdin_close;
+	d_stdin.open = stdin_open;
+	d_stdin.read = stdin_read;
+	d_stdin.write = stdin_write;
 
-	device_register( &stdin );
+	device_register( &d_stdin );
 }
 
 void stdin_close( inode_id id ) {

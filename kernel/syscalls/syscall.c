@@ -107,6 +107,9 @@ void syscall_handler( registers **_context ) {
 		case SYSCALL_WRITE:
 			write_syscall_handler( _context, context->rdi, context->rsi, context->rdx );
 			break;
+		case SYSCALL_STATFS:
+			statfs_syscall_handler( _context, context->rdi, context->rsi );
+			break;
 		default:
 			debugf( "Unhandled syscall number: %d\n", context->rax );
 	}

@@ -107,6 +107,15 @@ pid_t process_get_new_process( void ) {
 		p->file_descriptors[i].id = i;
 	}
 
+	p->file_descriptors[ STDIN_FILENO ].in_use = true;
+	strcpy( p->file_descriptors[ STDIN_FILENO ].path, "/dev/stdin" );
+
+	p->file_descriptors[ STDOUT_FILENO ].in_use = true;
+	strcpy( p->file_descriptors[ STDOUT_FILENO ].path, "/dev/stdout" );
+
+	p->file_descriptors[ STDERR_FILENO ].in_use = true;
+	strcpy( p->file_descriptors[ STDERR_FILENO ].path, "/dev/stderr" );
+
 	avs_list_append( global_proc_data.process_list, p );
 
 	//klog( LOG_INFO, "Created new process. pid=%d", p->pid );

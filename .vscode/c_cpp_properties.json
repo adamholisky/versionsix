@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/usr/local/osdev/source/versionsix/kernel/include",
-                "/usr/local/osdev/source/versionsix/vi_klibc_static/include"
+                "/usr/local/osdev/source/versionsix/avs-libc_static/include"
             ],
             "defines": [
                 "VI_ENV_OS",
@@ -13,7 +13,8 @@
                 "VIOS",
                 "ENABLE_GUI",
                 "GDBSTUB_X86_64",
-                "GDBSTUB_IMPLEMENTATION"
+                "GDBSTUB_IMPLEMENTATION",
+                "AVSOS_KERNEL"
             ],
             "compilerPath": "/usr/local/osdev/bin/x86_64-elf-g++",
             "cStandard": "c17",

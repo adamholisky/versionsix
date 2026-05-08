@@ -2,20 +2,20 @@
 #include <device.h>
 #include <devices/stderr.h>
 
-device stderr;
+device d_stderr;
 
 void device_register_stderr( void ) {
-	memset( &stderr, 0, sizeof(device) );
+	memset( &d_stderr, 0, sizeof(device) );
 
-	strcpy( stderr.major_id, "stderr" );
-	strcpy( stderr.minor_id, "0" );
+	strcpy( d_stderr.major_id, "stderr" );
+	strcpy( d_stderr.minor_id, "0" );
 
-	stderr.close = stderr_close;
-	stderr.open = stderr_open;
-	stderr.read = stderr_read;
-	stderr.write = stderr_write;
+	d_stderr.close = stderr_close;
+	d_stderr.open = stderr_open;
+	d_stderr.read = stderr_read;
+	d_stderr.write = stderr_write;
 
-	device_register( &stderr );
+	device_register( &d_stderr );
 }
 
 void stderr_close( inode_id id ) {

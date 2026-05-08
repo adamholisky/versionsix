@@ -8,6 +8,7 @@ extern "C" {
 #include <interrupt.h>
 #include <stdbool.h>
 #include <process.h>
+#include <fs.h>
 
 #define SYSCALL_READ 0
 #define SYSCALL_WRITE 1
@@ -19,6 +20,7 @@ extern "C" {
 #define SYSCALL_EXIT 7
 #define SYSCALL_WAIT 8
 #define SYSCALL_EXECM 9
+#define SYSCALL_STATFS 10
 
 typedef uint16_t umode_t;
 
@@ -46,9 +48,11 @@ int execve( char *path, char *argv[], char *envp[] );
 int execm( void *exec_data, char *argv[], char *envp[] );
 void exit( int status );
 int open( const char *path, int flags );
+size_t read( int fd, void *buf, size_t count );
+int statfs( const char *path, struct stat *statbuf );
 pid_t wait( pid_t pid );
 size_t write( int fd, void *buff, size_t count );
-size_t read( int fd, void *buf, size_t count );
+
 
 // Handlers
 int close_syscall_handler( registers **context, int fd );
@@ -58,6 +62,7 @@ void exit_syscall_handler( registers **context, int return_code );
 int open_syscall_handler( registers **context, const char *path, int flags, umode_t mode  );
 int wait_syscall_handler( registers **context, pid_t pid );
 int read_syscall_handler( registers **context, int fd, void *buf, size_t count );
+int statfs_syscall_handler( registers **context, const char *path, struct stat *statbuf );
 void write_syscall_handler( registers **context, int fd, void *buff, size_t count );
 
 #ifdef __cplusplus

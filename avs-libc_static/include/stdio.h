@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <wctype.h> //TODO: eliminate need for this header here (refactor types?)
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,6 +22,14 @@ extern "C" {
 
 #undef EOF
 #define EOF (-1)
+
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
+
+#define STDERR_FILENO 2
+#define STDIN_FILENO 0
+#define STDOUT_FILENO 1
 
 typedef union _G_fpos64_t
 {
@@ -61,11 +70,75 @@ struct __sbuf
 //#define __FILE_defined
 //#endif
 
+typedef int __dev_t;
+typedef uint32_t __ino_t;
+typedef int __nlink_t;
+typedef int __uid_t;
+typedef int __gid_t;
+typedef int __blksize_t;
+typedef uint32_t __off_t;
+typedef int __blkcnt_t;
+//typedef uint32_t __time_t;
+typedef uint32_t __syscall_ulong_t;
+
+#define dev_t __dev_t
+#define off_t __off_t
+#define ino_t __ino_t
+#define nlink_t __nlink_t
+#define uid_t __uid_t
+#define gid_t __gid_t
+#define blksize_t __blksize_t
+#define blkcnt_t __blkcnt_t
+//#define time_t __time_t
+#define syscall_ulong_t __syscall_ulong_t
+
+#ifndef AVSOS_KERNEL
+	struct stat {
+		dev_t st_dev;		/* Device.  */
+		ino_t st_ino;		/* File serial number.	*/
+		mode_t st_mode;			/* File mode.  */
+		nlink_t st_nlink;			/* Link count.  */
+		uid_t st_uid;		/* User ID of the file's owner.	*/
+		gid_t st_gid;		/* Group ID of the file's group.*/
+		dev_t st_rdev;		/* Device number, if device.  */
+		off_t st_size;			/* Size of file, in bytes.  */
+		blksize_t st_blksize;	/* Optimal block size for I/O.  */
+		blkcnt_t st_blocks;		/* Number 512-byte blocks allocated. */
+		uint32_t st_atime;			/* Time of last access.  */
+		syscall_ulong_t st_atimensec;	/* Nscecs of last access.  */
+		uint32_t st_mtime;			/* Time of last modification.  */
+		syscall_ulong_t st_mtimensec;	/* Nsecs of last modification.  */
+		uint32_t st_ctime;			/* Time of last status change.  */
+		syscall_ulong_t st_ctimensec;	/* Nsecs of last status change.  */
+
+		unsigned char type;
+	};
+#else
+	#include <fs.h>
+#endif
+
 typedef struct {
 	int fd;
 	int mode;
-	unsigned char *pos;
+	long pos;
+	int error_num;
+	bool in_use;
+	size_t size;
+	char pathname[255];
+	uint32_t pid;
 } FILE;
+
+FILE *libc_internal_get_new_file_handle( void );
+
+extern FILE *stdin;
+extern FILE *stdout;
+extern FILE *stderr;
+
+size_t fread( void *ptr, size_t size, size_t nmemb, FILE *fh );
+size_t fwrite( const void *ptr, size_t size, size_t nmemb, FILE *fh );
+int fprintf(FILE* __restrict, const char* __restrict, ...);
+int fstat( int fd, struct stat *statbuf );
+
 
 #pragma mark - Supported Functions -
 
@@ -162,7 +235,6 @@ int vprintf(const char* __restrict, __isoc_va_list);
 void perror(const char*);
 
 int wprintf(const wchar_t* __restrict, ...);
-int fprintf(FILE* __restrict, const char* __restrict, ...);
 int vfprintf(FILE* __restrict, const char* __restrict, __isoc_va_list);
 int vsprintf(char* __restrict, const char* __restrict, __isoc_va_list);
 int fwprintf(FILE* __restrict, const wchar_t* __restrict, ...);

@@ -156,6 +156,7 @@ typedef struct {
 	int id;
 	char *path;
 	pid_t owner;
+	size_t size_at_open;
 } vfs_fd_entry;
 
 /**

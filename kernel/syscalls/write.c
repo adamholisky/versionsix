@@ -47,6 +47,7 @@ void write_syscall_handler( registers **context, int fd, void *buff, size_t coun
 			}
 		}
 	} else {
-		klog( LOG_ERROR, "Unimplemented write fd: %d", fd );
+		klog( LOG_ERROR, "Unimplemented write destination. FD=%d   buff=0x%011llX  count=%d", fd, buff, count );
+		klog( LOG_ERROR, "\'%s\'", buff );
 	}
 }

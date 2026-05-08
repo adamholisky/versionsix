@@ -9,6 +9,15 @@ extern "C"
 
 #include <stdint.h>
 
+#define WANT_ROUNDING 1
+
+#define NAN       (0.0f/0.0f)
+#define INFINITY  1e5000f
+
+#define HUGE_VALF INFINITY
+#define HUGE_VAL  ((double)INFINITY)
+#define HUGE_VALL ((long double)INFINITY)
+
 #define FP_ILOGBNAN (-1-0x7fffffff)
 #define FP_ILOGB0 FP_ILOGBNAN
 
@@ -123,6 +132,23 @@ double __math_xflow(uint32_t sign, double y);
 double __math_uflow(uint32_t sign);
 double __math_oflow(uint32_t sign);
 double pow(double x, double y);
+double ldexp(double x, int exp);
+double frexp(double x, int *e);
+double fmod(double x, double y);
+double exp(double x);
+double scalbn(double x, int n);
+int __rem_pio2_large(double *x, double *y, int e0, int nx, int prec);
+int __rem_pio2(double x, double *y);
+double atan(double x);
+double asin(double x);
+double cos(double x);
+double sin(double x);
+double atan2(double y, double x);
+double acos(double x);
+double tan(double x);
+double sqrt(double x);
+double log2(double x);
+double log10(double x);
 
 
 #define asuint(f) ((union{float _f; uint32_t _i;}){f})._i
@@ -152,6 +178,43 @@ static inline double fp_barrier(double x)
 	return y;
 }
 
+#define EXTRACT_WORDS(hi,lo,d)                    \
+do {                                              \
+  uint64_t __u = asuint64(d);                     \
+  (hi) = __u >> 32;                               \
+  (lo) = (uint32_t)__u;                           \
+} while (0)
+
+#define GET_HIGH_WORD(hi,d)                       \
+do {                                              \
+  (hi) = asuint64(d) >> 32;                       \
+} while (0)
+
+#define GET_LOW_WORD(lo,d)                        \
+do {                                              \
+  (lo) = (uint32_t)asuint64(d);                   \
+} while (0)
+
+#define INSERT_WORDS(d,hi,lo)                     \
+do {                                              \
+  (d) = asdouble(((uint64_t)(hi)<<32) | (uint32_t)(lo)); \
+} while (0)
+
+#define SET_HIGH_WORD(d,hi)                       \
+  INSERT_WORDS(d, hi, (uint32_t)asuint64(d))
+
+#define SET_LOW_WORD(d,lo)                        \
+  INSERT_WORDS(d, asuint64(d)>>32, lo)
+
+#define GET_FLOAT_WORD(w,d)                       \
+do {                                              \
+  (w) = asuint(d);                                \
+} while (0)
+
+#define SET_FLOAT_WORD(d,w)                       \
+do {                                              \
+  (d) = asfloat(w);                               \
+} while (0)
 
 
 #define WANT_ROUNDING 1

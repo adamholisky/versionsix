@@ -6,7 +6,7 @@
 #include <_types/_uint16_t.h>
 #include <_types/_uint32_t.h>
 
-#pragma mark - NULL -
+// #pragma mark - NULL -
 
 #ifdef __cplusplus
 /*! Expands to 0L (for C++). Implementation-defined null pointer constant  */
@@ -17,7 +17,7 @@
 #define NULL ((void*)0)
 #endif
 
-#pragma mark - offsetof -
+// #pragma mark - offsetof -
 
 #if __GNUC__ > 3
 
@@ -29,7 +29,7 @@
 #define offsetof(type, member) ((size_t)((char*)&(((type*)0)->member) - (char*)0))
 #endif
 
-#pragma mark - max_align_t -
+// #pragma mark - max_align_t -
 
 #if(defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || \
 	(defined(__cplusplus) && __cplusplus >= 201103L)

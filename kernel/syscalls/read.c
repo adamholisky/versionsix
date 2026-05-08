@@ -35,11 +35,20 @@ int read_syscall_handler( registers **context, int fd, void *buf, size_t count )
 	}
 
 	if( fd == STDIN_FILENO ) {
-		uint8_t scancode = keyboard_get_scancode();
-		char c = keyboard_scancode_to_char( scancode );
+		char *s = (char *)buf;
 
-		*(char *)buf = c;
-		ret_val = 1;
+		for( int i = 0; i < count; i++ ) {
+			uint8_t scancode = keyboard_get_scancode();
+			char c = keyboard_scancode_to_char( scancode );
+
+			s[i] = c;
+
+			ret_val = i;
+
+			if( c == '\n' ) {
+				break;
+			}
+		}
 	} else {
 		ret_val = vfs_read( global_proc_data.current_process->file_descriptors[fd].path, buf, count, global_proc_data.current_process->file_descriptors[fd].pos );
 	}

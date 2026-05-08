@@ -9,20 +9,20 @@ extern "C" {
 #include <stdint.h>
 #include <wctype.h>
 
-#pragma mark - Definitions -
+// #pragma mark - Definitions -
 
 typedef struct
 {
 	unsigned __opaque1, __opaque2;
 } mbstate_t;
 
-#pragma mark - Supported APIs -
+// #pragma mark - Supported APIs -
 
 int wcwidth(wchar_t);
 int wcswidth(const wchar_t*, size_t);
 wchar_t* wcschr(const wchar_t*, wchar_t);
 
-#pragma mark - Unspported API -
+// #pragma mark - Unspported API -
 
 #ifndef DISABLE_UNIMPLEMENTED_LIBC_APIS
 wint_t btowc(int);

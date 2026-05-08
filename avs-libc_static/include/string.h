@@ -8,7 +8,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-#pragma mark - memory -
+// #pragma mark - memory -
 
 /**
  * @brief Compares the first n characters of the two objects pointed to by s1 and s2.
@@ -110,7 +110,7 @@ void* memchr(const void* s, int c, size_t n);
  * */
 void* memmem(const void* l, size_t l_len, const void* s, size_t s_len);
 
-#pragma mark - string -
+// #pragma mark - string -
 
 /**
  * @brief Returns the length of the given null-terminated byte string.

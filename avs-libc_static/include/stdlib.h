@@ -9,7 +9,7 @@
 extern "C" {
 #endif //__cplusplus
 
-#pragma mark - definitions & types -
+// #pragma mark - definitions & types -
 
 /// Division type for integers
 typedef struct
@@ -47,8 +47,6 @@ typedef struct
 /// We are faking this for now, since we don't provide locale support.
 #define MB_CUR_MAX sizeof(wchar_t)
 
-#pragma mark - runtime -
-
 // TODO
 
 void abort(void) __attribute__((noreturn));
@@ -75,8 +73,6 @@ char* getenv(const char*);
 int system(const char*);
 #endif
 
-#pragma mark - Multibyte APIs -
-
 #ifndef DISABLE_UNIMPLEMENTED_LIBC_APIS
 int mblen(const char*, size_t);
 int mbtowc(wchar_t* __restrict, const char* __restrict, size_t);
@@ -85,7 +81,6 @@ size_t mbstowcs(wchar_t* __restrict, const char* __restrict, size_t);
 size_t wcstombs(char* __restrict, const wchar_t* __restrict, size_t);
 #endif
 
-#pragma mark - ascii-to-x -
 
 /**
  * @brief Interprets an integer value in a byte string pointed to by str.
@@ -165,7 +160,6 @@ long long atoll(const char* str);
  * */
 double atof(const char* str);
 
-#pragma mark - str-to-x -
 
 /**
  * @brief Interprets a floating-point value in a byte string pointed to by str.
@@ -429,7 +423,7 @@ unsigned long long strtoull(const char* __restrict str, char** __restrict str_en
 // TODO:
 long double strtold(const char* __restrict, char** __restrict);
 
-#pragma mark - math -
+// #pragma mark - math -
 
 /**
  * @brief Computes the absolute value of an integer number.
@@ -531,7 +525,7 @@ ldiv_t ldiv(long x, long y);
  * */
 lldiv_t lldiv(long long x, long long y);
 
-#pragma mark - random number generation -
+// #pragma mark - random number generation -
 
 int rand_r(unsigned int* ctx);
 
@@ -565,7 +559,7 @@ int rand(void);
  * */
 void srand(unsigned seed);
 
-#pragma mark - sorting -
+// #pragma mark - sorting -
 
 /**
  * @brief Sorts the given array pointed to by vbase in ascending order.
@@ -696,7 +690,7 @@ void qsort_r(void* a, size_t n, size_t es, void* thunk,
  * */
 void qsort(void* a, size_t n, size_t es, int (*compar)(const void*, const void*));
 
-#pragma mark - memory -
+// #pragma mark - memory -
 
 /**
  * @brief Allocates size bytes of uninitialized storage.

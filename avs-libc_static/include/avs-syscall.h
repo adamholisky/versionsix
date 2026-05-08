@@ -34,6 +34,8 @@ typedef struct {
 // User facing
 uint64_t syscall( uint64_t call_num, uint8_t num_args, syscall_args *args );
 void libc_internal_initalize( void );
+FILE* libc_internal_get_new_file_handle( void );
+FILE* libc_internal_get_file_from_fd( int fd );
 
 // Glue
 

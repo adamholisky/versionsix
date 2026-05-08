@@ -9,6 +9,8 @@ extern "C" {
 #define STDIN_FILENO 0
 #define STDOUT_FILENO 1
 
+int isatty( int fd );
+
 #ifdef __cplusplus
 }
 #endif

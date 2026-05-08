@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-#pragma mark - Types and Definitions -
+// #pragma mark - Types and Definitions -
 
 #define CLOCKS_PER_SEC 1000000L
 
@@ -83,7 +83,7 @@ struct itimerspec
 
 #endif
 
-#pragma mark - Functions -
+// #pragma mark - Functions -
 
 char* asctime(const struct tm*);
 

@@ -18,7 +18,7 @@ extern "C" {
 /// Only the functions defined in printf.h and in the Supported Functions
 /// section below are currently safe for bare metal
 
-#pragma mark - Definitions -
+// #pragma mark - Definitions -
 
 #undef EOF
 #define EOF (-1)
@@ -26,6 +26,16 @@ extern "C" {
 #define SEEK_SET 0
 #define SEEK_CUR 1
 #define SEEK_END 2
+
+#define _IOFBF 0
+#define _IOLBF 1
+#define _IONBF 2
+
+#define BUFSIZ 1024
+#define FILENAME_MAX 4096
+#define FOPEN_MAX 1000
+#define TMP_MAX 10000
+#define L_tmpnam 20
 
 #define STDERR_FILENO 2
 #define STDIN_FILENO 0
@@ -126,6 +136,12 @@ typedef struct {
 	size_t size;
 	char pathname[255];
 	uint32_t pid;
+	char *buf;
+	size_t buf_size;
+	char *rpos;
+	char *rend;
+	unsigned char *shend;
+	off_t shlim, shcnt;
 } FILE;
 
 FILE *libc_internal_get_new_file_handle( void );
@@ -134,13 +150,40 @@ extern FILE *stdin;
 extern FILE *stdout;
 extern FILE *stderr;
 
+#define shcnt(f) ((f)->shcnt + ((f)->rpos - (f)->buf))
+#define shlim(f, lim) __shlim((f), (lim))
+#define shgetc(f) (((f)->rpos != (f)->shend) ? *(f)->rpos++ : __shgetc(f))
+#define shunget(f) ((f)->shlim>=0 ? (void)(f)->rpos-- : (void)0)
+#define sh_fromstring(f, s) ((f)->buf = (f)->rpos = (void *)(s), (f)->rend = (void*)-1)
+
 size_t fread( void *ptr, size_t size, size_t nmemb, FILE *fh );
 size_t fwrite( const void *ptr, size_t size, size_t nmemb, FILE *fh );
 int fprintf(FILE* __restrict, const char* __restrict, ...);
 int fstat( int fd, struct stat *statbuf );
+int fputc(int c, FILE* fh );
+int putc( int , FILE* fh );
+char* fgets( char* s, int size, FILE* fh );
+int fseek( FILE* fh, long offset, int whence );
+int fgetc( FILE *stream );
+int getc( FILE *stream );
+int getchar( void );
+int ungetc( int c, FILE *stream );
+FILE* fopen(const char* __restrict, const char* __restrict);
+FILE* freopen(const char* __restrict, const char* __restrict, FILE* __restrict);
+int fclose(FILE*);
+FILE* tmpfile(void);
+void __shlim(FILE *f, off_t lim);
+int __shgetc(FILE *f);
+int __uflow(FILE *f);
+long double __floatscan(FILE *, int, int);
 
 
-#pragma mark - Supported Functions -
+int setvbuf( FILE *stream, char buf, int mode, size_t size );
+
+
+
+
+// #pragma mark - Supported Functions -
 
 /// Requires a definition of _putchar() for your platform
 int putchar(int c);
@@ -151,35 +194,24 @@ int asprintf(char**, const char*, ...);
 int vasprintf(char**, const char*, __isoc_va_list);
 #endif
 
-#pragma mark - Unsupported Functions -
+// #pragma mark - Unsupported Functions -
 
 #ifndef DISABLE_UNIMPLEMENTED_LIBC_APIS
 
-int fseek(FILE*, long, int);
 long ftell(FILE*);
 void rewind(FILE*);
 
 int fgetpos(FILE* __restrict, fpos_t* __restrict);
 int fsetpos(FILE*, const fpos_t*);
 
-size_t fread(void* __restrict, size_t, size_t, FILE* __restrict);
-size_t fwrite(const void* __restrict, size_t, size_t, FILE* __restrict);
-
-char* fgets(char* __restrict, int, FILE* __restrict);
 #if __STDC_VERSION__ < 201112L
 char* gets(char*);
 #endif
 
-int fputc(int, FILE*);
-int putc(int, FILE*);
-
 wchar_t* fgetws(wchar_t* __restrict, int, FILE* __restrict);
 int fputws(const wchar_t* __restrict, FILE* __restrict);
 
-int fgetc(FILE*);
-int getc(FILE*);
-int getchar(void);
-int ungetc(int, FILE*);
+
 
 wint_t fgetwc(FILE*);
 wint_t getwc(FILE*);
@@ -191,7 +223,7 @@ wint_t putwc(wchar_t, FILE*);
 wint_t putwchar(wchar_t);
 
 char* tmpnam(char*);
-FILE* tmpfile(void);
+
 
 int fwide(FILE*, int);
 
@@ -209,7 +241,6 @@ void clearerr(FILE*);
 int remove(const char*);
 int rename(const char*, const char*);
 
-int setvbuf(FILE* __restrict, char* __restrict, int, size_t);
 void setbuf(FILE* __restrict, char* __restrict);
 
 int scanf(const char* __restrict, ...);

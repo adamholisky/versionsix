@@ -7,10 +7,10 @@
 #include <page.h>
 
 pid_t fork_syscall_handler( registers **context ) {
-	klog( LOG_DEBUG, "In fork." );
-
 	process_data *p_parent = process_get_current();
 	pid_t pid_parent = p_parent->pid;
+
+	klog( LOG_DEBUG, "In fork for %d", pid_parent );
 
 	pid_t pid_child = process_get_new_process();
 

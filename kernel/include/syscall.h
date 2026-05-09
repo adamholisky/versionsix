@@ -21,6 +21,7 @@ extern "C" {
 #define SYSCALL_WAIT 8
 #define SYSCALL_EXECM 9
 #define SYSCALL_STATFS 10
+#define SYSCALL_CLONE 11
 
 typedef uint16_t umode_t;
 
@@ -52,7 +53,8 @@ size_t read( int fd, void *buf, size_t count );
 int statfs( const char *path, struct stat *statbuf );
 pid_t wait( pid_t pid );
 size_t write( int fd, void *buff, size_t count );
-
+int clone( void (*start)( void *), int flags, void *args );
+void yield( void );
 
 // Handlers
 int close_syscall_handler( registers **context, int fd );
@@ -64,6 +66,7 @@ int wait_syscall_handler( registers **context, pid_t pid );
 int read_syscall_handler( registers **context, int fd, void *buf, size_t count );
 int statfs_syscall_handler( registers **context, const char *path, struct stat *statbuf );
 void write_syscall_handler( registers **context, int fd, void *buff, size_t count );
+int clone_syscall_handler( registers **context, void (*start)( void *), void *stack, int flags, void *args );
 
 #ifdef __cplusplus
 }

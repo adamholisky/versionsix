@@ -74,6 +74,11 @@ char *syscall_log_msg_first = "In syscall. num=";
 
 void syscall_handler( registers **_context ) {
 	registers *context = *_context;
+	pid_t pid_caller = process_get_current_proc_id();
+	char *path_caller = process_get_current_path();
+
+	debugf( "In syscall. pid=%d (%s)  num=%d\n", pid_caller, path_caller, context->rax );
+	klog( LOG_DEBUG, "In syscall. pid=%d (%s)  num=%d", pid_caller, path_caller, context->rax );
 
 	switch( context->rax ) {
 		case SYSCALL_FORK:
@@ -109,6 +114,9 @@ void syscall_handler( registers **_context ) {
 			break;
 		case SYSCALL_STATFS:
 			statfs_syscall_handler( _context, context->rdi, context->rsi );
+			break;
+		case SYSCALL_CLONE:
+			clone_syscall_handler( _context, context->rdi, NULL, 0, NULL );
 			break;
 		default:
 			debugf( "Unhandled syscall number: %d\n", context->rax );

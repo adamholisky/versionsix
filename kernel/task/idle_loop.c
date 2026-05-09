@@ -21,7 +21,7 @@ void kernel_idle_loop( void ) {
 			i = 0;
 			klog( LOG_DEBUG, "Idle million." );
 		} else {
-			printf( "." );
+			//
 		}
 
 		syscall( SYSCALL_SCHED_YIELD, 0, NULL );

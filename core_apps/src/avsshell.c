@@ -107,6 +107,8 @@ void kshell_main_loop( void ) {
 		main_shell.line_index = 0;
 		bool do_extra_newline = true;
 
+		memset( main_shell.current_line, 0, KSHELL_MAX_LINESIZE );
+
 		//memset( main_shell.current_line, 0, KSHELL_MAX_LINESIZE );
 		printf( "> " );
 		//printf( "[AVSOS %s@%s %s]: ", user_name, host, kshell_get_env_var("WD") );

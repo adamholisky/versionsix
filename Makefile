@@ -185,6 +185,9 @@ run-debug: install
 run-debug-term: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NONE) $(QEMU_DEBUG_COMMON) $(QEMU_DEBUG_LOGGING)
 
+apps:
+	cd core_apps && make clean && make
+
 gdb:
 	gdb -q --command=$(ROOT_DIR)/build_support/gdb_control/tui.gdb
 

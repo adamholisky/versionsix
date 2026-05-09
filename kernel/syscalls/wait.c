@@ -20,6 +20,7 @@ extern kernel_proc_data global_proc_data;
 
 int wait_syscall_handler( registers **context, pid_t pid ) {
 	klog( LOG_INFO, "Wait calling_pid=%d  waiting_for=%d", global_proc_data.current_process->pid, pid );
+	debugf( "Wait calling_pid=%d  waiting_for=%d\n", global_proc_data.current_process->pid, pid );
 
 	global_proc_data.current_process->status = PROCESS_STATUS_WAITING;
 	global_proc_data.current_process->wait_for_pid = pid;

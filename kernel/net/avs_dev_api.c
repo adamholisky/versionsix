@@ -12,6 +12,14 @@ static const char base64_tables[][65] = {
 	[BASE64_IMAP] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+,",
 };
 
+char api_call[255];
+
+char json_size_start[] = { "{ \"cmd\": \"size\", \"file\": \"" };
+char json_size_end[] = { ".exec\" }\n" };
+
+char json_load_start[] = { "{ \"cmd\": \"load\", \"file\": \"" };
+char json_load_end[] = { ".exec\" }\n" };
+
 /**
  * @brief 
  * 
@@ -23,8 +31,16 @@ uint64_t avs_dev_api_get_file_size( char *path ) {
 	char reply[255];
 
 	memset( reply, 0, 255 );
+	memset( api_call, 0, 255 );
 
-	avs_dev_api_send( "{ \"cmd\": \"size\", \"file\": \"ls.exec\" }\n" );
+	kstrcpy( api_call, json_size_start );
+	kstrcat( api_call, path );
+	kstrcat( api_call, json_size_end );
+
+	printf( "Sending API: -->%s<--\n", api_call );
+
+	avs_dev_api_send( api_call );
+	printf( "Waiting.\n" );
 	int reply_size = avs_dev_api_wait_for_reply( reply, 255 );
 
 	exec_size = strtol( reply, NULL, 10 );
@@ -44,7 +60,14 @@ size_t avs_dev_api_load_file( char *path, void *data ) {
 
 	char *b64_data = kmalloc( 1024 * 1024 );
 
-	avs_dev_api_send( "{ \"cmd\": \"load\", \"file\": \"ls.exec\" }\n" );
+	memset( api_call, 0, 255 );
+	kstrcpy( api_call, json_load_start );
+	kstrcat( api_call, path );
+	kstrcat( api_call, json_load_end );
+
+	printf( "Sending API: -->%s<--\n", api_call );
+	avs_dev_api_send( api_call );
+	printf( "Waiting.\n" );
 	int b64_file_len = avs_dev_api_wait_for_reply( b64_data, 1024 * 1024 );
 
 	printf( "--> size: %ld\n", b64_file_len );
@@ -77,6 +100,8 @@ int avs_dev_api_send( char *cmd ) {
  * @param len 
  */
 void avs_dev_api_write_str_to_serial_port( char *s, int len ) {
+	printf( "Writing: len=%d\n", len );
+
 	for( int i = 0; i < len; i++ ) {
 		while((inportb(DEV_API_SERIAL_PORT + 5) & 0x20) == 0) {
 			;
@@ -84,6 +109,8 @@ void avs_dev_api_write_str_to_serial_port( char *s, int len ) {
 
 		outportb( DEV_API_SERIAL_PORT, *s++ );
 	}
+
+	printf( "Done writing\n" );
 }
 
 /**

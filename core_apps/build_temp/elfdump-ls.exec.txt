@@ -10,7 +10,7 @@ ELF Header:
   Version:                           0x1
   Entry point address:               0x830
   Start of program headers:          64 (bytes into file)
-  Start of section headers:          8416 (bytes into file)
+  Start of section headers:          8448 (bytes into file)
   Flags:                             0x0
   Size of this header:               64 (bytes)
   Size of program headers:           56 (bytes)
@@ -38,12 +38,12 @@ Section Headers:
   [14] .debug_aranges    PROGBITS        0000000000000000 000f60 000060 00      0   0 16
   [15] .debug_info       PROGBITS        0000000000000000 000fc0 0005c9 00      0   0  1
   [16] .debug_abbrev     PROGBITS        0000000000000000 001589 000165 00      0   0  1
-  [17] .debug_line       PROGBITS        0000000000000000 0016ee 00016c 00      0   0  1
-  [18] .debug_str        PROGBITS        0000000000000000 00185a 00034c 01  MS  0   0  1
-  [19] .debug_line_str   PROGBITS        0000000000000000 001ba6 0001e9 01  MS  0   0  1
-  [20] .symtab           SYMTAB          0000000000000000 001d90 0001c8 18     21   8  8
-  [21] .strtab           STRTAB          0000000000000000 001f58 0000b9 00      0   0  1
-  [22] .shstrtab         STRTAB          0000000000000000 002011 0000ce 00      0   0  1
+  [17] .debug_line       PROGBITS        0000000000000000 0016ee 000176 00      0   0  1
+  [18] .debug_str        PROGBITS        0000000000000000 001864 00034c 01  MS  0   0  1
+  [19] .debug_line_str   PROGBITS        0000000000000000 001bb0 0001fa 01  MS  0   0  1
+  [20] .symtab           SYMTAB          0000000000000000 001db0 0001c8 18     21   8  8
+  [21] .strtab           STRTAB          0000000000000000 001f78 0000b9 00      0   0  1
+  [22] .shstrtab         STRTAB          0000000000000000 002031 0000ce 00      0   0  1
 Key to Flags:
   W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
   L (link order), O (extra OS processing required), G (group), T (TLS),

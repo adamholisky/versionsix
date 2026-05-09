@@ -2,7 +2,7 @@
 
 ROOT_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-DEFINES = -DVIOS
+DEFINES = -DVIOS -DAVSOS_KERNEL
 
 CC = /usr/local/osdev/bin/x86_64-elf-gcc
 ASM = /usr/local/osdev/bin/x86_64-elf-as
@@ -26,7 +26,7 @@ CFLAGS_REDUCED = $(DEFINES) -Wno-write-strings \
 	-O0 \
 	-g \
 	-I$(ROOT_DIR)/../kernel/include \
-	-I$(ROOT_DIR)/../vi_klibc_static/include \
+	-I$(ROOT_DIR)/../avs-libc_static/include \
 	-I$(ROOT_DIR)/src \
     -m64                 \
     -march=x86-64        \
@@ -55,6 +55,8 @@ build/%.o: %.c
 glue/crt0.o: glue/crt0.S
 	@>&2 printf "[Build] $<\n"
 	$(CC) $(CFLAGS_REDUCED) $(CFLAGS_APP_SPECIFIC) -c glue/crt0.S -o glue/crt0.o >> $(BUILD_LOG)
+
+apps: $(EXEC_C)
 
 install:
 	@make install_stage2 >> $(BUILD_LOG)

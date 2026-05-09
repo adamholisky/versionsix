@@ -157,27 +157,10 @@ process_data* process_get_data_from_pid( pid_t pid ) {
 	avs_node *head = global_proc_data.process_list->head;
 	process_data *p = NULL;
 
-	/* for( int i = 0; i < global_proc_data.process_list->size; i++ ) {
-		p = (process_data *)head->data;
-
-		if( p->pid == pid ) {
-			klog( LOG_DEBUG, "Found pid, using it." );
-			return p;
-		} else {
-			head = head->next;
-
-			if( head == NULL ) {
-				break;
-			}
-		}
-	}
- */
-
 	avs_node *n_p = avs_list_find_data( global_proc_data.process_list, &pid, avs_list_compare_pids );
 
 	if( n_p != NULL ) {
 		p = (process_data *)n_p->data;
-		//klog( LOG_DEBUG, "p.pid=%d p.stack_size=%d", p->pid, p->stack_size);
 	} else {
 		//klog( LOG_DEBUG, "Couldn't find pid=%d", pid );
 	}
@@ -202,7 +185,7 @@ void process_set_next_up( process_data *p ) {
 int process_sched_yield( registers **context ) {
 	static int num_sched_called = 0;
 
-	//klog( LOG_DEBUG, "In yield." );
+	debugf( "In yield.\n" );
 
 	process_data *old_p = global_proc_data.current_process;
 	process_data *new_p = NULL;
@@ -221,6 +204,7 @@ int process_sched_yield( registers **context ) {
 
 				if( head == NULL ) {
 					// We ran out of processes... shouldn't be here?
+					debugf( "Scheduler reached, impossible NULL\n" );
 					klog( LOG_PANIC, "Scheduler reached impossible NULL" );
 				}
 			}
@@ -241,11 +225,12 @@ int process_sched_yield( registers **context ) {
 			switch( p_candidate->status ) {
 				case PROCESS_STATUS_INACTIVE:
 				case PROCESS_STATUS_ACTIVE:
-				case PROCESS_STATUS_WAITING:
 				case PROCESS_STATUS_SLEEP:
 					//klog( LOG_DEBUG, "Candidate found. pid: %d", p_candidate->pid );
+					debugf( "Next process found: %d with status %d\n", p_candidate->pid, p_candidate->status );
 					next_process_found = true;
 					break;
+				case PROCESS_STATUS_WAITING:
 				default:
 					next_process_found = false;
 					break;
@@ -260,6 +245,8 @@ int process_sched_yield( registers **context ) {
 	}
 
 	if( new_p == old_p ) {
+		debugf( "Yield from %d to %d FAILED. Cannot yield to self.\n", old_p->pid, new_p->pid );
+		klog( LOG_PANIC, "Yield from %d to %d FAILED", old_p->pid, new_p->pid );
 		return 0;
 	}
 
@@ -271,23 +258,35 @@ int process_sched_yield( registers **context ) {
 	if( old_p->status == PROCESS_STATUS_WAITING_FOR_DEATH ) {
 		old_p->status = PROCESS_STATUS_DEAD;
 	} else {
-		old_p->status = PROCESS_STATUS_INACTIVE;
+		if( old_p->status != PROCESS_STATUS_WAITING ) {
+			old_p->status = PROCESS_STATUS_INACTIVE;
+		}
 	}
 
+	process_data *addr_space_to_copy = NULL;
+
 	if( new_p->has_own_addr_space ) {
-		
-		for( int i = 0; i < new_p->data_section_count; i++ ) {
-			page_map( new_p->data_sections[i].virt, new_p->data_sections[i].phys );
+		// this is a normal process or has otherwise been flagged to have its own address space (data + code as it stands now )
+		addr_space_to_copy = new_p;
+	} else {
+		// this is a thread, use its parent
+		debugf( "copying parent addr space\n" );
+
+		addr_space_to_copy = process_get_data_from_pid( new_p->pid_parent );
+	}
+
+	// Leave the kernel out of this.
+
+	if( new_p->pid != 0 ) {
+		for( int i = 0; i < addr_space_to_copy->data_section_count; i++ ) {
+		page_map( addr_space_to_copy->data_sections[i].virt, addr_space_to_copy->data_sections[i].phys );
 			//klog( LOG_DEBUG, "For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid, new_p->data_sections[i].virt, new_p->data_sections[i].phys );
 		}
 
 		for( int i = 0; i < new_p->text_section_count; i++ ) {
-			page_map( new_p->text_sections[i].virt, new_p->text_sections[i].phys );
+			page_map( addr_space_to_copy->text_sections[i].virt, addr_space_to_copy->text_sections[i].phys );
 			//klog( LOG_DEBUG, "For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid, new_p->text_sections[i].virt, new_p->text_sections[i].phys );
 		}
-
-		//memcpy( new_p->proc_stack_kvirt, &new_p->context, sizeof(registers) );
-		//*context = new_p->proc_stack_virt;
 	}
 
 	for( int i = 0; i < PROCESS_DEFAULT_STACK_PAGES; i++ ) {
@@ -315,6 +314,9 @@ int process_sched_yield( registers **context ) {
 	//klog( LOG_DEBUG, "Out yield. New PID: %d  New RIP=0x%016llX  phys=0x%016llX", new_p->pid, new_p->context.rip, paging_virtual_to_physical( new_p->context.rip ) );
 	
 	//debugf( "%d", new_p->pid );
+
+	debugf( "Yield from %d to %d\n", old_p->pid, new_p->pid );
+	klog( LOG_INFO, "Yield from %d to %d", old_p->pid, new_p->pid );
 
 	return 0;
 }
@@ -379,4 +381,8 @@ int process_get_free_fd( process_data *p ) {
 	}
 
 	return res;
+}
+
+char* process_get_current_path( void ) {
+	return global_proc_data.current_process->path;
 }

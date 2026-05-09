@@ -19,6 +19,10 @@ extern "C"
 #define PROCESS_DEFAULT_STACK_SIZE 65536
 #define PROCESS_DEFAULT_STACK_PAGES 16
 
+#define PROCESS_TYPE_USER_PROC 0
+#define PROCESS_TYPE_THREAD 1
+#define PROCESS_TYPE_PROC 2
+
 #define PROCESS_STATUS_IN_SETUP 0
 #define PROCESS_STATUS_ACTIVE 1
 #define PROCESS_STATUS_INACTIVE 2
@@ -65,6 +69,7 @@ typedef struct {
 	registers context;
 	bool first_run;
 	pid_t wait_for_pid;
+	int type;
 
 	fd_process file_descriptors[25];
 
@@ -125,6 +130,7 @@ void process_idle_loop( void );
 int process_sched_yield( registers **context );
 void process_sched_set_next_yield( pid_t pid );
 void process_set_next_up( process_data *p );
+char* process_get_current_path( void );
 
 void processes_diagnostic_dump( void );
 void process_diagnostic_context( registers *context );

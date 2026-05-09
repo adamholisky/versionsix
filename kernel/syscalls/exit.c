@@ -24,10 +24,11 @@ void exit_syscall_handler( registers **context, int return_code ) {
 	global_proc_data.current_process->status = PROCESS_STATUS_WAITING_FOR_DEATH;
 
 	process_data *p_parent = process_get_data_from_pid( global_proc_data.current_process->pid_parent );
-	p_parent->status = PROCESS_STATUS_INACTIVE;
-	p_parent->wait_for_pid = 0;
-
-	process_set_next_up( p_parent );
+	if( p_parent != NULL && p_parent->wait_for_pid == global_proc_data.current_process->pid ) {
+		p_parent->status = PROCESS_STATUS_INACTIVE;
+		p_parent->wait_for_pid = 0;
+		process_set_next_up( p_parent );
+	}
 
 	klog( LOG_INFO, "Exit syscall now yielding." );
 

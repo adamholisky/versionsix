@@ -63,6 +63,7 @@ int clone_syscall_handler( registers **context, void (*start)( void *), void *st
 	p_child->proc_stack_phys = paging_virtual_to_physical( p_child->proc_stack_kvirt );
 	p_child->stack_size = PROCESS_DEFAULT_STACK_SIZE;
 	memcpy( p_child->proc_stack_kvirt, p_parent->proc_stack_kvirt, p_parent->stack_size );
+	p_child->context.rsp = (uint64_t)p_child->proc_stack_virt + p_child->stack_size - 8;
 
 	// Symbol index setup
 	p_child->rela_sym_index = p_parent->rela_sym_index;
@@ -73,8 +74,8 @@ int clone_syscall_handler( registers **context, void (*start)( void *), void *st
 
 	klog( LOG_DEBUG, "Out clone. Returning %d", pid_child );
 
-	(*context)->rax = 0;
-	(*context)->rip = start;
+	(*context)->rax = p_child;
+	//(*context)->rip = start;
 
 	debugf( "Out clone. Returning to %d @ 0x%016llX\n", pid_child, (*context)->rip );
 

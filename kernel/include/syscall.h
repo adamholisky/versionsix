@@ -22,6 +22,7 @@ extern "C" {
 #define SYSCALL_EXECM 9
 #define SYSCALL_STATFS 10
 #define SYSCALL_CLONE 11
+#define SYSCALL_LSEEK 12
 
 typedef uint16_t umode_t;
 

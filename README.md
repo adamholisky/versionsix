@@ -45,6 +45,8 @@ Version 6 is made up of a lot of different systems working together. They're all
 | In-OS sanity checks | 🟢 | Panics and attention-grabbing errors present thorughout |
 | PCI | 🟢 | Good enough to get basic info for devices |
 | libc | 🟢 | Good enough, compiled on its own |
+| Threads | 🟢 | Good enough for basic thread support. Fragile. |
+| Lua | 🟢 | Lua 5.5 integrated and working |
 | klib | 🟡 | Starting to bring in other library routines for better data structure and routine support |
 | Ethernet | 🟡 | Good enough, maybe |
 | ARP | 🟡 | Protocol works, need to do dictionary |
@@ -131,3 +133,6 @@ For normal execution, the Makefile and QEMU are configured to send data accordin
 
 From the root directory, run `make run-debug` to boot the OS with QEMU accepting remote connections to port 58001. Run `make gdb` to run GDB using the basic configuration in the `build_support/gdb_control/commands.gdb` file. TUI support included in `tui.gdb`, and breakpoints added in `breakpoints.gdb`.
 
+## AI Statement
+
+Generative AI is not used in this project at all. Claude is used to search documentation and code, and to help me remember what some obscure makefile syntax is that I haven't touched in two years. Every bit of code, however minor, has been written by human hands, and human hands alone.

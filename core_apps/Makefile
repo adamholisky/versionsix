@@ -26,7 +26,8 @@ CFLAGS_REDUCED = $(DEFINES) -Wno-write-strings \
 	-O0 \
 	-g \
 	-I$(ROOT_DIR)/../kernel/include \
-	-I$(ROOT_DIR)/../avs-libc_static/include \
+	-I$(ROOT_DIR)/../avs-libc-static/include \
+	-I$(ROOT_DIR)/../liblua-static/include \
 	-I$(ROOT_DIR)/src \
     -m64                 \
     -march=x86-64        \

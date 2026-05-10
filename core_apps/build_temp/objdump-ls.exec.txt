@@ -63,11 +63,11 @@ Idx Name          Size      VMA               LMA               File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_abbrev 00000165  0000000000000000  0000000000000000  00001589  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_line   00000176  0000000000000000  0000000000000000  000016ee  2**0
+ 16 .debug_line   0000017a  0000000000000000  0000000000000000  000016ee  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_str    0000034c  0000000000000000  0000000000000000  00001864  2**0
+ 17 .debug_str    0000034c  0000000000000000  0000000000000000  00001868  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line_str 000001fa  0000000000000000  0000000000000000  00001bb0  2**0
+ 18 .debug_line_str 00000246  0000000000000000  0000000000000000  00001bb4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 SYMBOL TABLE:
 0000000000000000 l    df *ABS*	0000000000000000 ls.c
@@ -1746,76 +1746,71 @@ Disassembly of section .debug_info:
   ec:	08 03                	or     %al,(%rbx)
   ee:	01 02                	add    %eax,(%rdx)
   f0:	2e 02 00             	cs add (%rax),%al
-  f3:	00 03                	add    %al,(%rbx)
-  f5:	01 06                	add    %eax,(%rsi)
-  f7:	3d 02 00 00 11       	cmp    $0x11000002,%eax
-  fc:	cc                   	int3
-  fd:	00 00                	add    %al,(%rax)
-  ff:	00 03                	add    %al,(%rbx)
- 101:	08 04 ec             	or     %al,(%rsp,%rbp,8)
- 104:	01 00                	add    %eax,(%rax)
- 106:	00 02                	add    %al,(%rdx)
- 108:	17                   	(bad)
- 109:	01 00                	add    %eax,(%rax)
- 10b:	00 08                	add    %cl,(%rax)
- 10d:	53                   	push   %rbx
- 10e:	0d 35 00 00 00       	or     $0x35,%eax
- 113:	02 82 02 00 00 08    	add    0x8000002(%rdx),%al
- 119:	54                   	push   %rsp
- 11a:	12 5d 00             	adc    0x0(%rbp),%bl
- 11d:	00 00                	add    %al,(%rax)
- 11f:	02 a6 01 00 00 08    	add    0x8000001(%rsi),%ah
- 125:	55                   	push   %rbp
- 126:	0d 35 00 00 00       	or     $0x35,%eax
- 12b:	02 af 02 00 00 08    	add    0x8000002(%rdi),%ch
- 131:	56                   	push   %rsi
- 132:	0d 35 00 00 00       	or     $0x35,%eax
- 137:	02 4d 00             	add    0x0(%rbp),%cl
- 13a:	00 00                	add    %al,(%rax)
- 13c:	08 57 0d             	or     %dl,0xd(%rdi)
- 13f:	35 00 00 00 02       	xor    $0x2000000,%eax
- 144:	0d 02 00 00 08       	or     $0x8000002,%eax
- 149:	58                   	pop    %rax
- 14a:	0d 35 00 00 00       	or     $0x35,%eax
- 14f:	02 45 00             	add    0x0(%rbp),%al
- 152:	00 00                	add    %al,(%rax)
- 154:	08 59 12             	or     %bl,0x12(%rcx)
- 157:	5d                   	pop    %rbp
- 158:	00 00                	add    %al,(%rax)
- 15a:	00 02                	add    %al,(%rdx)
- 15c:	d4                   	(bad)
+  f3:	00 02                	add    %al,(%rdx)
+  f5:	17                   	(bad)
+  f6:	01 00                	add    %eax,(%rax)
+  f8:	00 08                	add    %cl,(%rax)
+  fa:	1f                   	(bad)
+  fb:	0d 35 00 00 00       	or     $0x35,%eax
+ 100:	02 82 02 00 00 08    	add    0x8000002(%rdx),%al
+ 106:	20 12                	and    %dl,(%rdx)
+ 108:	5d                   	pop    %rbp
+ 109:	00 00                	add    %al,(%rax)
+ 10b:	00 02                	add    %al,(%rdx)
+ 10d:	a6                   	cmpsb  (%rdi),(%rsi)
+ 10e:	01 00                	add    %eax,(%rax)
+ 110:	00 08                	add    %cl,(%rax)
+ 112:	21 0d 35 00 00 00    	and    %ecx,0x35(%rip)        # 14d <asvfs_getattr@plt-0x653>
+ 118:	02 af 02 00 00 08    	add    0x8000002(%rdi),%ch
+ 11e:	22 0d 35 00 00 00    	and    0x35(%rip),%cl        # 159 <asvfs_getattr@plt-0x647>
+ 124:	02 4d 00             	add    0x0(%rbp),%cl
+ 127:	00 00                	add    %al,(%rax)
+ 129:	08 23                	or     %ah,(%rbx)
+ 12b:	0d 35 00 00 00       	or     $0x35,%eax
+ 130:	02 0d 02 00 00 08    	add    0x8000002(%rip),%cl        # 8000138 <error_strings+0x7ffe218>
+ 136:	24 0d                	and    $0xd,%al
+ 138:	35 00 00 00 02       	xor    $0x2000000,%eax
+ 13d:	45 00 00             	add    %r8b,(%r8)
+ 140:	00 08                	add    %cl,(%rax)
+ 142:	25 12 5d 00 00       	and    $0x5d12,%eax
+ 147:	00 02                	add    %al,(%rdx)
+ 149:	d4                   	(bad)
+ 14a:	00 00                	add    %al,(%rax)
+ 14c:	00 08                	add    %cl,(%rax)
+ 14e:	26 0d 35 00 00 00    	es or  $0x35,%eax
+ 154:	02 f3                	add    %bl,%dh
+ 156:	01 00                	add    %eax,(%rax)
+ 158:	00 08                	add    %cl,(%rax)
+ 15a:	28 12                	sub    %dl,(%rdx)
+ 15c:	5d                   	pop    %rbp
  15d:	00 00                	add    %al,(%rax)
- 15f:	00 08                	add    %cl,(%rax)
- 161:	5a                   	pop    %rdx
- 162:	0d 35 00 00 00       	or     $0x35,%eax
- 167:	02 f3                	add    %bl,%dh
- 169:	01 00                	add    %eax,(%rax)
- 16b:	00 08                	add    %cl,(%rax)
- 16d:	5c                   	pop    %rsp
- 16e:	12 5d 00             	adc    0x0(%rbp),%bl
- 171:	00 00                	add    %al,(%rax)
- 173:	02 c7                	add    %bh,%al
- 175:	02 00                	add    (%rax),%al
- 177:	00 09                	add    %cl,(%rcx)
- 179:	1a 12                	sbb    (%rdx),%dl
- 17b:	5d                   	pop    %rbp
- 17c:	00 00                	add    %al,(%rax)
- 17e:	00 0a                	add    %cl,(%rdx)
- 180:	ba 00 00 00 44       	mov    $0x44000000,%edx
+ 15f:	00 03                	add    %al,(%rbx)
+ 161:	01 06                	add    %eax,(%rsi)
+ 163:	3d 02 00 00 11       	cmp    $0x11000002,%eax
+ 168:	38 01                	cmp    %al,(%rcx)
+ 16a:	00 00                	add    %al,(%rax)
+ 16c:	03 08                	add    (%rax),%ecx
+ 16e:	04 ec                	add    $0xec,%al
+ 170:	01 00                	add    %eax,(%rax)
+ 172:	00 02                	add    %al,(%rdx)
+ 174:	c7 02 00 00 09 1a    	movl   $0x1a090000,(%rdx)
+ 17a:	12 5d 00             	adc    0x0(%rbp),%bl
+ 17d:	00 00                	add    %al,(%rax)
+ 17f:	0a ba 00 00 00 44    	or     0x44000000(%rdx),%bh
  185:	09 31                	or     %esi,(%rcx)
  187:	41 02 00             	add    (%r8),%al
  18a:	00 01                	add    %al,(%rcx)
  18c:	eb 02                	jmp    190 <asvfs_getattr@plt-0x610>
  18e:	00 00                	add    %al,(%rax)
  190:	09 32                	or     %esi,(%rdx)
- 192:	08 df                	or     %bl,%bh
+ 192:	08 cc                	or     %cl,%ah
  194:	00 00                	add    %al,(%rax)
  196:	00 00                	add    %al,(%rax)
  198:	01 cd                	add    %ecx,%ebp
  19a:	00 00                	add    %al,(%rax)
  19c:	00 09                	add    %cl,(%rcx)
  19e:	33 08                	xor    (%rax),%ecx
- 1a0:	eb 00                	jmp    1a2 <asvfs_getattr@plt-0x5fe>
+ 1a0:	d8 00                	fadds  (%rax)
  1a2:	00 00                	add    %al,(%rax)
  1a4:	04 01                	add    $0x1,%al
  1a6:	da 01                	fiaddl (%rcx)
@@ -1825,42 +1820,43 @@ Disassembly of section .debug_info:
  1af:	00 00                	add    %al,(%rax)
  1b1:	08 01                	or     %al,(%rcx)
  1b3:	25 02 00 00 09       	and    $0x9000002,%eax
- 1b8:	35 0a f7 00 00       	xor    $0xf70a,%eax
+ 1b8:	35 0a e4 00 00       	xor    $0xe40a,%eax
  1bd:	00 0c 01             	add    %cl,(%rcx,%rax,1)
  1c0:	1f                   	(bad)
  1c1:	01 00                	add    %eax,(%rax)
  1c3:	00 09                	add    %cl,(%rcx)
- 1c5:	36 08 03             	ss or  %al,(%rbx)
- 1c8:	01 00                	add    %eax,(%rax)
+ 1c5:	36 08 f0             	ss or  %dh,%al
+ 1c8:	00 00                	add    %al,(%rax)
  1ca:	00 10                	add    %dl,(%rax)
  1cc:	01 c0                	add    %eax,%eax
  1ce:	02 00                	add    (%rax),%al
  1d0:	00 09                	add    %cl,(%rcx)
  1d2:	37                   	(bad)
- 1d3:	08 0f                	or     %cl,(%rdi)
- 1d5:	01 00                	add    %eax,(%rax)
+ 1d3:	08 fc                	or     %bh,%ah
+ 1d5:	00 00                	add    %al,(%rax)
  1d7:	00 14 01             	add    %dl,(%rcx,%rax,1)
  1da:	98                   	cwtl
  1db:	02 00                	add    (%rax),%al
  1dd:	00 09                	add    %cl,(%rcx)
  1df:	38 08                	cmp    %cl,(%rax)
- 1e1:	df 00                	filds  (%rax)
- 1e3:	00 00                	add    %al,(%rax)
- 1e5:	18 01                	sbb    %al,(%rcx)
- 1e7:	d2 01                	rolb   %cl,(%rcx)
- 1e9:	00 00                	add    %al,(%rax)
- 1eb:	09 39                	or     %edi,(%rcx)
- 1ed:	08 27                	or     %ah,(%rdi)
- 1ef:	01 00                	add    %eax,(%rax)
- 1f1:	00 1c 01             	add    %bl,(%rcx,%rax,1)
+ 1e1:	cc                   	int3
+ 1e2:	00 00                	add    %al,(%rax)
+ 1e4:	00 18                	add    %bl,(%rax)
+ 1e6:	01 d2                	add    %edx,%edx
+ 1e8:	01 00                	add    %eax,(%rax)
+ 1ea:	00 09                	add    %cl,(%rcx)
+ 1ec:	39 08                	cmp    %ecx,(%rax)
+ 1ee:	14 01                	adc    $0x1,%al
+ 1f0:	00 00                	add    %al,(%rax)
+ 1f2:	1c 01                	sbb    $0x1,%al
  1f4:	4c 02 00             	rex.WR add (%rax),%r8b
  1f7:	00 09                	add    %cl,(%rcx)
- 1f9:	3a 0c 1b             	cmp    (%rbx,%rbx,1),%cl
+ 1f9:	3a 0c 08             	cmp    (%rax,%rcx,1),%cl
  1fc:	01 00                	add    %eax,(%rax)
  1fe:	00 20                	add    %ah,(%rax)
  200:	01 9e 00 00 00 09    	add    %ebx,0x9000000(%rsi)
  206:	3b 0b                	cmp    (%rbx),%ecx
- 208:	33 01                	xor    (%rcx),%eax
+ 208:	20 01                	and    %al,(%rcx)
  20a:	00 00                	add    %al,(%rax)
  20c:	24 01                	and    $0x1,%al
  20e:	bd 01 00 00 09       	mov    $0x9000001,%ebp
@@ -1870,7 +1866,7 @@ Disassembly of section .debug_info:
  21a:	01 fa                	add    %edi,%edx
  21c:	02 00                	add    (%rax),%al
  21e:	00 09                	add    %cl,(%rcx)
- 220:	3d 12 3f 01 00       	cmp    $0x13f12,%eax
+ 220:	3d 12 2c 01 00       	cmp    $0x12c12,%eax
  225:	00 2c 01             	add    %ch,(%rcx,%rax,1)
  228:	43 03 00             	rex.XB add (%r8),%eax
  22b:	00 09                	add    %cl,(%rcx)
@@ -1880,9 +1876,9 @@ Disassembly of section .debug_info:
  235:	75 02                	jne    239 <asvfs_getattr@plt-0x567>
  237:	00 00                	add    %al,(%rax)
  239:	09 3f                	or     %edi,(%rdi)
- 23b:	12 3f                	adc    (%rdi),%bh
- 23d:	01 00                	add    %eax,(%rax)
- 23f:	00 34 01             	add    %dh,(%rcx,%rax,1)
+ 23b:	12 2c 01             	adc    (%rcx,%rax,1),%ch
+ 23e:	00 00                	add    %al,(%rax)
+ 240:	34 01                	xor    $0x1,%al
  242:	6c                   	insb   (%dx),(%rdi)
  243:	02 00                	add    (%rax),%al
  245:	00 09                	add    %cl,(%rcx)
@@ -1892,9 +1888,9 @@ Disassembly of section .debug_info:
  24f:	df 00                	filds  (%rax)
  251:	00 00                	add    %al,(%rax)
  253:	09 41 12             	or     %eax,0x12(%rcx)
- 256:	3f                   	(bad)
- 257:	01 00                	add    %eax,(%rax)
- 259:	00 3c 01             	add    %bh,(%rcx,%rax,1)
+ 256:	2c 01                	sub    $0x1,%al
+ 258:	00 00                	add    %al,(%rax)
+ 25a:	3c 01                	cmp    $0x1,%al
  25c:	6e                   	outsb  (%rsi),(%dx)
  25d:	00 00                	add    %al,(%rax)
  25f:	00 09                	add    %cl,(%rcx)
@@ -1905,19 +1901,18 @@ Disassembly of section .debug_info:
  26d:	00 09                	add    %cl,(%rcx)
  26f:	46 15 57 01 00 00    	rex.RX adc $0x157,%eax
  275:	06                   	(bad)
- 276:	cc                   	int3
- 277:	00 00                	add    %al,(%rax)
- 279:	00 08                	add    %cl,(%rax)
- 27b:	62 02 00 00 62       	(bad)
- 280:	02 00                	add    (%rax),%al
- 282:	00 09                	add    %cl,(%rcx)
+ 276:	38 01                	cmp    %al,(%rcx)
+ 278:	00 00                	add    %al,(%rax)
+ 27a:	08 62 02             	or     %ah,0x2(%rdx)
+ 27d:	00 00                	add    %al,(%rax)
+ 27f:	62 02 00 00 09       	(bad)
  284:	9d                   	popf
  285:	00 00                	add    %al,(%rax)
  287:	00 14 00             	add    %dl,(%rax,%rax,1)
  28a:	06                   	(bad)
- 28b:	d3 00                	roll   %cl,(%rax)
- 28d:	00 00                	add    %al,(%rax)
- 28f:	05 0f 03 00 00       	add    $0x30f,%eax
+ 28b:	3f                   	(bad)
+ 28c:	01 00                	add    %eax,(%rax)
+ 28e:	00 05 0f 03 00 00    	add    %al,0x30f(%rip)        # 5a3 <asvfs_getattr@plt-0x1fd>
  294:	0c 1b                	or     $0x1b,%al
  296:	15 52 02 00 00       	adc    $0x252,%eax
  29b:	09 03                	or     %eax,(%rbx)
@@ -1977,9 +1972,9 @@ Disassembly of section .debug_info:
  321:	03 c2                	add    %edx,%eax
  323:	02 00                	add    (%rax),%al
  325:	00 08                	add    %cl,(%rax)
- 327:	cc                   	int3
- 328:	00 00                	add    %al,(%rax)
- 32a:	00 0e                	add    %cl,(%rsi)
+ 327:	38 01                	cmp    %al,(%rcx)
+ 329:	00 00                	add    %al,(%rax)
+ 32b:	0e                   	(bad)
  32c:	03 00                	add    (%rax),%eax
  32e:	00 09                	add    %cl,(%rcx)
  330:	9d                   	popf
@@ -2249,14 +2244,15 @@ Disassembly of section .debug_info:
  5a8:	91                   	xchg   %eax,%ecx
  5a9:	58                   	pop    %rax
  5aa:	00 08                	add    %cl,(%rax)
- 5ac:	cc                   	int3
- 5ad:	00 00                	add    %al,(%rax)
- 5af:	00 94 05 00 00 17 9d 	add    %dl,-0x62e90000(%rbp,%rax,1)
+ 5ac:	38 01                	cmp    %al,(%rcx)
+ 5ae:	00 00                	add    %al,(%rax)
+ 5b0:	94                   	xchg   %eax,%esp
+ 5b1:	05 00 00 17 9d       	add    $0x9d170000,%eax
  5b6:	00 00                	add    %al,(%rax)
  5b8:	00 ff                	add    %bh,%bh
  5ba:	03 00                	add    (%rax),%eax
- 5bc:	18 cc                	sbb    %cl,%ah
- 5be:	00 00                	add    %al,(%rax)
+ 5bc:	18 38                	sbb    %bh,(%rax)
+ 5be:	01 00                	add    %eax,(%rax)
  5c0:	00 09                	add    %cl,(%rcx)
  5c2:	9d                   	popf
  5c3:	00 00                	add    %al,(%rax)
@@ -2461,9 +2457,9 @@ Disassembly of section .debug_line:
   48:	21 3e                	and    %edi,(%rsi)
   4a:	5a                   	pop    %rdx
   4b:	2f                   	(bad)
-  4c:	02 05 00 01 01 21    	add    0x21010100(%rip),%al        # 21010152 <error_strings+0x2100e232>
+  4c:	02 05 00 01 01 25    	add    0x25010100(%rip),%al        # 25010152 <error_strings+0x2500e232>
   52:	01 00                	add    %eax,(%rax)
-  54:	00 05 00 08 00 98    	add    %al,-0x67fff800(%rip)        # ffffffff9800085a <error_strings+0xffffffff97ffe93a>
+  54:	00 05 00 08 00 9c    	add    %al,-0x63fff800(%rip)        # ffffffff9c00085a <error_strings+0xffffffff9bffe93a>
   5a:	00 00                	add    %al,(%rax)
   5c:	00 01                	add    %al,(%rcx)
   5e:	01 01                	add    %eax,(%rcx)
@@ -2476,7 +2472,7 @@ Disassembly of section .debug_line:
   6d:	00 01                	add    %al,(%rcx)
   6f:	01 01                	add    %eax,(%rcx)
   71:	1f                   	(bad)
-  72:	06                   	(bad)
+  72:	07                   	(bad)
   73:	00 00                	add    %al,(%rax)
   75:	00 00                	add    %al,(%rax)
   77:	42 00 00             	rex.X add %al,(%rax)
@@ -2486,91 +2482,96 @@ Disassembly of section .debug_line:
   80:	00 00                	add    %al,(%rax)
   82:	00 dd                	add    %bl,%ch
   84:	00 00                	add    %al,(%rax)
-  86:	00 1c 01             	add    %bl,(%rcx,%rax,1)
-  89:	00 00                	add    %al,(%rax)
-  8b:	02 01                	add    (%rcx),%al
-  8d:	1f                   	(bad)
-  8e:	02 0f                	add    (%rdi),%cl
-  90:	14 3d                	adc    $0x3d,%al
-  92:	00 00                	add    %al,(%rax)
-  94:	00 01                	add    %al,(%rcx)
-  96:	3d 00 00 00 01       	cmp    $0x1000000,%eax
-  9b:	5f                   	pop    %rdi
-  9c:	01 00                	add    %eax,(%rax)
-  9e:	00 02                	add    %al,(%rdx)
-  a0:	6b 01 00             	imul   $0x0,(%rcx),%eax
-  a3:	00 02                	add    %al,(%rdx)
-  a5:	77 01                	ja     a8 <asvfs_getattr@plt-0x6f8>
-  a7:	00 00                	add    %al,(%rax)
-  a9:	02 83 01 00 00 02    	add    0x2000001(%rbx),%al
-  af:	8e 01                	mov    (%rcx),%es
-  b1:	00 00                	add    %al,(%rax)
-  b3:	02 98 01 00 00 03    	add    0x3000001(%rax),%bl
-  b9:	a1 01 00 00 03 df 01 	movabs 0x1df03000001,%eax
-  c0:	00 00 
-  c2:	04 a9                	add    $0xa9,%al
-  c4:	01 00                	add    %eax,(%rax)
-  c6:	00 05 b0 01 00 00    	add    %al,0x1b0(%rip)        # 27c <asvfs_getattr@plt-0x524>
-  cc:	05 b7 01 00 00       	add    $0x1b7,%eax
-  d1:	04 c3                	add    $0xc3,%al
-  d3:	01 00                	add    %eax,(%rax)
-  d5:	00 04 cb             	add    %al,(%rbx,%rcx,8)
-  d8:	01 00                	add    %eax,(%rax)
-  da:	00 04 de             	add    %al,(%rsi,%rbx,8)
-  dd:	01 00                	add    %eax,(%rax)
-  df:	00 04 d3             	add    %al,(%rbx,%rdx,8)
-  e2:	01 00                	add    %eax,(%rax)
-  e4:	00 03                	add    %al,(%rbx)
-  e6:	dc 01                	faddl  (%rcx)
-  e8:	00 00                	add    %al,(%rax)
-  ea:	04 e4                	add    $0xe4,%al
-  ec:	01 00                	add    %eax,(%rax)
-  ee:	00 04 f0             	add    %al,(%rax,%rsi,8)
-  f1:	01 00                	add    %eax,(%rax)
-  f3:	00 04 05 24 00 09 02 	add    %al,0x2090024(,%rax,1)
-  fa:	48 08 00             	rex.W or %al,(%rax)
-  fd:	00 00                	add    %al,(%rax)
-  ff:	00 00                	add    %al,(%rax)
- 101:	00 19                	add    %bl,(%rcx)
- 103:	05 02 08 77 05       	add    $0x5770802,%eax
- 108:	04 08                	add    $0x8,%al
- 10a:	84 05 16 91 05 03    	test   %al,0x3059116(%rip)        # 3059226 <error_strings+0x3057306>
- 110:	ac                   	lods   (%rsi),%al
- 111:	05 07 08 4d 08       	add    $0x84d0807,%eax
- 116:	13 08                	adc    (%rax),%ecx
- 118:	13 05 06 08 14 05    	adc    0x5140806(%rip),%eax        # 5140924 <error_strings+0x513ea04>
- 11e:	04 00                	add    $0x0,%al
- 120:	02 04 01             	add    (%rcx,%rax,1),%al
- 123:	08 82 05 03 4b 05    	or     %al,0x54b0305(%rdx)
- 129:	14 08                	adc    $0x8,%al
- 12b:	86 05 0f 08 ae 05    	xchg   %al,0x5ae080f(%rip)        # 5ae0940 <error_strings+0x5adea20>
- 131:	04 08                	add    $0x8,%al
- 133:	2f                   	(bad)
- 134:	05 03 75 05 0a       	add    $0xa057503,%eax
- 139:	08 c9                	or     %cl,%cl
- 13b:	05 2a 79 05 03       	add    $0x305792a,%eax
- 140:	82                   	(bad)
- 141:	00 02                	add    %al,(%rdx)
- 143:	04 01                	add    $0x1,%al
- 145:	06                   	(bad)
- 146:	4a 00 02             	rex.WX add %al,(%rdx)
- 149:	04 02                	add    $0x2,%al
- 14b:	74 05                	je     152 <asvfs_getattr@plt-0x64e>
- 14d:	1c 00                	sbb    $0x0,%al
- 14f:	02 04 04             	add    (%rsp,%rax,1),%al
- 152:	06                   	(bad)
- 153:	58                   	pop    %rax
- 154:	05 03 00 02 04       	add    $0x4020003,%eax
- 159:	04 82                	add    $0x82,%al
- 15b:	05 12 08 65 05       	add    $0x5650812,%eax
- 160:	22 00                	and    (%rax),%al
- 162:	02 04 01             	add    (%rcx,%rax,1),%al
- 165:	f2 05 02 78 08 3e    	repnz add $0x3e087802,%eax
- 16b:	05 09 bb 05 01       	add    $0x105bb09,%eax
- 170:	59                   	pop    %rcx
- 171:	02 02                	add    (%rdx),%al
- 173:	00 01                	add    %al,(%rcx)
- 175:	01                   	.byte 0x1
+  86:	00 29                	add    %ch,(%rcx)
+  88:	01 00                	add    %eax,(%rax)
+  8a:	00 68 01             	add    %ch,0x1(%rax)
+  8d:	00 00                	add    %al,(%rax)
+  8f:	02 01                	add    (%rcx),%al
+  91:	1f                   	(bad)
+  92:	02 0f                	add    (%rdi),%cl
+  94:	14 3d                	adc    $0x3d,%al
+  96:	00 00                	add    %al,(%rax)
+  98:	00 01                	add    %al,(%rcx)
+  9a:	3d 00 00 00 01       	cmp    $0x1000000,%eax
+  9f:	ab                   	stos   %eax,(%rdi)
+  a0:	01 00                	add    %eax,(%rax)
+  a2:	00 02                	add    %al,(%rdx)
+  a4:	b7 01                	mov    $0x1,%bh
+  a6:	00 00                	add    %al,(%rax)
+  a8:	02 c3                	add    %bl,%al
+  aa:	01 00                	add    %eax,(%rax)
+  ac:	00 02                	add    %al,(%rdx)
+  ae:	cf                   	iret
+  af:	01 00                	add    %eax,(%rax)
+  b1:	00 02                	add    %al,(%rdx)
+  b3:	da 01                	fiaddl (%rcx)
+  b5:	00 00                	add    %al,(%rax)
+  b7:	02 e4                	add    %ah,%ah
+  b9:	01 00                	add    %eax,(%rax)
+  bb:	00 03                	add    %al,(%rbx)
+  bd:	ed                   	in     (%dx),%eax
+  be:	01 00                	add    %eax,(%rax)
+  c0:	00 04 2b             	add    %al,(%rbx,%rbp,1)
+  c3:	02 00                	add    (%rax),%al
+  c5:	00 05 f5 01 00 00    	add    %al,0x1f5(%rip)        # 2c0 <asvfs_getattr@plt-0x4e0>
+  cb:	06                   	(bad)
+  cc:	fc                   	cld
+  cd:	01 00                	add    %eax,(%rax)
+  cf:	00 06                	add    %al,(%rsi)
+  d1:	03 02                	add    (%rdx),%eax
+  d3:	00 00                	add    %al,(%rax)
+  d5:	05 0f 02 00 00       	add    $0x20f,%eax
+  da:	05 17 02 00 00       	add    $0x217,%eax
+  df:	05 2a 02 00 00       	add    $0x22a,%eax
+  e4:	05 1f 02 00 00       	add    $0x21f,%eax
+  e9:	03 28                	add    (%rax),%ebp
+  eb:	02 00                	add    (%rax),%al
+  ed:	00 05 30 02 00 00    	add    %al,0x230(%rip)        # 323 <asvfs_getattr@plt-0x47d>
+  f3:	05 3c 02 00 00       	add    $0x23c,%eax
+  f8:	05 05 24 00 09       	add    $0x9002405,%eax
+  fd:	02 48 08             	add    0x8(%rax),%cl
+ 100:	00 00                	add    %al,(%rax)
+ 102:	00 00                	add    %al,(%rax)
+ 104:	00 00                	add    %al,(%rax)
+ 106:	19 05 02 08 77 05    	sbb    %eax,0x5770802(%rip)        # 577090e <error_strings+0x576e9ee>
+ 10c:	04 08                	add    $0x8,%al
+ 10e:	84 05 16 91 05 03    	test   %al,0x3059116(%rip)        # 305922a <error_strings+0x305730a>
+ 114:	ac                   	lods   (%rsi),%al
+ 115:	05 07 08 4d 08       	add    $0x84d0807,%eax
+ 11a:	13 08                	adc    (%rax),%ecx
+ 11c:	13 05 06 08 14 05    	adc    0x5140806(%rip),%eax        # 5140928 <error_strings+0x513ea08>
+ 122:	04 00                	add    $0x0,%al
+ 124:	02 04 01             	add    (%rcx,%rax,1),%al
+ 127:	08 82 05 03 4b 05    	or     %al,0x54b0305(%rdx)
+ 12d:	14 08                	adc    $0x8,%al
+ 12f:	86 05 0f 08 ae 05    	xchg   %al,0x5ae080f(%rip)        # 5ae0944 <error_strings+0x5adea24>
+ 135:	04 08                	add    $0x8,%al
+ 137:	2f                   	(bad)
+ 138:	05 03 75 05 0a       	add    $0xa057503,%eax
+ 13d:	08 c9                	or     %cl,%cl
+ 13f:	05 2a 79 05 03       	add    $0x305792a,%eax
+ 144:	82                   	(bad)
+ 145:	00 02                	add    %al,(%rdx)
+ 147:	04 01                	add    $0x1,%al
+ 149:	06                   	(bad)
+ 14a:	4a 00 02             	rex.WX add %al,(%rdx)
+ 14d:	04 02                	add    $0x2,%al
+ 14f:	74 05                	je     156 <asvfs_getattr@plt-0x64a>
+ 151:	1c 00                	sbb    $0x0,%al
+ 153:	02 04 04             	add    (%rsp,%rax,1),%al
+ 156:	06                   	(bad)
+ 157:	58                   	pop    %rax
+ 158:	05 03 00 02 04       	add    $0x4020003,%eax
+ 15d:	04 82                	add    $0x82,%al
+ 15f:	05 12 08 65 05       	add    $0x5650812,%eax
+ 164:	22 00                	and    (%rax),%al
+ 166:	02 04 01             	add    (%rcx,%rax,1),%al
+ 169:	f2 05 02 78 08 3e    	repnz add $0x3e087802,%eax
+ 16f:	05 09 bb 05 01       	add    $0x105bb09,%eax
+ 174:	59                   	pop    %rcx
+ 175:	02 02                	add    (%rdx),%al
+ 177:	00 01                	add    %al,(%rcx)
+ 179:	01                   	.byte 0x1
 
 Disassembly of section .debug_str:
 
@@ -2982,13 +2983,10 @@ Disassembly of section .debug_line_str:
   76:	61                   	(bad)
   77:	76 73                	jbe    ec <asvfs_getattr@plt-0x6b4>
   79:	2d 6c 69 62 63       	sub    $0x6362696c,%eax
-  7e:	5f                   	pop    %rdi
-  7f:	73 74                	jae    f5 <asvfs_getattr@plt-0x6ab>
-  81:	61                   	(bad)
-  82:	74 69                	je     ed <asvfs_getattr@plt-0x6b3>
-  84:	63 2f                	movsxd (%rdi),%ebp
-  86:	69 6e 63 6c 75 64 65 	imul   $0x6564756c,0x63(%rsi),%ebp
-  8d:	2f                   	(bad)
+  7e:	2d 73 74 61 74       	sub    $0x74617473,%eax
+  83:	69 63 2f 69 6e 63 6c 	imul   $0x6c636e69,0x2f(%rbx),%esp
+  8a:	75 64                	jne    f0 <asvfs_getattr@plt-0x6b0>
+  8c:	65 2f                	gs (bad)
   8e:	5f                   	pop    %rdi
   8f:	74 79                	je     10a <asvfs_getattr@plt-0x696>
   91:	70 65                	jo     f8 <asvfs_getattr@plt-0x6a8>
@@ -3018,13 +3016,10 @@ Disassembly of section .debug_line_str:
   c5:	61                   	(bad)
   c6:	76 73                	jbe    13b <asvfs_getattr@plt-0x665>
   c8:	2d 6c 69 62 63       	sub    $0x6362696c,%eax
-  cd:	5f                   	pop    %rdi
-  ce:	73 74                	jae    144 <asvfs_getattr@plt-0x65c>
-  d0:	61                   	(bad)
-  d1:	74 69                	je     13c <asvfs_getattr@plt-0x664>
-  d3:	63 2f                	movsxd (%rdi),%ebp
-  d5:	69 6e 63 6c 75 64 65 	imul   $0x6564756c,0x63(%rsi),%ebp
-  dc:	00 2f                	add    %ch,(%rdi)
+  cd:	2d 73 74 61 74       	sub    $0x74617473,%eax
+  d2:	69 63 2f 69 6e 63 6c 	imul   $0x6c636e69,0x2f(%rbx),%esp
+  d9:	75 64                	jne    13f <asvfs_getattr@plt-0x661>
+  db:	65 00 2f             	add    %ch,%gs:(%rdi)
   de:	75 73                	jne    153 <asvfs_getattr@plt-0x64d>
   e0:	72 2f                	jb     111 <asvfs_getattr@plt-0x68f>
   e2:	6c                   	insb   (%dx),(%rdi)
@@ -3046,90 +3041,121 @@ Disassembly of section .debug_line_str:
  106:	70 70                	jo     178 <asvfs_getattr@plt-0x628>
  108:	73 2f                	jae    139 <asvfs_getattr@plt-0x667>
  10a:	2e 2e 2f             	cs cs (bad)
- 10d:	6b 65 72 6e          	imul   $0x6e,0x72(%rbp),%esp
- 111:	65 6c                	gs insb (%dx),(%rdi)
- 113:	2f                   	(bad)
- 114:	69 6e 63 6c 75 64 65 	imul   $0x6564756c,0x63(%rsi),%ebp
- 11b:	00 2f                	add    %ch,(%rdi)
- 11d:	75 73                	jne    192 <asvfs_getattr@plt-0x60e>
- 11f:	72 2f                	jb     150 <asvfs_getattr@plt-0x650>
- 121:	6c                   	insb   (%dx),(%rdi)
- 122:	6f                   	outsl  (%rsi),(%dx)
- 123:	63 61 6c             	movsxd 0x6c(%rcx),%esp
- 126:	2f                   	(bad)
- 127:	6f                   	outsl  (%rsi),(%dx)
- 128:	73 64                	jae    18e <asvfs_getattr@plt-0x612>
- 12a:	65 76 2f             	gs jbe 15c <asvfs_getattr@plt-0x644>
- 12d:	73 6f                	jae    19e <asvfs_getattr@plt-0x602>
- 12f:	75 72                	jne    1a3 <asvfs_getattr@plt-0x5fd>
- 131:	63 65 2f             	movsxd 0x2f(%rbp),%esp
- 134:	76 65                	jbe    19b <asvfs_getattr@plt-0x605>
- 136:	72 73                	jb     1ab <asvfs_getattr@plt-0x5f5>
- 138:	69 6f 6e 73 69 78 2f 	imul   $0x2f786973,0x6e(%rdi),%ebp
- 13f:	63 6f 72             	movsxd 0x72(%rdi),%ebp
- 142:	65 5f                	gs pop %rdi
- 144:	61                   	(bad)
- 145:	70 70                	jo     1b7 <asvfs_getattr@plt-0x5e9>
- 147:	73 2f                	jae    178 <asvfs_getattr@plt-0x628>
- 149:	2e 2e 2f             	cs cs (bad)
- 14c:	6b 65 72 6e          	imul   $0x6e,0x72(%rbp),%esp
- 150:	65 6c                	gs insb (%dx),(%rdi)
- 152:	2f                   	(bad)
- 153:	69 6e 63 6c 75 64 65 	imul   $0x6564756c,0x63(%rsi),%ebp
- 15a:	2f                   	(bad)
- 15b:	6c                   	insb   (%dx),(%rdi)
- 15c:	69 62 00 5f 75 69 6e 	imul   $0x6e69755f,0x0(%rdx),%esp
- 163:	74 31                	je     196 <asvfs_getattr@plt-0x60a>
- 165:	36 5f                	ss pop %rdi
- 167:	74 2e                	je     197 <asvfs_getattr@plt-0x609>
- 169:	68 00 5f 75 69       	push   $0x69755f00
- 16e:	6e                   	outsb  (%rsi),(%dx)
- 16f:	74 33                	je     1a4 <asvfs_getattr@plt-0x5fc>
- 171:	32 5f 74             	xor    0x74(%rdi),%bl
- 174:	2e 68 00 5f 75 69    	cs push $0x69755f00
- 17a:	6e                   	outsb  (%rsi),(%dx)
- 17b:	74 36                	je     1b3 <asvfs_getattr@plt-0x5ed>
- 17d:	34 5f                	xor    $0x5f,%al
- 17f:	74 2e                	je     1af <asvfs_getattr@plt-0x5f1>
- 181:	68 00 5f 75 69       	push   $0x69755f00
- 186:	6e                   	outsb  (%rsi),(%dx)
- 187:	74 38                	je     1c1 <asvfs_getattr@plt-0x5df>
- 189:	5f                   	pop    %rdi
- 18a:	74 2e                	je     1ba <asvfs_getattr@plt-0x5e6>
- 18c:	68 00 5f 73 69       	push   $0x69735f00
- 191:	7a 65                	jp     1f8 <asvfs_getattr@plt-0x5a8>
- 193:	5f                   	pop    %rdi
- 194:	74 2e                	je     1c4 <asvfs_getattr@plt-0x5dc>
- 196:	68 00 73 74 64       	push   $0x64747300
- 19b:	64 65 66 2e 68 00 73 	fs gs cs pushw $0x7300
- 1a2:	74 64                	je     208 <asvfs_getattr@plt-0x598>
- 1a4:	69 6f 2e 68 00 6e 6f 	imul   $0x6f6e0068,0x2e(%rdi),%ebp
- 1ab:	64 65 2e 68 00 6c 69 	fs gs cs push $0x73696c00
- 1b2:	73 
+ 10d:	61                   	(bad)
+ 10e:	76 73                	jbe    183 <asvfs_getattr@plt-0x61d>
+ 110:	2d 6c 69 62 63       	sub    $0x6362696c,%eax
+ 115:	2d 73 74 61 74       	sub    $0x74617473,%eax
+ 11a:	69 63 2f 69 6e 63 6c 	imul   $0x6c636e69,0x2f(%rbx),%esp
+ 121:	75 64                	jne    187 <asvfs_getattr@plt-0x619>
+ 123:	65 2f                	gs (bad)
+ 125:	73 79                	jae    1a0 <asvfs_getattr@plt-0x600>
+ 127:	73 00                	jae    129 <asvfs_getattr@plt-0x677>
+ 129:	2f                   	(bad)
+ 12a:	75 73                	jne    19f <asvfs_getattr@plt-0x601>
+ 12c:	72 2f                	jb     15d <asvfs_getattr@plt-0x643>
+ 12e:	6c                   	insb   (%dx),(%rdi)
+ 12f:	6f                   	outsl  (%rsi),(%dx)
+ 130:	63 61 6c             	movsxd 0x6c(%rcx),%esp
+ 133:	2f                   	(bad)
+ 134:	6f                   	outsl  (%rsi),(%dx)
+ 135:	73 64                	jae    19b <asvfs_getattr@plt-0x605>
+ 137:	65 76 2f             	gs jbe 169 <asvfs_getattr@plt-0x637>
+ 13a:	73 6f                	jae    1ab <asvfs_getattr@plt-0x5f5>
+ 13c:	75 72                	jne    1b0 <asvfs_getattr@plt-0x5f0>
+ 13e:	63 65 2f             	movsxd 0x2f(%rbp),%esp
+ 141:	76 65                	jbe    1a8 <asvfs_getattr@plt-0x5f8>
+ 143:	72 73                	jb     1b8 <asvfs_getattr@plt-0x5e8>
+ 145:	69 6f 6e 73 69 78 2f 	imul   $0x2f786973,0x6e(%rdi),%ebp
+ 14c:	63 6f 72             	movsxd 0x72(%rdi),%ebp
+ 14f:	65 5f                	gs pop %rdi
+ 151:	61                   	(bad)
+ 152:	70 70                	jo     1c4 <asvfs_getattr@plt-0x5dc>
+ 154:	73 2f                	jae    185 <asvfs_getattr@plt-0x61b>
+ 156:	2e 2e 2f             	cs cs (bad)
+ 159:	6b 65 72 6e          	imul   $0x6e,0x72(%rbp),%esp
+ 15d:	65 6c                	gs insb (%dx),(%rdi)
+ 15f:	2f                   	(bad)
+ 160:	69 6e 63 6c 75 64 65 	imul   $0x6564756c,0x63(%rsi),%ebp
+ 167:	00 2f                	add    %ch,(%rdi)
+ 169:	75 73                	jne    1de <asvfs_getattr@plt-0x5c2>
+ 16b:	72 2f                	jb     19c <asvfs_getattr@plt-0x604>
+ 16d:	6c                   	insb   (%dx),(%rdi)
+ 16e:	6f                   	outsl  (%rsi),(%dx)
+ 16f:	63 61 6c             	movsxd 0x6c(%rcx),%esp
+ 172:	2f                   	(bad)
+ 173:	6f                   	outsl  (%rsi),(%dx)
+ 174:	73 64                	jae    1da <asvfs_getattr@plt-0x5c6>
+ 176:	65 76 2f             	gs jbe 1a8 <asvfs_getattr@plt-0x5f8>
+ 179:	73 6f                	jae    1ea <asvfs_getattr@plt-0x5b6>
+ 17b:	75 72                	jne    1ef <asvfs_getattr@plt-0x5b1>
+ 17d:	63 65 2f             	movsxd 0x2f(%rbp),%esp
+ 180:	76 65                	jbe    1e7 <asvfs_getattr@plt-0x5b9>
+ 182:	72 73                	jb     1f7 <asvfs_getattr@plt-0x5a9>
+ 184:	69 6f 6e 73 69 78 2f 	imul   $0x2f786973,0x6e(%rdi),%ebp
+ 18b:	63 6f 72             	movsxd 0x72(%rdi),%ebp
+ 18e:	65 5f                	gs pop %rdi
+ 190:	61                   	(bad)
+ 191:	70 70                	jo     203 <asvfs_getattr@plt-0x59d>
+ 193:	73 2f                	jae    1c4 <asvfs_getattr@plt-0x5dc>
+ 195:	2e 2e 2f             	cs cs (bad)
+ 198:	6b 65 72 6e          	imul   $0x6e,0x72(%rbp),%esp
+ 19c:	65 6c                	gs insb (%dx),(%rdi)
+ 19e:	2f                   	(bad)
+ 19f:	69 6e 63 6c 75 64 65 	imul   $0x6564756c,0x63(%rsi),%ebp
+ 1a6:	2f                   	(bad)
+ 1a7:	6c                   	insb   (%dx),(%rdi)
+ 1a8:	69 62 00 5f 75 69 6e 	imul   $0x6e69755f,0x0(%rdx),%esp
+ 1af:	74 31                	je     1e2 <asvfs_getattr@plt-0x5be>
+ 1b1:	36 5f                	ss pop %rdi
  1b3:	74 2e                	je     1e3 <asvfs_getattr@plt-0x5bd>
- 1b5:	68 00 69 6e 74       	push   $0x746e6900
- 1ba:	65 72 72             	gs jb  22f <asvfs_getattr@plt-0x571>
- 1bd:	75 70                	jne    22f <asvfs_getattr@plt-0x571>
- 1bf:	74 2e                	je     1ef <asvfs_getattr@plt-0x5b1>
- 1c1:	68 00 64 65 62       	push   $0x62656400
- 1c6:	75 67                	jne    22f <asvfs_getattr@plt-0x571>
- 1c8:	2e 68 00 65 72 72    	cs push $0x72726500
- 1ce:	6f                   	outsl  (%rsi),(%dx)
- 1cf:	72 2e                	jb     1ff <asvfs_getattr@plt-0x5a1>
- 1d1:	68 00 70 72 69       	push   $0x69727000
- 1d6:	6e                   	outsb  (%rsi),(%dx)
- 1d7:	74 66                	je     23f <asvfs_getattr@plt-0x561>
- 1d9:	2e 68 00 61 73 76    	cs push $0x76736100
- 1df:	66 73 2e             	data16 jae 210 <asvfs_getattr@plt-0x590>
- 1e2:	68 00 62 6f 6f       	push   $0x6f6f6200
- 1e7:	74 73                	je     25c <asvfs_getattr@plt-0x544>
- 1e9:	74 72                	je     25d <asvfs_getattr@plt-0x543>
- 1eb:	61                   	(bad)
- 1ec:	70 2e                	jo     21c <asvfs_getattr@plt-0x584>
- 1ee:	68 00 6b 6d 65       	push   $0x656d6b00
- 1f3:	6d                   	insl   (%dx),(%rdi)
- 1f4:	6f                   	outsl  (%rsi),(%dx)
- 1f5:	72 79                	jb     270 <asvfs_getattr@plt-0x530>
- 1f7:	2e                   	cs
- 1f8:	68                   	.byte 0x68
+ 1b5:	68 00 5f 75 69       	push   $0x69755f00
+ 1ba:	6e                   	outsb  (%rsi),(%dx)
+ 1bb:	74 33                	je     1f0 <asvfs_getattr@plt-0x5b0>
+ 1bd:	32 5f 74             	xor    0x74(%rdi),%bl
+ 1c0:	2e 68 00 5f 75 69    	cs push $0x69755f00
+ 1c6:	6e                   	outsb  (%rsi),(%dx)
+ 1c7:	74 36                	je     1ff <asvfs_getattr@plt-0x5a1>
+ 1c9:	34 5f                	xor    $0x5f,%al
+ 1cb:	74 2e                	je     1fb <asvfs_getattr@plt-0x5a5>
+ 1cd:	68 00 5f 75 69       	push   $0x69755f00
+ 1d2:	6e                   	outsb  (%rsi),(%dx)
+ 1d3:	74 38                	je     20d <asvfs_getattr@plt-0x593>
+ 1d5:	5f                   	pop    %rdi
+ 1d6:	74 2e                	je     206 <asvfs_getattr@plt-0x59a>
+ 1d8:	68 00 5f 73 69       	push   $0x69735f00
+ 1dd:	7a 65                	jp     244 <asvfs_getattr@plt-0x55c>
+ 1df:	5f                   	pop    %rdi
+ 1e0:	74 2e                	je     210 <asvfs_getattr@plt-0x590>
+ 1e2:	68 00 73 74 64       	push   $0x64747300
+ 1e7:	64 65 66 2e 68 00 74 	fs gs cs pushw $0x7400
+ 1ee:	79 70                	jns    260 <asvfs_getattr@plt-0x540>
+ 1f0:	65 73 2e             	gs jae 221 <asvfs_getattr@plt-0x57f>
+ 1f3:	68 00 6e 6f 64       	push   $0x646f6e00
+ 1f8:	65 2e 68 00 6c 69 73 	gs cs push $0x73696c00
+ 1ff:	74 2e                	je     22f <asvfs_getattr@plt-0x571>
+ 201:	68 00 69 6e 74       	push   $0x746e6900
+ 206:	65 72 72             	gs jb  27b <asvfs_getattr@plt-0x525>
+ 209:	75 70                	jne    27b <asvfs_getattr@plt-0x525>
+ 20b:	74 2e                	je     23b <asvfs_getattr@plt-0x565>
+ 20d:	68 00 64 65 62       	push   $0x62656400
+ 212:	75 67                	jne    27b <asvfs_getattr@plt-0x525>
+ 214:	2e 68 00 65 72 72    	cs push $0x72726500
+ 21a:	6f                   	outsl  (%rsi),(%dx)
+ 21b:	72 2e                	jb     24b <asvfs_getattr@plt-0x555>
+ 21d:	68 00 70 72 69       	push   $0x69727000
+ 222:	6e                   	outsb  (%rsi),(%dx)
+ 223:	74 66                	je     28b <asvfs_getattr@plt-0x515>
+ 225:	2e 68 00 61 73 76    	cs push $0x76736100
+ 22b:	66 73 2e             	data16 jae 25c <asvfs_getattr@plt-0x544>
+ 22e:	68 00 62 6f 6f       	push   $0x6f6f6200
+ 233:	74 73                	je     2a8 <asvfs_getattr@plt-0x4f8>
+ 235:	74 72                	je     2a9 <asvfs_getattr@plt-0x4f7>
+ 237:	61                   	(bad)
+ 238:	70 2e                	jo     268 <asvfs_getattr@plt-0x538>
+ 23a:	68 00 6b 6d 65       	push   $0x656d6b00
+ 23f:	6d                   	insl   (%dx),(%rdi)
+ 240:	6f                   	outsl  (%rsi),(%dx)
+ 241:	72 79                	jb     2bc <asvfs_getattr@plt-0x4e4>
+ 243:	2e                   	cs
+ 244:	68                   	.byte 0x68
 	...

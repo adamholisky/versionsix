@@ -1824,41 +1824,40 @@ Disassembly of section .debug_info:
  12a:	00 07                	add    %al,(%rdi)
  12c:	c7 00 00 00 10 30    	movl   $0x30100000,(%rax)
  132:	07                   	(bad)
- 133:	1c 09                	sbb    $0x9,%al
- 135:	54                   	push   %rsp
- 136:	01 00                	add    %eax,(%rax)
+ 133:	1d 09 54 01 00       	sbb    $0x15409,%eax
  138:	00 06                	add    %al,(%rsi)
  13a:	f3 01 00             	repz add %eax,(%rax)
- 13d:	00 1d 64 00 00 00    	add    %bl,0x64(%rip)        # 1a7 <syscall@plt-0x639>
- 143:	00 06                	add    %al,(%rsi)
+ 13d:	00 1e                	add    %bl,(%rsi)
+ 13f:	64 00 00             	add    %al,%fs:(%rax)
+ 142:	00 00                	add    %al,(%rax)
+ 144:	06                   	(bad)
  145:	f9                   	stc
  146:	01 00                	add    %eax,(%rax)
- 148:	00 1e                	add    %bl,(%rsi)
+ 148:	00 1f                	add    %bl,(%rdi)
  14a:	64 00 00             	add    %al,%fs:(%rax)
  14d:	00 08                	add    %cl,(%rax)
  14f:	06                   	(bad)
  150:	ff 01                	incl   (%rcx)
  152:	00 00                	add    %al,(%rax)
- 154:	1f                   	(bad)
- 155:	64 00 00             	add    %al,%fs:(%rax)
+ 154:	20 64 00 00          	and    %ah,0x0(%rax,%rax,1)
  158:	00 10                	add    %dl,(%rax)
  15a:	06                   	(bad)
- 15b:	05 02 00 00 20       	add    $0x20000002,%eax
+ 15b:	05 02 00 00 21       	add    $0x21000002,%eax
  160:	64 00 00             	add    %al,%fs:(%rax)
  163:	00 18                	add    %bl,(%rax)
  165:	06                   	(bad)
  166:	45 00 00             	add    %r8b,(%r8)
- 169:	00 21                	add    %ah,(%rcx)
+ 169:	00 22                	add    %ah,(%rdx)
  16b:	64 00 00             	add    %al,%fs:(%rax)
  16e:	00 20                	add    %ah,(%rax)
  170:	06                   	(bad)
  171:	4b 00 00             	rex.WXB add %al,(%r8)
- 174:	00 22                	add    %ah,(%rdx)
+ 174:	00 23                	add    %ah,(%rbx)
  176:	64 00 00             	add    %al,%fs:(%rax)
  179:	00 28                	add    %ch,(%rax)
  17b:	00 05 60 01 00 00    	add    %al,0x160(%rip)        # 2e1 <syscall@plt-0x4ff>
  181:	07                   	(bad)
- 182:	23 03                	and    (%rbx),%eax
+ 182:	24 03                	and    $0x3,%al
  184:	08 01                	or     %al,(%rcx)
  186:	00 00                	add    %al,(%rax)
  188:	08 dc                	or     %bl,%ah
@@ -1906,7 +1905,8 @@ Disassembly of section .debug_info:
  1e6:	04 6d                	add    $0x6d,%al
  1e8:	01 00                	add    %eax,(%rax)
  1ea:	00 07                	add    %al,(%rdi)
- 1ec:	36 07                	ss (bad)
+ 1ec:	37                   	(bad)
+ 1ed:	07                   	(bad)
  1ee:	f7 00 00 00 d4 01    	testl  $0x1d40000,(%rax)
  1f4:	00 00                	add    %al,(%rax)
  1f6:	01 f7                	add    %esi,%edi
@@ -1915,7 +1915,7 @@ Disassembly of section .debug_info:
  1fc:	04 6b                	add    $0x6b,%al
  1fe:	00 00                	add    %al,(%rax)
  200:	00 07                	add    %al,(%rdi)
- 202:	31 05 35 00 00 00    	xor    %eax,0x35(%rip)        # 23d <syscall@plt-0x5a3>
+ 202:	32 05 35 00 00 00    	xor    0x35(%rip),%al        # 23d <syscall@plt-0x5a3>
  208:	f4                   	hlt
  209:	01 00                	add    %eax,(%rax)
  20b:	00 01                	add    %al,(%rcx)
@@ -1930,7 +1930,8 @@ Disassembly of section .debug_info:
  21c:	04 58                	add    $0x58,%al
  21e:	00 00                	add    %al,(%rax)
  220:	00 07                	add    %al,(%rdi)
- 222:	26 0a 64 00 00       	es or  0x0(%rax,%rax,1),%ah
+ 222:	27                   	(bad)
+ 223:	0a 64 00 00          	or     0x0(%rax,%rax,1),%ah
  227:	00 14 02             	add    %dl,(%rdx,%rax,1)
  22a:	00 00                	add    %al,(%rax)
  22c:	01 64 00 00          	add    %esp,0x0(%rax,%rax,1)
@@ -2555,13 +2556,10 @@ Disassembly of section .debug_line_str:
   7a:	61                   	(bad)
   7b:	76 73                	jbe    f0 <syscall@plt-0x6f0>
   7d:	2d 6c 69 62 63       	sub    $0x6362696c,%eax
-  82:	5f                   	pop    %rdi
-  83:	73 74                	jae    f9 <syscall@plt-0x6e7>
-  85:	61                   	(bad)
-  86:	74 69                	je     f1 <syscall@plt-0x6ef>
-  88:	63 2f                	movsxd (%rdi),%ebp
-  8a:	69 6e 63 6c 75 64 65 	imul   $0x6564756c,0x63(%rsi),%ebp
-  91:	2f                   	(bad)
+  82:	2d 73 74 61 74       	sub    $0x74617473,%eax
+  87:	69 63 2f 69 6e 63 6c 	imul   $0x6c636e69,0x2f(%rbx),%esp
+  8e:	75 64                	jne    f4 <syscall@plt-0x6ec>
+  90:	65 2f                	gs (bad)
   92:	5f                   	pop    %rdi
   93:	74 79                	je     10e <syscall@plt-0x6d2>
   95:	70 65                	jo     fc <syscall@plt-0x6e4>
@@ -2617,13 +2615,10 @@ Disassembly of section .debug_line_str:
  108:	61                   	(bad)
  109:	76 73                	jbe    17e <syscall@plt-0x662>
  10b:	2d 6c 69 62 63       	sub    $0x6362696c,%eax
- 110:	5f                   	pop    %rdi
- 111:	73 74                	jae    187 <syscall@plt-0x659>
- 113:	61                   	(bad)
- 114:	74 69                	je     17f <syscall@plt-0x661>
- 116:	63 2f                	movsxd (%rdi),%ebp
- 118:	69 6e 63 6c 75 64 65 	imul   $0x6564756c,0x63(%rsi),%ebp
- 11f:	00 5f 75             	add    %bl,0x75(%rdi)
+ 110:	2d 73 74 61 74       	sub    $0x74617473,%eax
+ 115:	69 63 2f 69 6e 63 6c 	imul   $0x6c636e69,0x2f(%rbx),%esp
+ 11c:	75 64                	jne    182 <syscall@plt-0x65e>
+ 11e:	65 00 5f 75          	add    %bl,%gs:0x75(%rdi)
  122:	69 6e 74 33 32 5f 74 	imul   $0x745f3233,0x74(%rsi),%ebp
  129:	2e 68 00 5f 75 69    	cs push $0x69755f00
  12f:	6e                   	outsb  (%rsi),(%dx)

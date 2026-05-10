@@ -13,10 +13,7 @@
 #include <syscall.h>
 #include <stdio.h>
 
-#include <avs_dev_api.h>
-
-#include <lualib.h> 
-#include <lauxlib.h>
+#include <setjmp.h>
 
 extern void libc_internal_initalize( void );
 
@@ -26,32 +23,13 @@ void do_a_thing( void ) {
 	do_a_thing_main( 0, NULL );
 }
 
-lua_State *L;
+jmp_buf jump_buffer;
 
 int do_a_thing_main( int argc, char* argv[] ) {
 	klog( LOG_INFO, "-----> doing a thing <-----" );
 	debugf( "-----> doing a thing <-----\n" );
 
-	L = luaL_newstate();
-
-	/* Check the return value */
-	if ( L == NULL ) {
-		fprintf( stdout, "Lua: cannot initialize\n" );
-		return -1;
-	} else {
-		fprintf( stderr, "Lua initalized!\n" );
-	}
-
-	luaL_openlibs(L);
-
-	int lua_err = luaL_dostring( L, "print(\"Hello, from lua!\");" );
-
-	printf( "lua returned: %d\n", lua_err );
-	if( lua_err != 0 ) {
-		printf( "lua says: %s\n", lua_tostring(L, 1) );
-	}
-
-	lua_close(L);
+	
 
 	debugf( "-----> stopped doing a thing <-----\n" );
 	klog( LOG_INFO, "-----> stopped doing a thing <-----" );

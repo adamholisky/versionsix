@@ -9,6 +9,8 @@
 extern "C" {
 #endif //__cplusplus
 
+char* getenv(const char*);
+
 // #pragma mark - definitions & types -
 
 /// Division type for integers
@@ -63,10 +65,8 @@ int at_quick_exit(void (*)(void));
 void quick_exit(int) __attribute__((noreturn));
 int cxa_atexit(void (*)(void*), void*, void*);
 
-#ifndef DISABLE_UNIMPLEMENTED_LIBC_APIS
-// Unsupported in bare metal environments:
-char* getenv(const char*);
-#endif
+
+
 
 #ifndef DISABLE_UNIMPLEMENTED_LIBC_APIS
 // Unsupported in bare metal environments:

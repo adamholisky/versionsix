@@ -15,7 +15,7 @@ extern "C" {
 #include <syscall.h>
 #include <debug.h>
 #include <framebuffer.h>
-#include <error.h>
+#include <kerror.h>
 
 #define VIFS_OS
 
@@ -78,6 +78,8 @@ void main_console_blink_cursor( void );
 
 void do_a_thing( void );
 int do_a_thing_main( int argc, char *argv[] );
+
+#define KASSERT_NOT_NULL_R(x) if(x == NULL) { klog( LOG_ERROR, "Assert not null failed on " #x ); return 0; }
 
 #ifdef __cplusplus
 }

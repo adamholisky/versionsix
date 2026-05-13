@@ -27,7 +27,7 @@ int elf_loader_load( process_data* p, uint8_t* data ) {
 
 			if ( !elf_load_symbols( elf_f ) ) {
 				debugf( "Symbols failed to load." );
-				return ERR_ELF_INAVLID;
+				return KERR_ELF_INAVLID;
 			}
 
 			symbols_diagnostic( elf_f->symbols );

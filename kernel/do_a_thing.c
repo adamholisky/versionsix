@@ -13,7 +13,7 @@
 #include <syscall.h>
 #include <stdio.h>
 
-#include <setjmp.h>
+#include <lib.h>
 
 extern void libc_internal_initalize( void );
 
@@ -23,13 +23,12 @@ void do_a_thing( void ) {
 	do_a_thing_main( 0, NULL );
 }
 
-jmp_buf jump_buffer;
-
 int do_a_thing_main( int argc, char* argv[] ) {
 	klog( LOG_INFO, "-----> doing a thing <-----" );
 	debugf( "-----> doing a thing <-----\n" );
 
-	
+	lib_initalize();
+	lib_register( "/libavsul.so" );
 
 	debugf( "-----> stopped doing a thing <-----\n" );
 	klog( LOG_INFO, "-----> stopped doing a thing <-----" );

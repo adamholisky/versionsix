@@ -7,11 +7,11 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-#define ERR_NONE 0
-#define ERR_UNKNOWN -1
-#define ERR_STAT -2
-#define ERR_INVALID_ELF_TYPE -3
-#define ERR_ELF_INAVLID -4
+#define KERR_NONE 0
+#define KERR_UNKNOWN -1
+#define KERR_STAT -2
+#define KERR_INVALID_ELF_TYPE -3
+#define KERR_ELF_INAVLID -4
 
 
 static const char *error_strings[] = {

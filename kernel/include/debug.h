@@ -45,6 +45,11 @@ static const char * bit_array[16] = {
 #define dD dbD();
 #define dE dbE();
 
+#define kA() klog( LOG_DEBUG, "---> A <---" )
+#define kB() klog( LOG_DEBUG, "---> B <---" )
+#define kC() klog( LOG_DEBUG, "---> C <---" )
+#define kD() klog( LOG_DEBUG, "---> D <---" )
+
 #define debugf_bit_array( x ) debugf_raw( "flags: %s %s %s %s %s %s %s %s -- 0x%08X\n", \
         bit_array[ 0xF & (x >> 28) ], \
         bit_array[ 0xF & (x >> 24) ], \

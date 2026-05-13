@@ -28,7 +28,7 @@ int do_a_thing_main( int argc, char* argv[] ) {
 	debugf( "-----> doing a thing <-----\n" );
 
 	lib_initalize();
-	lib_register( "/libavsul.so" );
+	lib_register( "/bin/libtest.so" );
 
 	debugf( "-----> stopped doing a thing <-----\n" );
 	klog( LOG_INFO, "-----> stopped doing a thing <-----" );

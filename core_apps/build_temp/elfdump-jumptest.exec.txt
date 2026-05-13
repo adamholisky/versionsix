@@ -41,7 +41,7 @@ Section Headers:
   [17] .debug_abbrev     PROGBITS        0000000000000000 00106c 000148 00      0   0  1
   [18] .debug_line       PROGBITS        0000000000000000 0011b4 0000ec 00      0   0  1
   [19] .debug_str        PROGBITS        0000000000000000 0012a0 000168 01  MS  0   0  1
-  [20] .debug_line_str   PROGBITS        0000000000000000 001408 000101 01  MS  0   0  1
+  [20] .debug_line_str   PROGBITS        0000000000000000 001408 000102 01  MS  0   0  1
   [21] .symtab           SYMTAB          0000000000000000 001510 000180 18     22   8  8
   [22] .strtab           STRTAB          0000000000000000 001690 00009c 00      0   0  1
   [23] .shstrtab         STRTAB          0000000000000000 00172c 0000d3 00      0   0  1

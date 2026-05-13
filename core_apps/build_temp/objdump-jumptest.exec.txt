@@ -69,7 +69,7 @@ Idx Name          Size      VMA               LMA               File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  18 .debug_str    00000168  0000000000000000  0000000000000000  000012a0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_line_str 00000101  0000000000000000  0000000000000000  00001408  2**0
+ 19 .debug_line_str 00000102  0000000000000000  0000000000000000  00001408  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 SYMBOL TABLE:
 0000000000000000 l    df *ABS*	0000000000000000 jumptest.c
@@ -1437,9 +1437,9 @@ static const char * bit_array[16] = {
 	...
 
 0000000000001d40 <error_strings>:
-#define ERR_STAT -2
-#define ERR_INVALID_ELF_TYPE -3
-#define ERR_ELF_INAVLID -4
+#define KERR_STAT -2
+#define KERR_INVALID_ELF_TYPE -3
+#define KERR_ELF_INAVLID -4
 
 
 static const char *error_strings[] = {
@@ -2001,10 +2001,10 @@ Disassembly of section .debug_line:
   9b:	00 02                	add    %al,(%rdx)
   9d:	e7 00                	out    %eax,$0x0
   9f:	00 00                	add    %al,(%rax)
-  a1:	02 ef                	add    %bh,%ch
+  a1:	02 f0                	add    %al,%dh
   a3:	00 00                	add    %al,(%rax)
   a5:	00 03                	add    %al,(%rbx)
-  a7:	f8                   	clc
+  a7:	f9                   	stc
   a8:	00 00                	add    %al,(%rax)
   aa:	00 03                	add    %al,(%rbx)
   ac:	05 23 00 09 02       	add    $0x2090023,%eax
@@ -2272,15 +2272,15 @@ Disassembly of section .debug_line_str:
   db:	74 2e                	je     10b <longjmp@plt-0x5a5>
   dd:	68 00 64 65 62       	push   $0x62656400
   e2:	75 67                	jne    14b <longjmp@plt-0x565>
-  e4:	2e 68 00 65 72 72    	cs push $0x72726500
-  ea:	6f                   	outsl  (%rsi),(%dx)
-  eb:	72 2e                	jb     11b <longjmp@plt-0x595>
-  ed:	68 00 73 65 74       	push   $0x74657300
-  f2:	6a 6d                	push   $0x6d
-  f4:	70 2e                	jo     124 <longjmp@plt-0x58c>
-  f6:	68 00 70 72 69       	push   $0x69727000
-  fb:	6e                   	outsb  (%rsi),(%dx)
-  fc:	74 66                	je     164 <longjmp@plt-0x54c>
-  fe:	2e                   	cs
-  ff:	68                   	.byte 0x68
+  e4:	2e 68 00 6b 65 72    	cs push $0x72656b00
+  ea:	72 6f                	jb     15b <longjmp@plt-0x555>
+  ec:	72 2e                	jb     11c <longjmp@plt-0x594>
+  ee:	68 00 73 65 74       	push   $0x74657300
+  f3:	6a 6d                	push   $0x6d
+  f5:	70 2e                	jo     125 <longjmp@plt-0x58b>
+  f7:	68 00 70 72 69       	push   $0x69727000
+  fc:	6e                   	outsb  (%rsi),(%dx)
+  fd:	74 66                	je     165 <longjmp@plt-0x54b>
+  ff:	2e                   	cs
+ 100:	68                   	.byte 0x68
 	...

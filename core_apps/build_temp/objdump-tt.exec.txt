@@ -67,7 +67,7 @@ Idx Name          Size      VMA               LMA               File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_str    000001b6  0000000000000000  0000000000000000  00001565  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line_str 00000161  0000000000000000  0000000000000000  0000171b  2**0
+ 18 .debug_line_str 00000162  0000000000000000  0000000000000000  0000171b  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 SYMBOL TABLE:
 0000000000000000 l    df *ABS*	0000000000000000 tt.c
@@ -1626,9 +1626,9 @@ static const char * bit_array[16] = {
 	...
 
 0000000000001f40 <error_strings>:
-#define ERR_STAT -2
-#define ERR_INVALID_ELF_TYPE -3
-#define ERR_ELF_INAVLID -4
+#define KERR_STAT -2
+#define KERR_INVALID_ELF_TYPE -3
+#define KERR_ELF_INAVLID -4
 
 
 static const char *error_strings[] = {
@@ -1861,7 +1861,7 @@ Disassembly of section .debug_info:
  185:	3a 06                	cmp    (%rsi),%al
  187:	09 6a 00             	or     %ebp,0x0(%rdx)
  18a:	00 00                	add    %al,(%rax)
- 18c:	05 3c 71 01 00       	add    $0x1713c,%eax
+ 18c:	05 41 71 01 00       	add    $0x17141,%eax
  191:	00 02                	add    %al,(%rdx)
  193:	a3 00 00 00 0a 00 0b 	movabs %eax,0x530b000a000000
  19a:	53 00 
@@ -2239,9 +2239,9 @@ Disassembly of section .debug_line:
   a9:	00 03                	add    %al,(%rbx)
   ab:	46 01 00             	rex.RX add %r8d,(%rax)
   ae:	00 03                	add    %al,(%rbx)
-  b0:	4e 01 00             	rex.WRX add %r8,(%rax)
+  b0:	4f 01 00             	rex.WRXB add %r8,(%r8)
   b3:	00 03                	add    %al,(%rbx)
-  b5:	58                   	pop    %rax
+  b5:	59                   	pop    %rcx
   b6:	01 00                	add    %eax,(%rax)
   b8:	00 04 05 23 00 09 02 	add    %al,0x2090023(,%rax,1)
   bf:	f8                   	clc
@@ -2608,15 +2608,15 @@ Disassembly of section .debug_line_str:
  13a:	74 2e                	je     16a <yield@plt-0x606>
  13c:	68 00 64 65 62       	push   $0x62656400
  141:	75 67                	jne    1aa <yield@plt-0x5c6>
- 143:	2e 68 00 65 72 72    	cs push $0x72726500
- 149:	6f                   	outsl  (%rsi),(%dx)
- 14a:	72 2e                	jb     17a <yield@plt-0x5f6>
- 14c:	68 00 73 79 73       	push   $0x73797300
- 151:	63 61 6c             	movsxd 0x6c(%rcx),%esp
- 154:	6c                   	insb   (%dx),(%rdi)
- 155:	2e 68 00 70 72 69    	cs push $0x69727000
- 15b:	6e                   	outsb  (%rsi),(%dx)
- 15c:	74 66                	je     1c4 <yield@plt-0x5ac>
- 15e:	2e                   	cs
- 15f:	68                   	.byte 0x68
+ 143:	2e 68 00 6b 65 72    	cs push $0x72656b00
+ 149:	72 6f                	jb     1ba <yield@plt-0x5b6>
+ 14b:	72 2e                	jb     17b <yield@plt-0x5f5>
+ 14d:	68 00 73 79 73       	push   $0x73797300
+ 152:	63 61 6c             	movsxd 0x6c(%rcx),%esp
+ 155:	6c                   	insb   (%dx),(%rdi)
+ 156:	2e 68 00 70 72 69    	cs push $0x69727000
+ 15c:	6e                   	outsb  (%rsi),(%dx)
+ 15d:	74 66                	je     1c5 <yield@plt-0x5ab>
+ 15f:	2e                   	cs
+ 160:	68                   	.byte 0x68
 	...

@@ -67,7 +67,7 @@ Idx Name          Size      VMA               LMA               File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_str    0000020b  0000000000000000  0000000000000000  00001561  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line_str 0000019e  0000000000000000  0000000000000000  0000176c  2**0
+ 18 .debug_line_str 0000019f  0000000000000000  0000000000000000  0000176c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 SYMBOL TABLE:
 0000000000000000 l    df *ABS*	0000000000000000 apirun.c
@@ -1621,9 +1621,9 @@ static const char * bit_array[16] = {
 	...
 
 0000000000001f60 <error_strings>:
-#define ERR_STAT -2
-#define ERR_INVALID_ELF_TYPE -3
-#define ERR_ELF_INAVLID -4
+#define KERR_STAT -2
+#define KERR_INVALID_ELF_TYPE -3
+#define KERR_ELF_INAVLID -4
 
 
 static const char *error_strings[] = {
@@ -1946,7 +1946,7 @@ Disassembly of section .debug_info:
  240:	00 0a                	add    %cl,(%rdx)
  242:	43 01 00             	rex.XB add %eax,(%r8)
  245:	00 09                	add    %cl,(%rcx)
- 247:	3e 06                	ds (bad)
+ 247:	43 06                	rex.XB (bad)
  249:	2b 02                	sub    (%rdx),%eax
  24b:	00 00                	add    %al,(%rax)
  24d:	01 64 00 00          	add    %esp,0x0(%rax,%rax,1)
@@ -2242,10 +2242,10 @@ Disassembly of section .debug_line:
   bd:	00 03                	add    %al,(%rbx)
   bf:	75 01                	jne    c2 <syscall@plt-0x71e>
   c1:	00 00                	add    %al,(%rax)
-  c3:	03 7d 01             	add    0x1(%rbp),%edi
+  c3:	03 7e 01             	add    0x1(%rsi),%edi
   c6:	00 00                	add    %al,(%rax)
-  c8:	03 87 01 00 00 03    	add    0x3000001(%rdi),%eax
-  ce:	95                   	xchg   %eax,%ebp
+  c8:	03 88 01 00 00 03    	add    0x3000001(%rax),%ecx
+  ce:	96                   	xchg   %eax,%esi
   cf:	01 00                	add    %eax,(%rax)
   d1:	00 04 05 24 00 09 02 	add    %al,0x2090024(,%rax,1)
   d8:	98                   	cwtl
@@ -2646,21 +2646,21 @@ Disassembly of section .debug_line_str:
  169:	74 2e                	je     199 <syscall@plt-0x647>
  16b:	68 00 64 65 62       	push   $0x62656400
  170:	75 67                	jne    1d9 <syscall@plt-0x607>
- 172:	2e 68 00 65 72 72    	cs push $0x72726500
- 178:	6f                   	outsl  (%rsi),(%dx)
- 179:	72 2e                	jb     1a9 <syscall@plt-0x637>
- 17b:	68 00 6b 6d 65       	push   $0x656d6b00
- 180:	6d                   	insl   (%dx),(%rdi)
- 181:	6f                   	outsl  (%rsi),(%dx)
- 182:	72 79                	jb     1fd <syscall@plt-0x5e3>
- 184:	2e 68 00 61 76 73    	cs push $0x73766100
- 18a:	5f                   	pop    %rdi
- 18b:	64 65 76 5f          	fs gs jbe 1ee <syscall@plt-0x5f2>
- 18f:	61                   	(bad)
- 190:	70 69                	jo     1fb <syscall@plt-0x5e5>
- 192:	2e 68 00 70 72 69    	cs push $0x69727000
- 198:	6e                   	outsb  (%rsi),(%dx)
- 199:	74 66                	je     201 <syscall@plt-0x5df>
- 19b:	2e                   	cs
- 19c:	68                   	.byte 0x68
+ 172:	2e 68 00 6b 65 72    	cs push $0x72656b00
+ 178:	72 6f                	jb     1e9 <syscall@plt-0x5f7>
+ 17a:	72 2e                	jb     1aa <syscall@plt-0x636>
+ 17c:	68 00 6b 6d 65       	push   $0x656d6b00
+ 181:	6d                   	insl   (%dx),(%rdi)
+ 182:	6f                   	outsl  (%rsi),(%dx)
+ 183:	72 79                	jb     1fe <syscall@plt-0x5e2>
+ 185:	2e 68 00 61 76 73    	cs push $0x73766100
+ 18b:	5f                   	pop    %rdi
+ 18c:	64 65 76 5f          	fs gs jbe 1ef <syscall@plt-0x5f1>
+ 190:	61                   	(bad)
+ 191:	70 69                	jo     1fc <syscall@plt-0x5e4>
+ 193:	2e 68 00 70 72 69    	cs push $0x69727000
+ 199:	6e                   	outsb  (%rsi),(%dx)
+ 19a:	74 66                	je     202 <syscall@plt-0x5de>
+ 19c:	2e                   	cs
+ 19d:	68                   	.byte 0x68
 	...

@@ -30,6 +30,8 @@ int do_a_thing_main( int argc, char* argv[] ) {
 	lib_initalize();
 	lib_register( "/bin/libtest.so" );
 
+	execve( "/bin/slibtest.exec", NULL, NULL );
+
 	debugf( "-----> stopped doing a thing <-----\n" );
 	klog( LOG_INFO, "-----> stopped doing a thing <-----" );
 	return 0;

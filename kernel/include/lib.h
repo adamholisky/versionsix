@@ -46,6 +46,8 @@ int lib_register( char *pathname );
 void lib_initalize( void );
 int lib_load_symbols( lib_shared *lib, void *lib_data );
 int lib_load_program_headers( lib_shared *lib, void *lib_data );
+void lib_load_dynamic_linker( lib_shared *lib );
+void *lib_dynamic_linker( char *name );
 
 #ifdef __cplusplus
 }

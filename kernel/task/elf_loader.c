@@ -10,6 +10,8 @@
 
 #include <elf_loader.h>
 
+#include <lib.h>
+
 extern void elf_dynamic_linker_preamble( void );
 
 int elf_loader_load( process_data* p, uint8_t* data ) {
@@ -262,8 +264,11 @@ void* elf_loader_dynamic_linker( uint64_t got_table_data, uint8_t got_index ) {
 	process_data *p = process_get_current();
 
 	symbol* sym = symbols_get_symbol( get_ksyms_object(), p->rela_sym_index[got_index].name );
-	function_addr = sym->addr;
 
+	if( sym != NULL ) {
+		function_addr = sym->addr;
+	}
+	
 	if( function_addr == NULL ) {
 		for( int i = 0; i < p->num_dyn_syms; i++ ) {
 			if( strcmp( p->rela_sym_index[got_index].name , p->dyn_sym_index[i].name ) == 0 ) {
@@ -271,6 +276,11 @@ void* elf_loader_dynamic_linker( uint64_t got_table_data, uint8_t got_index ) {
 				break;
 			}
 		}
+	}
+
+	if( function_addr == NULL ) {
+		function_addr = lib_dynamic_linker( p->rela_sym_index[got_index].name );
+		klog( LOG_INFO, "Found in library, returning: 0x%016llX\n", function_addr );
 	}
 
 	if( function_addr == NULL ) {

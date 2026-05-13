@@ -67,7 +67,7 @@ Idx Name          Size      VMA               LMA               File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_str    0000034c  0000000000000000  0000000000000000  00001868  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line_str 00000246  0000000000000000  0000000000000000  00001bb4  2**0
+ 18 .debug_line_str 00000247  0000000000000000  0000000000000000  00001bb4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 SYMBOL TABLE:
 0000000000000000 l    df *ABS*	0000000000000000 ls.c
@@ -1574,9 +1574,9 @@ static const char * bit_array[16] = {
 	...
 
 0000000000001f20 <error_strings>:
-#define ERR_STAT -2
-#define ERR_INVALID_ELF_TYPE -3
-#define ERR_ELF_INAVLID -4
+#define KERR_STAT -2
+#define KERR_INVALID_ELF_TYPE -3
+#define KERR_ELF_INAVLID -4
 
 
 static const char *error_strings[] = {
@@ -2511,7 +2511,7 @@ Disassembly of section .debug_line:
   bb:	00 03                	add    %al,(%rbx)
   bd:	ed                   	in     (%dx),%eax
   be:	01 00                	add    %eax,(%rax)
-  c0:	00 04 2b             	add    %al,(%rbx,%rbp,1)
+  c0:	00 04 2c             	add    %al,(%rsp,%rbp,1)
   c3:	02 00                	add    (%rax),%al
   c5:	00 05 f5 01 00 00    	add    %al,0x1f5(%rip)        # 2c0 <asvfs_getattr@plt-0x4e0>
   cb:	06                   	(bad)
@@ -2522,12 +2522,12 @@ Disassembly of section .debug_line:
   d3:	00 00                	add    %al,(%rax)
   d5:	05 0f 02 00 00       	add    $0x20f,%eax
   da:	05 17 02 00 00       	add    $0x217,%eax
-  df:	05 2a 02 00 00       	add    $0x22a,%eax
-  e4:	05 1f 02 00 00       	add    $0x21f,%eax
-  e9:	03 28                	add    (%rax),%ebp
+  df:	05 2b 02 00 00       	add    $0x22b,%eax
+  e4:	05 20 02 00 00       	add    $0x220,%eax
+  e9:	03 29                	add    (%rcx),%ebp
   eb:	02 00                	add    (%rax),%al
-  ed:	00 05 30 02 00 00    	add    %al,0x230(%rip)        # 323 <asvfs_getattr@plt-0x47d>
-  f3:	05 3c 02 00 00       	add    $0x23c,%eax
+  ed:	00 05 31 02 00 00    	add    %al,0x231(%rip)        # 324 <asvfs_getattr@plt-0x47c>
+  f3:	05 3d 02 00 00       	add    $0x23d,%eax
   f8:	05 05 24 00 09       	add    $0x9002405,%eax
   fd:	02 48 08             	add    0x8(%rax),%cl
  100:	00 00                	add    %al,(%rax)
@@ -3139,23 +3139,23 @@ Disassembly of section .debug_line_str:
  20b:	74 2e                	je     23b <asvfs_getattr@plt-0x565>
  20d:	68 00 64 65 62       	push   $0x62656400
  212:	75 67                	jne    27b <asvfs_getattr@plt-0x525>
- 214:	2e 68 00 65 72 72    	cs push $0x72726500
- 21a:	6f                   	outsl  (%rsi),(%dx)
- 21b:	72 2e                	jb     24b <asvfs_getattr@plt-0x555>
- 21d:	68 00 70 72 69       	push   $0x69727000
- 222:	6e                   	outsb  (%rsi),(%dx)
- 223:	74 66                	je     28b <asvfs_getattr@plt-0x515>
- 225:	2e 68 00 61 73 76    	cs push $0x76736100
- 22b:	66 73 2e             	data16 jae 25c <asvfs_getattr@plt-0x544>
- 22e:	68 00 62 6f 6f       	push   $0x6f6f6200
- 233:	74 73                	je     2a8 <asvfs_getattr@plt-0x4f8>
- 235:	74 72                	je     2a9 <asvfs_getattr@plt-0x4f7>
- 237:	61                   	(bad)
- 238:	70 2e                	jo     268 <asvfs_getattr@plt-0x538>
- 23a:	68 00 6b 6d 65       	push   $0x656d6b00
- 23f:	6d                   	insl   (%dx),(%rdi)
- 240:	6f                   	outsl  (%rsi),(%dx)
- 241:	72 79                	jb     2bc <asvfs_getattr@plt-0x4e4>
- 243:	2e                   	cs
- 244:	68                   	.byte 0x68
+ 214:	2e 68 00 6b 65 72    	cs push $0x72656b00
+ 21a:	72 6f                	jb     28b <asvfs_getattr@plt-0x515>
+ 21c:	72 2e                	jb     24c <asvfs_getattr@plt-0x554>
+ 21e:	68 00 70 72 69       	push   $0x69727000
+ 223:	6e                   	outsb  (%rsi),(%dx)
+ 224:	74 66                	je     28c <asvfs_getattr@plt-0x514>
+ 226:	2e 68 00 61 73 76    	cs push $0x76736100
+ 22c:	66 73 2e             	data16 jae 25d <asvfs_getattr@plt-0x543>
+ 22f:	68 00 62 6f 6f       	push   $0x6f6f6200
+ 234:	74 73                	je     2a9 <asvfs_getattr@plt-0x4f7>
+ 236:	74 72                	je     2aa <asvfs_getattr@plt-0x4f6>
+ 238:	61                   	(bad)
+ 239:	70 2e                	jo     269 <asvfs_getattr@plt-0x537>
+ 23b:	68 00 6b 6d 65       	push   $0x656d6b00
+ 240:	6d                   	insl   (%dx),(%rdi)
+ 241:	6f                   	outsl  (%rsi),(%dx)
+ 242:	72 79                	jb     2bd <asvfs_getattr@plt-0x4e3>
+ 244:	2e                   	cs
+ 245:	68                   	.byte 0x68
 	...

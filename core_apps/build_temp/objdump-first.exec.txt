@@ -67,7 +67,7 @@ Idx Name          Size      VMA               LMA               File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_str    000001bb  0000000000000000  0000000000000000  00001300  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line_str 0000018b  0000000000000000  0000000000000000  000014bb  2**0
+ 18 .debug_line_str 0000018c  0000000000000000  0000000000000000  000014bb  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 SYMBOL TABLE:
 0000000000000000 l    df *ABS*	0000000000000000 first.c
@@ -1441,9 +1441,9 @@ static const char * bit_array[16] = {
 	...
 
 0000000000001d80 <error_strings>:
-#define ERR_STAT -2
-#define ERR_INVALID_ELF_TYPE -3
-#define ERR_ELF_INAVLID -4
+#define KERR_STAT -2
+#define KERR_INVALID_ELF_TYPE -3
+#define KERR_ELF_INAVLID -4
 
 
 static const char *error_strings[] = {
@@ -2016,9 +2016,9 @@ Disassembly of section .debug_line:
   b5:	62 01 00 00 03       	(bad)
   ba:	6a 01                	push   $0x1
   bc:	00 00                	add    %al,(%rax)
-  be:	03 72 01             	add    0x1(%rdx),%esi
+  be:	03 73 01             	add    0x1(%rbx),%esi
   c1:	00 00                	add    %al,(%rax)
-  c3:	04 7b                	add    $0x7b,%al
+  c3:	04 7c                	add    $0x7c,%al
   c5:	01 00                	add    %eax,(%rax)
   c7:	00 03                	add    %al,(%rbx)
   c9:	05 24 00 09 02       	add    $0x2090024,%eax
@@ -2389,20 +2389,20 @@ Disassembly of section .debug_line_str:
  15e:	74 2e                	je     18e <syscall@plt-0x542>
  160:	68 00 64 65 62       	push   $0x62656400
  165:	75 67                	jne    1ce <syscall@plt-0x502>
- 167:	2e 68 00 65 72 72    	cs push $0x72726500
- 16d:	6f                   	outsl  (%rsi),(%dx)
- 16e:	72 2e                	jb     19e <syscall@plt-0x532>
- 170:	68 00 70 72 69       	push   $0x69727000
- 175:	6e                   	outsb  (%rsi),(%dx)
- 176:	74 66                	je     1de <syscall@plt-0x4f2>
- 178:	2e 68 00 6b 65 72    	cs push $0x72656b00
- 17e:	6e                   	outsb  (%rsi),(%dx)
- 17f:	65 6c                	gs insb (%dx),(%rdi)
- 181:	5f                   	pop    %rdi
- 182:	63 6f 6d             	movsxd 0x6d(%rdi),%ebp
- 185:	6d                   	insl   (%dx),(%rdi)
- 186:	6f                   	outsl  (%rsi),(%dx)
- 187:	6e                   	outsb  (%rsi),(%dx)
- 188:	2e                   	cs
- 189:	68                   	.byte 0x68
+ 167:	2e 68 00 6b 65 72    	cs push $0x72656b00
+ 16d:	72 6f                	jb     1de <syscall@plt-0x4f2>
+ 16f:	72 2e                	jb     19f <syscall@plt-0x531>
+ 171:	68 00 70 72 69       	push   $0x69727000
+ 176:	6e                   	outsb  (%rsi),(%dx)
+ 177:	74 66                	je     1df <syscall@plt-0x4f1>
+ 179:	2e 68 00 6b 65 72    	cs push $0x72656b00
+ 17f:	6e                   	outsb  (%rsi),(%dx)
+ 180:	65 6c                	gs insb (%dx),(%rdi)
+ 182:	5f                   	pop    %rdi
+ 183:	63 6f 6d             	movsxd 0x6d(%rdi),%ebp
+ 186:	6d                   	insl   (%dx),(%rdi)
+ 187:	6f                   	outsl  (%rsi),(%dx)
+ 188:	6e                   	outsb  (%rsi),(%dx)
+ 189:	2e                   	cs
+ 18a:	68                   	.byte 0x68
 	...

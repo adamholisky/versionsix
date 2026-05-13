@@ -49,7 +49,7 @@ int elf2_new_initalize_file( elf2_file *f_elf, void *data ) {
 
 				if( phdr->p_type == PT_LOAD ) { f_elf->program_headers_num_loads++; }
 
-				printf( "Added PH: %d \t %d \t phys 0x%016llX \t %X \t virt 0x%016llX \t %X RWX: %d %d %d\n", i, f_elf->program_headers[i].type, f_elf->program_headers[i].phys_addr, f_elf->program_headers[i].phys_size, f_elf->program_headers[i].virt_addr, f_elf->program_headers[i].virt_size, f_elf->program_headers[i].read, f_elf->program_headers[i].write, f_elf->program_headers[i].execute );
+				//printf( "Added PH: %d \t %d \t phys 0x%016llX \t %X \t virt 0x%016llX \t %X RWX: %d %d %d\n", i, f_elf->program_headers[i].type, f_elf->program_headers[i].phys_addr, f_elf->program_headers[i].phys_size, f_elf->program_headers[i].virt_addr, f_elf->program_headers[i].virt_size, f_elf->program_headers[i].read, f_elf->program_headers[i].write, f_elf->program_headers[i].execute );
 			}
 		}
 	}
@@ -79,9 +79,9 @@ int elf2_new_initalize_file( elf2_file *f_elf, void *data ) {
 					f_elf->dynsym_ents[i].type = ELF64_ST_TYPE( s_dyn->st_info );
 					f_elf->dynsym_ents[i].binding = ELF64_ST_BIND( s_dyn->st_info );
 
-					if( f_elf->dynsym_ents[i].sh_index != 0 ) { f_elf->num_symbols; }
+					if( f_elf->dynsym_ents[i].sh_index != 0 ) { f_elf->num_symbols++; }
 
-					printf( "Added: 0x%X \t for 0x%X \t idx %d \t type %d \t %s \n", f_elf->dynsym_ents[i].addr, f_elf->dynsym_ents[i].size, f_elf->dynsym_ents[i].sh_index, f_elf->dynsym_ents[i].type, f_elf->dynsym_ents[i].name );
+					//printf( "Added: 0x%X \t for 0x%X \t idx %d \t type %d \t %s \n", f_elf->dynsym_ents[i].addr, f_elf->dynsym_ents[i].size, f_elf->dynsym_ents[i].sh_index, f_elf->dynsym_ents[i].type, f_elf->dynsym_ents[i].name );
 				}
 			} else {
 				f_elf->has_dynsym = false;

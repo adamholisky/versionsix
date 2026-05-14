@@ -51,7 +51,7 @@ int lib_register( char *pathname ) {
 	lib_shared *lib = kmalloc( sizeof(lib_shared) );
 	memset( lib, 0, sizeof(lib_shared) );
 	lib->f_elf = kmalloc( sizeof(elf2_file) );
-	memset( lib->f_elf, 0, sizeof(lib_shared) );
+	memset( lib->f_elf, 0, sizeof(elf2_file) );
 	int elf_err = elf2_new_initalize_file( lib->f_elf, lib_data );
 	if( elf_err != KERR_NONE ) {
 		klog( LOG_ERROR, "ELF file init failed: %d", elf_err );
@@ -132,6 +132,8 @@ int lib_load_program_headers( lib_shared *lib, void *lib_data ) {
 
 	elf2_program_header *program_headers = lib->f_elf->program_headers;
 
+	int i_adjusted = 0;
+
 	// Populate the pages array
 	for( int i = 0; i < lib->f_elf->program_headers_num_ents; i++ ) {
 		if( program_headers[i].type != PT_LOAD ) {
@@ -139,31 +141,37 @@ int lib_load_program_headers( lib_shared *lib, void *lib_data ) {
 			continue;
 		}
 
-		lib->mem_sections[i].num_pages = (program_headers[i].virt_size / PAGE_SIZE) + 1;
-		lib->mem_sections[i].read = program_headers[i].read;
-		lib->mem_sections[i].write = program_headers[i].write;
-		lib->mem_sections[i].execute = program_headers[i].execute;
-		lib->mem_sections[i].pages = kmalloc( sizeof(lib_shared_page) * lib->mem_sections[i].num_pages );
+		lib->mem_sections[i_adjusted].num_pages = (program_headers[i].virt_size / PAGE_SIZE) + 1;
+		lib->mem_sections[i_adjusted].read = program_headers[i].read;
+		lib->mem_sections[i_adjusted].write = program_headers[i].write;
+		lib->mem_sections[i_adjusted].execute = program_headers[i].execute;
+		lib->mem_sections[i_adjusted].pages = kmalloc( sizeof(lib_shared_page) * lib->mem_sections[i_adjusted].num_pages );
 
-		for( int j = 0; j < lib->mem_sections[i].num_pages; j++ ) {			
-			lib->mem_sections[i].pages[j].virt = page_allocate_kernel( 1 );
-			lib->mem_sections[i].pages[j].phys = paging_virtual_to_physical( lib->mem_sections[i].pages[j].virt );
+		for( int j = 0; j < lib->mem_sections[i_adjusted].num_pages; j++ ) {			
+			lib->mem_sections[i_adjusted].pages[j].virt = page_allocate_kernel( 1 );
+			lib->mem_sections[i_adjusted].pages[j].phys = paging_virtual_to_physical( lib->mem_sections[i_adjusted].pages[j].virt );
 
-			memset( lib->mem_sections[i].pages[j].virt, 0, PAGE_SIZE );
+			memset( lib->mem_sections[i_adjusted].pages[j].virt, 0, PAGE_SIZE );
 
-			page_map( lib->mem_sections[i].pages[j].virt, lib->mem_sections[i].pages[j].phys );
+			page_map( lib->mem_sections[i_adjusted].pages[j].virt, lib->mem_sections[i_adjusted].pages[j].phys );
 
-			printf( "Page allocated. virt=0x%016llX\n", lib->mem_sections[i].pages[j].virt );
+			printf( "Page allocated. virt=0x%016llX\n", lib->mem_sections[i_adjusted].pages[j].virt );
 		}
 
-		printf( "mem copy to 0x%016llX from 0x%016llX for %X\n", lib->mem_sections[i].pages[0].virt, (uint8_t *)lib_data + program_headers[i].phys_addr, program_headers[i].phys_size );
+		printf( "mem copy to 0x%016llX from 0x%016llX for %X\n", lib->mem_sections[i_adjusted].pages[0].virt, (uint8_t *)lib_data + program_headers[i].phys_offset, program_headers[i].phys_size );
 
-		memcpy( lib->mem_sections[i].pages[0].virt, (uint8_t *)lib_data + program_headers[i].phys_addr, program_headers[i].phys_size );
+		memcpy( lib->mem_sections[i_adjusted].pages[0].virt, (uint8_t *)lib_data + program_headers[i].phys_offset, program_headers[i].phys_size );
+
+		i_adjusted++;
 	}
 }
 
 void lib_load_dynamic_linker( lib_shared *lib ) {
 	Elf64_Shdr *elf_got_section = elf2_new_get_section_header_by_name( lib->f_elf, ".got.plt" );
+
+	debugf( "GOT section output:\n" );
+	kdebug_peek_at( elf_got_section );
+
 	if( elf_got_section != NULL ) {
 		uint8_t *got_data = lib->mem_sections[0].pages[0].virt + elf_got_section->sh_addr;
 

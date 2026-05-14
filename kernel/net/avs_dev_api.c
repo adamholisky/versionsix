@@ -21,6 +21,18 @@ char json_load_start[] = { "{ \"cmd\": \"load\", \"file\": \"" };
 char json_load_end[] = { ".exec\" }\n" };
 
 /**
+ * @brief Sends hello, resetting klog's log
+ * 
+ */
+void avs_dev_api_send_hello( void ) {
+	memset( api_call, 0, 255 );
+
+	kstrcpy( api_call, "{ \"cmd\": \"hello\", \"build\": \"" STR(BUILD_NUM) "\" }\n" );
+
+	avs_dev_api_send( api_call );
+}
+
+/**
  * @brief 
  * 
  * @param path 
@@ -100,7 +112,7 @@ int avs_dev_api_send( char *cmd ) {
  * @param len 
  */
 void avs_dev_api_write_str_to_serial_port( char *s, int len ) {
-	printf( "Writing: len=%d\n", len );
+	//printf( "Writing: len=%d\n", len );
 
 	for( int i = 0; i < len; i++ ) {
 		while((inportb(DEV_API_SERIAL_PORT + 5) & 0x20) == 0) {
@@ -110,7 +122,7 @@ void avs_dev_api_write_str_to_serial_port( char *s, int len ) {
 		outportb( DEV_API_SERIAL_PORT, *s++ );
 	}
 
-	printf( "Done writing\n" );
+	//printf( "Done writing\n" );
 }
 
 /**

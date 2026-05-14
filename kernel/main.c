@@ -31,6 +31,7 @@
 #include <tests.h>
 #include <sys_info.h>
 #include <process.h>
+#include <avs_dev_api.h>
 
 #include <spng.h>
 
@@ -64,7 +65,7 @@ void kernel_main( void ) {
 	serial_initalize();
 	debugf( "avsOS Debug Out\n" );
 	debugf( "Build Number: %d\n", BUILD_NUM );
-	klog( LOG_INFO, "---------------------> New Run <---------------------" );
+	avs_dev_api_send_hello();
 
 	/* 	debugf( "Kernel stack top:                 0x%016llX\n", &kernel_stack );
 		uint64_t rbp_value;

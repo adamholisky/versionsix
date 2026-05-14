@@ -28,7 +28,7 @@ int do_a_thing_main( int argc, char* argv[] ) {
 	debugf( "-----> doing a thing <-----\n" );
 
 	lib_initalize();
-	lib_register( "/bin/libtest.so" );
+	lib_register( "/lib/libtest.so" );
 
 	execve( "/bin/slibtest.exec", NULL, NULL );
 

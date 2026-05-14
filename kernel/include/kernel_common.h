@@ -79,6 +79,9 @@ void main_console_blink_cursor( void );
 void do_a_thing( void );
 int do_a_thing_main( int argc, char *argv[] );
 
+#define STR_PART2(x) #x
+#define STR(x) STR_PART2(x)
+
 #define KASSERT_NOT_NULL_R(x) if(x == NULL) { klog( LOG_ERROR, "Assert not null failed on " #x ); return 0; }
 
 #ifdef __cplusplus

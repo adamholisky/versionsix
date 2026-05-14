@@ -18,6 +18,7 @@ enum base64_variant {
 	BASE64_IMAP,      /* RFC 3501 */
 };
 
+void avs_dev_api_send_hello( void );
 uint64_t avs_dev_api_get_file_size( char *path );
 size_t avs_dev_api_load_file( char *path, void *data );
 int avs_dev_api_send( char *cmd );

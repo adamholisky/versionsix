@@ -75,7 +75,7 @@ QEMU_DISPLAY_CURSES = -display curses
 QEMU_DISPLAY_NORMAL = -vga std -no-shutdown
 QEMU_DISPLAY_VNC = -vnc 0.0.0.0:52102,websocket=58003
 QEMU_DEBUG_COMMON = -S -gdb tcp::$(PORT_GDB)
-QEMU_DEBUG_LOGGING = -d cpu_reset -D $(ROOT_DIR)/logs/qemu_debug_log.txt
+QEMU_DEBUG_LOGGING = -d int,cpu_reset -D $(ROOT_DIR)/logs/qemu_debug_log.txt
 
 
 SOURCES_C = $(shell ls kernel/**/*.c)
@@ -87,7 +87,7 @@ all: install
 
 build/versionvi.bin: increment_build_number $(OBJECTS_C) $(OBJECTS_ASMS)
 	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/linker.ld -o build/versionvi.bin avs-libc-static/avslibc.o liblua-static/avs-lua.o $(OBJECTS_C) $(OBJECTS_ASMS)
-	readelf -W -a build/versionvi.bin > logs/elfdump.txt
+	make dump_info &
 	@>&2 $(call echo_tag_green,Build, Done making version $(BUILD_NUMBER))
 
 build/%.o: %.c
@@ -100,18 +100,11 @@ build/%.o: %.S
 	$(eval OBJNAME := $(shell basename $@))
 	$(CC) $(AFLAGS) -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
 
-dumpobjs:
+dump_info:
+	readelf -W -a build/versionvi.bin > logs/elfdump.txt
 	$(OBJDUMP) -x -D -S build/versionvi.bin > logs/objdump.txt 
 
-cp: cp_fs cp_vit
-
-cp_fs:
-	@cp -f ../vifs/src/vfs.c kernel/fs/vfs.c
-	@cp -f ../vifs/src/rfs.c kernel/fs/rfs.c
-	@cp -f ../vifs/src/afs.c kernel/fs/afs.c
-	@cp -f ../vifs/include/vfs.h kernel/include/vfs.h
-	@cp -f ../vifs/include/rfs.h kernel/include/rfs.h
-	@cp -f ../vifs/include/afs.h kernel/include/afs.h
+cp: cp_vit
 
 cp_vit:
 	@cp -f ../viui/include/vit.h kernel/include/vit.h
@@ -167,8 +160,7 @@ run: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING)
 
 run-term:  install
-	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NONE) $(QEMU_DEBUG_LOGGING)
-
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NONE) $(QEMU_DEBUG_LOGGING) |& tee $(ROOT_DIR)/logs/console.log
 
 run-vnc:  install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_VNC) $(QEMU_DEBUG_LOGGING)
@@ -186,7 +178,16 @@ run-debug-term: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NONE) $(QEMU_DEBUG_COMMON) $(QEMU_DEBUG_LOGGING)
 
 apps:
-	cd core_apps && make clean && make
+	cd core_apps && make
+
+apps-clean:
+	cd core_apps && make clean
+
+libs:
+	cd core_libs && make
+
+libs-clean:
+	cd core_libs && make clean
 
 gdb:
 	gdb -q --command=$(ROOT_DIR)/build_support/gdb_control/tui.gdb
@@ -257,7 +258,7 @@ increment_build_number:
 .PHONY: clean
 clean:
 	@$(call echo_tag_yellow,Clean, Starting cleanup)
-	@rm -rf build_support/logs/build.log
+	@rm -rf logs/build.log
 	@make clean_stage_2 >> $(BUILD_LOG)
 	@$(call echo_tag_yellow,Clean, Done)
 

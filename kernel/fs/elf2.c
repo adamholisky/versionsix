@@ -39,6 +39,7 @@ int elf2_new_initalize_file( elf2_file *f_elf, void *data ) {
 				Elf64_Phdr *phdr = elf2_new_get_program_header_by_index( f_elf, i );
 
 				f_elf->program_headers[i].phys_addr = phdr->p_paddr;
+				f_elf->program_headers[i].phys_offset = phdr->p_offset;
 				f_elf->program_headers[i].virt_addr = phdr->p_vaddr;
 				f_elf->program_headers[i].type = phdr->p_type;
 				f_elf->program_headers[i].phys_size = phdr->p_filesz;
@@ -49,7 +50,7 @@ int elf2_new_initalize_file( elf2_file *f_elf, void *data ) {
 
 				if( phdr->p_type == PT_LOAD ) { f_elf->program_headers_num_loads++; }
 
-				//printf( "Added PH: %d \t %d \t phys 0x%016llX \t %X \t virt 0x%016llX \t %X RWX: %d %d %d\n", i, f_elf->program_headers[i].type, f_elf->program_headers[i].phys_addr, f_elf->program_headers[i].phys_size, f_elf->program_headers[i].virt_addr, f_elf->program_headers[i].virt_size, f_elf->program_headers[i].read, f_elf->program_headers[i].write, f_elf->program_headers[i].execute );
+				printf( "Added PH: %d \t %d \t phys 0x%016llX \t offset 0x%0X \t %X \t virt 0x%016llX \t %X RWX: %d %d %d\n", i, f_elf->program_headers[i].type, f_elf->program_headers[i].phys_addr, f_elf->program_headers[i].phys_offset, f_elf->program_headers[i].phys_size, f_elf->program_headers[i].virt_addr, f_elf->program_headers[i].virt_size, f_elf->program_headers[i].read, f_elf->program_headers[i].write, f_elf->program_headers[i].execute );
 			}
 		}
 	}

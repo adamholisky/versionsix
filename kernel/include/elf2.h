@@ -25,6 +25,7 @@ typedef struct {
 typedef struct {
 	uint32_t	type;
 	uint64_t	phys_addr;
+	uint64_t 	phys_offset;
 	uint64_t	virt_addr;
 	uint64_t	phys_size;
 	uint64_t	virt_size;

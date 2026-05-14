@@ -137,6 +137,8 @@ void process_diagnostic_context( registers *context );
 
 int process_get_free_fd( process_data *p );
 
+void k_yield_in_int( void );
+
 #ifdef __cplusplus
 }
 #endif

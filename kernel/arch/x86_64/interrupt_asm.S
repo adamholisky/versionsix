@@ -162,3 +162,8 @@ isr_254:
 	add $16, %rsp
 
 	iretq
+
+.global k_yield_in_int
+k_yield_in_int:
+	movq $4, %rax
+	call isr_254

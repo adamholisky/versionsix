@@ -211,6 +211,12 @@ int lib_load_program_headers( lib_shared *lib, void *lib_data ) {
 	}
 }
 
+/**
+ * @brief Return the symbol's address from any library that's been loaded.
+ * 
+ * @param name 
+ * @return void* 
+ */
 void *lib_dynamic_linker( char *name ) {
 	avs_node *n = lib_registry->head;
 
@@ -222,5 +228,7 @@ void *lib_dynamic_linker( char *name ) {
 				return lib->lib_symbols[j].addr;
 			}
 		}
+
+		n = n->next;
 	}
 }

@@ -3,6 +3,7 @@
 #include <process.h>
 #include <lib/list.h>
 #include <keyboard.h>
+#include <stdlib.h>
 
 bool keep_running;
 
@@ -24,6 +25,7 @@ int kbugs_q( int argc, char **argv );
 int kbugs_shutdown( int argc, char **argv );
 int kbugs_ps( int argc, char **argv );
 int kbugs_mem( int argc, char **argv );
+int kbugs_kill( int argc, char **argv );
 
 typedef int (*kbugs_cmd)( int num_args, char *arg_list[] );
 #define kbugs_cmd_check_and_run(x,fn) if( strcmp( argv_builder[0], ##x ) == 0 ) { fn## ( num_args, argv_builder ); }
@@ -55,7 +57,7 @@ void kbugs_main( void ) {
 		bool do_extra_newline = true;
 
 		memset( kbugs_current_line, 0, KBUGS_MAX_LINE_SIZE );
-		printf( "> " );
+		printf( "kbugs > " );
 
 		/* Step 1: Get the line, put it into current_line */
 		do {
@@ -151,6 +153,7 @@ void kbugs_main( void ) {
 		if( strcmp( argv_builder[0], "ps" ) == 0 ) { cmd_to_run = kbugs_ps; }
 		if( strcmp( argv_builder[0], "dm" ) == 0 ) { cmd_to_run = kbugs_dm; }
 		if( strcmp( argv_builder[0], "sm" ) == 0 ) { cmd_to_run = kbugs_sm; }
+		if( strcmp( argv_builder[0], "kill" ) == 0 ) { cmd_to_run = kbugs_kill; }
 		if( strcmp( argv_builder[0], "q" ) == 0 ) { cmd_to_run = kbugs_q; }
 		if( strcmp( argv_builder[0], "shutdown" ) == 0 ) { cmd_to_run = kbugs_shutdown; }
 
@@ -191,6 +194,33 @@ int kbugs_q( int argc, char **argv ) {
 
 int kbugs_shutdown( int argc, char **argv ) {
 	do_immediate_shutdown();
+
+	return 0;
+}
+
+int kbugs_kill( int argc, char **argv ) {
+	if( argc != 2 ) {
+		printf( "kill syntax: kill <pid>\n" );
+		return 0;
+	}
+
+	int pid = atol( argv[1] );
+
+	printf( "Killing pid %d\n", pid );
+
+	// This can probably be done in syscall exit somehow
+	process_data *p = process_get_data_from_pid(pid);
+	p->status = PROCESS_STATUS_WAITING_FOR_DEATH;
+	p->exit_code = -1;
+
+	process_data *p_parent = process_get_data_from_pid( p->pid_parent );
+	if( p_parent != NULL && p_parent->wait_for_pid == pid ) {
+		p_parent->status = PROCESS_STATUS_INACTIVE;
+		p_parent->wait_for_pid = 0;
+		process_set_next_up( p_parent );
+	}
+
+	k_yield_in_int();
 
 	return 0;
 }

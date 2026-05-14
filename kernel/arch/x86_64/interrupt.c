@@ -173,18 +173,10 @@ void interrupt_handler_stage_2( registers **_reg ) {
 			p->exit_code = 1;
 			debugf_raw( "Ending process %d, switching to kbugs, then yielding to kernel\n", current_pid, KERNEL_PROCESS_ID );
 			
-			kbugs_main();
-
+			// we want this here so kbugs can change the next process, but default to kernel idle loop
 			process_sched_set_next_yield( 0 );
-			process_sched_yield( _reg );
 
-
-			/* task *t = get_task_data( current_task_id );
-			t->exit_code = 1;
-			debugf_raw( "Ending task %d, switching to parent id %d\n", current_task_id, t->parent_task_id );
-			task_set_task_status( current_task_id, TASK_STATUS_DEAD );
-			task_set_yield_to_next( t->parent_task_id );
-			task_sched_yield( _reg ); */
+			kbugs_main();
 		}
 	} else {
 		if( irq_handlers[reg->interrupt_no - 0x20].in_use == true ) {

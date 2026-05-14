@@ -7,7 +7,7 @@ start address 0x0000000000000d90
 
 Program Header:
     LOAD off    0x0000000000000000 vaddr 0x0000000000000000 paddr 0x0000000000000000 align 2**12
-         filesz 0x0000000000001d48 memsz 0x0000000000001d48 flags r-x
+         filesz 0x0000000000001d68 memsz 0x0000000000001d68 flags r-x
     LOAD off    0x0000000000002000 vaddr 0x0000000000002000 paddr 0x0000000000002000 align 2**12
          filesz 0x0000000000000348 memsz 0x00000000000004c8 flags rw-
  DYNAMIC off    0x0000000000002000 vaddr 0x0000000000002000 paddr 0x0000000000002000 align 2**3
@@ -43,11 +43,11 @@ Idx Name          Size      VMA               LMA               File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   5 .plt          00000130  0000000000000c60  0000000000000c60  00000c60  2**4
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  6 .text         00000adc  0000000000000d90  0000000000000d90  00000d90  2**0
+  6 .text         00000af0  0000000000000d90  0000000000000d90  00000d90  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  7 .rodata       00000313  0000000000001870  0000000000001870  00001870  2**4
+  7 .rodata       00000323  0000000000001880  0000000000001880  00001880  2**4
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  8 .eh_frame     000001c0  0000000000001b88  0000000000001b88  00001b88  2**3
+  8 .eh_frame     000001c0  0000000000001ba8  0000000000001ba8  00001ba8  2**3
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   9 .dynamic      00000130  0000000000002000  0000000000002000  00002000  2**3
                   CONTENTS, ALLOC, LOAD, DATA
@@ -65,11 +65,11 @@ Idx Name          Size      VMA               LMA               File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_abbrev 000002d1  0000000000000000  0000000000000000  0000308c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000045d  0000000000000000  0000000000000000  0000335d  2**0
+ 17 .debug_line   0000045f  0000000000000000  0000000000000000  0000335d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000005e1  0000000000000000  0000000000000000  000037ba  2**0
+ 18 .debug_str    000005e1  0000000000000000  0000000000000000  000037bc  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_line_str 00000264  0000000000000000  0000000000000000  00003d9b  2**0
+ 19 .debug_line_str 00000264  0000000000000000  0000000000000000  00003d9d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 SYMBOL TABLE:
 0000000000000000 l    df *ABS*	0000000000000000 avsshell.c
@@ -77,8 +77,8 @@ SYMBOL TABLE:
 00000000000021e0 l     O .data	00000000000000a8 intel_exceptions
 00000000000022a0 l     O .data	0000000000000080 bit_array
 0000000000002320 l     O .data	0000000000000028 error_strings
-0000000000001b63 l     O .rodata	0000000000000005 __FUNCTION__.1
-0000000000001b70 l     O .rodata	0000000000000013 __FUNCTION__.0
+0000000000001b7f l     O .rodata	0000000000000005 __FUNCTION__.1
+0000000000001b90 l     O .rodata	0000000000000013 __FUNCTION__.0
 0000000000000000 l    df *ABS*	0000000000000000 
 0000000000002000 l     O .dynamic	0000000000000000 _DYNAMIC
 0000000000002130 l     O .got.plt	0000000000000000 _GLOBAL_OFFSET_TABLE_
@@ -89,13 +89,13 @@ SYMBOL TABLE:
 0000000000000000         *UND*	0000000000000000 syscall
 0000000000002450 g     O .bss	0000000000000010 env_vars
 0000000000002440 g     O .bss	0000000000000010 kshell_commands
-00000000000017cd g     F .text	000000000000009f kshell_set_env_var
+00000000000017e1 g     F .text	000000000000009f kshell_set_env_var
 0000000000000000         *UND*	0000000000000000 execve
 0000000000000000         *UND*	0000000000000000 kstrcat
-0000000000001772 g     F .text	000000000000005b kshell_get_env_var
-00000000000016ab g     F .text	00000000000000c7 kshell_add_command
+0000000000001786 g     F .text	000000000000005b kshell_get_env_var
+00000000000016bf g     F .text	00000000000000c7 kshell_add_command
 000000000000113a g     F .text	0000000000000020 kshell_stop
-00000000000015fc g     F .text	0000000000000037 kshell_handle_special_keypress
+0000000000001610 g     F .text	0000000000000037 kshell_handle_special_keypress
 0000000000000000         *UND*	0000000000000000 process_exit
 0000000000000000         *UND*	0000000000000000 wait
 0000000000000d90 g       .text	0000000000000018 _start
@@ -103,18 +103,18 @@ SYMBOL TABLE:
 0000000000000000         *UND*	0000000000000000 symbols_get_symbol_array
 0000000000000000         *UND*	0000000000000000 kstrcpy
 0000000000000000         *UND*	0000000000000000 strncmp
-0000000000001633 g     F .text	0000000000000040 kshell_command_create
-0000000000001673 g     F .text	0000000000000012 kshell_command_run
+0000000000001647 g     F .text	0000000000000040 kshell_command_create
+0000000000001687 g     F .text	0000000000000012 kshell_command_run
 0000000000000000  w      *UND*	0000000000000000 memset
 0000000000000dbf g     F .text	0000000000000356 main
 0000000000000000         *UND*	0000000000000000 strcmp
 0000000000000000         *UND*	0000000000000000 symbols_get_total_symbols
-0000000000001685 g     F .text	0000000000000026 kshell_command_hello_world
+0000000000001699 g     F .text	0000000000000026 kshell_command_hello_world
 0000000000000000         *UND*	0000000000000000 printf_
 0000000000001115 g     F .text	0000000000000025 kshell_run
 0000000000000000         *UND*	0000000000000000 debugf_stage2
 0000000000000000         *UND*	0000000000000000 kmalloc
-000000000000115a g     F .text	00000000000004a2 kshell_main_loop
+000000000000115a g     F .text	00000000000004b6 kshell_main_loop
 0000000000002460 g     O .bss	0000000000000064 cmd
 
 
@@ -252,7 +252,7 @@ Disassembly of section .dynsym:
  281:	00 00                	add    %al,(%rax)
  283:	00 12                	add    %dl,(%rdx)
  285:	00 07                	add    %al,(%rdi)
- 287:	00 cd                	add    %cl,%ch
+ 287:	00 e1                	add    %ah,%cl
  289:	17                   	(bad)
  28a:	00 00                	add    %al,(%rax)
  28c:	00 00                	add    %al,(%rax)
@@ -273,23 +273,21 @@ Disassembly of section .dynsym:
  2ca:	00 00                	add    %al,(%rax)
  2cc:	12 00                	adc    (%rax),%al
  2ce:	07                   	(bad)
- 2cf:	00 72 17             	add    %dh,0x17(%rdx)
- 2d2:	00 00                	add    %al,(%rax)
- 2d4:	00 00                	add    %al,(%rax)
- 2d6:	00 00                	add    %al,(%rax)
- 2d8:	5b                   	pop    %rbx
- 2d9:	00 00                	add    %al,(%rax)
- 2db:	00 00                	add    %al,(%rax)
- 2dd:	00 00                	add    %al,(%rax)
- 2df:	00 a1 01 00 00 12    	add    %ah,0x12000001(%rcx)
- 2e5:	00 07                	add    %al,(%rdi)
- 2e7:	00 ab 16 00 00 00    	add    %ch,0x16(%rbx)
- 2ed:	00 00                	add    %al,(%rax)
- 2ef:	00 c7                	add    %al,%bh
- 2f1:	00 00                	add    %al,(%rax)
- 2f3:	00 00                	add    %al,(%rax)
- 2f5:	00 00                	add    %al,(%rax)
- 2f7:	00 0c 01             	add    %cl,(%rcx,%rax,1)
+ 2cf:	00 86 17 00 00 00    	add    %al,0x17(%rsi)
+ 2d5:	00 00                	add    %al,(%rax)
+ 2d7:	00 5b 00             	add    %bl,0x0(%rbx)
+ 2da:	00 00                	add    %al,(%rax)
+ 2dc:	00 00                	add    %al,(%rax)
+ 2de:	00 00                	add    %al,(%rax)
+ 2e0:	a1 01 00 00 12 00 07 	movabs 0xbf00070012000001,%eax
+ 2e7:	00 bf 
+ 2e9:	16                   	(bad)
+ 2ea:	00 00                	add    %al,(%rax)
+ 2ec:	00 00                	add    %al,(%rax)
+ 2ee:	00 00                	add    %al,(%rax)
+ 2f0:	c7 00 00 00 00 00    	movl   $0x0,(%rax)
+ 2f6:	00 00                	add    %al,(%rax)
+ 2f8:	0c 01                	or     $0x1,%al
  2fa:	00 00                	add    %al,(%rax)
  2fc:	12 00                	adc    (%rax),%al
  2fe:	07                   	(bad)
@@ -305,8 +303,10 @@ Disassembly of section .dynsym:
  311:	01 00                	add    %eax,(%rax)
  313:	00 12                	add    %dl,(%rdx)
  315:	00 07                	add    %al,(%rdi)
- 317:	00 fc                	add    %bh,%ah
- 319:	15 00 00 00 00       	adc    $0x0,%eax
+ 317:	00 10                	add    %dl,(%rax)
+ 319:	16                   	(bad)
+ 31a:	00 00                	add    %al,(%rax)
+ 31c:	00 00                	add    %al,(%rax)
  31e:	00 00                	add    %al,(%rax)
  320:	37                   	(bad)
  321:	00 00                	add    %al,(%rax)
@@ -350,8 +350,7 @@ Disassembly of section .dynsym:
  3d2:	00 00                	add    %al,(%rax)
  3d4:	12 00                	adc    (%rax),%al
  3d6:	07                   	(bad)
- 3d7:	00 33                	add    %dh,(%rbx)
- 3d9:	16                   	(bad)
+ 3d7:	00 47 16             	add    %al,0x16(%rdi)
  3da:	00 00                	add    %al,(%rax)
  3dc:	00 00                	add    %al,(%rax)
  3de:	00 00                	add    %al,(%rax)
@@ -360,23 +359,21 @@ Disassembly of section .dynsym:
  3e5:	00 00                	add    %al,(%rax)
  3e7:	00 8e 01 00 00 12    	add    %cl,0x12000001(%rsi)
  3ed:	00 07                	add    %al,(%rdi)
- 3ef:	00 73 16             	add    %dh,0x16(%rbx)
- 3f2:	00 00                	add    %al,(%rax)
- 3f4:	00 00                	add    %al,(%rax)
- 3f6:	00 00                	add    %al,(%rax)
- 3f8:	12 00                	adc    (%rax),%al
- 3fa:	00 00                	add    %al,(%rax)
- 3fc:	00 00                	add    %al,(%rax)
- 3fe:	00 00                	add    %al,(%rax)
- 400:	2b 01                	sub    (%rcx),%eax
- 402:	00 00                	add    %al,(%rax)
- 404:	20 00                	and    %al,(%rax)
+ 3ef:	00 87 16 00 00 00    	add    %al,0x16(%rdi)
+ 3f5:	00 00                	add    %al,(%rax)
+ 3f7:	00 12                	add    %dl,(%rdx)
+ 3f9:	00 00                	add    %al,(%rax)
+ 3fb:	00 00                	add    %al,(%rax)
+ 3fd:	00 00                	add    %al,(%rax)
+ 3ff:	00 2b                	add    %ch,(%rbx)
+ 401:	01 00                	add    %eax,(%rax)
+ 403:	00 20                	add    %ah,(%rax)
 	...
- 416:	00 00                	add    %al,(%rax)
- 418:	08 00                	or     %al,(%rax)
- 41a:	00 00                	add    %al,(%rax)
- 41c:	12 00                	adc    (%rax),%al
- 41e:	07                   	(bad)
+ 415:	00 00                	add    %al,(%rax)
+ 417:	00 08                	add    %cl,(%rax)
+ 419:	00 00                	add    %al,(%rax)
+ 41b:	00 12                	add    %dl,(%rdx)
+ 41d:	00 07                	add    %al,(%rdi)
  41f:	00 bf 0d 00 00 00    	add    %bh,0xd(%rdi)
  425:	00 00                	add    %al,(%rax)
  427:	00 56 03             	add    %dl,0x3(%rsi)
@@ -395,7 +392,7 @@ Disassembly of section .dynsym:
  462:	00 00                	add    %al,(%rax)
  464:	12 00                	adc    (%rax),%al
  466:	07                   	(bad)
- 467:	00 85 16 00 00 00    	add    %al,0x16(%rbp)
+ 467:	00 99 16 00 00 00    	add    %bl,0x16(%rcx)
  46d:	00 00                	add    %al,(%rax)
  46f:	00 26                	add    %ah,(%rsi)
  471:	00 00                	add    %al,(%rax)
@@ -431,9 +428,11 @@ Disassembly of section .dynsym:
  4e2:	00 00                	add    %al,(%rax)
  4e4:	00 00                	add    %al,(%rax)
  4e6:	00 00                	add    %al,(%rax)
- 4e8:	a2 04 00 00 00 00 00 	movabs %al,0x3e00000000000004
- 4ef:	00 3e 
- 4f1:	00 00                	add    %al,(%rax)
+ 4e8:	b6 04                	mov    $0x4,%dh
+ 4ea:	00 00                	add    %al,(%rax)
+ 4ec:	00 00                	add    %al,(%rax)
+ 4ee:	00 00                	add    %al,(%rax)
+ 4f0:	3e 00 00             	ds add %al,(%rax)
  4f3:	00 11                	add    %dl,(%rcx)
  4f5:	00 0d 00 60 24 00    	add    %cl,0x246000(%rip)        # 2464fb <cmd+0x24409b>
  4fb:	00 00                	add    %al,(%rax)
@@ -645,28 +644,28 @@ Disassembly of section .rela.dyn:
  6ca:	00 00                	add    %al,(%rax)
  6cc:	00 00                	add    %al,(%rax)
  6ce:	00 00                	add    %al,(%rax)
- 6d0:	70 18                	jo     6ea <strcpy@plt-0x586>
- 6d2:	00 00                	add    %al,(%rax)
- 6d4:	00 00                	add    %al,(%rax)
- 6d6:	00 00                	add    %al,(%rax)
- 6d8:	e8 21 00 00 00       	call   6fe <strcpy@plt-0x572>
+ 6d0:	80 18 00             	sbbb   $0x0,(%rax)
+ 6d3:	00 00                	add    %al,(%rax)
+ 6d5:	00 00                	add    %al,(%rax)
+ 6d7:	00 e8                	add    %ch,%al
+ 6d9:	21 00                	and    %eax,(%rax)
+ 6db:	00 00                	add    %al,(%rax)
  6dd:	00 00                	add    %al,(%rax)
  6df:	00 08                	add    %cl,(%rax)
  6e1:	00 00                	add    %al,(%rax)
  6e3:	00 00                	add    %al,(%rax)
  6e5:	00 00                	add    %al,(%rax)
- 6e7:	00 7f 18             	add    %bh,0x18(%rdi)
- 6ea:	00 00                	add    %al,(%rax)
- 6ec:	00 00                	add    %al,(%rax)
- 6ee:	00 00                	add    %al,(%rax)
- 6f0:	f0 21 00             	lock and %eax,(%rax)
+ 6e7:	00 8f 18 00 00 00    	add    %cl,0x18(%rdi)
+ 6ed:	00 00                	add    %al,(%rax)
+ 6ef:	00 f0                	add    %dh,%al
+ 6f1:	21 00                	and    %eax,(%rax)
  6f3:	00 00                	add    %al,(%rax)
  6f5:	00 00                	add    %al,(%rax)
  6f7:	00 08                	add    %cl,(%rax)
  6f9:	00 00                	add    %al,(%rax)
  6fb:	00 00                	add    %al,(%rax)
  6fd:	00 00                	add    %al,(%rax)
- 6ff:	00 85 18 00 00 00    	add    %al,0x18(%rbp)
+ 6ff:	00 95 18 00 00 00    	add    %dl,0x18(%rbp)
  705:	00 00                	add    %al,(%rax)
  707:	00 f8                	add    %bh,%al
  709:	21 00                	and    %eax,(%rax)
@@ -676,7 +675,7 @@ Disassembly of section .rela.dyn:
  711:	00 00                	add    %al,(%rax)
  713:	00 00                	add    %al,(%rax)
  715:	00 00                	add    %al,(%rax)
- 717:	00 89 18 00 00 00    	add    %cl,0x18(%rcx)
+ 717:	00 99 18 00 00 00    	add    %bl,0x18(%rcx)
  71d:	00 00                	add    %al,(%rax)
  71f:	00 00                	add    %al,(%rax)
  721:	22 00                	and    (%rax),%al
@@ -686,7 +685,7 @@ Disassembly of section .rela.dyn:
  729:	00 00                	add    %al,(%rax)
  72b:	00 00                	add    %al,(%rax)
  72d:	00 00                	add    %al,(%rax)
- 72f:	00 94 18 00 00 00 00 	add    %dl,0x0(%rax,%rbx,1)
+ 72f:	00 a4 18 00 00 00 00 	add    %ah,0x0(%rax,%rbx,1)
  736:	00 00                	add    %al,(%rax)
  738:	08 22                	or     %ah,(%rdx)
  73a:	00 00                	add    %al,(%rax)
@@ -696,7 +695,7 @@ Disassembly of section .rela.dyn:
  742:	00 00                	add    %al,(%rax)
  744:	00 00                	add    %al,(%rax)
  746:	00 00                	add    %al,(%rax)
- 748:	9d                   	popf
+ 748:	ad                   	lods   (%rsi),%eax
  749:	18 00                	sbb    %al,(%rax)
  74b:	00 00                	add    %al,(%rax)
  74d:	00 00                	add    %al,(%rax)
@@ -708,7 +707,9 @@ Disassembly of section .rela.dyn:
  759:	00 00                	add    %al,(%rax)
  75b:	00 00                	add    %al,(%rax)
  75d:	00 00                	add    %al,(%rax)
- 75f:	00 b2 18 00 00 00    	add    %dh,0x18(%rdx)
+ 75f:	00 c2                	add    %al,%dl
+ 761:	18 00                	sbb    %al,(%rax)
+ 763:	00 00                	add    %al,(%rax)
  765:	00 00                	add    %al,(%rax)
  767:	00 18                	add    %bl,(%rax)
  769:	22 00                	and    (%rax),%al
@@ -718,7 +719,7 @@ Disassembly of section .rela.dyn:
  771:	00 00                	add    %al,(%rax)
  773:	00 00                	add    %al,(%rax)
  775:	00 00                	add    %al,(%rax)
- 777:	00 c1                	add    %al,%cl
+ 777:	00 d1                	add    %dl,%cl
  779:	18 00                	sbb    %al,(%rax)
  77b:	00 00                	add    %al,(%rax)
  77d:	00 00                	add    %al,(%rax)
@@ -730,7 +731,7 @@ Disassembly of section .rela.dyn:
  789:	00 00                	add    %al,(%rax)
  78b:	00 00                	add    %al,(%rax)
  78d:	00 00                	add    %al,(%rax)
- 78f:	00 d6                	add    %dl,%dh
+ 78f:	00 e6                	add    %ah,%dh
  791:	18 00                	sbb    %al,(%rax)
  793:	00 00                	add    %al,(%rax)
  795:	00 00                	add    %al,(%rax)
@@ -742,7 +743,7 @@ Disassembly of section .rela.dyn:
  7a1:	00 00                	add    %al,(%rax)
  7a3:	00 00                	add    %al,(%rax)
  7a5:	00 00                	add    %al,(%rax)
- 7a7:	00 e3                	add    %ah,%bl
+ 7a7:	00 f3                	add    %dh,%bl
  7a9:	18 00                	sbb    %al,(%rax)
  7ab:	00 00                	add    %al,(%rax)
  7ad:	00 00                	add    %al,(%rax)
@@ -754,8 +755,8 @@ Disassembly of section .rela.dyn:
  7b9:	00 00                	add    %al,(%rax)
  7bb:	00 00                	add    %al,(%rax)
  7bd:	00 00                	add    %al,(%rax)
- 7bf:	00 ff                	add    %bh,%bh
- 7c1:	18 00                	sbb    %al,(%rax)
+ 7bf:	00 0f                	add    %cl,(%rdi)
+ 7c1:	19 00                	sbb    %eax,(%rax)
  7c3:	00 00                	add    %al,(%rax)
  7c5:	00 00                	add    %al,(%rax)
  7c7:	00 38                	add    %bh,(%rax)
@@ -766,7 +767,7 @@ Disassembly of section .rela.dyn:
  7d1:	00 00                	add    %al,(%rax)
  7d3:	00 00                	add    %al,(%rax)
  7d5:	00 00                	add    %al,(%rax)
- 7d7:	00 0b                	add    %cl,(%rbx)
+ 7d7:	00 1b                	add    %bl,(%rbx)
  7d9:	19 00                	sbb    %eax,(%rax)
  7db:	00 00                	add    %al,(%rax)
  7dd:	00 00                	add    %al,(%rax)
@@ -778,7 +779,7 @@ Disassembly of section .rela.dyn:
  7ea:	00 00                	add    %al,(%rax)
  7ec:	00 00                	add    %al,(%rax)
  7ee:	00 00                	add    %al,(%rax)
- 7f0:	1f                   	(bad)
+ 7f0:	2f                   	(bad)
  7f1:	19 00                	sbb    %eax,(%rax)
  7f3:	00 00                	add    %al,(%rax)
  7f5:	00 00                	add    %al,(%rax)
@@ -790,19 +791,19 @@ Disassembly of section .rela.dyn:
  802:	00 00                	add    %al,(%rax)
  804:	00 00                	add    %al,(%rax)
  806:	00 00                	add    %al,(%rax)
- 808:	33 19                	xor    (%rcx),%ebx
- 80a:	00 00                	add    %al,(%rax)
- 80c:	00 00                	add    %al,(%rax)
- 80e:	00 00                	add    %al,(%rax)
- 810:	50                   	push   %rax
- 811:	22 00                	and    (%rax),%al
- 813:	00 00                	add    %al,(%rax)
- 815:	00 00                	add    %al,(%rax)
- 817:	00 08                	add    %cl,(%rax)
- 819:	00 00                	add    %al,(%rax)
- 81b:	00 00                	add    %al,(%rax)
- 81d:	00 00                	add    %al,(%rax)
- 81f:	00 4c 19 00          	add    %cl,0x0(%rcx,%rbx,1)
+ 808:	43 19 00             	rex.XB sbb %eax,(%r8)
+ 80b:	00 00                	add    %al,(%rax)
+ 80d:	00 00                	add    %al,(%rax)
+ 80f:	00 50 22             	add    %dl,0x22(%rax)
+ 812:	00 00                	add    %al,(%rax)
+ 814:	00 00                	add    %al,(%rax)
+ 816:	00 00                	add    %al,(%rax)
+ 818:	08 00                	or     %al,(%rax)
+ 81a:	00 00                	add    %al,(%rax)
+ 81c:	00 00                	add    %al,(%rax)
+ 81e:	00 00                	add    %al,(%rax)
+ 820:	5c                   	pop    %rsp
+ 821:	19 00                	sbb    %eax,(%rax)
  823:	00 00                	add    %al,(%rax)
  825:	00 00                	add    %al,(%rax)
  827:	00 58 22             	add    %bl,0x22(%rax)
@@ -813,8 +814,7 @@ Disassembly of section .rela.dyn:
  832:	00 00                	add    %al,(%rax)
  834:	00 00                	add    %al,(%rax)
  836:	00 00                	add    %al,(%rax)
- 838:	57                   	push   %rdi
- 839:	19 00                	sbb    %eax,(%rax)
+ 838:	67 19 00             	sbb    %eax,(%eax)
  83b:	00 00                	add    %al,(%rax)
  83d:	00 00                	add    %al,(%rax)
  83f:	00 60 22             	add    %ah,0x22(%rax)
@@ -825,23 +825,19 @@ Disassembly of section .rela.dyn:
  84a:	00 00                	add    %al,(%rax)
  84c:	00 00                	add    %al,(%rax)
  84e:	00 00                	add    %al,(%rax)
- 850:	60                   	(bad)
- 851:	19 00                	sbb    %eax,(%rax)
- 853:	00 00                	add    %al,(%rax)
- 855:	00 00                	add    %al,(%rax)
- 857:	00 68 22             	add    %ch,0x22(%rax)
- 85a:	00 00                	add    %al,(%rax)
- 85c:	00 00                	add    %al,(%rax)
- 85e:	00 00                	add    %al,(%rax)
- 860:	08 00                	or     %al,(%rax)
- 862:	00 00                	add    %al,(%rax)
- 864:	00 00                	add    %al,(%rax)
- 866:	00 00                	add    %al,(%rax)
- 868:	7d 19                	jge    883 <strcpy@plt-0x3ed>
- 86a:	00 00                	add    %al,(%rax)
- 86c:	00 00                	add    %al,(%rax)
- 86e:	00 00                	add    %al,(%rax)
- 870:	70 22                	jo     894 <strcpy@plt-0x3dc>
+ 850:	70 19                	jo     86b <strcpy@plt-0x405>
+ 852:	00 00                	add    %al,(%rax)
+ 854:	00 00                	add    %al,(%rax)
+ 856:	00 00                	add    %al,(%rax)
+ 858:	68 22 00 00 00       	push   $0x22
+ 85d:	00 00                	add    %al,(%rax)
+ 85f:	00 08                	add    %cl,(%rax)
+ 861:	00 00                	add    %al,(%rax)
+ 863:	00 00                	add    %al,(%rax)
+ 865:	00 00                	add    %al,(%rax)
+ 867:	00 8d 19 00 00 00    	add    %cl,0x19(%rbp)
+ 86d:	00 00                	add    %al,(%rax)
+ 86f:	00 70 22             	add    %dh,0x22(%rax)
  872:	00 00                	add    %al,(%rax)
  874:	00 00                	add    %al,(%rax)
  876:	00 00                	add    %al,(%rax)
@@ -849,11 +845,11 @@ Disassembly of section .rela.dyn:
  87a:	00 00                	add    %al,(%rax)
  87c:	00 00                	add    %al,(%rax)
  87e:	00 00                	add    %al,(%rax)
- 880:	8d 19                	lea    (%rcx),%ebx
- 882:	00 00                	add    %al,(%rax)
- 884:	00 00                	add    %al,(%rax)
- 886:	00 00                	add    %al,(%rax)
- 888:	78 22                	js     8ac <strcpy@plt-0x3c4>
+ 880:	9d                   	popf
+ 881:	19 00                	sbb    %eax,(%rax)
+ 883:	00 00                	add    %al,(%rax)
+ 885:	00 00                	add    %al,(%rax)
+ 887:	00 78 22             	add    %bh,0x22(%rax)
  88a:	00 00                	add    %al,(%rax)
  88c:	00 00                	add    %al,(%rax)
  88e:	00 00                	add    %al,(%rax)
@@ -861,7 +857,7 @@ Disassembly of section .rela.dyn:
  892:	00 00                	add    %al,(%rax)
  894:	00 00                	add    %al,(%rax)
  896:	00 00                	add    %al,(%rax)
- 898:	9b                   	fwait
+ 898:	ab                   	stos   %eax,(%rdi)
  899:	19 00                	sbb    %eax,(%rax)
  89b:	00 00                	add    %al,(%rax)
  89d:	00 00                	add    %al,(%rax)
@@ -871,7 +867,9 @@ Disassembly of section .rela.dyn:
  8a9:	00 00                	add    %al,(%rax)
  8ab:	00 00                	add    %al,(%rax)
  8ad:	00 00                	add    %al,(%rax)
- 8af:	00 b9 19 00 00 00    	add    %bh,0x19(%rcx)
+ 8af:	00 c9                	add    %cl,%cl
+ 8b1:	19 00                	sbb    %eax,(%rax)
+ 8b3:	00 00                	add    %al,(%rax)
  8b5:	00 00                	add    %al,(%rax)
  8b7:	00 a0 22 00 00 00    	add    %ah,0x22(%rax)
  8bd:	00 00                	add    %al,(%rax)
@@ -879,7 +877,7 @@ Disassembly of section .rela.dyn:
  8c1:	00 00                	add    %al,(%rax)
  8c3:	00 00                	add    %al,(%rax)
  8c5:	00 00                	add    %al,(%rax)
- 8c7:	00 d2                	add    %dl,%dl
+ 8c7:	00 e2                	add    %ah,%dl
  8c9:	19 00                	sbb    %eax,(%rax)
  8cb:	00 00                	add    %al,(%rax)
  8cd:	00 00                	add    %al,(%rax)
@@ -889,7 +887,7 @@ Disassembly of section .rela.dyn:
  8d9:	00 00                	add    %al,(%rax)
  8db:	00 00                	add    %al,(%rax)
  8dd:	00 00                	add    %al,(%rax)
- 8df:	00 d7                	add    %dl,%bh
+ 8df:	00 e7                	add    %ah,%bh
  8e1:	19 00                	sbb    %eax,(%rax)
  8e3:	00 00                	add    %al,(%rax)
  8e5:	00 00                	add    %al,(%rax)
@@ -899,7 +897,7 @@ Disassembly of section .rela.dyn:
  8f1:	00 00                	add    %al,(%rax)
  8f3:	00 00                	add    %al,(%rax)
  8f5:	00 00                	add    %al,(%rax)
- 8f7:	00 dc                	add    %bl,%ah
+ 8f7:	00 ec                	add    %ch,%ah
  8f9:	19 00                	sbb    %eax,(%rax)
  8fb:	00 00                	add    %al,(%rax)
  8fd:	00 00                	add    %al,(%rax)
@@ -909,7 +907,7 @@ Disassembly of section .rela.dyn:
  909:	00 00                	add    %al,(%rax)
  90b:	00 00                	add    %al,(%rax)
  90d:	00 00                	add    %al,(%rax)
- 90f:	00 e1                	add    %ah,%cl
+ 90f:	00 f1                	add    %dh,%cl
  911:	19 00                	sbb    %eax,(%rax)
  913:	00 00                	add    %al,(%rax)
  915:	00 00                	add    %al,(%rax)
@@ -921,7 +919,7 @@ Disassembly of section .rela.dyn:
  921:	00 00                	add    %al,(%rax)
  923:	00 00                	add    %al,(%rax)
  925:	00 00                	add    %al,(%rax)
- 927:	00 e6                	add    %ah,%dh
+ 927:	00 f6                	add    %dh,%dh
  929:	19 00                	sbb    %eax,(%rax)
  92b:	00 00                	add    %al,(%rax)
  92d:	00 00                	add    %al,(%rax)
@@ -933,7 +931,7 @@ Disassembly of section .rela.dyn:
  939:	00 00                	add    %al,(%rax)
  93b:	00 00                	add    %al,(%rax)
  93d:	00 00                	add    %al,(%rax)
- 93f:	00 eb                	add    %ch,%bl
+ 93f:	00 fb                	add    %bh,%bl
  941:	19 00                	sbb    %eax,(%rax)
  943:	00 00                	add    %al,(%rax)
  945:	00 00                	add    %al,(%rax)
@@ -942,11 +940,8 @@ Disassembly of section .rela.dyn:
  94b:	00 00                	add    %al,(%rax)
  94d:	00 00                	add    %al,(%rax)
  94f:	00 08                	add    %cl,(%rax)
- 951:	00 00                	add    %al,(%rax)
- 953:	00 00                	add    %al,(%rax)
- 955:	00 00                	add    %al,(%rax)
- 957:	00 f0                	add    %dh,%al
- 959:	19 00                	sbb    %eax,(%rax)
+	...
+ 959:	1a 00                	sbb    (%rax),%al
  95b:	00 00                	add    %al,(%rax)
  95d:	00 00                	add    %al,(%rax)
  95f:	00 d8                	add    %bl,%al
@@ -957,9 +952,7 @@ Disassembly of section .rela.dyn:
  969:	00 00                	add    %al,(%rax)
  96b:	00 00                	add    %al,(%rax)
  96d:	00 00                	add    %al,(%rax)
- 96f:	00 f5                	add    %dh,%ch
- 971:	19 00                	sbb    %eax,(%rax)
- 973:	00 00                	add    %al,(%rax)
+ 96f:	00 05 1a 00 00 00    	add    %al,0x1a(%rip)        # 98f <strcpy@plt-0x2e1>
  975:	00 00                	add    %al,(%rax)
  977:	00 e0                	add    %ah,%al
  979:	22 00                	and    (%rax),%al
@@ -969,8 +962,8 @@ Disassembly of section .rela.dyn:
  981:	00 00                	add    %al,(%rax)
  983:	00 00                	add    %al,(%rax)
  985:	00 00                	add    %al,(%rax)
- 987:	00 fa                	add    %bh,%dl
- 989:	19 00                	sbb    %eax,(%rax)
+ 987:	00 0a                	add    %cl,(%rdx)
+ 989:	1a 00                	sbb    (%rax),%al
  98b:	00 00                	add    %al,(%rax)
  98d:	00 00                	add    %al,(%rax)
  98f:	00 e8                	add    %ch,%al
@@ -981,8 +974,8 @@ Disassembly of section .rela.dyn:
  999:	00 00                	add    %al,(%rax)
  99b:	00 00                	add    %al,(%rax)
  99d:	00 00                	add    %al,(%rax)
- 99f:	00 ff                	add    %bh,%bh
- 9a1:	19 00                	sbb    %eax,(%rax)
+ 99f:	00 0f                	add    %cl,(%rdi)
+ 9a1:	1a 00                	sbb    (%rax),%al
  9a3:	00 00                	add    %al,(%rax)
  9a5:	00 00                	add    %al,(%rax)
  9a7:	00 f0                	add    %dh,%al
@@ -993,7 +986,7 @@ Disassembly of section .rela.dyn:
  9b1:	00 00                	add    %al,(%rax)
  9b3:	00 00                	add    %al,(%rax)
  9b5:	00 00                	add    %al,(%rax)
- 9b7:	00 04 1a             	add    %al,(%rdx,%rbx,1)
+ 9b7:	00 14 1a             	add    %dl,(%rdx,%rbx,1)
  9ba:	00 00                	add    %al,(%rax)
  9bc:	00 00                	add    %al,(%rax)
  9be:	00 00                	add    %al,(%rax)
@@ -1005,7 +998,7 @@ Disassembly of section .rela.dyn:
  9c9:	00 00                	add    %al,(%rax)
  9cb:	00 00                	add    %al,(%rax)
  9cd:	00 00                	add    %al,(%rax)
- 9cf:	00 09                	add    %cl,(%rcx)
+ 9cf:	00 19                	add    %bl,(%rcx)
  9d1:	1a 00                	sbb    (%rax),%al
  9d3:	00 00                	add    %al,(%rax)
  9d5:	00 00                	add    %al,(%rax)
@@ -1017,7 +1010,7 @@ Disassembly of section .rela.dyn:
  9e1:	00 00                	add    %al,(%rax)
  9e3:	00 00                	add    %al,(%rax)
  9e5:	00 00                	add    %al,(%rax)
- 9e7:	00 0e                	add    %cl,(%rsi)
+ 9e7:	00 1e                	add    %bl,(%rsi)
  9e9:	1a 00                	sbb    (%rax),%al
  9eb:	00 00                	add    %al,(%rax)
  9ed:	00 00                	add    %al,(%rax)
@@ -1029,7 +1022,7 @@ Disassembly of section .rela.dyn:
  9f9:	00 00                	add    %al,(%rax)
  9fb:	00 00                	add    %al,(%rax)
  9fd:	00 00                	add    %al,(%rax)
- 9ff:	00 13                	add    %dl,(%rbx)
+ 9ff:	00 23                	add    %ah,(%rbx)
  a01:	1a 00                	sbb    (%rax),%al
  a03:	00 00                	add    %al,(%rax)
  a05:	00 00                	add    %al,(%rax)
@@ -1041,7 +1034,7 @@ Disassembly of section .rela.dyn:
  a11:	00 00                	add    %al,(%rax)
  a13:	00 00                	add    %al,(%rax)
  a15:	00 00                	add    %al,(%rax)
- a17:	00 18                	add    %bl,(%rax)
+ a17:	00 28                	add    %ch,(%rax)
  a19:	1a 00                	sbb    (%rax),%al
  a1b:	00 00                	add    %al,(%rax)
  a1d:	00 00                	add    %al,(%rax)
@@ -1053,7 +1046,7 @@ Disassembly of section .rela.dyn:
  a29:	00 00                	add    %al,(%rax)
  a2b:	00 00                	add    %al,(%rax)
  a2d:	00 00                	add    %al,(%rax)
- a2f:	00 1d 1a 00 00 00    	add    %bl,0x1a(%rip)        # a4f <strcpy@plt-0x221>
+ a2f:	00 2d 1a 00 00 00    	add    %ch,0x1a(%rip)        # a4f <strcpy@plt-0x221>
  a35:	00 00                	add    %al,(%rax)
  a37:	00 20                	add    %ah,(%rax)
  a39:	23 00                	and    (%rax),%eax
@@ -1063,7 +1056,7 @@ Disassembly of section .rela.dyn:
  a41:	00 00                	add    %al,(%rax)
  a43:	00 00                	add    %al,(%rax)
  a45:	00 00                	add    %al,(%rax)
- a47:	00 22                	add    %ah,(%rdx)
+ a47:	00 32                	add    %dh,(%rdx)
  a49:	1a 00                	sbb    (%rax),%al
  a4b:	00 00                	add    %al,(%rax)
  a4d:	00 00                	add    %al,(%rax)
@@ -1075,7 +1068,7 @@ Disassembly of section .rela.dyn:
  a59:	00 00                	add    %al,(%rax)
  a5b:	00 00                	add    %al,(%rax)
  a5d:	00 00                	add    %al,(%rax)
- a5f:	00 27                	add    %ah,(%rdi)
+ a5f:	00 37                	add    %dh,(%rdi)
  a61:	1a 00                	sbb    (%rax),%al
  a63:	00 00                	add    %al,(%rax)
  a65:	00 00                	add    %al,(%rax)
@@ -1087,7 +1080,7 @@ Disassembly of section .rela.dyn:
  a71:	00 00                	add    %al,(%rax)
  a73:	00 00                	add    %al,(%rax)
  a75:	00 00                	add    %al,(%rax)
- a77:	00 2f                	add    %ch,(%rdi)
+ a77:	00 3f                	add    %bh,(%rdi)
  a79:	1a 00                	sbb    (%rax),%al
  a7b:	00 00                	add    %al,(%rax)
  a7d:	00 00                	add    %al,(%rax)
@@ -1099,20 +1092,21 @@ Disassembly of section .rela.dyn:
  a89:	00 00                	add    %al,(%rax)
  a8b:	00 00                	add    %al,(%rax)
  a8d:	00 00                	add    %al,(%rax)
- a8f:	00 34 1a             	add    %dh,(%rdx,%rbx,1)
- a92:	00 00                	add    %al,(%rax)
- a94:	00 00                	add    %al,(%rax)
- a96:	00 00                	add    %al,(%rax)
- a98:	40 23 00             	rex and (%rax),%eax
- a9b:	00 00                	add    %al,(%rax)
- a9d:	00 00                	add    %al,(%rax)
- a9f:	00 08                	add    %cl,(%rax)
- aa1:	00 00                	add    %al,(%rax)
- aa3:	00 00                	add    %al,(%rax)
- aa5:	00 00                	add    %al,(%rax)
- aa7:	00 45 1a             	add    %al,0x1a(%rbp)
- aaa:	00 00                	add    %al,(%rax)
- aac:	00 00                	add    %al,(%rax)
+ a8f:	00 44 1a 00          	add    %al,0x0(%rdx,%rbx,1)
+ a93:	00 00                	add    %al,(%rax)
+ a95:	00 00                	add    %al,(%rax)
+ a97:	00 40 23             	add    %al,0x23(%rax)
+ a9a:	00 00                	add    %al,(%rax)
+ a9c:	00 00                	add    %al,(%rax)
+ a9e:	00 00                	add    %al,(%rax)
+ aa0:	08 00                	or     %al,(%rax)
+ aa2:	00 00                	add    %al,(%rax)
+ aa4:	00 00                	add    %al,(%rax)
+ aa6:	00 00                	add    %al,(%rax)
+ aa8:	55                   	push   %rbp
+ aa9:	1a 00                	sbb    (%rax),%al
+ aab:	00 00                	add    %al,(%rax)
+ aad:	00 00                	add    %al,(%rax)
 	...
 
 Disassembly of section .rela.plt:
@@ -1421,19 +1415,19 @@ int main( int argc, char *argv[] ) {
      dca:	48 89 75 c0          	mov    %rsi,-0x40(%rbp)
 
 	printf( "A Very Simply Shell is now running.\n" );
-     dce:	48 8d 05 83 0c 00 00 	lea    0xc83(%rip),%rax        # 1a58 <kshell_set_env_var+0x28b>
+     dce:	48 8d 05 93 0c 00 00 	lea    0xc93(%rip),%rax        # 1a68 <kshell_set_env_var+0x287>
      dd5:	48 89 c7             	mov    %rax,%rdi
      dd8:	b8 00 00 00 00       	mov    $0x0,%eax
      ddd:	e8 7e ff ff ff       	call   d60 <printf_@plt>
 	
 	// Setup first command
 	kshell_commands.cmd = kshell_command_create( "hw", (void *)kshell_command_hello_world );
-     de2:	48 8d 05 9c 08 00 00 	lea    0x89c(%rip),%rax        # 1685 <kshell_command_hello_world>
+     de2:	48 8d 05 b0 08 00 00 	lea    0x8b0(%rip),%rax        # 1699 <kshell_command_hello_world>
      de9:	48 89 c2             	mov    %rax,%rdx
-     dec:	48 8d 05 8a 0c 00 00 	lea    0xc8a(%rip),%rax        # 1a7d <kshell_set_env_var+0x2b0>
+     dec:	48 8d 05 9a 0c 00 00 	lea    0xc9a(%rip),%rax        # 1a8d <kshell_set_env_var+0x2ac>
      df3:	48 89 d6             	mov    %rdx,%rsi
      df6:	48 89 c7             	mov    %rax,%rdi
-     df9:	e8 35 08 00 00       	call   1633 <kshell_command_create>
+     df9:	e8 49 08 00 00       	call   1647 <kshell_command_create>
      dfe:	48 8d 15 3b 16 00 00 	lea    0x163b(%rip),%rdx        # 2440 <kshell_commands>
      e05:	48 89 42 08          	mov    %rax,0x8(%rdx)
 	kshell_commands.next = NULL;
@@ -1469,7 +1463,7 @@ int main( int argc, char *argv[] ) {
      e62:	48 8b 45 e8          	mov    -0x18(%rbp),%rax
      e66:	48 01 d0             	add    %rdx,%rax
      e69:	48 8b 00             	mov    (%rax),%rax
-     e6c:	48 8d 0d 0d 0c 00 00 	lea    0xc0d(%rip),%rcx        # 1a80 <kshell_set_env_var+0x2b3>
+     e6c:	48 8d 0d 1d 0c 00 00 	lea    0xc1d(%rip),%rcx        # 1a90 <kshell_set_env_var+0x2af>
      e73:	ba 17 00 00 00       	mov    $0x17,%edx
      e78:	48 89 ce             	mov    %rcx,%rsi
      e7b:	48 89 c7             	mov    %rax,%rdi
@@ -1477,8 +1471,8 @@ int main( int argc, char *argv[] ) {
      e83:	85 c0                	test   %eax,%eax
      e85:	0f 85 85 00 00 00    	jne    f10 <main+0x151>
 			debugf( "found: %s\n", symbol_array[i].name );
-     e8b:	48 8d 0d d1 0c 00 00 	lea    0xcd1(%rip),%rcx        # 1b63 <__FUNCTION__.1>
-     e92:	48 8d 05 ff 0b 00 00 	lea    0xbff(%rip),%rax        # 1a98 <kshell_set_env_var+0x2cb>
+     e8b:	48 8d 0d ed 0c 00 00 	lea    0xced(%rip),%rcx        # 1b7f <__FUNCTION__.1>
+     e92:	48 8d 05 0f 0c 00 00 	lea    0xc0f(%rip),%rax        # 1aa8 <kshell_set_env_var+0x2c7>
      e99:	ba 23 00 00 00       	mov    $0x23,%edx
      e9e:	48 89 ce             	mov    %rcx,%rsi
      ea1:	48 89 c7             	mov    %rax,%rdi
@@ -1494,7 +1488,7 @@ int main( int argc, char *argv[] ) {
      ec4:	48 8b 45 e8          	mov    -0x18(%rbp),%rax
      ec8:	48 01 d0             	add    %rdx,%rax
      ecb:	48 8b 00             	mov    (%rax),%rax
-     ece:	48 8d 15 cc 0b 00 00 	lea    0xbcc(%rip),%rdx        # 1aa1 <kshell_set_env_var+0x2d4>
+     ece:	48 8d 15 dc 0b 00 00 	lea    0xbdc(%rip),%rdx        # 1ab1 <kshell_set_env_var+0x2d0>
      ed5:	48 89 c6             	mov    %rax,%rsi
      ed8:	48 89 d7             	mov    %rdx,%rdi
      edb:	b8 00 00 00 00       	mov    $0x0,%eax
@@ -1524,14 +1518,14 @@ int main( int argc, char *argv[] ) {
 	}
 
 	dA
-     f23:	48 8d 0d 39 0c 00 00 	lea    0xc39(%rip),%rcx        # 1b63 <__FUNCTION__.1>
-     f2a:	48 8d 05 67 0b 00 00 	lea    0xb67(%rip),%rax        # 1a98 <kshell_set_env_var+0x2cb>
+     f23:	48 8d 0d 55 0c 00 00 	lea    0xc55(%rip),%rcx        # 1b7f <__FUNCTION__.1>
+     f2a:	48 8d 05 77 0b 00 00 	lea    0xb77(%rip),%rax        # 1aa8 <kshell_set_env_var+0x2c7>
      f31:	ba 29 00 00 00       	mov    $0x29,%edx
      f36:	48 89 ce             	mov    %rcx,%rsi
      f39:	48 89 c7             	mov    %rax,%rdi
      f3c:	b8 00 00 00 00       	mov    $0x0,%eax
      f41:	e8 2a fe ff ff       	call   d70 <debugf_stage2@plt>
-     f46:	48 8d 05 5f 0b 00 00 	lea    0xb5f(%rip),%rax        # 1aac <kshell_set_env_var+0x2df>
+     f46:	48 8d 05 6f 0b 00 00 	lea    0xb6f(%rip),%rax        # 1abc <kshell_set_env_var+0x2db>
      f4d:	48 89 c7             	mov    %rax,%rdi
      f50:	b8 00 00 00 00       	mov    $0x0,%eax
      f55:	e8 16 fe ff ff       	call   d70 <debugf_stage2@plt>
@@ -1559,14 +1553,14 @@ int main( int argc, char *argv[] ) {
      f9a:	48 89 82 d0 00 00 00 	mov    %rax,0xd0(%rdx)
 
 	dB
-     fa1:	48 8d 0d bb 0b 00 00 	lea    0xbbb(%rip),%rcx        # 1b63 <__FUNCTION__.1>
-     fa8:	48 8d 05 e9 0a 00 00 	lea    0xae9(%rip),%rax        # 1a98 <kshell_set_env_var+0x2cb>
+     fa1:	48 8d 0d d7 0b 00 00 	lea    0xbd7(%rip),%rcx        # 1b7f <__FUNCTION__.1>
+     fa8:	48 8d 05 f9 0a 00 00 	lea    0xaf9(%rip),%rax        # 1aa8 <kshell_set_env_var+0x2c7>
      faf:	ba 31 00 00 00       	mov    $0x31,%edx
      fb4:	48 89 ce             	mov    %rcx,%rsi
      fb7:	48 89 c7             	mov    %rax,%rdi
      fba:	b8 00 00 00 00       	mov    $0x0,%eax
      fbf:	e8 ac fd ff ff       	call   d70 <debugf_stage2@plt>
-     fc4:	48 8d 05 f1 0a 00 00 	lea    0xaf1(%rip),%rax        # 1abc <kshell_set_env_var+0x2ef>
+     fc4:	48 8d 05 01 0b 00 00 	lea    0xb01(%rip),%rax        # 1acc <kshell_set_env_var+0x2eb>
      fcb:	48 89 c7             	mov    %rax,%rdi
      fce:	b8 00 00 00 00       	mov    $0x0,%eax
      fd3:	e8 98 fd ff ff       	call   d70 <debugf_stage2@plt>
@@ -1583,7 +1577,7 @@ int main( int argc, char *argv[] ) {
      ff9:	48 8d 05 50 14 00 00 	lea    0x1450(%rip),%rax        # 2450 <env_vars>
     1000:	48 8b 40 08          	mov    0x8(%rax),%rax
     1004:	48 89 c2             	mov    %rax,%rdx
-    1007:	48 8d 05 be 0a 00 00 	lea    0xabe(%rip),%rax        # 1acc <kshell_set_env_var+0x2ff>
+    1007:	48 8d 05 ce 0a 00 00 	lea    0xace(%rip),%rax        # 1adc <kshell_set_env_var+0x2fb>
     100e:	48 89 c6             	mov    %rax,%rsi
     1011:	48 89 d7             	mov    %rdx,%rdi
     1014:	e8 57 fc ff ff       	call   c70 <strcpy@plt>
@@ -1591,7 +1585,7 @@ int main( int argc, char *argv[] ) {
     1019:	48 8d 05 30 14 00 00 	lea    0x1430(%rip),%rax        # 2450 <env_vars>
     1020:	48 8b 40 08          	mov    0x8(%rax),%rax
     1024:	48 83 c0 32          	add    $0x32,%rax
-    1028:	48 8d 15 a0 0a 00 00 	lea    0xaa0(%rip),%rdx        # 1acf <kshell_set_env_var+0x302>
+    1028:	48 8d 15 b0 0a 00 00 	lea    0xab0(%rip),%rdx        # 1adf <kshell_set_env_var+0x2fe>
     102f:	48 89 d6             	mov    %rdx,%rsi
     1032:	48 89 c7             	mov    %rax,%rdi
     1035:	e8 36 fc ff ff       	call   c70 <strcpy@plt>
@@ -1602,46 +1596,46 @@ int main( int argc, char *argv[] ) {
     104c:	00 00 00 00 
 
 	dC
-    1050:	48 8d 0d 0c 0b 00 00 	lea    0xb0c(%rip),%rcx        # 1b63 <__FUNCTION__.1>
-    1057:	48 8d 05 3a 0a 00 00 	lea    0xa3a(%rip),%rax        # 1a98 <kshell_set_env_var+0x2cb>
+    1050:	48 8d 0d 28 0b 00 00 	lea    0xb28(%rip),%rcx        # 1b7f <__FUNCTION__.1>
+    1057:	48 8d 05 4a 0a 00 00 	lea    0xa4a(%rip),%rax        # 1aa8 <kshell_set_env_var+0x2c7>
     105e:	ba 39 00 00 00       	mov    $0x39,%edx
     1063:	48 89 ce             	mov    %rcx,%rsi
     1066:	48 89 c7             	mov    %rax,%rdi
     1069:	b8 00 00 00 00       	mov    $0x0,%eax
     106e:	e8 fd fc ff ff       	call   d70 <debugf_stage2@plt>
-    1073:	48 8d 05 57 0a 00 00 	lea    0xa57(%rip),%rax        # 1ad1 <kshell_set_env_var+0x304>
+    1073:	48 8d 05 67 0a 00 00 	lea    0xa67(%rip),%rax        # 1ae1 <kshell_set_env_var+0x300>
     107a:	48 89 c7             	mov    %rax,%rdi
     107d:	b8 00 00 00 00       	mov    $0x0,%eax
     1082:	e8 e9 fc ff ff       	call   d70 <debugf_stage2@plt>
 
 	kshell_set_env_var( "PATH", "/bin" );
-    1087:	48 8d 15 53 0a 00 00 	lea    0xa53(%rip),%rdx        # 1ae1 <kshell_set_env_var+0x314>
-    108e:	48 8d 05 51 0a 00 00 	lea    0xa51(%rip),%rax        # 1ae6 <kshell_set_env_var+0x319>
+    1087:	48 8d 15 63 0a 00 00 	lea    0xa63(%rip),%rdx        # 1af1 <kshell_set_env_var+0x310>
+    108e:	48 8d 05 61 0a 00 00 	lea    0xa61(%rip),%rax        # 1af6 <kshell_set_env_var+0x315>
     1095:	48 89 d6             	mov    %rdx,%rsi
     1098:	48 89 c7             	mov    %rax,%rdi
-    109b:	e8 2d 07 00 00       	call   17cd <kshell_set_env_var>
+    109b:	e8 41 07 00 00       	call   17e1 <kshell_set_env_var>
 	kshell_set_env_var( "HOST", "qemu1" );
-    10a0:	48 8d 15 44 0a 00 00 	lea    0xa44(%rip),%rdx        # 1aeb <kshell_set_env_var+0x31e>
-    10a7:	48 8d 05 43 0a 00 00 	lea    0xa43(%rip),%rax        # 1af1 <kshell_set_env_var+0x324>
+    10a0:	48 8d 15 54 0a 00 00 	lea    0xa54(%rip),%rdx        # 1afb <kshell_set_env_var+0x31a>
+    10a7:	48 8d 05 53 0a 00 00 	lea    0xa53(%rip),%rax        # 1b01 <kshell_set_env_var+0x320>
     10ae:	48 89 d6             	mov    %rdx,%rsi
     10b1:	48 89 c7             	mov    %rax,%rdi
-    10b4:	e8 14 07 00 00       	call   17cd <kshell_set_env_var>
+    10b4:	e8 28 07 00 00       	call   17e1 <kshell_set_env_var>
 	kshell_set_env_var( "USER", "root" );
-    10b9:	48 8d 15 36 0a 00 00 	lea    0xa36(%rip),%rdx        # 1af6 <kshell_set_env_var+0x329>
-    10c0:	48 8d 05 34 0a 00 00 	lea    0xa34(%rip),%rax        # 1afb <kshell_set_env_var+0x32e>
+    10b9:	48 8d 15 46 0a 00 00 	lea    0xa46(%rip),%rdx        # 1b06 <kshell_set_env_var+0x325>
+    10c0:	48 8d 05 44 0a 00 00 	lea    0xa44(%rip),%rax        # 1b0b <kshell_set_env_var+0x32a>
     10c7:	48 89 d6             	mov    %rdx,%rsi
     10ca:	48 89 c7             	mov    %rax,%rdi
-    10cd:	e8 fb 06 00 00       	call   17cd <kshell_set_env_var>
+    10cd:	e8 0f 07 00 00       	call   17e1 <kshell_set_env_var>
 
 	dD
-    10d2:	48 8d 0d 8a 0a 00 00 	lea    0xa8a(%rip),%rcx        # 1b63 <__FUNCTION__.1>
-    10d9:	48 8d 05 b8 09 00 00 	lea    0x9b8(%rip),%rax        # 1a98 <kshell_set_env_var+0x2cb>
+    10d2:	48 8d 0d a6 0a 00 00 	lea    0xaa6(%rip),%rcx        # 1b7f <__FUNCTION__.1>
+    10d9:	48 8d 05 c8 09 00 00 	lea    0x9c8(%rip),%rax        # 1aa8 <kshell_set_env_var+0x2c7>
     10e0:	ba 3f 00 00 00       	mov    $0x3f,%edx
     10e5:	48 89 ce             	mov    %rcx,%rsi
     10e8:	48 89 c7             	mov    %rax,%rdi
     10eb:	b8 00 00 00 00       	mov    $0x0,%eax
     10f0:	e8 7b fc ff ff       	call   d70 <debugf_stage2@plt>
-    10f5:	48 8d 05 04 0a 00 00 	lea    0xa04(%rip),%rax        # 1b00 <kshell_set_env_var+0x333>
+    10f5:	48 8d 05 14 0a 00 00 	lea    0xa14(%rip),%rax        # 1b10 <kshell_set_env_var+0x32f>
     10fc:	48 89 c7             	mov    %rax,%rdi
     10ff:	b8 00 00 00 00       	mov    $0x0,%eax
     1104:	e8 67 fc ff ff       	call   d70 <debugf_stage2@plt>
@@ -1708,18 +1702,18 @@ void kshell_main_loop( void ) {
     115b:	48 89 e5             	mov    %rsp,%rbp
     115e:	48 81 ec 00 0b 00 00 	sub    $0xb00,%rsp
 	char *user_name = kshell_get_env_var( "USER" );
-    1165:	48 8d 05 8f 09 00 00 	lea    0x98f(%rip),%rax        # 1afb <kshell_set_env_var+0x32e>
+    1165:	48 8d 05 9f 09 00 00 	lea    0x99f(%rip),%rax        # 1b0b <kshell_set_env_var+0x32a>
     116c:	48 89 c7             	mov    %rax,%rdi
-    116f:	e8 fe 05 00 00       	call   1772 <kshell_get_env_var>
+    116f:	e8 12 06 00 00       	call   1786 <kshell_get_env_var>
     1174:	48 89 45 d0          	mov    %rax,-0x30(%rbp)
 	char *host = kshell_get_env_var( "HOST" );
-    1178:	48 8d 05 72 09 00 00 	lea    0x972(%rip),%rax        # 1af1 <kshell_set_env_var+0x324>
+    1178:	48 8d 05 82 09 00 00 	lea    0x982(%rip),%rax        # 1b01 <kshell_set_env_var+0x320>
     117f:	48 89 c7             	mov    %rax,%rdi
-    1182:	e8 eb 05 00 00       	call   1772 <kshell_get_env_var>
+    1182:	e8 ff 05 00 00       	call   1786 <kshell_get_env_var>
     1187:	48 89 45 c8          	mov    %rax,-0x38(%rbp)
 
 	while( main_shell.keep_going ) {
-    118b:	e9 56 04 00 00       	jmp    15e6 <kshell_main_loop+0x48c>
+    118b:	e9 6a 04 00 00       	jmp    15fa <kshell_main_loop+0x4a0>
 		uint8_t scancode = 0;
     1190:	c6 45 c7 00          	movb   $0x0,-0x39(%rbp)
 		char c = 0;
@@ -1742,7 +1736,7 @@ void kshell_main_loop( void ) {
 
 		//memset( main_shell.current_line, 0, KSHELL_MAX_LINESIZE );
 		printf( "> " );
-    11ce:	48 8d 05 3b 09 00 00 	lea    0x93b(%rip),%rax        # 1b10 <kshell_set_env_var+0x343>
+    11ce:	48 8d 05 4b 09 00 00 	lea    0x94b(%rip),%rax        # 1b20 <kshell_set_env_var+0x33f>
     11d5:	48 89 c7             	mov    %rax,%rdi
     11d8:	b8 00 00 00 00       	mov    $0x0,%eax
     11dd:	e8 7e fb ff ff       	call   d60 <printf_@plt>
@@ -1766,7 +1760,7 @@ void kshell_main_loop( void ) {
 					do_extra_newline = false;
     11fe:	c6 45 fe 00          	movb   $0x0,-0x2(%rbp)
 					printf( "\n" );
-    1202:	48 8d 05 0a 09 00 00 	lea    0x90a(%rip),%rax        # 1b13 <kshell_set_env_var+0x346>
+    1202:	48 8d 05 1a 09 00 00 	lea    0x91a(%rip),%rax        # 1b23 <kshell_set_env_var+0x342>
     1209:	48 89 c7             	mov    %rax,%rdi
     120c:	b8 00 00 00 00       	mov    $0x0,%eax
     1211:	e8 4a fb ff ff       	call   d60 <printf_@plt>
@@ -1795,7 +1789,7 @@ void kshell_main_loop( void ) {
     1277:	c6 00 00             	movb   $0x0,(%rax)
 
 						printf( "\b" );
-    127a:	48 8d 05 94 08 00 00 	lea    0x894(%rip),%rax        # 1b15 <kshell_set_env_var+0x348>
+    127a:	48 8d 05 a4 08 00 00 	lea    0x8a4(%rip),%rax        # 1b25 <kshell_set_env_var+0x344>
     1281:	48 89 c7             	mov    %rax,%rdi
     1284:	b8 00 00 00 00       	mov    $0x0,%eax
     1289:	e8 d2 fa ff ff       	call   d60 <printf_@plt>
@@ -1804,7 +1798,7 @@ void kshell_main_loop( void ) {
 				} else {
 					printf( "%c", c );
     1293:	0f be 45 c6          	movsbl -0x3a(%rbp),%eax
-    1297:	48 8d 15 79 08 00 00 	lea    0x879(%rip),%rdx        # 1b17 <kshell_set_env_var+0x34a>
+    1297:	48 8d 15 89 08 00 00 	lea    0x889(%rip),%rdx        # 1b27 <kshell_set_env_var+0x346>
     129e:	89 c6                	mov    %eax,%esi
     12a0:	48 89 d7             	mov    %rdx,%rdi
     12a3:	b8 00 00 00 00       	mov    $0x0,%eax
@@ -1840,7 +1834,7 @@ void kshell_main_loop( void ) {
 				get_next_key = kshell_handle_special_keypress( scancode );
     130b:	0f b6 45 c7          	movzbl -0x39(%rbp),%eax
     130f:	89 c7                	mov    %eax,%edi
-    1311:	e8 e6 02 00 00       	call   15fc <kshell_handle_special_keypress>
+    1311:	e8 fa 02 00 00       	call   1610 <kshell_handle_special_keypress>
     1316:	88 45 ff             	mov    %al,-0x1(%rbp)
 			}
 		} while( get_next_key );
@@ -1854,7 +1848,7 @@ void kshell_main_loop( void ) {
     1323:	80 7d fe 00          	cmpb   $0x0,-0x2(%rbp)
     1327:	74 14                	je     133d <kshell_main_loop+0x1e3>
 			printf( "\n" );
-    1329:	48 8d 05 e3 07 00 00 	lea    0x7e3(%rip),%rax        # 1b13 <kshell_set_env_var+0x346>
+    1329:	48 8d 05 f3 07 00 00 	lea    0x7f3(%rip),%rax        # 1b23 <kshell_set_env_var+0x342>
     1330:	48 89 c7             	mov    %rax,%rdi
     1333:	b8 00 00 00 00       	mov    $0x0,%eax
     1338:	e8 23 fa ff ff       	call   d60 <printf_@plt>
@@ -1864,13 +1858,13 @@ void kshell_main_loop( void ) {
 		if( strcmp( main_shell.current_line, "" ) == 0 ) {
     133d:	48 8d 05 1c 10 00 00 	lea    0x101c(%rip),%rax        # 2360 <main_shell>
     1344:	48 8b 80 d0 00 00 00 	mov    0xd0(%rax),%rax
-    134b:	48 8d 15 c8 07 00 00 	lea    0x7c8(%rip),%rdx        # 1b1a <kshell_set_env_var+0x34d>
+    134b:	48 8d 15 d8 07 00 00 	lea    0x7d8(%rip),%rdx        # 1b2a <kshell_set_env_var+0x349>
     1352:	48 89 d6             	mov    %rdx,%rsi
     1355:	48 89 c7             	mov    %rax,%rdi
     1358:	e8 e3 f9 ff ff       	call   d40 <strcmp@plt>
     135d:	85 c0                	test   %eax,%eax
     135f:	75 05                	jne    1366 <kshell_main_loop+0x20c>
-    1361:	e9 80 02 00 00       	jmp    15e6 <kshell_main_loop+0x48c>
+    1361:	e9 94 02 00 00       	jmp    15fa <kshell_main_loop+0x4a0>
 			continue;
 		}
 
@@ -2046,7 +2040,7 @@ void kshell_main_loop( void ) {
     1504:	e8 27 f8 ff ff       	call   d30 <memset@plt>
 
 		kstrcpy( cmd, "/bin/" );
-    1509:	48 8d 05 0b 06 00 00 	lea    0x60b(%rip),%rax        # 1b1b <kshell_set_env_var+0x34e>
+    1509:	48 8d 05 1b 06 00 00 	lea    0x61b(%rip),%rax        # 1b2b <kshell_set_env_var+0x34a>
     1510:	48 8d 15 49 0f 00 00 	lea    0xf49(%rip),%rdx        # 2460 <cmd>
     1517:	48 89 c6             	mov    %rax,%rsi
     151a:	48 89 d7             	mov    %rdx,%rdi
@@ -2058,7 +2052,7 @@ void kshell_main_loop( void ) {
     1533:	48 89 d7             	mov    %rdx,%rdi
     1536:	e8 85 f7 ff ff       	call   cc0 <kstrcat@plt>
 		kstrcat( cmd, ".exec" );
-    153b:	48 8d 05 df 05 00 00 	lea    0x5df(%rip),%rax        # 1b21 <kshell_set_env_var+0x354>
+    153b:	48 8d 05 ef 05 00 00 	lea    0x5ef(%rip),%rax        # 1b31 <kshell_set_env_var+0x350>
     1542:	48 8d 15 17 0f 00 00 	lea    0xf17(%rip),%rdx        # 2460 <cmd>
     1549:	48 89 c6             	mov    %rax,%rsi
     154c:	48 89 d7             	mov    %rdx,%rdi
@@ -2086,11 +2080,11 @@ void kshell_main_loop( void ) {
     1580:	83 7d b4 00          	cmpl   $0x0,-0x4c(%rbp)
     1584:	74 16                	je     159c <kshell_main_loop+0x442>
 			printf( "Command not found.\n" );
-    1586:	48 8d 05 9a 05 00 00 	lea    0x59a(%rip),%rax        # 1b27 <kshell_set_env_var+0x35a>
+    1586:	48 8d 05 aa 05 00 00 	lea    0x5aa(%rip),%rax        # 1b37 <kshell_set_env_var+0x356>
     158d:	48 89 c7             	mov    %rax,%rdi
     1590:	b8 00 00 00 00       	mov    $0x0,%eax
     1595:	e8 c6 f7 ff ff       	call   d60 <printf_@plt>
-    159a:	eb 4a                	jmp    15e6 <kshell_main_loop+0x48c>
+    159a:	eb 5e                	jmp    15fa <kshell_main_loop+0x4a0>
 		} else {
 			//printf( "Executing %s...\n", cmd );
 			
@@ -2114,7 +2108,7 @@ void kshell_main_loop( void ) {
     15cf:	48 89 c6             	mov    %rax,%rsi
     15d2:	48 89 cf             	mov    %rcx,%rdi
     15d5:	e8 d6 f6 ff ff       	call   cb0 <execve@plt>
-    15da:	eb 0a                	jmp    15e6 <kshell_main_loop+0x48c>
+    15da:	eb 1e                	jmp    15fa <kshell_main_loop+0x4a0>
 			} else {
 				//klog( LOG_DEBUG, "In parent, waiting for child process to exit." );
 				
@@ -2122,820 +2116,827 @@ void kshell_main_loop( void ) {
     15dc:	8b 45 9c             	mov    -0x64(%rbp),%eax
     15df:	89 c7                	mov    %eax,%edi
     15e1:	e8 fa f6 ff ff       	call   ce0 <wait@plt>
-	while( main_shell.keep_going ) {
-    15e6:	48 8d 05 73 0d 00 00 	lea    0xd73(%rip),%rax        # 2360 <main_shell>
-    15ed:	0f b6 00             	movzbl (%rax),%eax
-    15f0:	84 c0                	test   %al,%al
-    15f2:	0f 85 98 fb ff ff    	jne    1190 <kshell_main_loop+0x36>
 
-				//printf( "Post wait.\n" );
+				printf( "Post wait.\n" );
+    15e6:	48 8d 05 5e 05 00 00 	lea    0x55e(%rip),%rax        # 1b4b <kshell_set_env_var+0x36a>
+    15ed:	48 89 c7             	mov    %rax,%rdi
+    15f0:	b8 00 00 00 00       	mov    $0x0,%eax
+    15f5:	e8 66 f7 ff ff       	call   d60 <printf_@plt>
+	while( main_shell.keep_going ) {
+    15fa:	48 8d 05 5f 0d 00 00 	lea    0xd5f(%rip),%rax        # 2360 <main_shell>
+    1601:	0f b6 00             	movzbl (%rax),%eax
+    1604:	84 c0                	test   %al,%al
+    1606:	0f 85 84 fb ff ff    	jne    1190 <kshell_main_loop+0x36>
 			}
 		}
 	}
 }
-    15f8:	90                   	nop
-    15f9:	90                   	nop
-    15fa:	c9                   	leave
-    15fb:	c3                   	ret
+    160c:	90                   	nop
+    160d:	90                   	nop
+    160e:	c9                   	leave
+    160f:	c3                   	ret
 
-00000000000015fc <kshell_handle_special_keypress>:
+0000000000001610 <kshell_handle_special_keypress>:
  * 
  * @param scancode 
  * @return true continue with current line
  * @return false start over at a new line 
  */
 bool kshell_handle_special_keypress( uint8_t scancode ) {
-    15fc:	55                   	push   %rbp
-    15fd:	48 89 e5             	mov    %rsp,%rbp
-    1600:	48 83 ec 10          	sub    $0x10,%rsp
-    1604:	89 f8                	mov    %edi,%eax
-    1606:	88 45 fc             	mov    %al,-0x4(%rbp)
+    1610:	55                   	push   %rbp
+    1611:	48 89 e5             	mov    %rsp,%rbp
+    1614:	48 83 ec 10          	sub    $0x10,%rsp
+    1618:	89 f8                	mov    %edi,%eax
+    161a:	88 45 fc             	mov    %al,-0x4(%rbp)
 	switch( scancode ) {
-    1609:	0f b6 45 fc          	movzbl -0x4(%rbp),%eax
-    160d:	83 f8 01             	cmp    $0x1,%eax
-    1610:	74 07                	je     1619 <kshell_handle_special_keypress+0x1d>
-    1612:	83 f8 3b             	cmp    $0x3b,%eax
-    1615:	74 0e                	je     1625 <kshell_handle_special_keypress+0x29>
-    1617:	eb 13                	jmp    162c <kshell_handle_special_keypress+0x30>
+    161d:	0f b6 45 fc          	movzbl -0x4(%rbp),%eax
+    1621:	83 f8 01             	cmp    $0x1,%eax
+    1624:	74 07                	je     162d <kshell_handle_special_keypress+0x1d>
+    1626:	83 f8 3b             	cmp    $0x3b,%eax
+    1629:	74 0e                	je     1639 <kshell_handle_special_keypress+0x29>
+    162b:	eb 13                	jmp    1640 <kshell_handle_special_keypress+0x30>
 		case SCANCODE_ESC:
 			kshell_stop();
-    1619:	e8 1c fb ff ff       	call   113a <kshell_stop>
+    162d:	e8 08 fb ff ff       	call   113a <kshell_stop>
 			return false;
-    161e:	b8 00 00 00 00       	mov    $0x0,%eax
-    1623:	eb 0c                	jmp    1631 <kshell_handle_special_keypress+0x35>
+    1632:	b8 00 00 00 00       	mov    $0x0,%eax
+    1637:	eb 0c                	jmp    1645 <kshell_handle_special_keypress+0x35>
 		case SCANCODE_F1:
 			return true;
-    1625:	b8 01 00 00 00       	mov    $0x1,%eax
-    162a:	eb 05                	jmp    1631 <kshell_handle_special_keypress+0x35>
+    1639:	b8 01 00 00 00       	mov    $0x1,%eax
+    163e:	eb 05                	jmp    1645 <kshell_handle_special_keypress+0x35>
 		default:
 			return true;
-    162c:	b8 01 00 00 00       	mov    $0x1,%eax
+    1640:	b8 01 00 00 00       	mov    $0x1,%eax
 	}
 }
-    1631:	c9                   	leave
-    1632:	c3                   	ret
+    1645:	c9                   	leave
+    1646:	c3                   	ret
 
-0000000000001633 <kshell_command_create>:
+0000000000001647 <kshell_command_create>:
  * 
  * @param command_name display name AND command name
  * @param main_function pointer to the function address to run
  * @return kshell_command* pointer to a new kshell_command
  */
 kshell_command __attribute__ ((no_instrument_function)) *kshell_command_create( char *command_name, void *main_function ) {
-    1633:	55                   	push   %rbp
-    1634:	48 89 e5             	mov    %rsp,%rbp
-    1637:	48 83 ec 20          	sub    $0x20,%rsp
-    163b:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
-    163f:	48 89 75 e0          	mov    %rsi,-0x20(%rbp)
+    1647:	55                   	push   %rbp
+    1648:	48 89 e5             	mov    %rsp,%rbp
+    164b:	48 83 ec 20          	sub    $0x20,%rsp
+    164f:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
+    1653:	48 89 75 e0          	mov    %rsi,-0x20(%rbp)
 	kshell_command *cmd = (kshell_command *)kmalloc( sizeof( kshell_command ) );
-    1643:	bf 48 00 00 00       	mov    $0x48,%edi
-    1648:	e8 33 f7 ff ff       	call   d80 <kmalloc@plt>
-    164d:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+    1657:	bf 48 00 00 00       	mov    $0x48,%edi
+    165c:	e8 1f f7 ff ff       	call   d80 <kmalloc@plt>
+    1661:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
 	strcpy( cmd->name, command_name );
-    1651:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-    1655:	48 8b 55 e8          	mov    -0x18(%rbp),%rdx
-    1659:	48 89 d6             	mov    %rdx,%rsi
-    165c:	48 89 c7             	mov    %rax,%rdi
-    165f:	e8 0c f6 ff ff       	call   c70 <strcpy@plt>
+    1665:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+    1669:	48 8b 55 e8          	mov    -0x18(%rbp),%rdx
+    166d:	48 89 d6             	mov    %rdx,%rsi
+    1670:	48 89 c7             	mov    %rax,%rdi
+    1673:	e8 f8 f5 ff ff       	call   c70 <strcpy@plt>
 	cmd->entry = main_function;
-    1664:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-    1668:	48 8b 55 e0          	mov    -0x20(%rbp),%rdx
-    166c:	48 89 50 40          	mov    %rdx,0x40(%rax)
+    1678:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+    167c:	48 8b 55 e0          	mov    -0x20(%rbp),%rdx
+    1680:	48 89 50 40          	mov    %rdx,0x40(%rax)
 }
-    1670:	90                   	nop
-    1671:	c9                   	leave
-    1672:	c3                   	ret
+    1684:	90                   	nop
+    1685:	c9                   	leave
+    1686:	c3                   	ret
 
-0000000000001673 <kshell_command_run>:
+0000000000001687 <kshell_command_run>:
  * @param argc number of arguments
  * @param argv pointer array to list of null terminated strings
  * @return int exit code as given by command
  */
 #undef DEBUG_KSHELL_COMMAND_RUN
 int kshell_command_run( kshell_command *cmd, int argc, char *argv[] ) {
-    1673:	55                   	push   %rbp
-    1674:	48 89 e5             	mov    %rsp,%rbp
-    1677:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
-    167b:	89 75 f4             	mov    %esi,-0xc(%rbp)
-    167e:	48 89 55 e8          	mov    %rdx,-0x18(%rbp)
+    1687:	55                   	push   %rbp
+    1688:	48 89 e5             	mov    %rsp,%rbp
+    168b:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
+    168f:	89 75 f4             	mov    %esi,-0xc(%rbp)
+    1692:	48 89 55 e8          	mov    %rdx,-0x18(%rbp)
 	#ifdef DEBUG_KSHELL_COMMAND_RUN
 	debugf( "Exit code: %d\n", exit_code );
 	log_entry_exit();
 	#endif
 	return (int)exit_code; */
 }
-    1682:	90                   	nop
-    1683:	5d                   	pop    %rbp
-    1684:	c3                   	ret
+    1696:	90                   	nop
+    1697:	5d                   	pop    %rbp
+    1698:	c3                   	ret
 
-0000000000001685 <kshell_command_hello_world>:
+0000000000001699 <kshell_command_hello_world>:
 
 int kshell_command_hello_world( int argc, char *argv[] ) {
-    1685:	55                   	push   %rbp
-    1686:	48 89 e5             	mov    %rsp,%rbp
-    1689:	48 83 ec 10          	sub    $0x10,%rsp
-    168d:	89 7d fc             	mov    %edi,-0x4(%rbp)
-    1690:	48 89 75 f0          	mov    %rsi,-0x10(%rbp)
+    1699:	55                   	push   %rbp
+    169a:	48 89 e5             	mov    %rsp,%rbp
+    169d:	48 83 ec 10          	sub    $0x10,%rsp
+    16a1:	89 7d fc             	mov    %edi,-0x4(%rbp)
+    16a4:	48 89 75 f0          	mov    %rsi,-0x10(%rbp)
 	printf( "Hello, world!\n" );
-    1694:	48 8d 05 a0 04 00 00 	lea    0x4a0(%rip),%rax        # 1b3b <kshell_set_env_var+0x36e>
-    169b:	48 89 c7             	mov    %rax,%rdi
-    169e:	b8 00 00 00 00       	mov    $0x0,%eax
-    16a3:	e8 b8 f6 ff ff       	call   d60 <printf_@plt>
+    16a8:	48 8d 05 a8 04 00 00 	lea    0x4a8(%rip),%rax        # 1b57 <kshell_set_env_var+0x376>
+    16af:	48 89 c7             	mov    %rax,%rdi
+    16b2:	b8 00 00 00 00       	mov    $0x0,%eax
+    16b7:	e8 a4 f6 ff ff       	call   d60 <printf_@plt>
 }
-    16a8:	90                   	nop
-    16a9:	c9                   	leave
-    16aa:	c3                   	ret
+    16bc:	90                   	nop
+    16bd:	c9                   	leave
+    16be:	c3                   	ret
 
-00000000000016ab <kshell_add_command>:
+00000000000016bf <kshell_add_command>:
 
 
 void kshell_add_command( char *command_name, void *main_function ) {
-    16ab:	55                   	push   %rbp
-    16ac:	48 89 e5             	mov    %rsp,%rbp
-    16af:	48 83 ec 20          	sub    $0x20,%rsp
-    16b3:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
-    16b7:	48 89 75 e0          	mov    %rsi,-0x20(%rbp)
+    16bf:	55                   	push   %rbp
+    16c0:	48 89 e5             	mov    %rsp,%rbp
+    16c3:	48 83 ec 20          	sub    $0x20,%rsp
+    16c7:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
+    16cb:	48 89 75 e0          	mov    %rsi,-0x20(%rbp)
 	kshell_command_list *head = &kshell_commands;
-    16bb:	48 8d 05 7e 0d 00 00 	lea    0xd7e(%rip),%rax        # 2440 <kshell_commands>
-    16c2:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+    16cf:	48 8d 05 6a 0d 00 00 	lea    0xd6a(%rip),%rax        # 2440 <kshell_commands>
+    16d6:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
 	kshell_command_list *entry = NULL;
-    16c6:	48 c7 45 f0 00 00 00 	movq   $0x0,-0x10(%rbp)
-    16cd:	00 
+    16da:	48 c7 45 f0 00 00 00 	movq   $0x0,-0x10(%rbp)
+    16e1:	00 
 
 	do {
 		if( head->next == NULL ) {
-    16ce:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-    16d2:	48 8b 00             	mov    (%rax),%rax
-    16d5:	48 85 c0             	test   %rax,%rax
-    16d8:	75 1e                	jne    16f8 <kshell_add_command+0x4d>
+    16e2:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+    16e6:	48 8b 00             	mov    (%rax),%rax
+    16e9:	48 85 c0             	test   %rax,%rax
+    16ec:	75 1e                	jne    170c <kshell_add_command+0x4d>
 			head->next = (kshell_command_list *)kmalloc( sizeof(kshell_command_list) );
-    16da:	bf 10 00 00 00       	mov    $0x10,%edi
-    16df:	e8 9c f6 ff ff       	call   d80 <kmalloc@plt>
-    16e4:	48 8b 55 f8          	mov    -0x8(%rbp),%rdx
-    16e8:	48 89 02             	mov    %rax,(%rdx)
+    16ee:	bf 10 00 00 00       	mov    $0x10,%edi
+    16f3:	e8 88 f6 ff ff       	call   d80 <kmalloc@plt>
+    16f8:	48 8b 55 f8          	mov    -0x8(%rbp),%rdx
+    16fc:	48 89 02             	mov    %rax,(%rdx)
 			entry = (kshell_command_list *)head->next;
-    16eb:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-    16ef:	48 8b 00             	mov    (%rax),%rax
-    16f2:	48 89 45 f0          	mov    %rax,-0x10(%rbp)
-    16f6:	eb 0b                	jmp    1703 <kshell_add_command+0x58>
+    16ff:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+    1703:	48 8b 00             	mov    (%rax),%rax
+    1706:	48 89 45 f0          	mov    %rax,-0x10(%rbp)
+    170a:	eb 0b                	jmp    1717 <kshell_add_command+0x58>
 		} else {
 			head = (kshell_command_list *)head->next;
-    16f8:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-    16fc:	48 8b 00             	mov    (%rax),%rax
-    16ff:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+    170c:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+    1710:	48 8b 00             	mov    (%rax),%rax
+    1713:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
 		}
 	} while( entry == NULL );
-    1703:	48 83 7d f0 00       	cmpq   $0x0,-0x10(%rbp)
-    1708:	74 c4                	je     16ce <kshell_add_command+0x23>
+    1717:	48 83 7d f0 00       	cmpq   $0x0,-0x10(%rbp)
+    171c:	74 c4                	je     16e2 <kshell_add_command+0x23>
 
 	if( entry == NULL ) {
-    170a:	48 83 7d f0 00       	cmpq   $0x0,-0x10(%rbp)
-    170f:	75 39                	jne    174a <kshell_add_command+0x9f>
+    171e:	48 83 7d f0 00       	cmpq   $0x0,-0x10(%rbp)
+    1723:	75 39                	jne    175e <kshell_add_command+0x9f>
 		debugf( "Entry is null. Bailing.\n" );
-    1711:	48 8d 0d 58 04 00 00 	lea    0x458(%rip),%rcx        # 1b70 <__FUNCTION__.0>
-    1718:	48 8d 05 79 03 00 00 	lea    0x379(%rip),%rax        # 1a98 <kshell_set_env_var+0x2cb>
-    171f:	ba 5e 01 00 00       	mov    $0x15e,%edx
-    1724:	48 89 ce             	mov    %rcx,%rsi
-    1727:	48 89 c7             	mov    %rax,%rdi
-    172a:	b8 00 00 00 00       	mov    $0x0,%eax
-    172f:	e8 3c f6 ff ff       	call   d70 <debugf_stage2@plt>
-    1734:	48 8d 05 0f 04 00 00 	lea    0x40f(%rip),%rax        # 1b4a <kshell_set_env_var+0x37d>
+    1725:	48 8d 0d 64 04 00 00 	lea    0x464(%rip),%rcx        # 1b90 <__FUNCTION__.0>
+    172c:	48 8d 05 75 03 00 00 	lea    0x375(%rip),%rax        # 1aa8 <kshell_set_env_var+0x2c7>
+    1733:	ba 5e 01 00 00       	mov    $0x15e,%edx
+    1738:	48 89 ce             	mov    %rcx,%rsi
     173b:	48 89 c7             	mov    %rax,%rdi
     173e:	b8 00 00 00 00       	mov    $0x0,%eax
     1743:	e8 28 f6 ff ff       	call   d70 <debugf_stage2@plt>
+    1748:	48 8d 05 17 04 00 00 	lea    0x417(%rip),%rax        # 1b66 <kshell_set_env_var+0x385>
+    174f:	48 89 c7             	mov    %rax,%rdi
+    1752:	b8 00 00 00 00       	mov    $0x0,%eax
+    1757:	e8 14 f6 ff ff       	call   d70 <debugf_stage2@plt>
 		return;
-    1748:	eb 26                	jmp    1770 <kshell_add_command+0xc5>
+    175c:	eb 26                	jmp    1784 <kshell_add_command+0xc5>
 	}
 
 	entry->cmd = kshell_command_create( command_name, main_function );
-    174a:	48 8b 55 e0          	mov    -0x20(%rbp),%rdx
-    174e:	48 8b 45 e8          	mov    -0x18(%rbp),%rax
-    1752:	48 89 d6             	mov    %rdx,%rsi
-    1755:	48 89 c7             	mov    %rax,%rdi
-    1758:	e8 d6 fe ff ff       	call   1633 <kshell_command_create>
-    175d:	48 8b 55 f0          	mov    -0x10(%rbp),%rdx
-    1761:	48 89 42 08          	mov    %rax,0x8(%rdx)
+    175e:	48 8b 55 e0          	mov    -0x20(%rbp),%rdx
+    1762:	48 8b 45 e8          	mov    -0x18(%rbp),%rax
+    1766:	48 89 d6             	mov    %rdx,%rsi
+    1769:	48 89 c7             	mov    %rax,%rdi
+    176c:	e8 d6 fe ff ff       	call   1647 <kshell_command_create>
+    1771:	48 8b 55 f0          	mov    -0x10(%rbp),%rdx
+    1775:	48 89 42 08          	mov    %rax,0x8(%rdx)
 	entry->next = NULL;
-    1765:	48 8b 45 f0          	mov    -0x10(%rbp),%rax
-    1769:	48 c7 00 00 00 00 00 	movq   $0x0,(%rax)
+    1779:	48 8b 45 f0          	mov    -0x10(%rbp),%rax
+    177d:	48 c7 00 00 00 00 00 	movq   $0x0,(%rax)
 }
-    1770:	c9                   	leave
-    1771:	c3                   	ret
+    1784:	c9                   	leave
+    1785:	c3                   	ret
 
-0000000000001772 <kshell_get_env_var>:
+0000000000001786 <kshell_get_env_var>:
 
 char *kshell_get_env_var( char *name ) {
-    1772:	55                   	push   %rbp
-    1773:	48 89 e5             	mov    %rsp,%rbp
-    1776:	48 83 ec 20          	sub    $0x20,%rsp
-    177a:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
+    1786:	55                   	push   %rbp
+    1787:	48 89 e5             	mov    %rsp,%rbp
+    178a:	48 83 ec 20          	sub    $0x20,%rsp
+    178e:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
 	kshell_env_var *head = env_vars.top;
-    177e:	48 8d 05 cb 0c 00 00 	lea    0xccb(%rip),%rax        # 2450 <env_vars>
-    1785:	48 8b 40 08          	mov    0x8(%rax),%rax
-    1789:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+    1792:	48 8d 05 b7 0c 00 00 	lea    0xcb7(%rip),%rax        # 2450 <env_vars>
+    1799:	48 8b 40 08          	mov    0x8(%rax),%rax
+    179d:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
 
 	while( head != NULL ) {
-    178d:	eb 30                	jmp    17bf <kshell_get_env_var+0x4d>
+    17a1:	eb 30                	jmp    17d3 <kshell_get_env_var+0x4d>
 		if( strcmp( head->name, name ) == 0 ) {
-    178f:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-    1793:	48 8b 55 e8          	mov    -0x18(%rbp),%rdx
-    1797:	48 89 d6             	mov    %rdx,%rsi
-    179a:	48 89 c7             	mov    %rax,%rdi
-    179d:	e8 9e f5 ff ff       	call   d40 <strcmp@plt>
-    17a2:	85 c0                	test   %eax,%eax
-    17a4:	75 0a                	jne    17b0 <kshell_get_env_var+0x3e>
+    17a3:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+    17a7:	48 8b 55 e8          	mov    -0x18(%rbp),%rdx
+    17ab:	48 89 d6             	mov    %rdx,%rsi
+    17ae:	48 89 c7             	mov    %rax,%rdi
+    17b1:	e8 8a f5 ff ff       	call   d40 <strcmp@plt>
+    17b6:	85 c0                	test   %eax,%eax
+    17b8:	75 0a                	jne    17c4 <kshell_get_env_var+0x3e>
 			return head->value;
-    17a6:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-    17aa:	48 83 c0 32          	add    $0x32,%rax
-    17ae:	eb 1b                	jmp    17cb <kshell_get_env_var+0x59>
+    17ba:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+    17be:	48 83 c0 32          	add    $0x32,%rax
+    17c2:	eb 1b                	jmp    17df <kshell_get_env_var+0x59>
 		}
 
 		head = head->next;
-    17b0:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-    17b4:	48 8b 80 38 01 00 00 	mov    0x138(%rax),%rax
-    17bb:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+    17c4:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+    17c8:	48 8b 80 38 01 00 00 	mov    0x138(%rax),%rax
+    17cf:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
 	while( head != NULL ) {
-    17bf:	48 83 7d f8 00       	cmpq   $0x0,-0x8(%rbp)
-    17c4:	75 c9                	jne    178f <kshell_get_env_var+0x1d>
+    17d3:	48 83 7d f8 00       	cmpq   $0x0,-0x8(%rbp)
+    17d8:	75 c9                	jne    17a3 <kshell_get_env_var+0x1d>
 	}
 
 	return NULL;
-    17c6:	b8 00 00 00 00       	mov    $0x0,%eax
+    17da:	b8 00 00 00 00       	mov    $0x0,%eax
 }
-    17cb:	c9                   	leave
-    17cc:	c3                   	ret
+    17df:	c9                   	leave
+    17e0:	c3                   	ret
 
-00000000000017cd <kshell_set_env_var>:
+00000000000017e1 <kshell_set_env_var>:
 
 void kshell_set_env_var( char *name, char *value ) {
-    17cd:	55                   	push   %rbp
-    17ce:	48 89 e5             	mov    %rsp,%rbp
-    17d1:	48 83 ec 20          	sub    $0x20,%rsp
-    17d5:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
-    17d9:	48 89 75 e0          	mov    %rsi,-0x20(%rbp)
+    17e1:	55                   	push   %rbp
+    17e2:	48 89 e5             	mov    %rsp,%rbp
+    17e5:	48 83 ec 20          	sub    $0x20,%rsp
+    17e9:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
+    17ed:	48 89 75 e0          	mov    %rsi,-0x20(%rbp)
 	kshell_env_var *head = env_vars.top;
-    17dd:	48 8d 05 6c 0c 00 00 	lea    0xc6c(%rip),%rax        # 2450 <env_vars>
-    17e4:	48 8b 40 08          	mov    0x8(%rax),%rax
-    17e8:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+    17f1:	48 8d 05 58 0c 00 00 	lea    0xc58(%rip),%rax        # 2450 <env_vars>
+    17f8:	48 8b 40 08          	mov    0x8(%rax),%rax
+    17fc:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
 	kshell_env_var *tail = kmalloc( sizeof(kshell_env_var) );
-    17ec:	bf 40 01 00 00       	mov    $0x140,%edi
-    17f1:	e8 8a f5 ff ff       	call   d80 <kmalloc@plt>
-    17f6:	48 89 45 f0          	mov    %rax,-0x10(%rbp)
+    1800:	bf 40 01 00 00       	mov    $0x140,%edi
+    1805:	e8 76 f5 ff ff       	call   d80 <kmalloc@plt>
+    180a:	48 89 45 f0          	mov    %rax,-0x10(%rbp)
 	strcpy( tail->name,  name );
-    17fa:	48 8b 45 f0          	mov    -0x10(%rbp),%rax
-    17fe:	48 8b 55 e8          	mov    -0x18(%rbp),%rdx
-    1802:	48 89 d6             	mov    %rdx,%rsi
-    1805:	48 89 c7             	mov    %rax,%rdi
-    1808:	e8 63 f4 ff ff       	call   c70 <strcpy@plt>
+    180e:	48 8b 45 f0          	mov    -0x10(%rbp),%rax
+    1812:	48 8b 55 e8          	mov    -0x18(%rbp),%rdx
+    1816:	48 89 d6             	mov    %rdx,%rsi
+    1819:	48 89 c7             	mov    %rax,%rdi
+    181c:	e8 4f f4 ff ff       	call   c70 <strcpy@plt>
 	strcpy( tail->value, value );
-    180d:	48 8b 45 f0          	mov    -0x10(%rbp),%rax
-    1811:	48 8d 50 32          	lea    0x32(%rax),%rdx
-    1815:	48 8b 45 e0          	mov    -0x20(%rbp),%rax
-    1819:	48 89 c6             	mov    %rax,%rsi
-    181c:	48 89 d7             	mov    %rdx,%rdi
-    181f:	e8 4c f4 ff ff       	call   c70 <strcpy@plt>
+    1821:	48 8b 45 f0          	mov    -0x10(%rbp),%rax
+    1825:	48 8d 50 32          	lea    0x32(%rax),%rdx
+    1829:	48 8b 45 e0          	mov    -0x20(%rbp),%rax
+    182d:	48 89 c6             	mov    %rax,%rsi
+    1830:	48 89 d7             	mov    %rdx,%rdi
+    1833:	e8 38 f4 ff ff       	call   c70 <strcpy@plt>
 	tail->next = NULL;
-    1824:	48 8b 45 f0          	mov    -0x10(%rbp),%rax
-    1828:	48 c7 80 38 01 00 00 	movq   $0x0,0x138(%rax)
-    182f:	00 00 00 00 
+    1838:	48 8b 45 f0          	mov    -0x10(%rbp),%rax
+    183c:	48 c7 80 38 01 00 00 	movq   $0x0,0x138(%rax)
+    1843:	00 00 00 00 
 
 	do {
 		if( head->next == NULL ) {
-    1833:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-    1837:	48 8b 80 38 01 00 00 	mov    0x138(%rax),%rax
-    183e:	48 85 c0             	test   %rax,%rax
-    1841:	75 11                	jne    1854 <kshell_set_env_var+0x87>
+    1847:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+    184b:	48 8b 80 38 01 00 00 	mov    0x138(%rax),%rax
+    1852:	48 85 c0             	test   %rax,%rax
+    1855:	75 11                	jne    1868 <kshell_set_env_var+0x87>
 			head->next = tail;
-    1843:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-    1847:	48 8b 55 f0          	mov    -0x10(%rbp),%rdx
-    184b:	48 89 90 38 01 00 00 	mov    %rdx,0x138(%rax)
+    1857:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+    185b:	48 8b 55 f0          	mov    -0x10(%rbp),%rdx
+    185f:	48 89 90 38 01 00 00 	mov    %rdx,0x138(%rax)
 			return;
-    1852:	eb 16                	jmp    186a <kshell_set_env_var+0x9d>
+    1866:	eb 16                	jmp    187e <kshell_set_env_var+0x9d>
 		}
 
 		head = head->next;
-    1854:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-    1858:	48 8b 80 38 01 00 00 	mov    0x138(%rax),%rax
-    185f:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+    1868:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+    186c:	48 8b 80 38 01 00 00 	mov    0x138(%rax),%rax
+    1873:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
 	} while( head != NULL );
-    1863:	48 83 7d f8 00       	cmpq   $0x0,-0x8(%rbp)
-    1868:	75 c9                	jne    1833 <kshell_set_env_var+0x66>
-    186a:	c9                   	leave
-    186b:	c3                   	ret
+    1877:	48 83 7d f8 00       	cmpq   $0x0,-0x8(%rbp)
+    187c:	75 c9                	jne    1847 <kshell_set_env_var+0x66>
+    187e:	c9                   	leave
+    187f:	c3                   	ret
 
 Disassembly of section .rodata:
 
-0000000000001870 <__FUNCTION__.1-0x2f3>:
-    1870:	44 69 76 69 64 65 20 	imul   $0x62206564,0x69(%rsi),%r14d
-    1877:	62 
-    1878:	79 20                	jns    189a <kshell_set_env_var+0xcd>
-    187a:	5a                   	pop    %rdx
-    187b:	65 72 6f             	gs jb  18ed <kshell_set_env_var+0x120>
-    187e:	00 44 65 62          	add    %al,0x62(%rbp,%riz,2)
-    1882:	75 67                	jne    18eb <kshell_set_env_var+0x11e>
-    1884:	00 4e 4d             	add    %cl,0x4d(%rsi)
-    1887:	49 00 42 72          	rex.WB add %al,0x72(%r10)
-    188b:	65 61                	gs (bad)
-    188d:	6b 70 6f 69          	imul   $0x69,0x6f(%rax),%esi
-    1891:	6e                   	outsb  (%rsi),(%dx)
-    1892:	74 00                	je     1894 <kshell_set_env_var+0xc7>
-    1894:	4f 76 65             	rex.WRXB jbe 18fc <kshell_set_env_var+0x12f>
-    1897:	72 66                	jb     18ff <kshell_set_env_var+0x132>
-    1899:	6c                   	insb   (%dx),(%rdi)
-    189a:	6f                   	outsl  (%rsi),(%dx)
-    189b:	77 00                	ja     189d <kshell_set_env_var+0xd0>
-    189d:	42 6f                	rex.X outsl (%rsi),(%dx)
-    189f:	75 6e                	jne    190f <kshell_set_env_var+0x142>
-    18a1:	64 20 52 61          	and    %dl,%fs:0x61(%rdx)
-    18a5:	6e                   	outsb  (%rsi),(%dx)
-    18a6:	67 65 20 45 78       	and    %al,%gs:0x78(%ebp)
-    18ab:	63 65 65             	movsxd 0x65(%rbp),%esp
-    18ae:	64 65 64 00 49 6e    	fs gs add %cl,%fs:0x6e(%rcx)
-    18b4:	76 61                	jbe    1917 <kshell_set_env_var+0x14a>
-    18b6:	6c                   	insb   (%dx),(%rdi)
-    18b7:	69 64 20 4f 70 63 6f 	imul   $0x646f6370,0x4f(%rax,%riz,1),%esp
-    18be:	64 
-    18bf:	65 00 44 65 76       	add    %al,%gs:0x76(%rbp,%riz,2)
-    18c4:	69 63 65 20 4e 6f 74 	imul   $0x746f4e20,0x65(%rbx),%esp
-    18cb:	20 41 76             	and    %al,0x76(%rcx)
-    18ce:	61                   	(bad)
-    18cf:	69 6c 61 62 6c 65 00 	imul   $0x4400656c,0x62(%rcx,%riz,2),%ebp
-    18d6:	44 
-    18d7:	6f                   	outsl  (%rsi),(%dx)
-    18d8:	75 62                	jne    193c <kshell_set_env_var+0x16f>
-    18da:	6c                   	insb   (%dx),(%rdi)
-    18db:	65 20 46 61          	and    %al,%gs:0x61(%rsi)
-    18df:	75 6c                	jne    194d <kshell_set_env_var+0x180>
-    18e1:	74 00                	je     18e3 <kshell_set_env_var+0x116>
-    18e3:	43 6f                	rex.XB outsl (%rsi),(%dx)
-    18e5:	70 72                	jo     1959 <kshell_set_env_var+0x18c>
+0000000000001880 <__FUNCTION__.1-0x2ff>:
+    1880:	44 69 76 69 64 65 20 	imul   $0x62206564,0x69(%rsi),%r14d
+    1887:	62 
+    1888:	79 20                	jns    18aa <kshell_set_env_var+0xc9>
+    188a:	5a                   	pop    %rdx
+    188b:	65 72 6f             	gs jb  18fd <kshell_set_env_var+0x11c>
+    188e:	00 44 65 62          	add    %al,0x62(%rbp,%riz,2)
+    1892:	75 67                	jne    18fb <kshell_set_env_var+0x11a>
+    1894:	00 4e 4d             	add    %cl,0x4d(%rsi)
+    1897:	49 00 42 72          	rex.WB add %al,0x72(%r10)
+    189b:	65 61                	gs (bad)
+    189d:	6b 70 6f 69          	imul   $0x69,0x6f(%rax),%esi
+    18a1:	6e                   	outsb  (%rsi),(%dx)
+    18a2:	74 00                	je     18a4 <kshell_set_env_var+0xc3>
+    18a4:	4f 76 65             	rex.WRXB jbe 190c <kshell_set_env_var+0x12b>
+    18a7:	72 66                	jb     190f <kshell_set_env_var+0x12e>
+    18a9:	6c                   	insb   (%dx),(%rdi)
+    18aa:	6f                   	outsl  (%rsi),(%dx)
+    18ab:	77 00                	ja     18ad <kshell_set_env_var+0xcc>
+    18ad:	42 6f                	rex.X outsl (%rsi),(%dx)
+    18af:	75 6e                	jne    191f <kshell_set_env_var+0x13e>
+    18b1:	64 20 52 61          	and    %dl,%fs:0x61(%rdx)
+    18b5:	6e                   	outsb  (%rsi),(%dx)
+    18b6:	67 65 20 45 78       	and    %al,%gs:0x78(%ebp)
+    18bb:	63 65 65             	movsxd 0x65(%rbp),%esp
+    18be:	64 65 64 00 49 6e    	fs gs add %cl,%fs:0x6e(%rcx)
+    18c4:	76 61                	jbe    1927 <kshell_set_env_var+0x146>
+    18c6:	6c                   	insb   (%dx),(%rdi)
+    18c7:	69 64 20 4f 70 63 6f 	imul   $0x646f6370,0x4f(%rax,%riz,1),%esp
+    18ce:	64 
+    18cf:	65 00 44 65 76       	add    %al,%gs:0x76(%rbp,%riz,2)
+    18d4:	69 63 65 20 4e 6f 74 	imul   $0x746f4e20,0x65(%rbx),%esp
+    18db:	20 41 76             	and    %al,0x76(%rcx)
+    18de:	61                   	(bad)
+    18df:	69 6c 61 62 6c 65 00 	imul   $0x4400656c,0x62(%rcx,%riz,2),%ebp
+    18e6:	44 
     18e7:	6f                   	outsl  (%rsi),(%dx)
-    18e8:	63 65 73             	movsxd 0x73(%rbp),%esp
-    18eb:	73 6f                	jae    195c <kshell_set_env_var+0x18f>
-    18ed:	72 20                	jb     190f <kshell_set_env_var+0x142>
-    18ef:	53                   	push   %rbx
-    18f0:	65 67 6d             	gs insl (%dx),(%edi)
-    18f3:	65 6e                	outsb  %gs:(%rsi),(%dx)
-    18f5:	74 20                	je     1917 <kshell_set_env_var+0x14a>
-    18f7:	4f 76 65             	rex.WRXB jbe 195f <kshell_set_env_var+0x192>
-    18fa:	72 72                	jb     196e <kshell_set_env_var+0x1a1>
-    18fc:	75 6e                	jne    196c <kshell_set_env_var+0x19f>
-    18fe:	00 49 6e             	add    %cl,0x6e(%rcx)
-    1901:	76 61                	jbe    1964 <kshell_set_env_var+0x197>
-    1903:	6c                   	insb   (%dx),(%rdi)
-    1904:	69 64 20 54 53 53 00 	imul   $0x53005353,0x54(%rax,%riz,1),%esp
-    190b:	53 
-    190c:	65 67 6d             	gs insl (%dx),(%edi)
-    190f:	65 6e                	outsb  %gs:(%rsi),(%dx)
-    1911:	74 20                	je     1933 <kshell_set_env_var+0x166>
-    1913:	4e 6f                	rex.WRX outsl (%rsi),(%dx)
-    1915:	74 20                	je     1937 <kshell_set_env_var+0x16a>
-    1917:	50                   	push   %rax
-    1918:	72 65                	jb     197f <kshell_set_env_var+0x1b2>
-    191a:	73 65                	jae    1981 <kshell_set_env_var+0x1b4>
-    191c:	6e                   	outsb  (%rsi),(%dx)
-    191d:	74 00                	je     191f <kshell_set_env_var+0x152>
-    191f:	53                   	push   %rbx
-    1920:	74 61                	je     1983 <kshell_set_env_var+0x1b6>
-    1922:	63 6b 2d             	movsxd 0x2d(%rbx),%ebp
-    1925:	53                   	push   %rbx
-    1926:	65 67 6d             	gs insl (%dx),(%edi)
-    1929:	65 6e                	outsb  %gs:(%rsi),(%dx)
-    192b:	74 20                	je     194d <kshell_set_env_var+0x180>
-    192d:	46 61                	rex.RX (bad)
-    192f:	75 6c                	jne    199d <kshell_set_env_var+0x1d0>
-    1931:	74 00                	je     1933 <kshell_set_env_var+0x166>
-    1933:	47                   	rex.RXB
-    1934:	65 6e                	outsb  %gs:(%rsi),(%dx)
-    1936:	65 72 61             	gs jb  199a <kshell_set_env_var+0x1cd>
-    1939:	6c                   	insb   (%dx),(%rdi)
-    193a:	20 50 72             	and    %dl,0x72(%rax)
-    193d:	6f                   	outsl  (%rsi),(%dx)
-    193e:	74 65                	je     19a5 <kshell_set_env_var+0x1d8>
-    1940:	63 74 69 6f          	movsxd 0x6f(%rcx,%rbp,2),%esi
-    1944:	6e                   	outsb  (%rsi),(%dx)
-    1945:	20 46 61             	and    %al,0x61(%rsi)
-    1948:	75 6c                	jne    19b6 <kshell_set_env_var+0x1e9>
-    194a:	74 00                	je     194c <kshell_set_env_var+0x17f>
-    194c:	50                   	push   %rax
-    194d:	61                   	(bad)
-    194e:	67 65 20 46 61       	and    %al,%gs:0x61(%esi)
-    1953:	75 6c                	jne    19c1 <kshell_set_env_var+0x1f4>
-    1955:	74 00                	je     1957 <kshell_set_env_var+0x18a>
-    1957:	52                   	push   %rdx
-    1958:	65 73 65             	gs jae 19c0 <kshell_set_env_var+0x1f3>
-    195b:	72 76                	jb     19d3 <kshell_set_env_var+0x206>
-    195d:	65 64 00 78 38       	gs add %bh,%fs:0x38(%rax)
-    1962:	37                   	(bad)
-    1963:	20 46 6c             	and    %al,0x6c(%rsi)
-    1966:	6f                   	outsl  (%rsi),(%dx)
-    1967:	61                   	(bad)
-    1968:	74 69                	je     19d3 <kshell_set_env_var+0x206>
-    196a:	6e                   	outsb  (%rsi),(%dx)
-    196b:	67 2d 50 6f 69 6e    	addr32 sub $0x6e696f50,%eax
-    1971:	74 20                	je     1993 <kshell_set_env_var+0x1c6>
-    1973:	45 78 63             	rex.RB js 19d9 <kshell_set_env_var+0x20c>
-    1976:	65 70 74             	gs jo  19ed <kshell_set_env_var+0x220>
-    1979:	69 6f 6e 00 41 6c 69 	imul   $0x696c4100,0x6e(%rdi),%ebp
-    1980:	67 6e                	outsb  (%esi),(%dx)
-    1982:	6d                   	insl   (%dx),(%rdi)
-    1983:	65 6e                	outsb  %gs:(%rsi),(%dx)
-    1985:	74 20                	je     19a7 <kshell_set_env_var+0x1da>
-    1987:	43 68 65 63 6b 00    	rex.XB push $0x6b6365
-    198d:	4d 61                	rex.WRB (bad)
-    198f:	63 68 69             	movsxd 0x69(%rax),%ebp
-    1992:	6e                   	outsb  (%rsi),(%dx)
-    1993:	65 20 43 68          	and    %al,%gs:0x68(%rbx)
-    1997:	65 63 6b 00          	movsxd %gs:0x0(%rbx),%ebp
-    199b:	53                   	push   %rbx
-    199c:	49                   	rex.WB
-    199d:	4d                   	rex.WRB
-    199e:	44 20 46 6c          	and    %r8b,0x6c(%rsi)
-    19a2:	6f                   	outsl  (%rsi),(%dx)
-    19a3:	61                   	(bad)
-    19a4:	74 69                	je     1a0f <kshell_set_env_var+0x242>
-    19a6:	6e                   	outsb  (%rsi),(%dx)
-    19a7:	67 2d 50 6f 69 6e    	addr32 sub $0x6e696f50,%eax
-    19ad:	74 20                	je     19cf <kshell_set_env_var+0x202>
-    19af:	45 78 63             	rex.RB js 1a15 <kshell_set_env_var+0x248>
-    19b2:	65 70 74             	gs jo  1a29 <kshell_set_env_var+0x25c>
-    19b5:	69 6f 6e 00 56 69 72 	imul   $0x72695600,0x6e(%rdi),%ebp
-    19bc:	74 75                	je     1a33 <kshell_set_env_var+0x266>
-    19be:	61                   	(bad)
-    19bf:	6c                   	insb   (%dx),(%rdi)
-    19c0:	69 7a 61 74 69 6f 6e 	imul   $0x6e6f6974,0x61(%rdx),%edi
-    19c7:	20 45 78             	and    %al,0x78(%rbp)
-    19ca:	63 65 70             	movsxd 0x70(%rbp),%esp
-    19cd:	74 69                	je     1a38 <kshell_set_env_var+0x26b>
-    19cf:	6f                   	outsl  (%rsi),(%dx)
-    19d0:	6e                   	outsb  (%rsi),(%dx)
-    19d1:	00 30                	add    %dh,(%rax)
-    19d3:	30 30                	xor    %dh,(%rax)
-    19d5:	30 00                	xor    %al,(%rax)
-    19d7:	30 30                	xor    %dh,(%rax)
-    19d9:	30 31                	xor    %dh,(%rcx)
-    19db:	00 30                	add    %dh,(%rax)
-    19dd:	30 31                	xor    %dh,(%rcx)
-    19df:	30 00                	xor    %al,(%rax)
-    19e1:	30 30                	xor    %dh,(%rax)
-    19e3:	31 31                	xor    %esi,(%rcx)
-    19e5:	00 30                	add    %dh,(%rax)
-    19e7:	31 30                	xor    %esi,(%rax)
-    19e9:	30 00                	xor    %al,(%rax)
-    19eb:	30 31                	xor    %dh,(%rcx)
+    18e8:	75 62                	jne    194c <kshell_set_env_var+0x16b>
+    18ea:	6c                   	insb   (%dx),(%rdi)
+    18eb:	65 20 46 61          	and    %al,%gs:0x61(%rsi)
+    18ef:	75 6c                	jne    195d <kshell_set_env_var+0x17c>
+    18f1:	74 00                	je     18f3 <kshell_set_env_var+0x112>
+    18f3:	43 6f                	rex.XB outsl (%rsi),(%dx)
+    18f5:	70 72                	jo     1969 <kshell_set_env_var+0x188>
+    18f7:	6f                   	outsl  (%rsi),(%dx)
+    18f8:	63 65 73             	movsxd 0x73(%rbp),%esp
+    18fb:	73 6f                	jae    196c <kshell_set_env_var+0x18b>
+    18fd:	72 20                	jb     191f <kshell_set_env_var+0x13e>
+    18ff:	53                   	push   %rbx
+    1900:	65 67 6d             	gs insl (%dx),(%edi)
+    1903:	65 6e                	outsb  %gs:(%rsi),(%dx)
+    1905:	74 20                	je     1927 <kshell_set_env_var+0x146>
+    1907:	4f 76 65             	rex.WRXB jbe 196f <kshell_set_env_var+0x18e>
+    190a:	72 72                	jb     197e <kshell_set_env_var+0x19d>
+    190c:	75 6e                	jne    197c <kshell_set_env_var+0x19b>
+    190e:	00 49 6e             	add    %cl,0x6e(%rcx)
+    1911:	76 61                	jbe    1974 <kshell_set_env_var+0x193>
+    1913:	6c                   	insb   (%dx),(%rdi)
+    1914:	69 64 20 54 53 53 00 	imul   $0x53005353,0x54(%rax,%riz,1),%esp
+    191b:	53 
+    191c:	65 67 6d             	gs insl (%dx),(%edi)
+    191f:	65 6e                	outsb  %gs:(%rsi),(%dx)
+    1921:	74 20                	je     1943 <kshell_set_env_var+0x162>
+    1923:	4e 6f                	rex.WRX outsl (%rsi),(%dx)
+    1925:	74 20                	je     1947 <kshell_set_env_var+0x166>
+    1927:	50                   	push   %rax
+    1928:	72 65                	jb     198f <kshell_set_env_var+0x1ae>
+    192a:	73 65                	jae    1991 <kshell_set_env_var+0x1b0>
+    192c:	6e                   	outsb  (%rsi),(%dx)
+    192d:	74 00                	je     192f <kshell_set_env_var+0x14e>
+    192f:	53                   	push   %rbx
+    1930:	74 61                	je     1993 <kshell_set_env_var+0x1b2>
+    1932:	63 6b 2d             	movsxd 0x2d(%rbx),%ebp
+    1935:	53                   	push   %rbx
+    1936:	65 67 6d             	gs insl (%dx),(%edi)
+    1939:	65 6e                	outsb  %gs:(%rsi),(%dx)
+    193b:	74 20                	je     195d <kshell_set_env_var+0x17c>
+    193d:	46 61                	rex.RX (bad)
+    193f:	75 6c                	jne    19ad <kshell_set_env_var+0x1cc>
+    1941:	74 00                	je     1943 <kshell_set_env_var+0x162>
+    1943:	47                   	rex.RXB
+    1944:	65 6e                	outsb  %gs:(%rsi),(%dx)
+    1946:	65 72 61             	gs jb  19aa <kshell_set_env_var+0x1c9>
+    1949:	6c                   	insb   (%dx),(%rdi)
+    194a:	20 50 72             	and    %dl,0x72(%rax)
+    194d:	6f                   	outsl  (%rsi),(%dx)
+    194e:	74 65                	je     19b5 <kshell_set_env_var+0x1d4>
+    1950:	63 74 69 6f          	movsxd 0x6f(%rcx,%rbp,2),%esi
+    1954:	6e                   	outsb  (%rsi),(%dx)
+    1955:	20 46 61             	and    %al,0x61(%rsi)
+    1958:	75 6c                	jne    19c6 <kshell_set_env_var+0x1e5>
+    195a:	74 00                	je     195c <kshell_set_env_var+0x17b>
+    195c:	50                   	push   %rax
+    195d:	61                   	(bad)
+    195e:	67 65 20 46 61       	and    %al,%gs:0x61(%esi)
+    1963:	75 6c                	jne    19d1 <kshell_set_env_var+0x1f0>
+    1965:	74 00                	je     1967 <kshell_set_env_var+0x186>
+    1967:	52                   	push   %rdx
+    1968:	65 73 65             	gs jae 19d0 <kshell_set_env_var+0x1ef>
+    196b:	72 76                	jb     19e3 <kshell_set_env_var+0x202>
+    196d:	65 64 00 78 38       	gs add %bh,%fs:0x38(%rax)
+    1972:	37                   	(bad)
+    1973:	20 46 6c             	and    %al,0x6c(%rsi)
+    1976:	6f                   	outsl  (%rsi),(%dx)
+    1977:	61                   	(bad)
+    1978:	74 69                	je     19e3 <kshell_set_env_var+0x202>
+    197a:	6e                   	outsb  (%rsi),(%dx)
+    197b:	67 2d 50 6f 69 6e    	addr32 sub $0x6e696f50,%eax
+    1981:	74 20                	je     19a3 <kshell_set_env_var+0x1c2>
+    1983:	45 78 63             	rex.RB js 19e9 <kshell_set_env_var+0x208>
+    1986:	65 70 74             	gs jo  19fd <kshell_set_env_var+0x21c>
+    1989:	69 6f 6e 00 41 6c 69 	imul   $0x696c4100,0x6e(%rdi),%ebp
+    1990:	67 6e                	outsb  (%esi),(%dx)
+    1992:	6d                   	insl   (%dx),(%rdi)
+    1993:	65 6e                	outsb  %gs:(%rsi),(%dx)
+    1995:	74 20                	je     19b7 <kshell_set_env_var+0x1d6>
+    1997:	43 68 65 63 6b 00    	rex.XB push $0x6b6365
+    199d:	4d 61                	rex.WRB (bad)
+    199f:	63 68 69             	movsxd 0x69(%rax),%ebp
+    19a2:	6e                   	outsb  (%rsi),(%dx)
+    19a3:	65 20 43 68          	and    %al,%gs:0x68(%rbx)
+    19a7:	65 63 6b 00          	movsxd %gs:0x0(%rbx),%ebp
+    19ab:	53                   	push   %rbx
+    19ac:	49                   	rex.WB
+    19ad:	4d                   	rex.WRB
+    19ae:	44 20 46 6c          	and    %r8b,0x6c(%rsi)
+    19b2:	6f                   	outsl  (%rsi),(%dx)
+    19b3:	61                   	(bad)
+    19b4:	74 69                	je     1a1f <kshell_set_env_var+0x23e>
+    19b6:	6e                   	outsb  (%rsi),(%dx)
+    19b7:	67 2d 50 6f 69 6e    	addr32 sub $0x6e696f50,%eax
+    19bd:	74 20                	je     19df <kshell_set_env_var+0x1fe>
+    19bf:	45 78 63             	rex.RB js 1a25 <kshell_set_env_var+0x244>
+    19c2:	65 70 74             	gs jo  1a39 <kshell_set_env_var+0x258>
+    19c5:	69 6f 6e 00 56 69 72 	imul   $0x72695600,0x6e(%rdi),%ebp
+    19cc:	74 75                	je     1a43 <kshell_set_env_var+0x262>
+    19ce:	61                   	(bad)
+    19cf:	6c                   	insb   (%dx),(%rdi)
+    19d0:	69 7a 61 74 69 6f 6e 	imul   $0x6e6f6974,0x61(%rdx),%edi
+    19d7:	20 45 78             	and    %al,0x78(%rbp)
+    19da:	63 65 70             	movsxd 0x70(%rbp),%esp
+    19dd:	74 69                	je     1a48 <kshell_set_env_var+0x267>
+    19df:	6f                   	outsl  (%rsi),(%dx)
+    19e0:	6e                   	outsb  (%rsi),(%dx)
+    19e1:	00 30                	add    %dh,(%rax)
+    19e3:	30 30                	xor    %dh,(%rax)
+    19e5:	30 00                	xor    %al,(%rax)
+    19e7:	30 30                	xor    %dh,(%rax)
+    19e9:	30 31                	xor    %dh,(%rcx)
+    19eb:	00 30                	add    %dh,(%rax)
     19ed:	30 31                	xor    %dh,(%rcx)
-    19ef:	00 30                	add    %dh,(%rax)
-    19f1:	31 31                	xor    %esi,(%rcx)
-    19f3:	30 00                	xor    %al,(%rax)
-    19f5:	30 31                	xor    %dh,(%rcx)
-    19f7:	31 31                	xor    %esi,(%rcx)
-    19f9:	00 31                	add    %dh,(%rcx)
-    19fb:	30 30                	xor    %dh,(%rax)
-    19fd:	30 00                	xor    %al,(%rax)
-    19ff:	31 30                	xor    %esi,(%rax)
-    1a01:	30 31                	xor    %dh,(%rcx)
-    1a03:	00 31                	add    %dh,(%rcx)
+    19ef:	30 00                	xor    %al,(%rax)
+    19f1:	30 30                	xor    %dh,(%rax)
+    19f3:	31 31                	xor    %esi,(%rcx)
+    19f5:	00 30                	add    %dh,(%rax)
+    19f7:	31 30                	xor    %esi,(%rax)
+    19f9:	30 00                	xor    %al,(%rax)
+    19fb:	30 31                	xor    %dh,(%rcx)
+    19fd:	30 31                	xor    %dh,(%rcx)
+    19ff:	00 30                	add    %dh,(%rax)
+    1a01:	31 31                	xor    %esi,(%rcx)
+    1a03:	30 00                	xor    %al,(%rax)
     1a05:	30 31                	xor    %dh,(%rcx)
-    1a07:	30 00                	xor    %al,(%rax)
-    1a09:	31 30                	xor    %esi,(%rax)
-    1a0b:	31 31                	xor    %esi,(%rcx)
-    1a0d:	00 31                	add    %dh,(%rcx)
+    1a07:	31 31                	xor    %esi,(%rcx)
+    1a09:	00 31                	add    %dh,(%rcx)
+    1a0b:	30 30                	xor    %dh,(%rax)
+    1a0d:	30 00                	xor    %al,(%rax)
     1a0f:	31 30                	xor    %esi,(%rax)
-    1a11:	30 00                	xor    %al,(%rax)
-    1a13:	31 31                	xor    %esi,(%rcx)
+    1a11:	30 31                	xor    %dh,(%rcx)
+    1a13:	00 31                	add    %dh,(%rcx)
     1a15:	30 31                	xor    %dh,(%rcx)
-    1a17:	00 31                	add    %dh,(%rcx)
-    1a19:	31 31                	xor    %esi,(%rcx)
-    1a1b:	30 00                	xor    %al,(%rax)
-    1a1d:	31 31                	xor    %esi,(%rcx)
-    1a1f:	31 31                	xor    %esi,(%rcx)
-    1a21:	00 4e 6f             	add    %cl,0x6f(%rsi)
-    1a24:	6e                   	outsb  (%rsi),(%dx)
-    1a25:	65 00 55 6e          	add    %dl,%gs:0x6e(%rbp)
-    1a29:	6b 6e 6f 77          	imul   $0x77,0x6f(%rsi),%ebp
-    1a2d:	6e                   	outsb  (%rsi),(%dx)
-    1a2e:	00 53 74             	add    %dl,0x74(%rbx)
-    1a31:	61                   	(bad)
-    1a32:	74 00                	je     1a34 <kshell_set_env_var+0x267>
-    1a34:	49 6e                	rex.WB outsb (%rsi),(%dx)
-    1a36:	76 6c                	jbe    1aa4 <kshell_set_env_var+0x2d7>
-    1a38:	61                   	(bad)
-    1a39:	69 64 20 45 4c 46 20 	imul   $0x7420464c,0x45(%rax,%riz,1),%esp
-    1a40:	74 
-    1a41:	79 70                	jns    1ab3 <kshell_set_env_var+0x2e6>
-    1a43:	65 00 49 6e          	add    %cl,%gs:0x6e(%rcx)
-    1a47:	76 61                	jbe    1aaa <kshell_set_env_var+0x2dd>
-    1a49:	6c                   	insb   (%dx),(%rdi)
-    1a4a:	69 64 20 45 4c 46 00 	imul   $0x464c,0x45(%rax,%riz,1),%esp
-    1a51:	00 
-    1a52:	00 00                	add    %al,(%rax)
-    1a54:	00 00                	add    %al,(%rax)
-    1a56:	00 00                	add    %al,(%rax)
-    1a58:	41 20 56 65          	and    %dl,0x65(%r14)
-    1a5c:	72 79                	jb     1ad7 <kshell_set_env_var+0x30a>
-    1a5e:	20 53 69             	and    %dl,0x69(%rbx)
-    1a61:	6d                   	insl   (%dx),(%rdi)
-    1a62:	70 6c                	jo     1ad0 <kshell_set_env_var+0x303>
-    1a64:	79 20                	jns    1a86 <kshell_set_env_var+0x2b9>
-    1a66:	53                   	push   %rbx
-    1a67:	68 65 6c 6c 20       	push   $0x206c6c65
-    1a6c:	69 73 20 6e 6f 77 20 	imul   $0x20776f6e,0x20(%rbx),%esi
-    1a73:	72 75                	jb     1aea <kshell_set_env_var+0x31d>
-    1a75:	6e                   	outsb  (%rsi),(%dx)
-    1a76:	6e                   	outsb  (%rsi),(%dx)
-    1a77:	69 6e 67 2e 0a 00 68 	imul   $0x68000a2e,0x67(%rsi),%ebp
-    1a7e:	77 00                	ja     1a80 <kshell_set_env_var+0x2b3>
-    1a80:	6b 73 68 65          	imul   $0x65,0x68(%rbx),%esi
-    1a84:	6c                   	insb   (%dx),(%rdi)
-    1a85:	6c                   	insb   (%dx),(%rdi)
-    1a86:	5f                   	pop    %rdi
-    1a87:	61                   	(bad)
-    1a88:	70 70                	jo     1afa <kshell_set_env_var+0x32d>
-    1a8a:	5f                   	pop    %rdi
-    1a8b:	61                   	(bad)
-    1a8c:	64 64 5f             	fs fs pop %rdi
-    1a8f:	63 6f 6d             	movsxd 0x6d(%rdi),%ebp
-    1a92:	6d                   	insl   (%dx),(%rdi)
-    1a93:	61                   	(bad)
-    1a94:	6e                   	outsb  (%rsi),(%dx)
-    1a95:	64 5f                	fs pop %rdi
-    1a97:	00 5b 25             	add    %bl,0x25(%rbx)
-    1a9a:	73 3a                	jae    1ad6 <kshell_set_env_var+0x309>
-    1a9c:	25 64 5d 20 00       	and    $0x205d64,%eax
-    1aa1:	66 6f                	outsw  (%rsi),(%dx)
-    1aa3:	75 6e                	jne    1b13 <kshell_set_env_var+0x346>
-    1aa5:	64 3a 20             	cmp    %fs:(%rax),%ah
-    1aa8:	25 73 0a 00 0a       	and    $0xa000a73,%eax
-    1aad:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
-    1ab2:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
-    1ab7:	3e 20 41 0a          	ds and %al,0xa(%rcx)
-    1abb:	00 0a                	add    %cl,(%rdx)
+    1a17:	30 00                	xor    %al,(%rax)
+    1a19:	31 30                	xor    %esi,(%rax)
+    1a1b:	31 31                	xor    %esi,(%rcx)
+    1a1d:	00 31                	add    %dh,(%rcx)
+    1a1f:	31 30                	xor    %esi,(%rax)
+    1a21:	30 00                	xor    %al,(%rax)
+    1a23:	31 31                	xor    %esi,(%rcx)
+    1a25:	30 31                	xor    %dh,(%rcx)
+    1a27:	00 31                	add    %dh,(%rcx)
+    1a29:	31 31                	xor    %esi,(%rcx)
+    1a2b:	30 00                	xor    %al,(%rax)
+    1a2d:	31 31                	xor    %esi,(%rcx)
+    1a2f:	31 31                	xor    %esi,(%rcx)
+    1a31:	00 4e 6f             	add    %cl,0x6f(%rsi)
+    1a34:	6e                   	outsb  (%rsi),(%dx)
+    1a35:	65 00 55 6e          	add    %dl,%gs:0x6e(%rbp)
+    1a39:	6b 6e 6f 77          	imul   $0x77,0x6f(%rsi),%ebp
+    1a3d:	6e                   	outsb  (%rsi),(%dx)
+    1a3e:	00 53 74             	add    %dl,0x74(%rbx)
+    1a41:	61                   	(bad)
+    1a42:	74 00                	je     1a44 <kshell_set_env_var+0x263>
+    1a44:	49 6e                	rex.WB outsb (%rsi),(%dx)
+    1a46:	76 6c                	jbe    1ab4 <kshell_set_env_var+0x2d3>
+    1a48:	61                   	(bad)
+    1a49:	69 64 20 45 4c 46 20 	imul   $0x7420464c,0x45(%rax,%riz,1),%esp
+    1a50:	74 
+    1a51:	79 70                	jns    1ac3 <kshell_set_env_var+0x2e2>
+    1a53:	65 00 49 6e          	add    %cl,%gs:0x6e(%rcx)
+    1a57:	76 61                	jbe    1aba <kshell_set_env_var+0x2d9>
+    1a59:	6c                   	insb   (%dx),(%rdi)
+    1a5a:	69 64 20 45 4c 46 00 	imul   $0x464c,0x45(%rax,%riz,1),%esp
+    1a61:	00 
+    1a62:	00 00                	add    %al,(%rax)
+    1a64:	00 00                	add    %al,(%rax)
+    1a66:	00 00                	add    %al,(%rax)
+    1a68:	41 20 56 65          	and    %dl,0x65(%r14)
+    1a6c:	72 79                	jb     1ae7 <kshell_set_env_var+0x306>
+    1a6e:	20 53 69             	and    %dl,0x69(%rbx)
+    1a71:	6d                   	insl   (%dx),(%rdi)
+    1a72:	70 6c                	jo     1ae0 <kshell_set_env_var+0x2ff>
+    1a74:	79 20                	jns    1a96 <kshell_set_env_var+0x2b5>
+    1a76:	53                   	push   %rbx
+    1a77:	68 65 6c 6c 20       	push   $0x206c6c65
+    1a7c:	69 73 20 6e 6f 77 20 	imul   $0x20776f6e,0x20(%rbx),%esi
+    1a83:	72 75                	jb     1afa <kshell_set_env_var+0x319>
+    1a85:	6e                   	outsb  (%rsi),(%dx)
+    1a86:	6e                   	outsb  (%rsi),(%dx)
+    1a87:	69 6e 67 2e 0a 00 68 	imul   $0x68000a2e,0x67(%rsi),%ebp
+    1a8e:	77 00                	ja     1a90 <kshell_set_env_var+0x2af>
+    1a90:	6b 73 68 65          	imul   $0x65,0x68(%rbx),%esi
+    1a94:	6c                   	insb   (%dx),(%rdi)
+    1a95:	6c                   	insb   (%dx),(%rdi)
+    1a96:	5f                   	pop    %rdi
+    1a97:	61                   	(bad)
+    1a98:	70 70                	jo     1b0a <kshell_set_env_var+0x329>
+    1a9a:	5f                   	pop    %rdi
+    1a9b:	61                   	(bad)
+    1a9c:	64 64 5f             	fs fs pop %rdi
+    1a9f:	63 6f 6d             	movsxd 0x6d(%rdi),%ebp
+    1aa2:	6d                   	insl   (%dx),(%rdi)
+    1aa3:	61                   	(bad)
+    1aa4:	6e                   	outsb  (%rsi),(%dx)
+    1aa5:	64 5f                	fs pop %rdi
+    1aa7:	00 5b 25             	add    %bl,0x25(%rbx)
+    1aaa:	73 3a                	jae    1ae6 <kshell_set_env_var+0x305>
+    1aac:	25 64 5d 20 00       	and    $0x205d64,%eax
+    1ab1:	66 6f                	outsw  (%rsi),(%dx)
+    1ab3:	75 6e                	jne    1b23 <kshell_set_env_var+0x342>
+    1ab5:	64 3a 20             	cmp    %fs:(%rax),%ah
+    1ab8:	25 73 0a 00 0a       	and    $0xa000a73,%eax
     1abd:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
     1ac2:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
-    1ac7:	3e 20 42 0a          	ds and %al,0xa(%rdx)
-    1acb:	00 57 44             	add    %dl,0x44(%rdi)
-    1ace:	00 2f                	add    %ch,(%rdi)
-    1ad0:	00 0a                	add    %cl,(%rdx)
+    1ac7:	3e 20 41 0a          	ds and %al,0xa(%rcx)
+    1acb:	00 0a                	add    %cl,(%rdx)
+    1acd:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
     1ad2:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
-    1ad7:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
-    1adc:	3e 20 43 0a          	ds and %al,0xa(%rbx)
-    1ae0:	00 2f                	add    %ch,(%rdi)
-    1ae2:	62 69 6e 00 50       	(bad)
-    1ae7:	41 54                	push   %r12
-    1ae9:	48 00 71 65          	rex.W add %sil,0x65(%rcx)
-    1aed:	6d                   	insl   (%dx),(%rdi)
-    1aee:	75 31                	jne    1b21 <kshell_set_env_var+0x354>
-    1af0:	00 48 4f             	add    %cl,0x4f(%rax)
-    1af3:	53                   	push   %rbx
-    1af4:	54                   	push   %rsp
-    1af5:	00 72 6f             	add    %dh,0x6f(%rdx)
-    1af8:	6f                   	outsl  (%rsi),(%dx)
-    1af9:	74 00                	je     1afb <kshell_set_env_var+0x32e>
-    1afb:	55                   	push   %rbp
-    1afc:	53                   	push   %rbx
-    1afd:	45 52                	rex.RB push %r10
-    1aff:	00 0a                	add    %cl,(%rdx)
-    1b01:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
-    1b06:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
-    1b0b:	3e 20 44 0a 00       	ds and %al,0x0(%rdx,%rcx,1)
-    1b10:	3e 20 00             	ds and %al,(%rax)
-    1b13:	0a 00                	or     (%rax),%al
-    1b15:	08 00                	or     %al,(%rax)
-    1b17:	25 63 00 00 2f       	and    $0x2f000063,%eax
-    1b1c:	62 69 6e 2f 00       	(bad)
-    1b21:	2e 65 78 65          	cs js,pn 1b8a <__FUNCTION__.0+0x1a>
-    1b25:	63 00                	movsxd (%rax),%eax
-    1b27:	43 6f                	rex.XB outsl (%rsi),(%dx)
-    1b29:	6d                   	insl   (%dx),(%rdi)
-    1b2a:	6d                   	insl   (%dx),(%rdi)
-    1b2b:	61                   	(bad)
-    1b2c:	6e                   	outsb  (%rsi),(%dx)
-    1b2d:	64 20 6e 6f          	and    %ch,%fs:0x6f(%rsi)
-    1b31:	74 20                	je     1b53 <kshell_set_env_var+0x386>
-    1b33:	66 6f                	outsw  (%rsi),(%dx)
-    1b35:	75 6e                	jne    1ba5 <__FUNCTION__.0+0x35>
-    1b37:	64 2e 0a 00          	fs or  %fs:(%rax),%al
-    1b3b:	48                   	rex.W
-    1b3c:	65 6c                	gs insb (%dx),(%rdi)
-    1b3e:	6c                   	insb   (%dx),(%rdi)
-    1b3f:	6f                   	outsl  (%rsi),(%dx)
-    1b40:	2c 20                	sub    $0x20,%al
-    1b42:	77 6f                	ja     1bb3 <__FUNCTION__.0+0x43>
-    1b44:	72 6c                	jb     1bb2 <__FUNCTION__.0+0x42>
-    1b46:	64 21 0a             	and    %ecx,%fs:(%rdx)
-    1b49:	00 45 6e             	add    %al,0x6e(%rbp)
-    1b4c:	74 72                	je     1bc0 <__FUNCTION__.0+0x50>
-    1b4e:	79 20                	jns    1b70 <__FUNCTION__.0>
-    1b50:	69 73 20 6e 75 6c 6c 	imul   $0x6c6c756e,0x20(%rbx),%esi
-    1b57:	2e 20 42 61          	cs and %al,0x61(%rdx)
-    1b5b:	69 6c 69 6e 67 2e 0a 	imul   $0xa2e67,0x6e(%rcx,%rbp,2),%ebp
-    1b62:	00 
+    1ad7:	3e 20 42 0a          	ds and %al,0xa(%rdx)
+    1adb:	00 57 44             	add    %dl,0x44(%rdi)
+    1ade:	00 2f                	add    %ch,(%rdi)
+    1ae0:	00 0a                	add    %cl,(%rdx)
+    1ae2:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
+    1ae7:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
+    1aec:	3e 20 43 0a          	ds and %al,0xa(%rbx)
+    1af0:	00 2f                	add    %ch,(%rdi)
+    1af2:	62 69 6e 00 50       	(bad)
+    1af7:	41 54                	push   %r12
+    1af9:	48 00 71 65          	rex.W add %sil,0x65(%rcx)
+    1afd:	6d                   	insl   (%dx),(%rdi)
+    1afe:	75 31                	jne    1b31 <kshell_set_env_var+0x350>
+    1b00:	00 48 4f             	add    %cl,0x4f(%rax)
+    1b03:	53                   	push   %rbx
+    1b04:	54                   	push   %rsp
+    1b05:	00 72 6f             	add    %dh,0x6f(%rdx)
+    1b08:	6f                   	outsl  (%rsi),(%dx)
+    1b09:	74 00                	je     1b0b <kshell_set_env_var+0x32a>
+    1b0b:	55                   	push   %rbp
+    1b0c:	53                   	push   %rbx
+    1b0d:	45 52                	rex.RB push %r10
+    1b0f:	00 0a                	add    %cl,(%rdx)
+    1b11:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
+    1b16:	2d 2d 2d 2d 2d       	sub    $0x2d2d2d2d,%eax
+    1b1b:	3e 20 44 0a 00       	ds and %al,0x0(%rdx,%rcx,1)
+    1b20:	3e 20 00             	ds and %al,(%rax)
+    1b23:	0a 00                	or     (%rax),%al
+    1b25:	08 00                	or     %al,(%rax)
+    1b27:	25 63 00 00 2f       	and    $0x2f000063,%eax
+    1b2c:	62 69 6e 2f 00       	(bad)
+    1b31:	2e 65 78 65          	cs js,pn 1b9a <__FUNCTION__.0+0xa>
+    1b35:	63 00                	movsxd (%rax),%eax
+    1b37:	43 6f                	rex.XB outsl (%rsi),(%dx)
+    1b39:	6d                   	insl   (%dx),(%rdi)
+    1b3a:	6d                   	insl   (%dx),(%rdi)
+    1b3b:	61                   	(bad)
+    1b3c:	6e                   	outsb  (%rsi),(%dx)
+    1b3d:	64 20 6e 6f          	and    %ch,%fs:0x6f(%rsi)
+    1b41:	74 20                	je     1b63 <kshell_set_env_var+0x382>
+    1b43:	66 6f                	outsw  (%rsi),(%dx)
+    1b45:	75 6e                	jne    1bb5 <__FUNCTION__.0+0x25>
+    1b47:	64 2e 0a 00          	fs or  %fs:(%rax),%al
+    1b4b:	50                   	push   %rax
+    1b4c:	6f                   	outsl  (%rsi),(%dx)
+    1b4d:	73 74                	jae    1bc3 <__FUNCTION__.0+0x33>
+    1b4f:	20 77 61             	and    %dh,0x61(%rdi)
+    1b52:	69 74 2e 0a 00 48 65 	imul   $0x6c654800,0xa(%rsi,%rbp,1),%esi
+    1b59:	6c 
+    1b5a:	6c                   	insb   (%dx),(%rdi)
+    1b5b:	6f                   	outsl  (%rsi),(%dx)
+    1b5c:	2c 20                	sub    $0x20,%al
+    1b5e:	77 6f                	ja     1bcf <__FUNCTION__.0+0x3f>
+    1b60:	72 6c                	jb     1bce <__FUNCTION__.0+0x3e>
+    1b62:	64 21 0a             	and    %ecx,%fs:(%rdx)
+    1b65:	00 45 6e             	add    %al,0x6e(%rbp)
+    1b68:	74 72                	je     1bdc <__FUNCTION__.0+0x4c>
+    1b6a:	79 20                	jns    1b8c <__FUNCTION__.1+0xd>
+    1b6c:	69 73 20 6e 75 6c 6c 	imul   $0x6c6c756e,0x20(%rbx),%esi
+    1b73:	2e 20 42 61          	cs and %al,0x61(%rdx)
+    1b77:	69 6c 69 6e 67 2e 0a 	imul   $0xa2e67,0x6e(%rcx,%rbp,2),%ebp
+    1b7e:	00 
 
-0000000000001b63 <__FUNCTION__.1>:
-    1b63:	6d                   	insl   (%dx),(%rdi)
-    1b64:	61                   	(bad)
-    1b65:	69 6e 00 00 00 00 00 	imul   $0x0,0x0(%rsi),%ebp
-    1b6c:	00 00                	add    %al,(%rax)
+0000000000001b7f <__FUNCTION__.1>:
+    1b7f:	6d                   	insl   (%dx),(%rdi)
+    1b80:	61                   	(bad)
+    1b81:	69 6e 00 00 00 00 00 	imul   $0x0,0x0(%rsi),%ebp
 	...
 
-0000000000001b70 <__FUNCTION__.0>:
-    1b70:	6b 73 68 65          	imul   $0x65,0x68(%rbx),%esi
-    1b74:	6c                   	insb   (%dx),(%rdi)
-    1b75:	6c                   	insb   (%dx),(%rdi)
-    1b76:	5f                   	pop    %rdi
-    1b77:	61                   	(bad)
-    1b78:	64 64 5f             	fs fs pop %rdi
-    1b7b:	63 6f 6d             	movsxd 0x6d(%rdi),%ebp
-    1b7e:	6d                   	insl   (%dx),(%rdi)
-    1b7f:	61                   	(bad)
-    1b80:	6e                   	outsb  (%rsi),(%dx)
-    1b81:	64                   	fs
+0000000000001b90 <__FUNCTION__.0>:
+    1b90:	6b 73 68 65          	imul   $0x65,0x68(%rbx),%esi
+    1b94:	6c                   	insb   (%dx),(%rdi)
+    1b95:	6c                   	insb   (%dx),(%rdi)
+    1b96:	5f                   	pop    %rdi
+    1b97:	61                   	(bad)
+    1b98:	64 64 5f             	fs fs pop %rdi
+    1b9b:	63 6f 6d             	movsxd 0x6d(%rdi),%ebp
+    1b9e:	6d                   	insl   (%dx),(%rdi)
+    1b9f:	61                   	(bad)
+    1ba0:	6e                   	outsb  (%rsi),(%dx)
+    1ba1:	64                   	fs
 	...
 
 Disassembly of section .eh_frame:
 
-0000000000001b88 <.eh_frame>:
-    1b88:	14 00                	adc    $0x0,%al
-    1b8a:	00 00                	add    %al,(%rax)
-    1b8c:	00 00                	add    %al,(%rax)
-    1b8e:	00 00                	add    %al,(%rax)
-    1b90:	01 7a 52             	add    %edi,0x52(%rdx)
-    1b93:	00 01                	add    %al,(%rcx)
-    1b95:	78 10                	js     1ba7 <__FUNCTION__.0+0x37>
-    1b97:	01 1b                	add    %ebx,(%rbx)
-    1b99:	0c 07                	or     $0x7,%al
-    1b9b:	08 90 01 00 00 24    	or     %dl,0x24000001(%rax)
-    1ba1:	00 00                	add    %al,(%rax)
-    1ba3:	00 1c 00             	add    %bl,(%rax,%rax,1)
-    1ba6:	00 00                	add    %al,(%rax)
-    1ba8:	b8 f0 ff ff 30       	mov    $0x30fffff0,%eax
-    1bad:	01 00                	add    %eax,(%rax)
-    1baf:	00 00                	add    %al,(%rax)
-    1bb1:	0e                   	(bad)
-    1bb2:	10 46 0e             	adc    %al,0xe(%rsi)
-    1bb5:	18 4a 0f             	sbb    %cl,0xf(%rdx)
-    1bb8:	0b 77 08             	or     0x8(%rdi),%esi
-    1bbb:	80 00 3f             	addb   $0x3f,(%rax)
-    1bbe:	1a 3b                	sbb    (%rbx),%bh
-    1bc0:	2a 33                	sub    (%rbx),%dh
-    1bc2:	24 22                	and    $0x22,%al
-    1bc4:	00 00                	add    %al,(%rax)
+0000000000001ba8 <.eh_frame>:
+    1ba8:	14 00                	adc    $0x0,%al
+    1baa:	00 00                	add    %al,(%rax)
+    1bac:	00 00                	add    %al,(%rax)
+    1bae:	00 00                	add    %al,(%rax)
+    1bb0:	01 7a 52             	add    %edi,0x52(%rdx)
+    1bb3:	00 01                	add    %al,(%rcx)
+    1bb5:	78 10                	js     1bc7 <__FUNCTION__.0+0x37>
+    1bb7:	01 1b                	add    %ebx,(%rbx)
+    1bb9:	0c 07                	or     $0x7,%al
+    1bbb:	08 90 01 00 00 24    	or     %dl,0x24000001(%rax)
+    1bc1:	00 00                	add    %al,(%rax)
+    1bc3:	00 1c 00             	add    %bl,(%rax,%rax,1)
     1bc6:	00 00                	add    %al,(%rax)
-    1bc8:	1c 00                	sbb    $0x0,%al
-    1bca:	00 00                	add    %al,(%rax)
-    1bcc:	44 00 00             	add    %r8b,(%rax)
-    1bcf:	00 d8                	add    %bl,%al
-    1bd1:	f1                   	int1
-    1bd2:	ff                   	(bad)
-    1bd3:	ff 17                	call   *(%rdi)
-    1bd5:	00 00                	add    %al,(%rax)
-    1bd7:	00 00                	add    %al,(%rax)
-    1bd9:	41 0e                	rex.B (bad)
-    1bdb:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
-    1be1:	52                   	push   %rdx
-    1be2:	0c 07                	or     $0x7,%al
-    1be4:	08 00                	or     %al,(%rax)
+    1bc8:	98                   	cwtl
+    1bc9:	f0 ff                	lock (bad)
+    1bcb:	ff 30                	push   (%rax)
+    1bcd:	01 00                	add    %eax,(%rax)
+    1bcf:	00 00                	add    %al,(%rax)
+    1bd1:	0e                   	(bad)
+    1bd2:	10 46 0e             	adc    %al,0xe(%rsi)
+    1bd5:	18 4a 0f             	sbb    %cl,0xf(%rdx)
+    1bd8:	0b 77 08             	or     0x8(%rdi),%esi
+    1bdb:	80 00 3f             	addb   $0x3f,(%rax)
+    1bde:	1a 3b                	sbb    (%rbx),%bh
+    1be0:	2a 33                	sub    (%rbx),%dh
+    1be2:	24 22                	and    $0x22,%al
+    1be4:	00 00                	add    %al,(%rax)
     1be6:	00 00                	add    %al,(%rax)
     1be8:	1c 00                	sbb    $0x0,%al
     1bea:	00 00                	add    %al,(%rax)
-    1bec:	64 00 00             	add    %al,%fs:(%rax)
-    1bef:	00 cf                	add    %cl,%bh
-    1bf1:	f1                   	int1
-    1bf2:	ff                   	(bad)
-    1bf3:	ff 56 03             	call   *0x3(%rsi)
-    1bf6:	00 00                	add    %al,(%rax)
-    1bf8:	00 41 0e             	add    %al,0xe(%rcx)
+    1bec:	44 00 00             	add    %r8b,(%rax)
+    1bef:	00 b8 f1 ff ff 17    	add    %bh,0x17fffff1(%rax)
+    1bf5:	00 00                	add    %al,(%rax)
+    1bf7:	00 00                	add    %al,(%rax)
+    1bf9:	41 0e                	rex.B (bad)
     1bfb:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
-    1c01:	03 51 03             	add    0x3(%rcx),%edx
-    1c04:	0c 07                	or     $0x7,%al
-    1c06:	08 00                	or     %al,(%rax)
+    1c01:	52                   	push   %rdx
+    1c02:	0c 07                	or     $0x7,%al
+    1c04:	08 00                	or     %al,(%rax)
+    1c06:	00 00                	add    %al,(%rax)
     1c08:	1c 00                	sbb    $0x0,%al
     1c0a:	00 00                	add    %al,(%rax)
-    1c0c:	84 00                	test   %al,(%rax)
-    1c0e:	00 00                	add    %al,(%rax)
-    1c10:	05 f5 ff ff 25       	add    $0x25fffff5,%eax
-    1c15:	00 00                	add    %al,(%rax)
+    1c0c:	64 00 00             	add    %al,%fs:(%rax)
+    1c0f:	00 af f1 ff ff 56    	add    %ch,0x56fffff1(%rdi)
+    1c15:	03 00                	add    (%rax),%eax
     1c17:	00 00                	add    %al,(%rax)
     1c19:	41 0e                	rex.B (bad)
     1c1b:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
-    1c21:	60                   	(bad)
-    1c22:	0c 07                	or     $0x7,%al
-    1c24:	08 00                	or     %al,(%rax)
-    1c26:	00 00                	add    %al,(%rax)
+    1c21:	03 51 03             	add    0x3(%rcx),%edx
+    1c24:	0c 07                	or     $0x7,%al
+    1c26:	08 00                	or     %al,(%rax)
     1c28:	1c 00                	sbb    $0x0,%al
     1c2a:	00 00                	add    %al,(%rax)
-    1c2c:	a4                   	movsb  (%rsi),(%rdi)
-    1c2d:	00 00                	add    %al,(%rax)
-    1c2f:	00 0a                	add    %cl,(%rdx)
-    1c31:	f5                   	cmc
+    1c2c:	84 00                	test   %al,(%rax)
+    1c2e:	00 00                	add    %al,(%rax)
+    1c30:	e5 f4                	in     $0xf4,%eax
     1c32:	ff                   	(bad)
-    1c33:	ff 20                	jmp    *(%rax)
-    1c35:	00 00                	add    %al,(%rax)
-    1c37:	00 00                	add    %al,(%rax)
+    1c33:	ff 25 00 00 00 00    	jmp    *0x0(%rip)        # 1c39 <__FUNCTION__.0+0xa9>
     1c39:	41 0e                	rex.B (bad)
     1c3b:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
-    1c41:	5b                   	pop    %rbx
+    1c41:	60                   	(bad)
     1c42:	0c 07                	or     $0x7,%al
     1c44:	08 00                	or     %al,(%rax)
     1c46:	00 00                	add    %al,(%rax)
     1c48:	1c 00                	sbb    $0x0,%al
     1c4a:	00 00                	add    %al,(%rax)
-    1c4c:	c4                   	(bad)
+    1c4c:	a4                   	movsb  (%rsi),(%rdi)
     1c4d:	00 00                	add    %al,(%rax)
-    1c4f:	00 0a                	add    %cl,(%rdx)
-    1c51:	f5                   	cmc
+    1c4f:	00 ea                	add    %ch,%dl
+    1c51:	f4                   	hlt
     1c52:	ff                   	(bad)
-    1c53:	ff a2 04 00 00 00    	jmp    *0x4(%rdx)
+    1c53:	ff 20                	jmp    *(%rax)
+    1c55:	00 00                	add    %al,(%rax)
+    1c57:	00 00                	add    %al,(%rax)
     1c59:	41 0e                	rex.B (bad)
     1c5b:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
-    1c61:	03 9d 04 0c 07 08    	add    0x8070c04(%rbp),%ebx
-    1c67:	00 1c 00             	add    %bl,(%rax,%rax,1)
+    1c61:	5b                   	pop    %rbx
+    1c62:	0c 07                	or     $0x7,%al
+    1c64:	08 00                	or     %al,(%rax)
+    1c66:	00 00                	add    %al,(%rax)
+    1c68:	1c 00                	sbb    $0x0,%al
     1c6a:	00 00                	add    %al,(%rax)
-    1c6c:	e4 00                	in     $0x0,%al
-    1c6e:	00 00                	add    %al,(%rax)
-    1c70:	8c f9                	mov    %?,%ecx
+    1c6c:	c4                   	(bad)
+    1c6d:	00 00                	add    %al,(%rax)
+    1c6f:	00 ea                	add    %ch,%dl
+    1c71:	f4                   	hlt
     1c72:	ff                   	(bad)
-    1c73:	ff 37                	push   (%rdi)
-    1c75:	00 00                	add    %al,(%rax)
-    1c77:	00 00                	add    %al,(%rax)
+    1c73:	ff b6 04 00 00 00    	push   0x4(%rsi)
     1c79:	41 0e                	rex.B (bad)
     1c7b:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
-    1c81:	72 0c                	jb     1c8f <__FUNCTION__.0+0x11f>
-    1c83:	07                   	(bad)
-    1c84:	08 00                	or     %al,(%rax)
-    1c86:	00 00                	add    %al,(%rax)
-    1c88:	1c 00                	sbb    $0x0,%al
+    1c81:	03 b1 04 0c 07 08    	add    0x8070c04(%rcx),%esi
+    1c87:	00 1c 00             	add    %bl,(%rax,%rax,1)
     1c8a:	00 00                	add    %al,(%rax)
-    1c8c:	04 01                	add    $0x1,%al
+    1c8c:	e4 00                	in     $0x0,%al
     1c8e:	00 00                	add    %al,(%rax)
-    1c90:	a3 f9 ff ff 40 00 00 	movabs %eax,0x40fffff9
-    1c97:	00 00 
+    1c90:	80 f9 ff             	cmp    $0xff,%cl
+    1c93:	ff 37                	push   (%rdi)
+    1c95:	00 00                	add    %al,(%rax)
+    1c97:	00 00                	add    %al,(%rax)
     1c99:	41 0e                	rex.B (bad)
     1c9b:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
-    1ca1:	7b 0c                	jnp    1caf <__FUNCTION__.0+0x13f>
+    1ca1:	72 0c                	jb     1caf <__FUNCTION__.0+0x11f>
     1ca3:	07                   	(bad)
     1ca4:	08 00                	or     %al,(%rax)
     1ca6:	00 00                	add    %al,(%rax)
     1ca8:	1c 00                	sbb    $0x0,%al
     1caa:	00 00                	add    %al,(%rax)
-    1cac:	24 01                	and    $0x1,%al
+    1cac:	04 01                	add    $0x1,%al
     1cae:	00 00                	add    %al,(%rax)
-    1cb0:	c3                   	ret
+    1cb0:	97                   	xchg   %eax,%edi
     1cb1:	f9                   	stc
     1cb2:	ff                   	(bad)
-    1cb3:	ff 12                	call   *(%rdx)
-    1cb5:	00 00                	add    %al,(%rax)
-    1cb7:	00 00                	add    %al,(%rax)
-    1cb9:	41 0e                	rex.B (bad)
+    1cb3:	ff 40 00             	incl   0x0(%rax)
+    1cb6:	00 00                	add    %al,(%rax)
+    1cb8:	00 41 0e             	add    %al,0xe(%rcx)
     1cbb:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
-    1cc1:	4d 0c 07             	rex.WRB or $0x7,%al
+    1cc1:	7b 0c                	jnp    1ccf <__FUNCTION__.0+0x13f>
+    1cc3:	07                   	(bad)
     1cc4:	08 00                	or     %al,(%rax)
     1cc6:	00 00                	add    %al,(%rax)
     1cc8:	1c 00                	sbb    $0x0,%al
     1cca:	00 00                	add    %al,(%rax)
-    1ccc:	44 01 00             	add    %r8d,(%rax)
-    1ccf:	00 b5 f9 ff ff 26    	add    %dh,0x26fffff9(%rbp)
+    1ccc:	24 01                	and    $0x1,%al
+    1cce:	00 00                	add    %al,(%rax)
+    1cd0:	b7 f9                	mov    $0xf9,%bh
+    1cd2:	ff                   	(bad)
+    1cd3:	ff 12                	call   *(%rdx)
     1cd5:	00 00                	add    %al,(%rax)
     1cd7:	00 00                	add    %al,(%rax)
     1cd9:	41 0e                	rex.B (bad)
     1cdb:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
-    1ce1:	61                   	(bad)
-    1ce2:	0c 07                	or     $0x7,%al
+    1ce1:	4d 0c 07             	rex.WRB or $0x7,%al
     1ce4:	08 00                	or     %al,(%rax)
     1ce6:	00 00                	add    %al,(%rax)
     1ce8:	1c 00                	sbb    $0x0,%al
     1cea:	00 00                	add    %al,(%rax)
-    1cec:	64 01 00             	add    %eax,%fs:(%rax)
-    1cef:	00 bb f9 ff ff c7    	add    %bh,-0x38000007(%rbx)
+    1cec:	44 01 00             	add    %r8d,(%rax)
+    1cef:	00 a9 f9 ff ff 26    	add    %ch,0x26fffff9(%rcx)
     1cf5:	00 00                	add    %al,(%rax)
     1cf7:	00 00                	add    %al,(%rax)
     1cf9:	41 0e                	rex.B (bad)
     1cfb:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
-    1d01:	02 c2                	add    %dl,%al
-    1d03:	0c 07                	or     $0x7,%al
-    1d05:	08 00                	or     %al,(%rax)
-    1d07:	00 1c 00             	add    %bl,(%rax,%rax,1)
+    1d01:	61                   	(bad)
+    1d02:	0c 07                	or     $0x7,%al
+    1d04:	08 00                	or     %al,(%rax)
+    1d06:	00 00                	add    %al,(%rax)
+    1d08:	1c 00                	sbb    $0x0,%al
     1d0a:	00 00                	add    %al,(%rax)
-    1d0c:	84 01                	test   %al,(%rcx)
-    1d0e:	00 00                	add    %al,(%rax)
-    1d10:	62 fa ff ff 5b       	(bad) {%k7}{z}
+    1d0c:	64 01 00             	add    %eax,%fs:(%rax)
+    1d0f:	00 af f9 ff ff c7    	add    %ch,-0x38000007(%rdi)
     1d15:	00 00                	add    %al,(%rax)
     1d17:	00 00                	add    %al,(%rax)
     1d19:	41 0e                	rex.B (bad)
     1d1b:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
-    1d21:	02 56 0c             	add    0xc(%rsi),%dl
-    1d24:	07                   	(bad)
+    1d21:	02 c2                	add    %dl,%al
+    1d23:	0c 07                	or     $0x7,%al
     1d25:	08 00                	or     %al,(%rax)
     1d27:	00 1c 00             	add    %bl,(%rax,%rax,1)
     1d2a:	00 00                	add    %al,(%rax)
-    1d2c:	a4                   	movsb  (%rsi),(%rdi)
-    1d2d:	01 00                	add    %eax,(%rax)
-    1d2f:	00 9d fa ff ff 9f    	add    %bl,-0x60000006(%rbp)
-    1d35:	00 00                	add    %al,(%rax)
-    1d37:	00 00                	add    %al,(%rax)
-    1d39:	41 0e                	rex.B (bad)
+    1d2c:	84 01                	test   %al,(%rcx)
+    1d2e:	00 00                	add    %al,(%rax)
+    1d30:	56                   	push   %rsi
+    1d31:	fa                   	cli
+    1d32:	ff                   	(bad)
+    1d33:	ff 5b 00             	lcall  *0x0(%rbx)
+    1d36:	00 00                	add    %al,(%rax)
+    1d38:	00 41 0e             	add    %al,0xe(%rcx)
     1d3b:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
-    1d41:	02 9a 0c 07 08 00    	add    0x8070c(%rdx),%bl
+    1d41:	02 56 0c             	add    0xc(%rsi),%dl
+    1d44:	07                   	(bad)
+    1d45:	08 00                	or     %al,(%rax)
+    1d47:	00 1c 00             	add    %bl,(%rax,%rax,1)
+    1d4a:	00 00                	add    %al,(%rax)
+    1d4c:	a4                   	movsb  (%rsi),(%rdi)
+    1d4d:	01 00                	add    %eax,(%rax)
+    1d4f:	00 91 fa ff ff 9f    	add    %dl,-0x60000006(%rcx)
+    1d55:	00 00                	add    %al,(%rax)
+    1d57:	00 00                	add    %al,(%rax)
+    1d59:	41 0e                	rex.B (bad)
+    1d5b:	10 86 02 43 0d 06    	adc    %al,0x60d4302(%rsi)
+    1d61:	02 9a 0c 07 08 00    	add    0x8070c(%rdx),%bl
 	...
 
 Disassembly of section .dynamic:
@@ -3107,82 +3108,77 @@ Disassembly of section .data:
 #define PIC_SECONDARY_OFFSET 0x28
 
 static const char * intel_exceptions[21] = {
-    21e0:	70 18                	jo     21fa <intel_exceptions+0x1a>
-    21e2:	00 00                	add    %al,(%rax)
-    21e4:	00 00                	add    %al,(%rax)
-    21e6:	00 00                	add    %al,(%rax)
-    21e8:	7f 18                	jg     2202 <intel_exceptions+0x22>
-    21ea:	00 00                	add    %al,(%rax)
-    21ec:	00 00                	add    %al,(%rax)
-    21ee:	00 00                	add    %al,(%rax)
-    21f0:	85 18                	test   %ebx,(%rax)
-    21f2:	00 00                	add    %al,(%rax)
-    21f4:	00 00                	add    %al,(%rax)
-    21f6:	00 00                	add    %al,(%rax)
-    21f8:	89 18                	mov    %ebx,(%rax)
-    21fa:	00 00                	add    %al,(%rax)
-    21fc:	00 00                	add    %al,(%rax)
-    21fe:	00 00                	add    %al,(%rax)
-    2200:	94                   	xchg   %eax,%esp
-    2201:	18 00                	sbb    %al,(%rax)
-    2203:	00 00                	add    %al,(%rax)
-    2205:	00 00                	add    %al,(%rax)
-    2207:	00 9d 18 00 00 00    	add    %bl,0x18(%rbp)
+    21e0:	80 18 00             	sbbb   $0x0,(%rax)
+    21e3:	00 00                	add    %al,(%rax)
+    21e5:	00 00                	add    %al,(%rax)
+    21e7:	00 8f 18 00 00 00    	add    %cl,0x18(%rdi)
+    21ed:	00 00                	add    %al,(%rax)
+    21ef:	00 95 18 00 00 00    	add    %dl,0x18(%rbp)
+    21f5:	00 00                	add    %al,(%rax)
+    21f7:	00 99 18 00 00 00    	add    %bl,0x18(%rcx)
+    21fd:	00 00                	add    %al,(%rax)
+    21ff:	00 a4 18 00 00 00 00 	add    %ah,0x0(%rax,%rbx,1)
+    2206:	00 00                	add    %al,(%rax)
+    2208:	ad                   	lods   (%rsi),%eax
+    2209:	18 00                	sbb    %al,(%rax)
+    220b:	00 00                	add    %al,(%rax)
     220d:	00 00                	add    %al,(%rax)
-    220f:	00 b2 18 00 00 00    	add    %dh,0x18(%rdx)
+    220f:	00 c2                	add    %al,%dl
+    2211:	18 00                	sbb    %al,(%rax)
+    2213:	00 00                	add    %al,(%rax)
     2215:	00 00                	add    %al,(%rax)
-    2217:	00 c1                	add    %al,%cl
+    2217:	00 d1                	add    %dl,%cl
     2219:	18 00                	sbb    %al,(%rax)
     221b:	00 00                	add    %al,(%rax)
     221d:	00 00                	add    %al,(%rax)
-    221f:	00 d6                	add    %dl,%dh
+    221f:	00 e6                	add    %ah,%dh
     2221:	18 00                	sbb    %al,(%rax)
     2223:	00 00                	add    %al,(%rax)
     2225:	00 00                	add    %al,(%rax)
-    2227:	00 e3                	add    %ah,%bl
+    2227:	00 f3                	add    %dh,%bl
     2229:	18 00                	sbb    %al,(%rax)
     222b:	00 00                	add    %al,(%rax)
     222d:	00 00                	add    %al,(%rax)
-    222f:	00 ff                	add    %bh,%bh
-    2231:	18 00                	sbb    %al,(%rax)
+    222f:	00 0f                	add    %cl,(%rdi)
+    2231:	19 00                	sbb    %eax,(%rax)
     2233:	00 00                	add    %al,(%rax)
     2235:	00 00                	add    %al,(%rax)
-    2237:	00 0b                	add    %cl,(%rbx)
+    2237:	00 1b                	add    %bl,(%rbx)
     2239:	19 00                	sbb    %eax,(%rax)
     223b:	00 00                	add    %al,(%rax)
     223d:	00 00                	add    %al,(%rax)
-    223f:	00 1f                	add    %bl,(%rdi)
+    223f:	00 2f                	add    %ch,(%rdi)
     2241:	19 00                	sbb    %eax,(%rax)
     2243:	00 00                	add    %al,(%rax)
     2245:	00 00                	add    %al,(%rax)
-    2247:	00 33                	add    %dh,(%rbx)
-    2249:	19 00                	sbb    %eax,(%rax)
-    224b:	00 00                	add    %al,(%rax)
-    224d:	00 00                	add    %al,(%rax)
-    224f:	00 4c 19 00          	add    %cl,0x0(%rcx,%rbx,1)
+    2247:	00 43 19             	add    %al,0x19(%rbx)
+    224a:	00 00                	add    %al,(%rax)
+    224c:	00 00                	add    %al,(%rax)
+    224e:	00 00                	add    %al,(%rax)
+    2250:	5c                   	pop    %rsp
+    2251:	19 00                	sbb    %eax,(%rax)
     2253:	00 00                	add    %al,(%rax)
     2255:	00 00                	add    %al,(%rax)
-    2257:	00 57 19             	add    %dl,0x19(%rdi)
+    2257:	00 67 19             	add    %ah,0x19(%rdi)
     225a:	00 00                	add    %al,(%rax)
     225c:	00 00                	add    %al,(%rax)
     225e:	00 00                	add    %al,(%rax)
-    2260:	60                   	(bad)
-    2261:	19 00                	sbb    %eax,(%rax)
-    2263:	00 00                	add    %al,(%rax)
-    2265:	00 00                	add    %al,(%rax)
-    2267:	00 7d 19             	add    %bh,0x19(%rbp)
+    2260:	70 19                	jo     227b <intel_exceptions+0x9b>
+    2262:	00 00                	add    %al,(%rax)
+    2264:	00 00                	add    %al,(%rax)
+    2266:	00 00                	add    %al,(%rax)
+    2268:	8d 19                	lea    (%rcx),%ebx
     226a:	00 00                	add    %al,(%rax)
     226c:	00 00                	add    %al,(%rax)
     226e:	00 00                	add    %al,(%rax)
-    2270:	8d 19                	lea    (%rcx),%ebx
-    2272:	00 00                	add    %al,(%rax)
-    2274:	00 00                	add    %al,(%rax)
-    2276:	00 00                	add    %al,(%rax)
-    2278:	9b                   	fwait
-    2279:	19 00                	sbb    %eax,(%rax)
-    227b:	00 00                	add    %al,(%rax)
+    2270:	9d                   	popf
+    2271:	19 00                	sbb    %eax,(%rax)
+    2273:	00 00                	add    %al,(%rax)
+    2275:	00 00                	add    %al,(%rax)
+    2277:	00 ab 19 00 00 00    	add    %ch,0x19(%rbx)
     227d:	00 00                	add    %al,(%rax)
-    227f:	00 b9 19 00 00 00    	add    %bh,0x19(%rcx)
+    227f:	00 c9                	add    %cl,%cl
+    2281:	19 00                	sbb    %eax,(%rax)
 	...
 
 00000000000022a0 <bit_array>:
@@ -3192,67 +3188,65 @@ static const char * intel_exceptions[21] = {
 #define LOG_PANIC 3     // Kernel panic, exec halted or will be halted
 
 static const char * bit_array[16] = {
-    22a0:	d2 19                	rcrb   %cl,(%rcx)
+    22a0:	e2 19                	loop   22bb <bit_array+0x1b>
     22a2:	00 00                	add    %al,(%rax)
     22a4:	00 00                	add    %al,(%rax)
     22a6:	00 00                	add    %al,(%rax)
-    22a8:	d7                   	xlat   (%rbx)
-    22a9:	19 00                	sbb    %eax,(%rax)
-    22ab:	00 00                	add    %al,(%rax)
-    22ad:	00 00                	add    %al,(%rax)
-    22af:	00 dc                	add    %bl,%ah
+    22a8:	e7 19                	out    %eax,$0x19
+    22aa:	00 00                	add    %al,(%rax)
+    22ac:	00 00                	add    %al,(%rax)
+    22ae:	00 00                	add    %al,(%rax)
+    22b0:	ec                   	in     (%dx),%al
     22b1:	19 00                	sbb    %eax,(%rax)
     22b3:	00 00                	add    %al,(%rax)
     22b5:	00 00                	add    %al,(%rax)
-    22b7:	00 e1                	add    %ah,%cl
+    22b7:	00 f1                	add    %dh,%cl
     22b9:	19 00                	sbb    %eax,(%rax)
     22bb:	00 00                	add    %al,(%rax)
     22bd:	00 00                	add    %al,(%rax)
-    22bf:	00 e6                	add    %ah,%dh
+    22bf:	00 f6                	add    %dh,%dh
     22c1:	19 00                	sbb    %eax,(%rax)
     22c3:	00 00                	add    %al,(%rax)
     22c5:	00 00                	add    %al,(%rax)
-    22c7:	00 eb                	add    %ch,%bl
+    22c7:	00 fb                	add    %bh,%bl
     22c9:	19 00                	sbb    %eax,(%rax)
     22cb:	00 00                	add    %al,(%rax)
     22cd:	00 00                	add    %al,(%rax)
-    22cf:	00 f0                	add    %dh,%al
-    22d1:	19 00                	sbb    %eax,(%rax)
+    22cf:	00 00                	add    %al,(%rax)
+    22d1:	1a 00                	sbb    (%rax),%al
     22d3:	00 00                	add    %al,(%rax)
     22d5:	00 00                	add    %al,(%rax)
-    22d7:	00 f5                	add    %dh,%ch
-    22d9:	19 00                	sbb    %eax,(%rax)
-    22db:	00 00                	add    %al,(%rax)
+    22d7:	00 05 1a 00 00 00    	add    %al,0x1a(%rip)        # 22f7 <bit_array+0x57>
     22dd:	00 00                	add    %al,(%rax)
-    22df:	00 fa                	add    %bh,%dl
-    22e1:	19 00                	sbb    %eax,(%rax)
+    22df:	00 0a                	add    %cl,(%rdx)
+    22e1:	1a 00                	sbb    (%rax),%al
     22e3:	00 00                	add    %al,(%rax)
     22e5:	00 00                	add    %al,(%rax)
-    22e7:	00 ff                	add    %bh,%bh
-    22e9:	19 00                	sbb    %eax,(%rax)
+    22e7:	00 0f                	add    %cl,(%rdi)
+    22e9:	1a 00                	sbb    (%rax),%al
     22eb:	00 00                	add    %al,(%rax)
     22ed:	00 00                	add    %al,(%rax)
-    22ef:	00 04 1a             	add    %al,(%rdx,%rbx,1)
+    22ef:	00 14 1a             	add    %dl,(%rdx,%rbx,1)
     22f2:	00 00                	add    %al,(%rax)
     22f4:	00 00                	add    %al,(%rax)
     22f6:	00 00                	add    %al,(%rax)
-    22f8:	09 1a                	or     %ebx,(%rdx)
+    22f8:	19 1a                	sbb    %ebx,(%rdx)
     22fa:	00 00                	add    %al,(%rax)
     22fc:	00 00                	add    %al,(%rax)
     22fe:	00 00                	add    %al,(%rax)
-    2300:	0e                   	(bad)
+    2300:	1e                   	(bad)
     2301:	1a 00                	sbb    (%rax),%al
     2303:	00 00                	add    %al,(%rax)
     2305:	00 00                	add    %al,(%rax)
-    2307:	00 13                	add    %dl,(%rbx)
+    2307:	00 23                	add    %ah,(%rbx)
     2309:	1a 00                	sbb    (%rax),%al
     230b:	00 00                	add    %al,(%rax)
     230d:	00 00                	add    %al,(%rax)
-    230f:	00 18                	add    %bl,(%rax)
+    230f:	00 28                	add    %ch,(%rax)
     2311:	1a 00                	sbb    (%rax),%al
     2313:	00 00                	add    %al,(%rax)
     2315:	00 00                	add    %al,(%rax)
-    2317:	00 1d 1a 00 00 00    	add    %bl,0x1a(%rip)        # 2337 <error_strings+0x17>
+    2317:	00 2d 1a 00 00 00    	add    %ch,0x1a(%rip)        # 2337 <error_strings+0x17>
     231d:	00 00                	add    %al,(%rax)
 	...
 
@@ -3263,25 +3257,24 @@ static const char * bit_array[16] = {
 
 
 static const char *error_strings[] = {
-    2320:	22 1a                	and    (%rdx),%bl
+    2320:	32 1a                	xor    (%rdx),%bl
     2322:	00 00                	add    %al,(%rax)
     2324:	00 00                	add    %al,(%rax)
     2326:	00 00                	add    %al,(%rax)
-    2328:	27                   	(bad)
+    2328:	37                   	(bad)
     2329:	1a 00                	sbb    (%rax),%al
     232b:	00 00                	add    %al,(%rax)
     232d:	00 00                	add    %al,(%rax)
-    232f:	00 2f                	add    %ch,(%rdi)
+    232f:	00 3f                	add    %bh,(%rdi)
     2331:	1a 00                	sbb    (%rax),%al
     2333:	00 00                	add    %al,(%rax)
     2335:	00 00                	add    %al,(%rax)
-    2337:	00 34 1a             	add    %dh,(%rdx,%rbx,1)
-    233a:	00 00                	add    %al,(%rax)
-    233c:	00 00                	add    %al,(%rax)
-    233e:	00 00                	add    %al,(%rax)
-    2340:	45 1a 00             	sbb    (%r8),%r8b
-    2343:	00 00                	add    %al,(%rax)
-    2345:	00 00                	add    %al,(%rax)
+    2337:	00 44 1a 00          	add    %al,0x0(%rdx,%rbx,1)
+    233b:	00 00                	add    %al,(%rax)
+    233d:	00 00                	add    %al,(%rax)
+    233f:	00 55 1a             	add    %dl,0x1a(%rbp)
+    2342:	00 00                	add    %al,(%rax)
+    2344:	00 00                	add    %al,(%rax)
 	...
 
 Disassembly of section .comment:
@@ -3325,8 +3318,7 @@ Disassembly of section .debug_aranges:
   42:	00 00                	add    %al,(%rax)
   44:	00 00                	add    %al,(%rax)
   46:	00 00                	add    %al,(%rax)
-  48:	c4                   	(bad)
-  49:	0a 00                	or     (%rax),%al
+  48:	d8 0a                	fmuls  (%rdx)
 	...
 
 Disassembly of section .debug_info:
@@ -3361,13 +3353,13 @@ Disassembly of section .debug_info:
   44:	00 00                	add    %al,(%rax)
   46:	00 00                	add    %al,(%rax)
   48:	00 00                	add    %al,(%rax)
-  4a:	c4                   	(bad)
-  4b:	0a 00                	or     (%rax),%al
-  4d:	00 00                	add    %al,(%rax)
-  4f:	00 00                	add    %al,(%rax)
-  51:	00 51 00             	add    %dl,0x0(%rcx)
-  54:	00 00                	add    %al,(%rax)
-  56:	06                   	(bad)
+  4a:	d8 0a                	fmuls  (%rdx)
+  4c:	00 00                	add    %al,(%rax)
+  4e:	00 00                	add    %al,(%rax)
+  50:	00 00                	add    %al,(%rax)
+  52:	51                   	push   %rcx
+  53:	00 00                	add    %al,(%rax)
+  55:	00 06                	add    %al,(%rsi)
   57:	02 05 fe 03 00 00    	add    0x3fe(%rip),%al        # 45b <strcpy@plt-0x815>
   5d:	1c 04                	sbb    $0x4,%al
   5f:	05 69 6e 74 00       	add    $0x746e69,%eax
@@ -4111,7 +4103,7 @@ Disassembly of section .debug_info:
  775:	17                   	(bad)
  776:	52                   	push   %rdx
  777:	00 00                	add    %al,(%rax)
- 779:	00 74 01 cd          	add    %dh,-0x33(%rcx,%rax,1)
+ 779:	00 74 01 e1          	add    %dh,-0x1f(%rcx,%rax,1)
  77d:	17                   	(bad)
  77e:	00 00                	add    %al,(%rax)
  780:	00 00                	add    %al,(%rax)
@@ -4152,7 +4144,7 @@ Disassembly of section .debug_info:
  7d6:	07                   	(bad)
  7d7:	6a 02                	push   $0x2
  7d9:	00 00                	add    %al,(%rax)
- 7db:	72 17                	jb     7f4 <strcpy@plt-0x47c>
+ 7db:	86 17                	xchg   %dl,(%rdi)
  7dd:	00 00                	add    %al,(%rax)
  7df:	00 00                	add    %al,(%rax)
  7e1:	00 00                	add    %al,(%rax)
@@ -4175,7 +4167,7 @@ Disassembly of section .debug_info:
  80e:	68 00 17 d9 02       	push   $0x2d91700
  813:	00 00                	add    %al,(%rax)
  815:	50                   	push   %rax
- 816:	01 ab 16 00 00 00    	add    %ebp,0x16(%rbx)
+ 816:	01 bf 16 00 00 00    	add    %edi,0x16(%rdi)
  81c:	00 00                	add    %al,(%rax)
  81e:	00 c7                	add    %al,%bh
  820:	00 00                	add    %al,(%rax)
@@ -4216,15 +4208,11 @@ Disassembly of section .debug_info:
  869:	18 97 00 00 00 6a    	sbb    %dl,0x6a000000(%rdi)
  86f:	08 00                	or     %al,(%rax)
  871:	00 09                	add    %cl,(%rcx)
- 873:	03 70 1b             	add    0x1b(%rax),%esi
- 876:	00 00                	add    %al,(%rax)
- 878:	00 00                	add    %al,(%rax)
- 87a:	00 00                	add    %al,(%rax)
- 87c:	00 0a                	add    %cl,(%rdx)
- 87e:	b4 04                	mov    $0x4,%ah
- 880:	00 00                	add    %al,(%rax)
- 882:	07                   	(bad)
- 883:	4b 01 00             	rex.WXB add %rax,(%r8)
+ 873:	03 90 1b 00 00 00    	add    0x1b(%rax),%edx
+ 879:	00 00                	add    %al,(%rax)
+ 87b:	00 00                	add    %al,(%rax)
+ 87d:	0a b4 04 00 00 07 4b 	or     0x4b070000(%rsp,%rax,1),%dh
+ 884:	01 00                	add    %eax,(%rax)
  886:	00 6a 08             	add    %ch,0x8(%rdx)
  889:	00 00                	add    %al,(%rax)
  88b:	08 9d 00 00 00 12    	or     %bl,0x12000000(%rbp)
@@ -4236,7 +4224,8 @@ Disassembly of section .debug_info:
  899:	02 00                	add    (%rax),%al
  89b:	00 4b 01             	add    %cl,0x1(%rbx)
  89e:	05 35 00 00 00       	add    $0x35,%eax
- 8a3:	85 16                	test   %edx,(%rsi)
+ 8a3:	99                   	cltd
+ 8a4:	16                   	(bad)
  8a5:	00 00                	add    %al,(%rax)
  8a7:	00 00                	add    %al,(%rax)
  8a9:	00 00                	add    %al,(%rax)
@@ -4257,7 +4246,7 @@ Disassembly of section .debug_info:
  8d4:	02 91 60 00 25 72    	add    0x72250060(%rcx),%dl
  8da:	05 00 00 02 2c       	add    $0x2c020000,%eax
  8df:	01 05 35 00 00 00    	add    %eax,0x35(%rip)        # 91a <strcpy@plt-0x356>
- 8e5:	73 16                	jae    8fd <strcpy@plt-0x373>
+ 8e5:	87 16                	xchg   %edx,(%rsi)
  8e7:	00 00                	add    %al,(%rax)
  8e9:	00 00                	add    %al,(%rax)
  8eb:	00 00                	add    %al,(%rax)
@@ -4283,7 +4272,7 @@ Disassembly of section .debug_info:
  92c:	00 00                	add    %al,(%rax)
  92e:	00 1d 01 3a af 04    	add    %bl,0x4af3a01(%rip)        # 4af4335 <cmd+0x4af1ed5>
  934:	00 00                	add    %al,(%rax)
- 936:	33 16                	xor    (%rsi),%edx
+ 936:	47 16                	rex.RXB (bad)
  938:	00 00                	add    %al,(%rax)
  93a:	00 00                	add    %al,(%rax)
  93c:	00 00                	add    %al,(%rax)
@@ -4317,8 +4306,10 @@ Disassembly of section .debug_info:
  980:	0a 01                	or     (%rcx),%al
  982:	06                   	(bad)
  983:	c5 00 00             	(bad)
- 986:	00 fc                	add    %bh,%ah
- 988:	15 00 00 00 00       	adc    $0x0,%eax
+ 986:	00 10                	add    %dl,(%rax)
+ 988:	16                   	(bad)
+ 989:	00 00                	add    %al,(%rax)
+ 98b:	00 00                	add    %al,(%rax)
  98d:	00 00                	add    %al,(%rax)
  98f:	37                   	(bad)
  990:	00 00                	add    %al,(%rax)
@@ -4344,7 +4335,7 @@ Disassembly of section .debug_info:
  9b6:	11 00                	adc    %eax,(%rax)
  9b8:	00 00                	add    %al,(%rax)
  9ba:	00 00                	add    %al,(%rax)
- 9bc:	00 a2 04 00 00 00    	add    %ah,0x4(%rdx)
+ 9bc:	00 b6 04 00 00 00    	add    %dh,0x4(%rsi)
  9c2:	00 00                	add    %al,(%rax)
  9c4:	00 01                	add    %al,(%rcx)
  9c6:	9c                   	pushf
@@ -4362,7 +4353,7 @@ Disassembly of section .debug_info:
  9ec:	11 00                	adc    %eax,(%rax)
  9ee:	00 00                	add    %al,(%rax)
  9f0:	00 00                	add    %al,(%rax)
- 9f2:	00 56 04             	add    %dl,0x4(%rsi)
+ 9f2:	00 6a 04             	add    %ch,0x4(%rdx)
  9f5:	00 00                	add    %al,(%rax)
  9f7:	00 00                	add    %al,(%rax)
  9f9:	00 00                	add    %al,(%rax)
@@ -4492,7 +4483,8 @@ Disassembly of section .debug_info:
  b1a:	9c                   	pushf
  b1b:	15 00 00 00 00       	adc    $0x0,%eax
  b20:	00 00                	add    %al,(%rax)
- b22:	4a 00 00             	rex.WX add %al,(%rax)
+ b22:	5e                   	pop    %rsi
+ b23:	00 00                	add    %al,(%rax)
  b25:	00 00                	add    %al,(%rax)
  b27:	00 00                	add    %al,(%rax)
  b29:	00 04 27             	add    %al,(%rdi,%riz,1)
@@ -4578,7 +4570,7 @@ Disassembly of section .debug_info:
  c07:	5f                   	pop    %rdi
  c08:	0c 00                	or     $0x0,%al
  c0a:	00 09                	add    %cl,(%rcx)
- c0c:	03 63 1b             	add    0x1b(%rbx),%esp
+ c0c:	03 7f 1b             	add    0x1b(%rdi),%edi
  c0f:	00 00                	add    %al,(%rax)
  c11:	00 00                	add    %al,(%rax)
  c13:	00 00                	add    %al,(%rax)
@@ -5009,7 +5001,7 @@ Disassembly of section .debug_line:
   48:	21 3e                	and    %edi,(%rsi)
   4a:	5a                   	pop    %rdx
   4b:	2f                   	(bad)
-  4c:	02 05 00 01 01 08    	add    0x8010100(%rip),%al        # 8010152 <cmd+0x800dcf2>
+  4c:	02 05 00 01 01 0a    	add    0xa010100(%rip),%al        # a010152 <cmd+0xa00dcf2>
   52:	04 00                	add    $0x0,%al
   54:	00 05 00 08 00 ab    	add    %al,-0x54fff800(%rip)        # ffffffffab00085a <cmd+0xffffffffaaffe3fa>
   5a:	00 00                	add    %al,(%rax)
@@ -5271,75 +5263,73 @@ Disassembly of section .debug_line:
  36a:	0a 00                	or     (%rax),%al
  36c:	02 04 01             	add    (%rcx,%rax,1),%al
  36f:	08 3c 05 06 3f 05 05 	or     %bh,0x5053f06(,%rax,1)
- 376:	68 02 23 16 05       	push   $0x5162302
- 37b:	13 03                	adc    (%rbx),%eax
- 37d:	ec                   	in     (%dx),%al
- 37e:	7e 9e                	jle    31e <strcpy@plt-0x952>
- 380:	05 09 9e 05 01       	add    $0x1059e09,%eax
- 385:	03 9a 01 82 05 39    	add    0x39058201(%rdx),%ebx
- 38b:	03 09                	add    (%rcx),%ecx
- 38d:	4a 05 02 c9 05 04    	rex.WX add $0x405c902,%rax
- 393:	f4                   	hlt
- 394:	05 0b 59 76 76       	add    $0x7676590b,%eax
- 399:	05 01 5a 05 7b       	add    $0x7b055a01,%eax
- 39e:	03 09                	add    (%rcx),%ecx
- 3a0:	2e 05 2a f3 05 0d    	cs add $0xd05f32a,%eax
- 3a6:	d7                   	xlat   (%rbx)
- 3a7:	05 02 4a 05 0d       	add    $0xd054a02,%eax
- 3ac:	e5 05                	in     $0x5,%eax
- 3ae:	01 bb 05 47 03 0b    	add    %edi,0xb034705(%rbx)
- 3b4:	3c 05                	cmp    $0x5,%al
- 3b6:	01 03                	add    %eax,(%rbx)
- 3b8:	1d e4 05 3a 3e       	sbb    $0x3e3a05e4,%eax
- 3bd:	05 02 e5 05 01       	add    $0x105e502,%eax
- 3c2:	08 3d 05 44 3f 05    	or     %bh,0x53f4405(%rip)        # 53f47cd <cmd+0x53f236d>
- 3c8:	17                   	(bad)
- 3c9:	f3 ad                	rep lods (%rsi),%eax
- 3cb:	05 0b 85 05 05       	add    $0x505850b,%eax
- 3d0:	74 05                	je     3d7 <strcpy@plt-0x899>
- 3d2:	28 59 05             	sub    %bl,0x5(%rcx)
- 3d5:	0f 00 02             	sldt   (%rdx)
- 3d8:	04 01                	add    $0x1,%al
- 3da:	9e                   	sahf
- 3db:	05 0a 75 05 09       	add    $0x905750a,%eax
- 3e0:	ca 05 11             	lret   $0x1105
- 3e3:	ae                   	scas   (%rdi),%al
- 3e4:	05 04 76 05 03       	add    $0x3057604,%eax
- 3e9:	75 00                	jne    3eb <strcpy@plt-0x885>
- 3eb:	02 04 01             	add    (%rcx,%rax,1),%al
- 3ee:	06                   	(bad)
- 3ef:	02 23                	add    (%rbx),%ah
- 3f1:	12 06                	adc    (%rsi),%al
- 3f3:	08 3d 05 0f 31 05    	or     %bh,0x5310f05(%rip)        # 53112fe <cmd+0x530ee9e>
- 3f9:	0d 00 02 04 01       	or     $0x1040200,%eax
- 3fe:	08 2e                	or     %ch,(%rsi)
- 400:	05 0e 83 05 01       	add    $0x105830e,%eax
- 405:	ad                   	lods   (%rsi),%eax
- 406:	05 28 30 05 12       	add    $0x12053028,%eax
- 40b:	bb 05 07 e6 05       	mov    $0x5e60705,%ebx
- 410:	13 2f                	adc    (%rdi),%ebp
- 412:	05 07 4a 05 05       	add    $0x5054a07,%eax
- 417:	00 02                	add    %al,(%rdx)
- 419:	04 01                	add    $0x1,%al
- 41b:	e4 05                	in     $0x5,%al
- 41d:	0b 4b 05             	or     0x5(%rbx),%ecx
- 420:	08 a1 05 0e df 05    	or     %ah,0x5df0e05(%rcx)
- 426:	09 7c 05 01          	or     %edi,0x1(%rbp,%rax,1)
- 42a:	59                   	pop    %rcx
- 42b:	05 34 30 05 12       	add    $0x12053034,%eax
- 430:	f3 05 19 e5 05 0e    	repz add $0xe05e519,%eax
- 436:	d7                   	xlat   (%rbx)
- 437:	05 02 4a 05 0e       	add    $0xe054a02,%eax
- 43c:	e5 05                	in     $0x5,%eax
- 43e:	02 82 05 0d e5 05    	add    0x5e50d05(%rdx),%al
- 444:	0b e7                	or     %edi,%esp
- 446:	05 05 ac 05 0f       	add    $0xf05ac05,%eax
- 44b:	59                   	pop    %rcx
- 44c:	05 04 e5 05 08       	add    $0x805e504,%eax
- 451:	31 05 10 e5 05 01    	xor    %eax,0x105e510(%rip)        # 105e967 <cmd+0x105c507>
- 457:	75 02                	jne    45b <strcpy@plt-0x815>
- 459:	02 00                	add    (%rax),%al
- 45b:	01 01                	add    %eax,(%rcx)
+ 376:	68 02 23 16 a0       	push   $0xffffffffa0162302
+ 37b:	05 13 03 ea 7e       	add    $0x7eea0313,%eax
+ 380:	08 3c 05 09 9e 05 01 	or     %bh,0x1059e09(,%rax,1)
+ 387:	03 9a 01 82 05 39    	add    0x39058201(%rdx),%ebx
+ 38d:	03 09                	add    (%rcx),%ecx
+ 38f:	4a 05 02 c9 05 04    	rex.WX add $0x405c902,%rax
+ 395:	f4                   	hlt
+ 396:	05 0b 59 76 76       	add    $0x7676590b,%eax
+ 39b:	05 01 5a 05 7b       	add    $0x7b055a01,%eax
+ 3a0:	03 09                	add    (%rcx),%ecx
+ 3a2:	2e 05 2a f3 05 0d    	cs add $0xd05f32a,%eax
+ 3a8:	d7                   	xlat   (%rbx)
+ 3a9:	05 02 4a 05 0d       	add    $0xd054a02,%eax
+ 3ae:	e5 05                	in     $0x5,%eax
+ 3b0:	01 bb 05 47 03 0b    	add    %edi,0xb034705(%rbx)
+ 3b6:	3c 05                	cmp    $0x5,%al
+ 3b8:	01 03                	add    %eax,(%rbx)
+ 3ba:	1d e4 05 3a 3e       	sbb    $0x3e3a05e4,%eax
+ 3bf:	05 02 e5 05 01       	add    $0x105e502,%eax
+ 3c4:	08 3d 05 44 3f 05    	or     %bh,0x53f4405(%rip)        # 53f47cf <cmd+0x53f236f>
+ 3ca:	17                   	(bad)
+ 3cb:	f3 ad                	rep lods (%rsi),%eax
+ 3cd:	05 0b 85 05 05       	add    $0x505850b,%eax
+ 3d2:	74 05                	je     3d9 <strcpy@plt-0x897>
+ 3d4:	28 59 05             	sub    %bl,0x5(%rcx)
+ 3d7:	0f 00 02             	sldt   (%rdx)
+ 3da:	04 01                	add    $0x1,%al
+ 3dc:	9e                   	sahf
+ 3dd:	05 0a 75 05 09       	add    $0x905750a,%eax
+ 3e2:	ca 05 11             	lret   $0x1105
+ 3e5:	ae                   	scas   (%rdi),%al
+ 3e6:	05 04 76 05 03       	add    $0x3057604,%eax
+ 3eb:	75 00                	jne    3ed <strcpy@plt-0x883>
+ 3ed:	02 04 01             	add    (%rcx,%rax,1),%al
+ 3f0:	06                   	(bad)
+ 3f1:	02 23                	add    (%rbx),%ah
+ 3f3:	12 06                	adc    (%rsi),%al
+ 3f5:	08 3d 05 0f 31 05    	or     %bh,0x5310f05(%rip)        # 5311300 <cmd+0x530eea0>
+ 3fb:	0d 00 02 04 01       	or     $0x1040200,%eax
+ 400:	08 2e                	or     %ch,(%rsi)
+ 402:	05 0e 83 05 01       	add    $0x105830e,%eax
+ 407:	ad                   	lods   (%rsi),%eax
+ 408:	05 28 30 05 12       	add    $0x12053028,%eax
+ 40d:	bb 05 07 e6 05       	mov    $0x5e60705,%ebx
+ 412:	13 2f                	adc    (%rdi),%ebp
+ 414:	05 07 4a 05 05       	add    $0x5054a07,%eax
+ 419:	00 02                	add    %al,(%rdx)
+ 41b:	04 01                	add    $0x1,%al
+ 41d:	e4 05                	in     $0x5,%al
+ 41f:	0b 4b 05             	or     0x5(%rbx),%ecx
+ 422:	08 a1 05 0e df 05    	or     %ah,0x5df0e05(%rcx)
+ 428:	09 7c 05 01          	or     %edi,0x1(%rbp,%rax,1)
+ 42c:	59                   	pop    %rcx
+ 42d:	05 34 30 05 12       	add    $0x12053034,%eax
+ 432:	f3 05 19 e5 05 0e    	repz add $0xe05e519,%eax
+ 438:	d7                   	xlat   (%rbx)
+ 439:	05 02 4a 05 0e       	add    $0xe054a02,%eax
+ 43e:	e5 05                	in     $0x5,%eax
+ 440:	02 82 05 0d e5 05    	add    0x5e50d05(%rdx),%al
+ 446:	0b e7                	or     %edi,%esp
+ 448:	05 05 ac 05 0f       	add    $0xf05ac05,%eax
+ 44d:	59                   	pop    %rcx
+ 44e:	05 04 e5 05 08       	add    $0x805e504,%eax
+ 453:	31 05 10 e5 05 01    	xor    %eax,0x105e510(%rip)        # 105e969 <cmd+0x105c509>
+ 459:	75 02                	jne    45d <strcpy@plt-0x813>
+ 45b:	02 00                	add    (%rax),%al
+ 45d:	01 01                	add    %eax,(%rcx)
 
 Disassembly of section .debug_str:
 

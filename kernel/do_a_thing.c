@@ -19,16 +19,14 @@ extern void libc_internal_initalize( void );
 
 void do_a_thing( void ) {
 	libc_internal_initalize();
+	lib_register( "/lib/libtest.so" );
 
-	do_a_thing_main( 0, NULL );
+	//do_a_thing_main( 0, NULL );
 }
 
 int do_a_thing_main( int argc, char* argv[] ) {
 	klog( LOG_INFO, "-----> doing a thing <-----" );
 	debugf( "-----> doing a thing <-----\n" );
-
-	lib_initalize();
-	lib_register( "/lib/libtest.so" );
 
 	execve( "/bin/slibtest.exec", NULL, NULL );
 

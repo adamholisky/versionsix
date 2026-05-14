@@ -65,8 +65,6 @@ QEMU_COMMON = 	-readconfig ${ROOT_DIR}/build_support/qemu_configs/x86_64_primary
 				\
 				-m 8G \
 				\
-				-d cpu_reset \
-				\
 				-no-reboot \
 				\
 				-pidfile ${ROOT_DIR}/logs/qemu_pid
@@ -87,7 +85,6 @@ all: install
 
 build/versionvi.bin: increment_build_number $(OBJECTS_C) $(OBJECTS_ASMS)
 	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/linker.ld -o build/versionvi.bin avs-libc-static/avslibc.o liblua-static/avs-lua.o $(OBJECTS_C) $(OBJECTS_ASMS)
-	make dump_info &
 	@>&2 $(call echo_tag_green,Build, Done making version $(BUILD_NUMBER))
 
 build/%.o: %.c
@@ -101,8 +98,8 @@ build/%.o: %.S
 	$(CC) $(AFLAGS) -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
 
 dump_info:
-	readelf -W -a build/versionvi.bin > logs/elfdump.txt
-	$(OBJDUMP) -x -D -S build/versionvi.bin > logs/objdump.txt 
+	@readelf -W -a build/versionvi.bin > logs/elfdump.txt
+	@$(OBJDUMP) -x -D -S build/versionvi.bin > logs/objdump.txt 
 
 cp: cp_vit
 
@@ -146,14 +143,17 @@ cp_vit:
 	@cp -f ../viui/src/vui/schrift.c kernel/vui/schrift.c
 
 install:
-	@make install_stage2 >> $(BUILD_LOG)
+	@make -j22 install_stage2 >> $(BUILD_LOG)
 	@>&2 $(call echo_tag_green,Install, Build $(BUILD_NUMBER) is now installed)
 	@>&2 $(call echo_tag_green,Install, Done)
+	@>&2 make --no-print-directory dump_info & >> $(BUILD_LOG)
 
 install_stage2: build/versionvi.bin
 	@>&2 $(call echo_tag_green,Install, Installing to $(KERNEL_BOOT_IMG))
 	@mcopy -D o -i $(ROOT_DIR)/$(KERNEL_BOOT_IMG)@@1M $(ROOT_DIR)/build_support/boot_files/limine.conf ::/boot/limine
+	@>&2 $(call echo_tag_green,Install, bop)
 	@mcopy -D o -i $(ROOT_DIR)/$(KERNEL_BOOT_IMG)@@1M $(ROOT_DIR)/build/versionvi.bin ::/boot
+	@>&2 $(call echo_tag_green,Install, boop)
 
 #& /mnt/c/"Program Files"/TightVNC/tvnviewer.exe :0
 run: install

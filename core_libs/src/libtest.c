@@ -17,7 +17,7 @@ int test_func_two( int b ) {
 }
 
 char* test_func_three( int a, char *s ) {
-    printf( "Test function three: %d and %d and %s", a, b_saved, s );
+    printf( "Test function three: %d and %d and %s\n", a, b_saved, s );
 
     return my_string;
 }

@@ -44,7 +44,7 @@ Idx Name          Size      VMA               LMA               File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
   6 .text         0000008b  0000000000000280  0000000000000280  00000280  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  7 .rodata       00000056  0000000000000310  0000000000000310  00000310  2**3
+  7 .rodata       00000057  0000000000000310  0000000000000310  00000310  2**3
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   8 .eh_frame     0000009c  0000000000000368  0000000000000368  00000368  2**3
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
@@ -304,7 +304,7 @@ char* test_func_three( int a, char *s ) {
  2d4:	48 83 ec 10          	sub    $0x10,%rsp
  2d8:	89 7d fc             	mov    %edi,-0x4(%rbp)
  2db:	48 89 75 f0          	mov    %rsi,-0x10(%rbp)
-    printf( "Test function three: %d and %d and %s", a, b_saved, s );
+    printf( "Test function three: %d and %d and %s\n", a, b_saved, s );
  2df:	48 8b 05 52 12 00 00 	mov    0x1252(%rip),%rax        # 1538 <b_saved-0x4c>
  2e6:	8b 10                	mov    (%rax),%edx
  2e8:	48 8b 4d f0          	mov    -0x10(%rbp),%rcx
@@ -354,7 +354,8 @@ Disassembly of section .rodata:
  361:	64                   	fs
  362:	20                   	.byte 0x20
  363:	25                   	.byte 0x25
- 364:	73 00                	jae    366 <test_func_three+0x96>
+ 364:	73 0a                	jae    370 <test_func_three+0xa0>
+	...
 
 Disassembly of section .eh_frame:
 

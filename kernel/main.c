@@ -32,6 +32,7 @@
 #include <sys_info.h>
 #include <process.h>
 #include <avs_dev_api.h>
+#include <lib.h>
 
 #include <spng.h>
 
@@ -103,6 +104,8 @@ void kernel_main( void ) {
 	device_initalize();
 	fs_initalize_part2();
 	devices_populate_fs();
+
+	lib_initalize();
 
 	// GUI gets enabled here, or terminal redirects to.... ?
 #ifdef ENABLE_GUI

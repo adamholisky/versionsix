@@ -39,6 +39,9 @@ typedef struct _lib_shared {
 
 	uint64_t num_symbols;
 	lib_symbol *lib_symbols;
+
+	int total_pages;
+	void *lib_base;
 	
 } lib_shared;
 
@@ -46,7 +49,7 @@ int lib_register( char *pathname );
 void lib_initalize( void );
 int lib_load_symbols( lib_shared *lib, void *lib_data );
 int lib_load_program_headers( lib_shared *lib, void *lib_data );
-void lib_load_dynamic_linker( lib_shared *lib );
+int lib_load_relocation_tables( lib_shared *lib, void *lib_data );
 void *lib_dynamic_linker( char *name );
 
 #ifdef __cplusplus

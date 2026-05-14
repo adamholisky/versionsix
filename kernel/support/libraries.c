@@ -4,6 +4,7 @@
 #include <vfs.h>
 #include <elf2.h>
 #include <page.h>
+#include <elf_loader.h>
 
 #include <lib.h>
 
@@ -65,13 +66,56 @@ int lib_register( char *pathname ) {
 	// Load the symbols
 	lib_load_symbols( lib, lib_data );
 
-	// Setup the linker
-	lib_load_dynamic_linker( lib );
+	// Process relocation tables
+	lib_load_relocation_tables( lib, lib_data );
 
 	// Attach to shared library list
 	avs_list_append( lib_registry, lib );
 
 	return 0;
+}
+
+/**
+ * @brief Processes the .rela.plt and .rela.dyn sections for functions, assigns correct addresses/offsets
+ * 
+ * @param lib 
+ * @param lib_data 
+ * @return int 
+ */
+int lib_load_relocation_tables( lib_shared *lib, void *lib_data ) {
+	// First the .rela.dyn section
+
+	Elf64_Shdr *sh_dyn = elf2_new_get_section_header_by_name( lib->f_elf, ".rela.dyn" );
+	if( sh_dyn != NULL ) {
+		int num_entries = sh_dyn->sh_size / sizeof(Elf64_Rela);
+
+		Elf64_Rela *dyn_ents = (Elf64_Rela *)((uint8_t*)lib_data + sh_dyn->sh_offset );
+
+		for( int i = 0; i < num_entries; i++ ) {
+			if( ELF64_R_TYPE( dyn_ents[i].r_info ) == R_X86_64_GLOB_DAT ) {
+				*(uint64_t *)(lib->lib_base + dyn_ents[i].r_offset) = lib->lib_base + lib->f_elf->dynsym_ents[ ELF64_R_SYM(dyn_ents[i].r_info) ].addr;
+			}
+		}
+	}
+
+	Elf64_Shdr *sh_plt = elf2_new_get_section_header_by_name( lib->f_elf, ".rela.plt" );
+	if( sh_plt != NULL ) {
+		int num_entries = sh_plt->sh_size / sizeof(Elf64_Rela);
+
+		Elf64_Rela *dyn_ents = (Elf64_Rela *)((uint8_t*)lib_data + sh_plt->sh_offset );
+
+		for( int i = 0; i < num_entries; i++ ) {
+			if( ELF64_R_TYPE( dyn_ents[i].r_info ) == R_X86_64_JUMP_SLOT ) {
+				void *addr = elf_loader_get_ksym_addr( lib->f_elf->dynsym_ents[ELF64_R_SYM(dyn_ents[i].r_info)].name );
+				
+				if( addr == NULL ) {
+					klog( LOG_ERROR, "got null addr for %s", lib->f_elf->dynsym_ents[ELF64_R_SYM(dyn_ents[i].r_info)].name );
+				} else {
+					*(uint64_t *)(lib->lib_base + dyn_ents[i].r_offset) = addr;
+				}
+			}
+		}
+	}
 }
 
 /**
@@ -103,7 +147,8 @@ int lib_load_symbols( lib_shared *lib, void *lib_data ) {
 			continue;
 		}
 
-		lib->lib_symbols[lib_sym_count].addr = lib->mem_sections[0].pages[0].virt + lib->f_elf->dynsym_ents[i].addr;
+		//lib->lib_symbols[lib_sym_count].addr = lib->mem_sections[0].pages[0].virt + lib->f_elf->dynsym_ents[i].addr;
+		lib->lib_symbols[lib_sym_count].addr = lib->lib_base + lib->f_elf->dynsym_ents[i].addr;
 		kstrcpy( lib->lib_symbols[lib_sym_count].name, lib->f_elf->dynsym_ents[i].name );
 		
 
@@ -134,72 +179,46 @@ int lib_load_program_headers( lib_shared *lib, void *lib_data ) {
 
 	int i_adjusted = 0;
 
-	// Populate the pages array
+	int virt_mem_max = 0;
+
 	for( int i = 0; i < lib->f_elf->program_headers_num_ents; i++ ) {
 		if( program_headers[i].type != PT_LOAD ) {
 			//printf( "Skipping %d\n", i );
 			continue;
 		}
 
-		lib->mem_sections[i_adjusted].num_pages = (program_headers[i].virt_size / PAGE_SIZE) + 1;
-		lib->mem_sections[i_adjusted].read = program_headers[i].read;
-		lib->mem_sections[i_adjusted].write = program_headers[i].write;
-		lib->mem_sections[i_adjusted].execute = program_headers[i].execute;
-		lib->mem_sections[i_adjusted].pages = kmalloc( sizeof(lib_shared_page) * lib->mem_sections[i_adjusted].num_pages );
+		uint64_t ent_end_addr = program_headers[i].virt_addr + program_headers[i].virt_size;
+		
+		if( ent_end_addr > virt_mem_max ) {
+			virt_mem_max = ent_end_addr;
+		}
+	}
 
-		for( int j = 0; j < lib->mem_sections[i_adjusted].num_pages; j++ ) {			
-			lib->mem_sections[i_adjusted].pages[j].virt = page_allocate_kernel( 1 );
-			lib->mem_sections[i_adjusted].pages[j].phys = paging_virtual_to_physical( lib->mem_sections[i_adjusted].pages[j].virt );
+	lib->total_pages = (virt_mem_max / PAGE_SIZE) + 1;
 
-			memset( lib->mem_sections[i_adjusted].pages[j].virt, 0, PAGE_SIZE );
+	klog( LOG_DEBUG, "virt_mem_max = 0x%X    total_pages = %d", virt_mem_max, lib->total_pages );
 
-			page_map( lib->mem_sections[i_adjusted].pages[j].virt, lib->mem_sections[i_adjusted].pages[j].phys );
+	lib->lib_base = page_allocate_kernel( lib->total_pages );
+	//page_map( lib->lib_base, paging_virtual_to_physical(lib->lib_base) );
+	memset( lib->lib_base, 0, lib->total_pages * PAGE_SIZE );
 
-			printf( "Page allocated. virt=0x%016llX\n", lib->mem_sections[i_adjusted].pages[j].virt );
+	for( int i = 0; i < lib->f_elf->program_headers_num_ents; i++ ) {
+		if( program_headers[i].type != PT_LOAD ) {
+			continue;
 		}
 
-		printf( "mem copy to 0x%016llX from 0x%016llX for %X\n", lib->mem_sections[i_adjusted].pages[0].virt, (uint8_t *)lib_data + program_headers[i].phys_offset, program_headers[i].phys_size );
-
-		memcpy( lib->mem_sections[i_adjusted].pages[0].virt, (uint8_t *)lib_data + program_headers[i].phys_offset, program_headers[i].phys_size );
-
-		i_adjusted++;
-	}
-}
-
-void lib_load_dynamic_linker( lib_shared *lib ) {
-	Elf64_Shdr *elf_got_section = elf2_new_get_section_header_by_name( lib->f_elf, ".got.plt" );
-
-	debugf( "GOT section output:\n" );
-	kdebug_peek_at( elf_got_section );
-
-	if( elf_got_section != NULL ) {
-		uint8_t *got_data = lib->mem_sections[0].pages[0].virt + elf_got_section->sh_addr;
-
-		uint64_t *got64_t = (uint64_t *)got_data;
-
-		//*(uint64_t *)(got_data + 0x08) = p->text_sections[0].virt + rel_plt->sh_offset;
-		*(uint64_t *)(got_data + 0x10) = elf_dynamic_linker_preamble;
-	} else {
-		debugf( "Could not locate .got section. Failing hard.\n" );
-		do_immediate_shutdown();
+		memcpy( (uint8_t *)lib->lib_base + program_headers[i].virt_addr, (uint8_t *)lib_data + program_headers[i].phys_offset, program_headers[i].phys_size );
 	}
 }
 
 void *lib_dynamic_linker( char *name ) {
 	avs_node *n = lib_registry->head;
 
-	printf( "looking for %s\n", name );
-
 	for( int i = 0; i < lib_registry->size; i++ ) {
 		lib_shared *lib = (lib_shared *)n->data;
 
-		printf( "a\n" );
-
 		for( int j = 0; j < lib->num_symbols; j++ ) {
-			printf( "b: %s\n", lib->lib_symbols[j].name );
-			if( kstrcmp( lib->lib_symbols[j].name, name ) == 0 ) {
-				printf( "Returning 0x%016llX\n", lib->lib_symbols[j].addr );
-				
+			if( kstrcmp( lib->lib_symbols[j].name, name ) == 0 ) {				
 				return lib->lib_symbols[j].addr;
 			}
 		}

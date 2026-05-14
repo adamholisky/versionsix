@@ -256,6 +256,23 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 
 }
 
+void* elf_loader_get_ksym_addr( char *sym_name ) {
+	void *return_addr = NULL;
+
+	if( sym_name == NULL ) {
+		klog( LOG_ERROR, "sym_name is null" );
+		return NULL;
+	}
+
+	symbol *sym = symbols_get_symbol( get_ksyms_object(), sym_name );
+
+	if( sym != NULL ) {
+		return_addr = sym->addr;
+	}
+
+	return return_addr;
+}
+
 void* elf_loader_dynamic_linker( uint64_t got_table_data, uint8_t got_index ) {
 	//debugf( "dynamic linker, yay! got_table_data=0x%016llX    got_index=%02llX\n", got_table_data, got_index );
 	//klog( LOG_INFO, "Linking symbol at index %d", got_index );

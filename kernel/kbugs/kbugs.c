@@ -4,6 +4,9 @@
 #include <lib/list.h>
 #include <keyboard.h>
 #include <stdlib.h>
+#include <stacktrace.h>
+
+#include <zydis.h>
 
 bool keep_running;
 
@@ -17,6 +20,10 @@ char kbugs_lines[KBUGS_MAX_HISTORY][KBUGS_MAX_LINE_SIZE];
 char kbugs_current_line[KBUGS_MAX_LINE_SIZE];
 uint8_t kbugs_line_index;
 
+void *kbugs_data_crash_addr;
+registers *kbugs_data_crash_context;
+extern kernel_proc_data global_proc_data;
+
 char kbugs_get_c( void );
 
 int kbugs_dm( int argc, char **argv );
@@ -26,6 +33,9 @@ int kbugs_shutdown( int argc, char **argv );
 int kbugs_ps( int argc, char **argv );
 int kbugs_mem( int argc, char **argv );
 int kbugs_kill( int argc, char **argv );
+int kbugs_da( int argc, char **argv );
+void kbugs_crash_report( void );
+void kbugs_cleanup_before_exit( void );
 
 typedef int (*kbugs_cmd)( int num_args, char *arg_list[] );
 #define kbugs_cmd_check_and_run(x,fn) if( strcmp( argv_builder[0], ##x ) == 0 ) { fn## ( num_args, argv_builder ); }
@@ -48,6 +58,10 @@ void kbugs_main( void ) {
 	keep_running = true;
 
 	printf( "Welcome to kbugs.\n" );
+
+	if( kbugs_data_crash_context != NULL ) {
+		kbugs_crash_report();
+	}
 
 	do {
 		uint8_t scancode = 0;
@@ -151,6 +165,7 @@ void kbugs_main( void ) {
 		
 		if( strcmp( argv_builder[0], "sd" ) == 0 ) { cmd_to_run = kbugs_shutdown; }
 		if( strcmp( argv_builder[0], "ps" ) == 0 ) { cmd_to_run = kbugs_ps; }
+		if( strcmp( argv_builder[0], "da" ) == 0 ) { cmd_to_run = kbugs_da; }
 		if( strcmp( argv_builder[0], "dm" ) == 0 ) { cmd_to_run = kbugs_dm; }
 		if( strcmp( argv_builder[0], "sm" ) == 0 ) { cmd_to_run = kbugs_sm; }
 		if( strcmp( argv_builder[0], "kill" ) == 0 ) { cmd_to_run = kbugs_kill; }
@@ -173,6 +188,8 @@ void kbugs_main( void ) {
 		}
 
 	} while( keep_running );
+
+	kbugs_cleanup_before_exit();
 }
 
 int kbugs_dm( int argc, char **argv ) {
@@ -194,6 +211,34 @@ int kbugs_q( int argc, char **argv ) {
 
 int kbugs_shutdown( int argc, char **argv ) {
 	do_immediate_shutdown();
+
+	return 0;
+}
+
+int kbugs_da( int argc, char **argv ) {
+	ZyanUSize offset = 0;
+	ZydisDisassembledInstruction instruction;
+
+	ZyanU64 runtime_addr = kbugs_data_crash_addr;
+
+	runtime_addr = runtime_addr - 20;
+
+	while( ZYAN_SUCCESS( ZydisDisassembleIntel(
+		ZYDIS_MACHINE_MODE_LONG_64,
+		runtime_addr,
+		kbugs_data_crash_addr + offset,
+		50 - offset,
+		&instruction
+	))) {
+		char star = ' ';
+		if( runtime_addr == kbugs_data_crash_addr ) {
+			star = '*';
+		}
+
+		debugf( "%016llX  %c  %s\n", runtime_addr, star, instruction.text );
+		offset += instruction.info.length;
+		runtime_addr += instruction.info.length;
+	}
 
 	return 0;
 }
@@ -220,14 +265,14 @@ int kbugs_kill( int argc, char **argv ) {
 		process_set_next_up( p_parent );
 	}
 
+	kbugs_cleanup_before_exit();
+
 	k_yield_in_int();
 
 	return 0;
 }
 
 int kbugs_ps( int argc, char **argv ) {
-	extern kernel_proc_data global_proc_data;
-
 	printf( "Current pid: %d\n", global_proc_data.current_process->pid );
 
 	printf( "Proc list\n====================\n" );
@@ -246,4 +291,88 @@ int kbugs_ps( int argc, char **argv ) {
 
 int kbugs_mem( int argc, char **argv ) {
 
+}
+
+void kbugs_cleanup_before_exit( void ) {
+	kbugs_data_crash_addr = 0;
+	kbugs_data_crash_context = 0;
+}
+
+#define kb_out(...) debugf_raw(__VA_ARGS__)
+
+void kbugs_crash_report( void ) {
+	process_data *p = process_get_current();
+	registers *reg = kbugs_data_crash_context;
+
+	       //================================================================================
+	kb_out( "================================================================================\n" );
+	kb_out( "Kbugs Crash Report\n" );
+	kb_out( "\n" );
+	kb_out( "Exception %d: %s \n", reg->interrupt_no, intel_exceptions[reg->interrupt_no] );
+	kb_out( "Exec: %s    pid: %d\n", p->path, p->pid );
+	kb_out( "rip:  0x%016llX (%s)\n", reg->rip, kernel_symbols_get_function_name_at(reg->rip) );
+	kb_out( "rax:  0x%016llX  rbx:  0x%016llX  rcx:  0x%016llX\n", reg->rax, reg->rbx, reg->rcx );
+	kb_out( "rdx:  0x%016llX  rsi:  0x%016llX  rdi:  0x%016llX\n", reg->rdx, reg->rsi, reg->rdi );
+	kb_out( "rsp:  0x%016llX  rbp:  0x%016llX  cr0:  0x%016llX \n", reg->rsp, reg->rbp, get_cr0() );
+	kb_out( "cr2:  0x%016llX  cr3:  0x%016llX  cr4:  0x%016llX\n", get_cr2(), get_cr3(), get_cr4() );
+	kb_out( "cs:   0x%04X  num:  0x%08X  err:  0x%08X  flag: 0x%08X\n", reg->cs, reg->interrupt_no, reg->error_no, reg->rflags);
+	kb_out( "\n" );
+	kb_out( "Stack Trace:\n" );
+	
+	stacktrace_out_for_rbp( reg->rbp, false, true, 4 );
+
+	kb_out( "\n" );
+	kb_out( "Disassembled instruction at pc:\n" );
+
+	ZyanUSize offset = 0;
+	ZydisDisassembledInstruction instruction;
+
+	ZyanU64 runtime_addr = kbugs_data_crash_addr;
+
+	runtime_addr = runtime_addr - 20;
+
+	while( ZYAN_SUCCESS( ZydisDisassembleIntel(
+		ZYDIS_MACHINE_MODE_LONG_64,
+		runtime_addr,
+		kbugs_data_crash_addr + offset,
+		50 - offset,
+		&instruction
+	))) {
+		char star = ' ';
+		if( runtime_addr == kbugs_data_crash_addr ) {
+			star = '*';
+		}
+
+		kb_out( "0x%016llX  %c  %s\n", runtime_addr, star, instruction.text );
+		offset += instruction.info.length;
+		runtime_addr += instruction.info.length;
+	}
+
+	kb_out( "\n" );
+	kb_out( "Process Data:                                   \n" );
+	kb_out( "Parent pid: %d    wait_for_pid: %d    type: %d    first_run: %d\n", p->pid_parent, p->wait_for_pid, p->type, p->first_run );
+	kb_out( "Stack kvirt: 0x%016llX    virt: 0x%016llX    phys: 0x%016llx\n", p->proc_stack_kvirt, p->proc_stack_virt, p->proc_stack_phys );
+	kb_out( "Text section count: %d    virt_start: 0x%016llX\n", p->text_section_count, p->text_secton_virt_start );
+	for( int i = 0; i < p->text_section_count; i++ ) {
+		kb_out( "    [%d] kvirt: 0x%016llX    virt: 0x%016llX    phys: 0x%016llX\n", i, p->text_sections[i].kern_virt, p->text_sections[i].virt, p->text_sections[i].phys );
+	}
+	kb_out( "Data section count: %d    virt_start: 0x%016llX\n", p->data_section_count, p->data_section_virt_start );
+	for( int i = 0; i < p->data_section_count; i++ ) {
+		kb_out( "    [%d] kvirt: 0x%016llX    virt: 0x%016llX    phys: 0x%016llX\n", i, p->data_sections[i].kern_virt, p->data_sections[i].virt, p->data_sections[i].phys );
+	}
+
+	kb_out( "\n" );
+	kb_out( "Processes running:\n" );
+	avs_node *n = global_proc_data.process_list->head;
+	for( int i = 0; i < global_proc_data.process_list->size; i ++ )  {
+		process_data *pl = n->data;
+
+		kb_out( "ID=%d    Name=%s    Status=%s (%d)\n", pl->pid, pl->name, process_status_text[pl->status], pl->status );
+		
+		n = n->next;
+	}
+
+
+
+	kb_out( "================================================================================\n" );
 }

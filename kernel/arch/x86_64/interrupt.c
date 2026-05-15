@@ -12,6 +12,8 @@ uint8_t pic1_irq_mask;
 uint8_t pic2_irq_mask;
 
 extern void kbugs_main( void );
+extern void *kbugs_data_crash_addr;
+extern registers *kbugs_data_crash_context;
 
 void interrupt_initalize( void ) {
 	// First: Setup the PIC
@@ -144,7 +146,7 @@ void interrupt_handler_stage_2( registers **_reg ) {
 
 		klog_crash( reg->rip, p );
 
-		debugf_raw( "================================================================================\n" );
+		/* debugf_raw( "================================================================================\n" );
 		debugf_raw( "Exception %d: %s \n", reg->interrupt_no, intel_exceptions[reg->interrupt_no] );
 		debugf_raw( "    pid:  %d %s\n", current_pid, p->path );
 		debugf_raw( "    rip:  0x%016llX (%s)\n", reg->rip, kernel_symbols_get_function_name_at(reg->rip) );
@@ -158,7 +160,7 @@ void interrupt_handler_stage_2( registers **_reg ) {
 		
 		stacktrace_out_for_rbp( reg->rbp, false, true, 4 );
 
-		debugf_raw( "================================================================================\n" );
+		debugf_raw( "================================================================================\n" ); */
 
 		if( current_pid == 0 ) {
 			debugf_raw( "\nKernel task generated exception. Kbugs then halting.\n" );
@@ -175,6 +177,9 @@ void interrupt_handler_stage_2( registers **_reg ) {
 			
 			// we want this here so kbugs can change the next process, but default to kernel idle loop
 			process_sched_set_next_yield( 0 );
+
+			kbugs_data_crash_addr = reg->rip;
+			kbugs_data_crash_context = reg;
 
 			kbugs_main();
 		}

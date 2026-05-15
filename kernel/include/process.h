@@ -35,6 +35,16 @@ extern "C"
 
 typedef uint32_t pid_t;
 
+static const char * process_status_text[7] = {
+	[0] = "In Setup",
+	[1] = "Active",
+	[2] = "Inactive",
+	[3] = "Waiting",
+	[4] = "Sleep",
+	[5] = "Waiting for death",
+	[6] = "Dead",
+};
+
 typedef struct {
 	uint64_t phys;
 	uint64_t virt;

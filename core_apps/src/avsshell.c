@@ -250,7 +250,7 @@ void kshell_main_loop( void ) {
 				
 				wait( child_pid );
 
-				printf( "Post wait.\n" );
+				//printf( "Post wait.\n" );
 			}
 		}
 	}

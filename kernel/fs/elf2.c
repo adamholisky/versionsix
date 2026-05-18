@@ -1,4 +1,5 @@
 #include <kernel_common.h>
+#include <kmemory.h>
 #include <vfs.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,7 +34,7 @@ int elf2_new_initalize_file( elf2_file *f_elf, void *data ) {
 	if( f_elf->program_headers_num_ents > 0 ) {
 		f_elf->has_program_headers = true;
 
-		f_elf->program_headers = malloc( sizeof(elf2_program_header) * f_elf->program_headers_num_ents );
+		f_elf->program_headers = kmalloc( sizeof(elf2_program_header) * f_elf->program_headers_num_ents );
 		if( f_elf->program_headers != NULL ) {
 			for( int i = 0; i < f_elf->program_headers_num_ents; i++ ) {
 				Elf64_Phdr *phdr = elf2_new_get_program_header_by_index( f_elf, i );
@@ -67,7 +68,7 @@ int elf2_new_initalize_file( elf2_file *f_elf, void *data ) {
 			f_elf->dynsym_str_tbl = f_elf->file_base + sh_dyn_str->sh_offset;
 
 			// Populate our dynamic symbol array
-			f_elf->dynsym_ents = malloc( sizeof(elf2_symbol) * f_elf->dynsym_num_ents);
+			f_elf->dynsym_ents = kmalloc( sizeof(elf2_symbol) * f_elf->dynsym_num_ents);
 
 			if( f_elf->dynsym_ents != NULL ) {
 				for( int i = 0; i < f_elf->dynsym_num_ents; i++ ) {

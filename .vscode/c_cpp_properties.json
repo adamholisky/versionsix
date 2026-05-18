@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/usr/local/osdev/source/versionsix/kernel/include",
-                "/usr/local/osdev/source/versionsix/avs-libc-static/include"
+                "/usr/local/osdev/source/versionsix/avs-klibc-static/include"
             ],
             "defines": [
                 "VI_ENV_OS",

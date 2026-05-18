@@ -24,6 +24,11 @@ extern "C" {
 #define SYSCALL_WAIT 8
 #define SYSCALL_EXECM 9
 #define SYSCALL_STATFS 10
+#define SYSCALL_CLONE 11
+#define SYSCALL_LSEEK 12
+#define SYSCALL_BRK 13
+#define SYSCALL_SBRK 14
+#define SYSCALL_MMAP 15
 
 typedef uint16_t umode_t;
 typedef uint32_t pid_t;
@@ -56,6 +61,8 @@ pid_t _wait( pid_t pid );
 size_t _write( int fd, void *buff, size_t count );
 size_t _read( int fd, void *buf, size_t count );
 int _statfs( const char *path, struct stat *statbuf );
+void* _sbrk( int inc_bytes );
+int _brk( void *addr );
 #endif
 
 #ifdef __cplusplus

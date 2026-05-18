@@ -50,7 +50,7 @@ CFLAGS = $(DEFINES) -Wno-write-strings \
 	-O0 \
 	-g \
 	-I$(ROOT_DIR)/kernel/include \
-	-I$(ROOT_DIR)/avs-libc-static/include \
+	-I$(ROOT_DIR)/avs-klibc-static/include \
 	-I$(ROOT_DIR)/liblua-static/include \
     -m64                 \
     -march=x86-64        \
@@ -84,7 +84,7 @@ OBJECTS_ASMS = $(patsubst %.S, build/%.o, $(shell ls kernel/**/*.S | xargs -n 1 
 all: install
 
 build/versionvi.bin: increment_build_number $(OBJECTS_C) $(OBJECTS_ASMS)
-	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/linker.ld -o build/versionvi.bin avs-libc-static/avslibc.o liblua-static/avs-lua.o $(OBJECTS_C) $(OBJECTS_ASMS)
+	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/linker.ld -o build/versionvi.bin avs-klibc-static/avs-klibc.o liblua-static/avs-lua.o $(OBJECTS_C) $(OBJECTS_ASMS)
 	@>&2 $(call echo_tag_green,Build, Done making version $(BUILD_NUMBER))
 
 build/%.o: %.c

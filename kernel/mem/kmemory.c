@@ -2,6 +2,8 @@
 #include <page.h>
 #include <kmemory.h>
 
+#include <stdlib.h>
+
 extern kinfo kernel_info;
 
 uint64_t memory_top;
@@ -30,6 +32,22 @@ void memory_initalize( void ) {
 	#ifdef DEBUG_MEMORY_INITALIZE
 	log_entry_exit();
 	#endif
+}
+
+// Temporary...
+void* malloc(size_t req_size) {
+	return kmalloc( req_size );
+}
+
+void free(void* ptr) {
+	kfree( ptr );
+}
+
+void* calloc(size_t num, size_t size) {
+	return kcalloc( num, size );
+}
+void* realloc(void* ptr, size_t size) {
+	return krealloc( ptr, size );
 }
 
 /* #undef DEBUG_KMALLOC

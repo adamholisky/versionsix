@@ -705,7 +705,7 @@ void qsort(void* a, size_t n, size_t es, int (*compar)(const void*, const void*)
  * The returned pointer must be deallocated with @see free() or @see realloc().
  * On failure, returns a null pointer.
  * */
-void* malloc(size_t size);
+void* malloc(size_t req_size);
 
 /**
  * @brief Deallocates allocated memory space.

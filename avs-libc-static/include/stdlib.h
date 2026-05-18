@@ -53,7 +53,7 @@ typedef struct
 
 void abort(void) __attribute__((noreturn));
 int atexit(void (*)(void));
-void exit(int) __attribute__((noreturn));
+void _exit(int) __attribute__((noreturn));
 
 /** TODO: CLEANUP DOC
  * Terminates the process normally by returning control to the host environment,

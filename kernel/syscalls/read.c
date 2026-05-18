@@ -50,7 +50,13 @@ int read_syscall_handler( registers **context, int fd, void *buf, size_t count )
 			}
 		}
 	} else {
-		ret_val = vfs_read( global_proc_data.current_process->file_descriptors[fd].path, buf, count, global_proc_data.current_process->file_descriptors[fd].pos );
+		vfs_fd *v_fd = vfs_get_fd_data( global_proc_data.current_process->file_descriptors[fd].vfs_fd );
+
+		if( v_fd->write_only ) {
+			klog( "fd was opened in write only. cannot read. fd=%d   path=%s", fd, v_fd->path );
+		}
+		
+		ret_val = vfs_read( v_fd->path, buf, count, global_proc_data.current_process->file_descriptors[fd].pos );
 	}
 
 	return ret_val;

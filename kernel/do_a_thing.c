@@ -14,11 +14,10 @@
 #include <stdio.h>
 
 #include <lib.h>
-
-extern void libc_internal_initalize( void );
+#include <avsos.h>
 
 void do_a_thing( void ) {
-	libc_internal_initalize();
+	avs_libc_init();
 	lib_register( "/lib/libtest.so" );
 
 	//do_a_thing_main( 0, NULL );

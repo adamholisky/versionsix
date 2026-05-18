@@ -1,9 +1,7 @@
-#include <kernel_common.h>
-#include <kshell_app.h>
-#include <fs.h>
-#include <vfs.h>
+#include <stdio.h>
+#include <string.h>
+#include <dirent.h>
 
-#include <asvfs.h>
 
 int main( int argc, char *argv[] ) {
 	char path[1024];
@@ -11,21 +9,21 @@ int main( int argc, char *argv[] ) {
 	memset( path, 0, 1024 );
 
 	if( argc == 2 ) {
-		kstrcpy( path, argv[1] );
+		strcpy( path, argv[1] );
 	}
 
 	char type_dir[] = "DIR ";
 	char type_file[] = "FILE";
 	char type_unknown[] = "????";
 
-	if( kstrcmp( path, "" ) == 0 ) {
-		kstrcpy( path, "/" );
+	if( strcmp( path, "" ) == 0 ) {
+		strcpy( path, "/" );
 	}
 
 	file_stats st;
-	int getattr_err = asvfs_getattr( path, &st );
+	int getattr_err = stat( path, &st );
 
-	vfs_dir *d = vfs_opendir( path );
+	DIR *d = opendir( path );
 	if( d == NULL ) {
 		printf( "Directory not found: %s\n", path );
 		return 1;
@@ -41,3 +39,17 @@ int main( int argc, char *argv[] ) {
 	vfs_closedir( d );
 	return 0;
 }
+
+/* Kernal-ized version
+
+
+#include <kernel_common.h>
+#include <kshell_app.h>
+#include <fs.h>
+#include <vfs.h>
+
+#include <asvfs.h>
+
+
+ * 
+ */

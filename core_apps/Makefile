@@ -48,6 +48,13 @@ finished/%.exec: build/%.o
 	readelf -W -a finished/$(OBJNAME) > build_temp/elfdump-$(OBJNAME).txt
 	$(OBJDUMP) -x -D -S finished/$(OBJNAME) > build_temp/objdump-$(OBJNAME).txt
 
+full/%: build/%.o 
+	@$(eval OBJNAME := $(shell basename $@))
+	@>&2 printf "[Link] $(OBJNAME)\n"
+	/usr/local/osdev/bin/x86_64-elf-avsos-gcc -g -Wl,--unresolved-symbols=ignore-all -o full/$(OBJNAME) $< 
+	readelf -W -a full/$(OBJNAME) > build_temp/elfdump-FULL-$(OBJNAME).txt
+	$(OBJDUMP) -x -D -S full/$(OBJNAME) > build_temp/objdump-FULL-$(OBJNAME).txt
+
 build/%.o: %.c
 	@$(eval OBJNAME := $(shell basename $@))
 	@>&2 printf "[Compile] $(OBJNAME)\n"
@@ -86,3 +93,8 @@ debug_dump:
 	@echo "----------"
 	@echo "End Debug Dump"
 	@echo " "
+
+
+# /usr/local/osdev/bin/x86_64-elf-avsos-gcc -DVIOS -DAVSOS_KERNEL -Wno-write-strings -Wno-pointer-to-int-cast -Wno-discarded-qualifiers -Wno-int-conversion -Wno-incompatible-pointer-types -O0 -g -I/usr/local/osdev/source/versionsix/core_apps/../kernel/include -I/usr/local/osdev/source/versionsix/core_apps/../avs-libc-static/include -I/usr/local/osdev/source/versionsix/core_apps/../liblua-static/include -I/usr/local/osdev/source/versionsix/core_apps/src -m64 -march=x86-64 -mabi=sysv -std=c11 -lgcc -fPIC  -c ../src/ls.c -o ls.o
+
+# /usr/local/osdev/bin/x86_64-elf-avsos-gcc -Wl,--unresolved-symbols=ignore-all ls.o -o ls

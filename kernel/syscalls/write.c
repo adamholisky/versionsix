@@ -6,6 +6,8 @@
 #include <device.h>
 #include <kernel_common.h>
 
+extern kernel_proc_data global_proc_data;
+
 extern void main_console_putc( char c );
 
 device *stderr_dev = NULL;
@@ -47,6 +49,12 @@ void write_syscall_handler( registers **context, int fd, void *buff, size_t coun
 			}
 		}
 	} else {
+		vfs_fd *v_fd = vfs_get_fd_data( global_proc_data.current_process->file_descriptors[fd].vfs_fd );
+
+		if( v_fd->read_only ) {
+			klog( "fd was opened in read only. cannot write. fd=%d   path=%s", fd, v_fd->path );
+		}
+
 		klog( LOG_ERROR, "Unimplemented write destination. FD=%d   buff=0x%011llX  count=%d", fd, buff, count );
 		klog( LOG_ERROR, "\'%s\'", buff );
 	}

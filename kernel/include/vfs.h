@@ -219,14 +219,22 @@ typedef struct {
  * 
  */
 
-#define FD_SYSTEM_MAX 255
+#define VFS_FD_MAX 255
 
 typedef struct {
 	int id;
-	bool in_use;
-	uint64_t inode_id;
 	int process_fd;
 	int ref_count;
+
+	bool in_use;
+
+	char path[255];
+
+	uint64_t inode_id;
+	
+	bool close_on_exec;
+	bool read_only;
+	bool write_only;
 } vfs_fd;
 
 // Initalizations
@@ -258,7 +266,7 @@ uint8_t *vfs_disk_write_no_cache( uint64_t drive, uint8_t *buff, size_t size, of
 void vfs_dump_mount_points( void );
 
 void vfs_fd_setup( void );
-vfs_fd *vfs_get_unused_fd( void );
+vfs_fd *vfs_alloc_fd( void );
 vfs_fd *vfs_get_fd_data( int fd );
 
 /* // File system management

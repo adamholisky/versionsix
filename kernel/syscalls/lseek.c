@@ -40,7 +40,7 @@ off_t lseek_syscall_handler( registers **context, int fd, off_t offset, int when
 	} else if( whence == SEEK_END ) {
 		struct stat sb;
 
-		int stat_err = vfs_getattr( global_proc_data.current_process->file_descriptors[fd].path, &sb );
+		int stat_err = vfs_getattr( process_get_fd_path( global_proc_data.current_process, fd ), &sb );
 
 		if( stat_err == -1 ) {
 			return -1;

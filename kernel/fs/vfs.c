@@ -346,20 +346,31 @@ void vfs_dump_mount_points( void ) {
 
 
 
-vfs_fd global_fds[FD_SYSTEM_MAX];
+vfs_fd global_fds[VFS_FD_MAX];
 
 void vfs_fd_setup( void ) {
-	memset( &global_fds, 0, sizeof(vfs_fd) * FD_SYSTEM_MAX );
+	// Setup base structures
+	memset( &global_fds, 0, sizeof(vfs_fd) * VFS_FD_MAX );
 
-	for( int i = 0; i < FD_SYSTEM_MAX; i++ ) {
+	for( int i = 0; i < VFS_FD_MAX; i++ ) {
 		global_fds[i].id = i;
 	}
+
+	// Setup stdin, stdout, stderr
+	global_fds[ STDIN_FILENO ].in_use = true;
+	strcpy( global_fds[ STDIN_FILENO ].path, "/dev/stdin" );
+
+	global_fds[ STDOUT_FILENO ].in_use = true;
+	strcpy( global_fds[ STDOUT_FILENO ].path, "/dev/stdout" );
+
+	global_fds[ STDERR_FILENO ].in_use = true;
+	strcpy( global_fds[ STDERR_FILENO ].path, "/dev/stderr" );
 }
 
-vfs_fd *vfs_get_unused_fd( void ) {
+vfs_fd *vfs_alloc_fd( void ) {
 	vfs_fd *fd_free = NULL;
 
-	for( int i = 0; i < FD_SYSTEM_MAX; i++ ) {
+	for( int i = 0; i < VFS_FD_MAX; i++ ) {
 		if( global_fds[i].in_use == false ) {
 			fd_free = &global_fds[i];
 		}
@@ -368,8 +379,20 @@ vfs_fd *vfs_get_unused_fd( void ) {
 	return fd_free;
 }
 
+void vfs_free_fd( int fd ) {
+	if( fd > 0 ) {
+		if( fd < VFS_FD_MAX ) {
+			global_fds[fd].in_use = false;
+		} else {
+			klog( LOG_ERROR, "fd greater than max vfs fds: %d", fd );
+		}
+	} else {
+		klog( LOG_ERROR, "vfs fd less than 0: %d", fd );
+	}
+}
+
 vfs_fd *vfs_get_fd_data( int fd ) {
-	if( fd >= FD_SYSTEM_MAX ) {
+	if( fd >= VFS_FD_MAX ) {
 		return NULL;
 	}
 

@@ -108,13 +108,13 @@ pid_t process_get_new_process( void ) {
 	}
 
 	p->file_descriptors[ STDIN_FILENO ].in_use = true;
-	strcpy( p->file_descriptors[ STDIN_FILENO ].path, "/dev/stdin" );
+	p->file_descriptors[ STDIN_FILENO ].vfs_fd = STDIN_FILENO;
 
 	p->file_descriptors[ STDOUT_FILENO ].in_use = true;
-	strcpy( p->file_descriptors[ STDOUT_FILENO ].path, "/dev/stdout" );
+	p->file_descriptors[ STDOUT_FILENO ].vfs_fd = STDOUT_FILENO;
 
 	p->file_descriptors[ STDERR_FILENO ].in_use = true;
-	strcpy( p->file_descriptors[ STDERR_FILENO ].path, "/dev/stderr" );
+	p->file_descriptors[ STDOUT_FILENO ].vfs_fd = STDOUT_FILENO;
 
 	avs_list_append( global_proc_data.process_list, p );
 
@@ -370,17 +370,37 @@ void process_diagnostic_context( registers *context ) {
 	printf( "\n" );
 }
 
-int process_get_free_fd( process_data *p ) {
+int process_alloc_fd( process_data *p ) {
 	int res = 0;
 
 	for( int i = 0; i < PROCESS_MAX_FDS; i++ ) {
 		if( p->file_descriptors[i].in_use == false ) { 
+			p->file_descriptors[i].pos = 0;
 			res = i;
 			break;
 		}
 	}
 
 	return res;
+}
+
+void process_free_fd( process_data *p, int fd ) {
+	if( fd > 0 ) {
+		if( fd < PROCESS_MAX_FDS ) {
+			p->file_descriptors[fd].in_use = false;
+		} else {
+			klog( LOG_ERROR, "fd greater than max fds: %d", fd );
+		}
+	} else {
+		klog( LOG_ERROR, "fd less than 0: %d", fd );
+	}
+}
+
+char* process_get_fd_path( process_data *p, int fd ) {
+	// TODO: Boundry checks
+
+	vfs_fd *v_fd = vfs_get_fd_data( p->file_descriptors[fd].vfs_fd );
+	return v_fd->path;
 }
 
 char* process_get_current_path( void ) {

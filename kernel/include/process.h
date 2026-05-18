@@ -64,9 +64,10 @@ typedef struct {
 	int id;
 	bool in_use;
 	bool was_used;
+	bool close_on_exec;
 	uint64_t pos;
-	char path[255];
-	int system_fd;
+	
+	int vfs_fd;
 } fd_process;
 
 typedef struct {
@@ -145,7 +146,9 @@ char* process_get_current_path( void );
 void processes_diagnostic_dump( void );
 void process_diagnostic_context( registers *context );
 
-int process_get_free_fd( process_data *p );
+int process_alloc_fd( process_data *p );
+void process_free_fd( process_data *p, int fd );
+char* process_get_fd_path( process_data *p, int fd );
 
 void k_yield_in_int( void );
 

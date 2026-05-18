@@ -36,8 +36,10 @@ typedef int __gid_t;
 typedef int __blksize_t;
 typedef uint32_t __off_t;
 typedef int __blkcnt_t;
-//typedef uint32_t __time_t;
+typedef uint32_t __time_t;
 typedef uint32_t __syscall_ulong_t;
+typedef unsigned int __mode_t;
+typedef long long suseconds_t;
 
 #define dev_t __dev_t
 #define off_t __off_t
@@ -47,7 +49,9 @@ typedef uint32_t __syscall_ulong_t;
 #define gid_t __gid_t
 #define blksize_t __blksize_t
 #define blkcnt_t __blkcnt_t
-//#define time_t __time_t
+#define time_t __time_t
 #define syscall_ulong_t __syscall_ulong_t
+
+typedef uint32_t pid_t;
 
 #endif

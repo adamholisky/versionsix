@@ -1,7 +1,7 @@
 #ifndef _TIME_H_
 #define _TIME_H_
 
-#include <_types/_time_t.h>
+#include <sys/types.h>
 #include <stddef.h>
 
 #ifdef __cplusplus

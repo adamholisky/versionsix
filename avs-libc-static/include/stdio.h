@@ -12,6 +12,8 @@
 extern "C" {
 #endif //__cplusplus
 
+#define __isoc_va_list va_list ap
+
 typedef union _G_fpos64_t
 {
 	char __opaque[16];
@@ -51,27 +53,12 @@ struct __sbuf
 //#define __FILE_defined
 //#endif
 
-#ifndef AVSOS_KERNEL
-	struct stat {
-		dev_t st_dev;		/* Device.  */
-		ino_t st_ino;		/* File serial number.	*/
-		mode_t st_mode;			/* File mode.  */
-		nlink_t st_nlink;			/* Link count.  */
-		uid_t st_uid;		/* User ID of the file's owner.	*/
-		gid_t st_gid;		/* Group ID of the file's group.*/
-		dev_t st_rdev;		/* Device number, if device.  */
-		off_t st_size;			/* Size of file, in bytes.  */
-		blksize_t st_blksize;	/* Optimal block size for I/O.  */
-		blkcnt_t st_blocks;		/* Number 512-byte blocks allocated. */
-		uint32_t st_atime;			/* Time of last access.  */
-		syscall_ulong_t st_atimensec;	/* Nscecs of last access.  */
-		uint32_t st_mtime;			/* Time of last modification.  */
-		syscall_ulong_t st_mtimensec;	/* Nsecs of last modification.  */
-		uint32_t st_ctime;			/* Time of last status change.  */
-		syscall_ulong_t st_ctimensec;	/* Nsecs of last status change.  */
+#define mode_t unsigned int
 
-		unsigned char type;
-	};
+#ifndef AVSOS_KERNEL
+#include <sys/stat.h>
+
+#undef mode_t
 #else
 	#include <fs.h>
 #endif

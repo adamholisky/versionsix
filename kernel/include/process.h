@@ -107,6 +107,11 @@ typedef struct {
 	uint64_t data_section_virt_start;
 	uint64_t data_section_ava;
 
+	uint16_t heap_page_count;
+	process_exec_section *heap_pages;
+	void *heap_top; // Can be less than heap_top_allocated, but never more.
+	void *heap_top_allocated; // heap page count * page size, always
+
 	symbol_index *rela_sym_index;
 	symbol_index *dyn_sym_index;
 	uint16_t num_dyn_syms;

@@ -116,6 +116,10 @@ pid_t process_get_new_process( void ) {
 	p->file_descriptors[ STDERR_FILENO ].in_use = true;
 	p->file_descriptors[ STDOUT_FILENO ].vfs_fd = STDOUT_FILENO;
 
+	p->heap_page_count = 0;
+	p->heap_pages = NULL;
+	p->heap_top = 0x00000000B0000000;
+
 	avs_list_append( global_proc_data.process_list, p );
 
 	//klog( LOG_INFO, "Created new process. pid=%d", p->pid );
@@ -279,13 +283,17 @@ int process_sched_yield( registers **context ) {
 
 	if( new_p->pid != 0 ) {
 		for( int i = 0; i < addr_space_to_copy->data_section_count; i++ ) {
-		page_map( addr_space_to_copy->data_sections[i].virt, addr_space_to_copy->data_sections[i].phys );
+			page_map( addr_space_to_copy->data_sections[i].virt, addr_space_to_copy->data_sections[i].phys );
 			//klog( LOG_DEBUG, "For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid, new_p->data_sections[i].virt, new_p->data_sections[i].phys );
 		}
 
 		for( int i = 0; i < new_p->text_section_count; i++ ) {
 			page_map( addr_space_to_copy->text_sections[i].virt, addr_space_to_copy->text_sections[i].phys );
 			//klog( LOG_DEBUG, "For pid %d: mapped virt to physical: 0x%016llX -> 0x%016llX", new_p->pid, new_p->text_sections[i].virt, new_p->text_sections[i].phys );
+		}
+
+		for( int i = 0; i < new_p->heap_page_count; i++ ) {
+			page_map( addr_space_to_copy->heap_pages[i].virt, addr_space_to_copy->heap_pages[i].phys );
 		}
 	}
 

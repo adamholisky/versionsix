@@ -17,7 +17,7 @@
 #include <avsos.h>
 
 void do_a_thing( void ) {
-	avs_libc_init();
+	//avs_libc_init();
 	lib_register( "/lib/libtest.so" );
 
 	//do_a_thing_main( 0, NULL );

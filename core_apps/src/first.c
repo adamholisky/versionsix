@@ -1,5 +1,5 @@
-#include <kernel_common.h>
-#include <process.h>
+#include <stdio.h>
+#include <avsos.h>
 
 /*	First program to test in program loader
  */
@@ -9,7 +9,9 @@ int main( int argc, char *argv[] ) {
 	uint64_t ret = 0;
 
 	// Callback to the OS to see if we should Do A Thing
-	do_a_thing();
+	//do_a_thing();
+
+	printf( "In first process.\n" );
 
 	pid = (pid_t)syscall( SYSCALL_FORK, 0, NULL );
 	
@@ -24,8 +26,8 @@ int main( int argc, char *argv[] ) {
 			printf( "Fork failed somehow?\n" );
 			break;
 		case 0:
-			printf( "Running /bin/avsshell.exec\n" );
-			execve( "/bin/avsshell.exec", NULL, NULL );
+			printf( "Running /bin/avsshell\n" );
+			execve( "/bin/avsshell", NULL, NULL );
 
 			printf( "Done running shell? Looping.\n" );
 
@@ -57,5 +59,5 @@ int main( int argc, char *argv[] ) {
 			}
 	}
 
-	return 69;
+	return 67;
 }

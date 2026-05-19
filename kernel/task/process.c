@@ -48,8 +48,8 @@ void process_setup_init( void ) {
 		do_immediate_shutdown();
 	}
 
-	strcpy( global_proc_data.root_pd->path, "/bin/first.exec" );
-	strcpy( global_proc_data.root_pd->name, "first.exec" );
+	strcpy( global_proc_data.root_pd->path, "/bin/first" );
+	strcpy( global_proc_data.root_pd->name, "first" );
 	strcpy( global_proc_data.root_pd->working_dir, "/" );
 	global_proc_data.root_pd->has_own_addr_space = true;
 

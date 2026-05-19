@@ -28,6 +28,7 @@ void write_syscall_handler( registers **context, int fd, void *buff, size_t coun
 
 	if (fd == FD_STDOUT) {
 		while (char_buff != char_buff_end) {
+			klog( LOG_DEBUG, "wc: '%c'", *char_buff );
 			main_console_putc( *char_buff );
 			char_buff++;
 		}

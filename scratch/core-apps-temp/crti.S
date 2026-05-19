@@ -1,12 +1,12 @@
 .section .init 
 .global _init
 _init:
-	pushq %rbp
-	movq %rsp, %rbp
+	push %rbp
+	moveq %rsp, %rbp
 
 .section .fini
 .global _fini
 _fini:
-	pushq %rbp
-	movq %rsp, %rbp
+	push %rbp
+	moveq %rsp, %rbp
 	

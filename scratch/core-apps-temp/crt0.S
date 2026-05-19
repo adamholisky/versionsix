@@ -17,12 +17,12 @@ _start:
 	popq %rdi
 	popq %rsi
 	call main
-	pushq %rax
+	push %eax
 
 	call _fini
 	call avs_libc_end
 
-	popq %rax
-	movq %rax, %rdi
+	pop $eax
+	movl %eax, %edi
 	call exit	// syscall, no return
 .size _start, . - _start

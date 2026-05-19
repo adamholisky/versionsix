@@ -112,15 +112,26 @@ void kernel_main( void ) {
 	enable_gui();
 #endif
 
+	system_information.version = 1;
+	memcpy( &system_information.kernel_info, &kernel_info, sizeof( kinfo ) );
+
+	keyboard_initalize();
+	process_initalize();
+	process_setup_init();
+
+	// Libraries need manual loading, for now
+	
+	printf( "loading libc\n" );
+	int register_result = lib_register( "/libc.so" );
+	printf( "done loading\n" );
+
 	// Printf is now okay
 	printf( "avsOS\n" );
 	printf( "Build %d\n", BUILD_NUM );
 
-	keyboard_initalize();
-	process_initalize();
+	
 
-	system_information.version = 1;
-	memcpy( &system_information.kernel_info, &kernel_info, sizeof( kinfo ) );
+	
 
 #ifdef ENABLE_NETWORKING
 	enable_networking();
@@ -130,13 +141,13 @@ void kernel_main( void ) {
 
 
 	extern uint64_t kernel_heap_virtual_memory_next;
-	printf( "kmalloc() heap at now:    0x%016llX\n", kernel_heap_virtual_memory_next );
+	//printf( "kmalloc() heap at now:    0x%016llX\n", kernel_heap_virtual_memory_next );
 	extern uint64_t syscall_stack_top;
-	printf( "syscall stack top:        0x%016llX\n", &syscall_stack_top );
+	//printf( "syscall stack top:        0x%016llX\n", &syscall_stack_top );
 
 	printf( "Startup done. Handing to init process.\n\n" );
 
-	process_setup_init();
+	
 
 	kernel_idle_loop();
 

@@ -2,6 +2,7 @@
 #include <interrupt.h>
 #include <syscall.h>
 #include <process.h>
+#include <serial.h>
 
 extern pid_t fork_syscall_handler( registers **context );
 
@@ -118,6 +119,10 @@ void syscall_handler( registers **_context ) {
 		case SYSCALL_CLONE:
 			clone_syscall_handler( _context, context->rdi, NULL, 0, NULL );
 			break;
+		case SYSCALL_CON_OUT:
+			serial_write_port( context->rdi, COM4 );
+			break;
+
 		default:
 			debugf( "Unhandled syscall number: %d\n", context->rax );
 	}

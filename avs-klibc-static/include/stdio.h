@@ -56,9 +56,9 @@ struct __sbuf
 #define mode_t unsigned int
 
 #ifndef AVSOS_KERNEL
-#include <sys/stat.h>
+	#include <sys/stat.h>
 
-#undef mode_t
+	#undef mode_t
 #else
 	#include <fs.h>
 #endif

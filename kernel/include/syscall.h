@@ -26,6 +26,7 @@ extern "C" {
 #define SYSCALL_BRK 13
 #define SYSCALL_SBRK 14
 #define SYSCALL_MMAP 15
+#define SYSCALL_CON_OUT 16
 
 typedef uint16_t umode_t;
 

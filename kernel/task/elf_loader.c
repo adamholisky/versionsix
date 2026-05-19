@@ -154,6 +154,12 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 	}
 
 	Elf64_Shdr* rel_plt = elf_get_section_header_by_name( elf_f, ".rela.plt" );
+
+	// This should be fine, if we don't have it the rest of the processing isn't necessary
+	if( rel_plt == NULL ) {
+		return 0;
+	}
+
 	uint8_t* rel_plt_data = (uint8_t*)data + rel_plt->sh_offset;
 	if ( rel_plt != NULL ) {
 		

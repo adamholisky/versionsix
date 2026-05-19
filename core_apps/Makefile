@@ -2,12 +2,12 @@
 
 ROOT_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-DEFINES = -DVIOS -DAVSOS_KERNEL
+DEFINES = -DVIOS
 
-CC = /usr/local/osdev/bin/x86_64-elf-gcc
-ASM = /usr/local/osdev/bin/x86_64-elf-as
-LD = /usr/local/osdev/bin/x86_64-elf-ld
-OBJDUMP = /usr/local/osdev/bin/x86_64-elf-objdump
+CC = /usr/local/osdev/bin/x86_64-elf-avsos-gcc
+LD = /usr/local/osdev/bin/x86_64-elf-avsos-ld
+ASM = /usr/local/osdev/bin/x86_64-elf-avsos-as
+OBJDUMP = /usr/local/osdev/bin/x86_64-elf-avsos-objdump
 
 BUILD_LOG = $(ROOT_DIR)/build_temp/build.log
 SHELL :=/bin/bash -O globstar
@@ -15,7 +15,7 @@ VPATH = $(shell find ./src -type d -printf "src/%P:")
 
 SOURCES_C = $(shell ls src/**/*.c)
 OBJECTS_C = $(patsubst %.c, build/%.o, $(shell ls src/**/*.c | xargs -n 1 basename))
-EXECS_C = $(patsubst %.c, finished/%.exec, $(shell ls src/**/*.c | xargs -n 1 basename))
+EXECS_C = $(patsubst %.c, full/%, $(shell ls src/**/*.c | xargs -n 1 basename))
 
 CFLAGS_REDUCED = $(DEFINES) -Wno-write-strings \
 	-Wno-pointer-to-int-cast \
@@ -25,10 +25,8 @@ CFLAGS_REDUCED = $(DEFINES) -Wno-write-strings \
 	-ffreestanding \
 	-O0 \
 	-g \
-	-I$(ROOT_DIR)/../kernel/include \
-	-I$(ROOT_DIR)/../avs-libc-static/include \
+	-I/usr/local/osdev/source/avs-libc/include \
 	-I$(ROOT_DIR)/../liblua-static/include \
-	-I$(ROOT_DIR)/src \
     -m64                 \
     -march=x86-64        \
     -mabi=sysv           \
@@ -38,8 +36,12 @@ CFLAGS_REDUCED = $(DEFINES) -Wno-write-strings \
 
 CFLAGS_APP_SPECIFIC = -fPIC 
 
+.PHONY: glue
+
 all: install 
 #glue/crt0.o $(OBJECTS_C) $(EXECS_C)
+
+#-Wl,--unresolved-symbols=ignore-all 
 
 finished/%.exec: build/%.o
 	@$(eval OBJNAME := $(shell basename $@))
@@ -51,7 +53,7 @@ finished/%.exec: build/%.o
 full/%: build/%.o 
 	@$(eval OBJNAME := $(shell basename $@))
 	@>&2 printf "[Link] $(OBJNAME)\n"
-	/usr/local/osdev/bin/x86_64-elf-avsos-gcc -g -Wl,--unresolved-symbols=ignore-all -o full/$(OBJNAME) $< 
+	/usr/local/osdev/bin/x86_64-elf-avsos-gcc -g -lc -o full/$(OBJNAME) $< 
 	readelf -W -a full/$(OBJNAME) > build_temp/elfdump-FULL-$(OBJNAME).txt
 	$(OBJDUMP) -x -D -S full/$(OBJNAME) > build_temp/objdump-FULL-$(OBJNAME).txt
 
@@ -60,9 +62,13 @@ build/%.o: %.c
 	@>&2 printf "[Compile] $(OBJNAME)\n"
 	$(CC) $(CFLAGS_REDUCED) $(CFLAGS_APP_SPECIFIC) -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
 
-glue/crt0.o: glue/crt0.S
-	@>&2 printf "[Build] $<\n"
+glue:
+	@>&2 printf "[Build] Glue\n"
 	$(CC) $(CFLAGS_REDUCED) $(CFLAGS_APP_SPECIFIC) -c glue/crt0.S -o glue/crt0.o >> $(BUILD_LOG)
+	$(CC) $(CFLAGS_REDUCED) $(CFLAGS_APP_SPECIFIC) -c glue/crti.S -o glue/crti.o >> $(BUILD_LOG)
+	$(CC) $(CFLAGS_REDUCED) $(CFLAGS_APP_SPECIFIC) -c glue/crtn.S -o glue/crtn.o >> $(BUILD_LOG)
+	cp -f glue/*.o /usr/local/osdev/lib/gcc/x86_64-elf-avsos/15.2.0
+	cp -f glue/crt0.o /usr/local/osdev/lib/gcc/x86_64-elf-avsos/15.2.0/crt1.o
 
 apps: $(EXEC_C)
 
@@ -70,15 +76,15 @@ install:
 	@make install_stage2 >> $(BUILD_LOG)
 	@>&2 printf "[Install] Done\n"
 
-install_stage2: glue/crt0.o $(EXECS_C)
+install_stage2: $(EXECS_C)
 	@make $(EXECS_C)
-	cd /home/adam/code/afs-fuse && sudo ./asvfs-fuse --image=/usr/local/osdev/source/versionsix/asvfs_drive.img testmnt && sudo cp -f /usr/local/osdev/source/versionsix/core_apps/finished/* testmnt/bin && sudo fusermount -u testmnt
+	cd /home/adam/code/afs-fuse && sudo ./asvfs-fuse --image=/usr/local/osdev/source/versionsix/asvfs_drive.img testmnt && sudo cp -f /avsos/lib/libc.so testmnt/libc.so && sudo cp -f /usr/local/osdev/source/versionsix/core_apps/full/* testmnt/bin && sudo fusermount -u testmnt
 
 clean:
 	rm -rf build/*.o
-	rm -rf glue/*.o
 	rm -rf build_temp/*
 	rm -rf finished/*
+	rm -rf full/*
 
 debug_dump:
 	@echo "Start Debug Dump"

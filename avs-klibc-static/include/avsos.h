@@ -51,18 +51,19 @@ FILE* libc_internal_get_file_from_fd( int fd );
 
 #ifndef AVSOS_KERNEL
 // Glue
-uint64_t _syscall( uint64_t call_num, uint8_t num_args, syscall_args *args );
-int _close( int fd );
-int _execve( char *path, char *argv[], char *envp[] );
-int _execm( void *exec_data, char *argv[], char *envp[] );
-void _exit( int status );
-int _open( const char *path, int flags );
-pid_t _wait( pid_t pid );
-size_t _write( int fd, void *buff, size_t count );
-size_t _read( int fd, void *buf, size_t count );
-int _statfs( const char *path, struct stat *statbuf );
-void* _sbrk( int inc_bytes );
-int _brk( void *addr );
+uint64_t syscall( uint64_t call_num, uint8_t num_args, syscall_args *args );
+int close( int fd );
+int execve( char *path, char *argv[], char *envp[] );
+int execm( void *exec_data, char *argv[], char *envp[] );
+void exit( int status );
+int open( const char *path, int flags );
+pid_t wait( pid_t pid );
+size_t write( int fd, void *buff, size_t count );
+size_t read( int fd, void *buf, size_t count );
+int statfs( const char *path, struct stat *statbuf );
+void* sbrk( int inc_bytes );
+int brk( void *addr );
+void sysc_con_out( char c );
 #endif
 
 #ifdef __cplusplus

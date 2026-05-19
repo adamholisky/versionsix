@@ -1,8 +1,8 @@
 .section .init
-	push %rbp
-	moveq %rsp, %rbp
+	pushq %rbp
+	movq %rsp, %rbp
 
 .section .fini
-	push %rbp
-	moveq %rsp, %rbp
+	pushq %rbp
+	movq %rsp, %rbp
 	

@@ -74,8 +74,9 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 	for ( int i = 0; i < elf_f->num_program_headers; i++ ) {
 		Elf64_Phdr* pheader = get_program_header_by_index( elf_f, i );
 
-
+		
 		if ( pheader->p_type == PT_LOAD ) {
+			debugf( "New setion to load.\n===============================\n" );
 			debugf( "Loading +0x%X to 0x%llX for 0x%X (%d) bytes.\n", pheader->p_offset, pheader->p_vaddr, pheader->p_memsz, pheader->p_memsz );
 
 			uint32_t num_pages = pheader->p_memsz / PAGE_SIZE;
@@ -90,7 +91,7 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 				// actual_virt_address gets the _programs_ virtual address that we start loading at. We align it to a 4k page. The integer divide forces whole numbers.
 				actual_virt_address = ( pheader->p_vaddr / 4096 ) * 4096;
 
-				num_pages++; // Fix this, should be based off size of program entry + page size to account for an extra page in the vaddr is over page size
+				//num_pages++; // Fix this, should be based off size of program entry + page size to account for an extra page in the vaddr is over page size
 
 				virt_offset = pheader->p_vaddr - actual_virt_address;
 
@@ -150,6 +151,8 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 			//kdebug_peek_at_n( kern_virt_data_start, (pheader->p_filesz / 0x10) + 10 );
 
 			page_count_from_prev_headers += num_pages;
+
+			debugf( "\n===============================\n" );
 		}
 	}
 
@@ -157,6 +160,7 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 
 	// This should be fine, if we don't have it the rest of the processing isn't necessary
 	if( rel_plt == NULL ) {
+		debugf( "No .rela.plt seectionn present, finishing loading.\n" );
 		return 0;
 	}
 
@@ -199,11 +203,11 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 		uint8_t* got_data = (uint8_t *)p->data_sections[0].kern_virt + elf_got_section->sh_addr - p->data_section_ava ;
 
 
-		/* debugf( ".got out pre:\n" );
+		debugf( ".got out pre:\n" );
 		for ( int j = 0; j < ( elf_got_section->sh_size ); j++ ) {
 			debugf_raw( "%02X ", *( got_data + j ) );
 		}
-		debugf_raw( "\n\n" ); */
+		debugf_raw( "\n\n" );
 
 		//*(got_data + 0x10) = elf_loader_dynamic_linker;
 		uint64_t *got64_t = (uint64_t *)got_data;
@@ -218,13 +222,13 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 		*(uint64_t *)(got_data + 0x10) = elf_dynamic_linker_preamble;
 		//*(got64_t + 0x3) = elf_loader_dynamic_linker;
 
-		/* debugf( "got + 0x10:      0x%llX (data: 0x%llX)\n", (got64_t + 1), *(got64_t + 1) );
+		debugf( "got + 0x10:      0x%llX (data: 0x%llX)\n", (got64_t + 1), *(got64_t + 1) );
 
 		debugf( ".got out post:\n" );
 		for ( int j = 0; j < ( elf_got_section->sh_size ); j++ ) {
 			debugf_raw( "%02X ", *( got_data + j ) );
 		}
-		debugf_raw( "\n\n" ); */
+		debugf_raw( "\n\n" );
 	} else {
 		debugf( "Could not locate .got section. Failing hard.\n" );
 		do_immediate_shutdown();

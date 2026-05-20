@@ -16,7 +16,7 @@ Program Header:
          filesz 0x00000000000001a8 memsz 0x0000000000000210 flags rw-
  DYNAMIC off    0x00000000000007e0 vaddr 0x00000000080017e0 paddr 0x00000000080017e0 align 2**3
          filesz 0x0000000000000130 memsz 0x0000000000000130 flags rw-
-EH_FRAME off    0x000000000000073c vaddr 0x000000000800073c paddr 0x000000000800073c align 2**2
+EH_FRAME off    0x0000000000000738 vaddr 0x0000000008000738 paddr 0x0000000008000738 align 2**2
          filesz 0x000000000000001c memsz 0x000000000000001c flags r--
 
 Dynamic Section:
@@ -46,17 +46,17 @@ Idx Name          Size      VMA               LMA               File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   4 .rela.plt     000000a8  00000000080002e0  00000000080002e0  000002e0  2**3
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .init         00000012  0000000008000388  0000000008000388  00000388  2**0
+  5 .init         00000010  0000000008000388  0000000008000388  00000388  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
   6 .plt          00000080  00000000080003a0  00000000080003a0  000003a0  2**4
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
   7 .text         000002a1  0000000008000420  0000000008000420  00000420  2**4
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  8 .fini         0000000d  00000000080006c1  00000000080006c1  000006c1  2**0
+  8 .fini         0000000b  00000000080006c1  00000000080006c1  000006c1  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  9 .rodata       0000006c  00000000080006ce  00000000080006ce  000006ce  2**0
+  9 .rodata       0000006c  00000000080006cc  00000000080006cc  000006cc  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
- 10 .eh_frame_hdr 0000001c  000000000800073c  000000000800073c  0000073c  2**2
+ 10 .eh_frame_hdr 0000001c  0000000008000738  0000000008000738  00000738  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
  11 .eh_frame     00000064  0000000008000758  0000000008000758  00000758  2**3
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
@@ -107,7 +107,7 @@ SYMBOL TABLE:
 0000000000000000 l    df *ABS*	0000000000000000 first.c
 0000000000000000 l    df *ABS*	0000000000000000 
 00000000080017e0 l     O .dynamic	0000000000000000 _DYNAMIC
-000000000800073c l       .eh_frame_hdr	0000000000000000 __GNU_EH_FRAME_HDR
+0000000008000738 l       .eh_frame_hdr	0000000000000000 __GNU_EH_FRAME_HDR
 0000000008001910 l     O .got.plt	0000000000000000 _GLOBAL_OFFSET_TABLE_
 0000000000000000       F *UND*	0000000000000000 syscall
 0000000000000000       F *UND*	0000000000000000 execve
@@ -303,10 +303,10 @@ _init:
  800038c:	e8 cf 01 00 00       	call   8000560 <frame_dummy>
  8000391:	e8 ea 02 00 00       	call   8000680 <__do_global_ctors_aux>
 .section .init
-	pushq %rbp
- 8000396:	55                   	push   %rbp
-	movq %rsp, %rbp
- 8000397:	48 89 e5             	mov    %rsp,%rbp
+	popq %rbp
+ 8000396:	5d                   	pop    %rbp
+	ret
+ 8000397:	c3                   	ret
 
 Disassembly of section .plt:
 
@@ -510,7 +510,7 @@ int main( int argc, char *argv[] ) {
 	//do_a_thing();
 
 	printf( "In first process.\n" );
- 80005ab:	48 8d 05 1c 01 00 00 	lea    0x11c(%rip),%rax        # 80006ce <_fini+0xd>
+ 80005ab:	48 8d 05 1a 01 00 00 	lea    0x11a(%rip),%rax        # 80006cc <_fini+0xb>
  80005b2:	48 89 c7             	mov    %rax,%rdi
  80005b5:	b8 00 00 00 00       	mov    $0x0,%eax
  80005ba:	e8 31 fe ff ff       	call   80003f0 <printf_@plt>
@@ -537,7 +537,7 @@ int main( int argc, char *argv[] ) {
  80005e8:	75 69                	jne    8000653 <main+0xc6>
 		case -1:
 			printf( "Fork failed somehow?\n" );
- 80005ea:	48 8d 05 f0 00 00 00 	lea    0xf0(%rip),%rax        # 80006e1 <_fini+0x20>
+ 80005ea:	48 8d 05 ee 00 00 00 	lea    0xee(%rip),%rax        # 80006df <_fini+0x1e>
  80005f1:	48 89 c7             	mov    %rax,%rdi
  80005f4:	b8 00 00 00 00       	mov    $0x0,%eax
  80005f9:	e8 f2 fd ff ff       	call   80003f0 <printf_@plt>
@@ -545,19 +545,19 @@ int main( int argc, char *argv[] ) {
  80005fe:	eb 6f                	jmp    800066f <main+0xe2>
 		case 0:
 			printf( "Running /bin/avsshell\n" );
- 8000600:	48 8d 05 f0 00 00 00 	lea    0xf0(%rip),%rax        # 80006f7 <_fini+0x36>
+ 8000600:	48 8d 05 ee 00 00 00 	lea    0xee(%rip),%rax        # 80006f5 <_fini+0x34>
  8000607:	48 89 c7             	mov    %rax,%rdi
  800060a:	b8 00 00 00 00       	mov    $0x0,%eax
  800060f:	e8 dc fd ff ff       	call   80003f0 <printf_@plt>
 			execve( "/bin/avsshell", NULL, NULL );
- 8000614:	48 8d 05 f3 00 00 00 	lea    0xf3(%rip),%rax        # 800070e <_fini+0x4d>
+ 8000614:	48 8d 05 f1 00 00 00 	lea    0xf1(%rip),%rax        # 800070c <_fini+0x4b>
  800061b:	ba 00 00 00 00       	mov    $0x0,%edx
  8000620:	be 00 00 00 00       	mov    $0x0,%esi
  8000625:	48 89 c7             	mov    %rax,%rdi
  8000628:	e8 93 fd ff ff       	call   80003c0 <execve@plt>
 
 			printf( "Done running shell? Looping.\n" );
- 800062d:	48 8d 05 e8 00 00 00 	lea    0xe8(%rip),%rax        # 800071c <_fini+0x5b>
+ 800062d:	48 8d 05 e6 00 00 00 	lea    0xe6(%rip),%rax        # 800071a <_fini+0x59>
  8000634:	48 89 c7             	mov    %rax,%rdi
  8000637:	b8 00 00 00 00       	mov    $0x0,%eax
  800063c:	e8 af fd ff ff       	call   80003f0 <printf_@plt>
@@ -638,77 +638,73 @@ _fini:
  80006c5:	e8 06 fe ff ff       	call   80004d0 <__do_global_dtors_aux>
 
 .section .fini
-	pushq %rbp
- 80006ca:	55                   	push   %rbp
-	movq %rsp, %rbp
- 80006cb:	48 89 e5             	mov    %rsp,%rbp
+	popq %rbp
+ 80006ca:	5d                   	pop    %rbp
+ 80006cb:	c3                   	ret
 
 Disassembly of section .rodata:
 
-00000000080006ce <.rodata>:
- 80006ce:	49 6e                	rex.WB outsb (%rsi),(%dx)
- 80006d0:	20 66 69             	and    %ah,0x69(%rsi)
- 80006d3:	72 73                	jb     8000748 <__GNU_EH_FRAME_HDR+0xc>
- 80006d5:	74 20                	je     80006f7 <_fini+0x36>
- 80006d7:	70 72                	jo     800074b <__GNU_EH_FRAME_HDR+0xf>
- 80006d9:	6f                   	outsl  (%rsi),(%dx)
- 80006da:	63 65 73             	movsxd 0x73(%rbp),%esp
- 80006dd:	73 2e                	jae    800070d <_fini+0x4c>
- 80006df:	0a 00                	or     (%rax),%al
- 80006e1:	46 6f                	rex.RX outsl (%rsi),(%dx)
- 80006e3:	72 6b                	jb     8000750 <__GNU_EH_FRAME_HDR+0x14>
- 80006e5:	20 66 61             	and    %ah,0x61(%rsi)
- 80006e8:	69 6c 65 64 20 73 6f 	imul   $0x6d6f7320,0x64(%rbp,%riz,2),%ebp
- 80006ef:	6d 
- 80006f0:	65 68 6f 77 3f 0a    	gs push $0xa3f776f
- 80006f6:	00 52 75             	add    %dl,0x75(%rdx)
- 80006f9:	6e                   	outsb  (%rsi),(%dx)
- 80006fa:	6e                   	outsb  (%rsi),(%dx)
- 80006fb:	69 6e 67 20 2f 62 69 	imul   $0x69622f20,0x67(%rsi),%ebp
- 8000702:	6e                   	outsb  (%rsi),(%dx)
- 8000703:	2f                   	(bad)
- 8000704:	61                   	(bad)
- 8000705:	76 73                	jbe    800077a <__GNU_EH_FRAME_HDR+0x3e>
- 8000707:	73 68                	jae    8000771 <__GNU_EH_FRAME_HDR+0x35>
- 8000709:	65 6c                	gs insb (%dx),(%rdi)
- 800070b:	6c                   	insb   (%dx),(%rdi)
- 800070c:	0a 00                	or     (%rax),%al
- 800070e:	2f                   	(bad)
- 800070f:	62 69 6e 2f 61       	(bad)
- 8000714:	76 73                	jbe    8000789 <__GNU_EH_FRAME_HDR+0x4d>
- 8000716:	73 68                	jae    8000780 <__GNU_EH_FRAME_HDR+0x44>
- 8000718:	65 6c                	gs insb (%dx),(%rdi)
- 800071a:	6c                   	insb   (%dx),(%rdi)
- 800071b:	00 44 6f 6e          	add    %al,0x6e(%rdi,%rbp,2)
- 800071f:	65 20 72 75          	and    %dh,%gs:0x75(%rdx)
- 8000723:	6e                   	outsb  (%rsi),(%dx)
- 8000724:	6e                   	outsb  (%rsi),(%dx)
- 8000725:	69 6e 67 20 73 68 65 	imul   $0x65687320,0x67(%rsi),%ebp
- 800072c:	6c                   	insb   (%dx),(%rdi)
- 800072d:	6c                   	insb   (%dx),(%rdi)
- 800072e:	3f                   	(bad)
- 800072f:	20 4c 6f 6f          	and    %cl,0x6f(%rdi,%rbp,2)
- 8000733:	70 69                	jo     800079e <__EH_FRAME_BEGIN__+0x6>
- 8000735:	6e                   	outsb  (%rsi),(%dx)
- 8000736:	67 2e 0a 00          	cs or  (%eax),%al
+00000000080006cc <.rodata>:
+ 80006cc:	49 6e                	rex.WB outsb (%rsi),(%dx)
+ 80006ce:	20 66 69             	and    %ah,0x69(%rsi)
+ 80006d1:	72 73                	jb     8000746 <__GNU_EH_FRAME_HDR+0xe>
+ 80006d3:	74 20                	je     80006f5 <_fini+0x34>
+ 80006d5:	70 72                	jo     8000749 <__GNU_EH_FRAME_HDR+0x11>
+ 80006d7:	6f                   	outsl  (%rsi),(%dx)
+ 80006d8:	63 65 73             	movsxd 0x73(%rbp),%esp
+ 80006db:	73 2e                	jae    800070b <_fini+0x4a>
+ 80006dd:	0a 00                	or     (%rax),%al
+ 80006df:	46 6f                	rex.RX outsl (%rsi),(%dx)
+ 80006e1:	72 6b                	jb     800074e <__GNU_EH_FRAME_HDR+0x16>
+ 80006e3:	20 66 61             	and    %ah,0x61(%rsi)
+ 80006e6:	69 6c 65 64 20 73 6f 	imul   $0x6d6f7320,0x64(%rbp,%riz,2),%ebp
+ 80006ed:	6d 
+ 80006ee:	65 68 6f 77 3f 0a    	gs push $0xa3f776f
+ 80006f4:	00 52 75             	add    %dl,0x75(%rdx)
+ 80006f7:	6e                   	outsb  (%rsi),(%dx)
+ 80006f8:	6e                   	outsb  (%rsi),(%dx)
+ 80006f9:	69 6e 67 20 2f 62 69 	imul   $0x69622f20,0x67(%rsi),%ebp
+ 8000700:	6e                   	outsb  (%rsi),(%dx)
+ 8000701:	2f                   	(bad)
+ 8000702:	61                   	(bad)
+ 8000703:	76 73                	jbe    8000778 <__GNU_EH_FRAME_HDR+0x40>
+ 8000705:	73 68                	jae    800076f <__GNU_EH_FRAME_HDR+0x37>
+ 8000707:	65 6c                	gs insb (%dx),(%rdi)
+ 8000709:	6c                   	insb   (%dx),(%rdi)
+ 800070a:	0a 00                	or     (%rax),%al
+ 800070c:	2f                   	(bad)
+ 800070d:	62 69 6e 2f 61       	(bad)
+ 8000712:	76 73                	jbe    8000787 <__GNU_EH_FRAME_HDR+0x4f>
+ 8000714:	73 68                	jae    800077e <__GNU_EH_FRAME_HDR+0x46>
+ 8000716:	65 6c                	gs insb (%dx),(%rdi)
+ 8000718:	6c                   	insb   (%dx),(%rdi)
+ 8000719:	00 44 6f 6e          	add    %al,0x6e(%rdi,%rbp,2)
+ 800071d:	65 20 72 75          	and    %dh,%gs:0x75(%rdx)
+ 8000721:	6e                   	outsb  (%rsi),(%dx)
+ 8000722:	6e                   	outsb  (%rsi),(%dx)
+ 8000723:	69 6e 67 20 73 68 65 	imul   $0x65687320,0x67(%rsi),%ebp
+ 800072a:	6c                   	insb   (%dx),(%rdi)
+ 800072b:	6c                   	insb   (%dx),(%rdi)
+ 800072c:	3f                   	(bad)
+ 800072d:	20 4c 6f 6f          	and    %cl,0x6f(%rdi,%rbp,2)
+ 8000731:	70 69                	jo     800079c <__EH_FRAME_BEGIN__+0x4>
+ 8000733:	6e                   	outsb  (%rsi),(%dx)
+ 8000734:	67 2e 0a 00          	cs or  (%eax),%al
 
 Disassembly of section .eh_frame_hdr:
 
-000000000800073c <__GNU_EH_FRAME_HDR>:
- 800073c:	01 1b                	add    %ebx,(%rbx)
- 800073e:	03 3b                	add    (%rbx),%edi
- 8000740:	18 00                	sbb    %al,(%rax)
+0000000008000738 <__GNU_EH_FRAME_HDR>:
+ 8000738:	01 1b                	add    %ebx,(%rbx)
+ 800073a:	03 3b                	add    (%rbx),%edi
+ 800073c:	1c 00                	sbb    $0x0,%al
+ 800073e:	00 00                	add    %al,(%rax)
+ 8000740:	02 00                	add    (%rax),%al
  8000742:	00 00                	add    %al,(%rax)
- 8000744:	02 00                	add    (%rax),%al
- 8000746:	00 00                	add    %al,(%rax)
- 8000748:	64 fc                	fs cld
- 800074a:	ff                   	(bad)
- 800074b:	ff 34 00             	push   (%rax,%rax,1)
- 800074e:	00 00                	add    %al,(%rax)
- 8000750:	51                   	push   %rcx
- 8000751:	fe                   	(bad)
- 8000752:	ff                   	(bad)
- 8000753:	ff 5c 00 00          	lcall  *0x0(%rax,%rax,1)
+ 8000744:	68 fc ff ff 38       	push   $0x38fffffc
+ 8000749:	00 00                	add    %al,(%rax)
+ 800074b:	00 55 fe             	add    %dl,-0x2(%rbp)
+ 800074e:	ff                   	(bad)
+ 800074f:	ff 60 00             	jmp    *0x0(%rax)
 	...
 
 Disassembly of section .eh_frame:
@@ -720,7 +716,7 @@ Disassembly of section .eh_frame:
  800075e:	00 00                	add    %al,(%rax)
  8000760:	01 7a 52             	add    %edi,0x52(%rdx)
  8000763:	00 01                	add    %al,(%rcx)
- 8000765:	78 10                	js     8000777 <__GNU_EH_FRAME_HDR+0x3b>
+ 8000765:	78 10                	js     8000777 <__GNU_EH_FRAME_HDR+0x3f>
  8000767:	01 1b                	add    %ebx,(%rbx)
  8000769:	0c 07                	or     $0x7,%al
  800076b:	08 90 01 00 00 24    	or     %dl,0x24000001(%rax)
@@ -996,14 +992,16 @@ Disassembly of section .debug_aranges:
   ad:	00 00                	add    %al,(%rax)
   af:	00 96 03 00 08 00    	add    %dl,0x80003(%rsi)
   b5:	00 00                	add    %al,(%rax)
-  b7:	00 04 00             	add    %al,(%rax,%rax,1)
-  ba:	00 00                	add    %al,(%rax)
-  bc:	00 00                	add    %al,(%rax)
-  be:	00 00                	add    %al,(%rax)
-  c0:	ca 06 00             	lret   $0x6
-  c3:	08 00                	or     %al,(%rax)
-  c5:	00 00                	add    %al,(%rax)
-  c7:	00 04 00             	add    %al,(%rax,%rax,1)
+  b7:	00 02                	add    %al,(%rdx)
+  b9:	00 00                	add    %al,(%rax)
+  bb:	00 00                	add    %al,(%rax)
+  bd:	00 00                	add    %al,(%rax)
+  bf:	00 ca                	add    %cl,%dl
+  c1:	06                   	(bad)
+  c2:	00 08                	add    %cl,(%rax)
+  c4:	00 00                	add    %al,(%rax)
+  c6:	00 00                	add    %al,(%rax)
+  c8:	02 00                	add    (%rax),%al
 	...
 
 Disassembly of section .debug_info:
@@ -1557,7 +1555,7 @@ Disassembly of section .debug_line:
  1ba:	00 00                	add    %al,(%rax)
  1bc:	00 13                	add    %dl,(%rbx)
  1be:	21 02                	and    %eax,(%rdx)
- 1c0:	03 00                	add    (%rax),%eax
+ 1c0:	01 00                	add    %eax,(%rax)
  1c2:	01 01                	add    %eax,(%rcx)
  1c4:	00 09                	add    %cl,(%rcx)
  1c6:	02 ca                	add    %dl,%cl
@@ -1567,7 +1565,7 @@ Disassembly of section .debug_line:
  1cd:	00 00                	add    %al,(%rax)
  1cf:	17                   	(bad)
  1d0:	21 02                	and    %eax,(%rdx)
- 1d2:	03 00                	add    (%rax),%eax
+ 1d2:	01 00                	add    %eax,(%rax)
  1d4:	01 01                	add    %eax,(%rcx)
 
 Disassembly of section .debug_str:
@@ -1913,8 +1911,10 @@ Disassembly of section .debug_rnglists:
   2f:	03 00                	add    (%rax),%eax
   31:	08 00                	or     %al,(%rax)
   33:	00 00                	add    %al,(%rax)
-  35:	00 04 07             	add    %al,(%rdi,%rax,1)
+  35:	00 02                	add    %al,(%rdx)
+  37:	07                   	(bad)
   38:	ca 06 00             	lret   $0x6
   3b:	08 00                	or     %al,(%rax)
   3d:	00 00                	add    %al,(%rax)
-  3f:	00 04 00             	add    %al,(%rax,%rax,1)
+  3f:	00 02                	add    %al,(%rdx)
+	...

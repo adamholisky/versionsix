@@ -189,7 +189,7 @@ void process_set_next_up( process_data *p ) {
 int process_sched_yield( registers **context ) {
 	static int num_sched_called = 0;
 
-	debugf( "In yield.\n" );
+	//debugf( "In yield.\n" );
 
 	process_data *old_p = global_proc_data.current_process;
 	process_data *new_p = NULL;
@@ -231,7 +231,7 @@ int process_sched_yield( registers **context ) {
 				case PROCESS_STATUS_ACTIVE:
 				case PROCESS_STATUS_SLEEP:
 					//klog( LOG_DEBUG, "Candidate found. pid: %d", p_candidate->pid );
-					debugf( "Next process found: %d with status %d\n", p_candidate->pid, p_candidate->status );
+					//debugf( "Next process found: %d with status %d\n", p_candidate->pid, p_candidate->status );
 					next_process_found = true;
 					break;
 				case PROCESS_STATUS_WAITING:
@@ -249,8 +249,8 @@ int process_sched_yield( registers **context ) {
 	}
 
 	if( new_p == old_p ) {
-		debugf( "Yield from %d to %d FAILED. Cannot yield to self.\n", old_p->pid, new_p->pid );
-		klog( LOG_PANIC, "Yield from %d to %d FAILED", old_p->pid, new_p->pid );
+		//debugf( "Yield from %d to %d FAILED. Cannot yield to self.\n", old_p->pid, new_p->pid );
+		//klog( LOG_PANIC, "Yield from %d to %d FAILED", old_p->pid, new_p->pid );
 		return 0;
 	}
 
@@ -323,7 +323,7 @@ int process_sched_yield( registers **context ) {
 	
 	//debugf( "%d", new_p->pid );
 
-	debugf( "Yield from %d to %d\n", old_p->pid, new_p->pid );
+	//debugf( "Yield from %d to %d\n", old_p->pid, new_p->pid );
 	klog( LOG_INFO, "Yield from %d to %d", old_p->pid, new_p->pid );
 
 	return 0;
@@ -413,4 +413,10 @@ char* process_get_fd_path( process_data *p, int fd ) {
 
 char* process_get_current_path( void ) {
 	return global_proc_data.current_process->path;
+}
+
+void process_set_status( pid_t pid, uint8_t status ) {
+	process_data *p = process_get_data_from_pid(pid);
+
+	p->status = status;
 }

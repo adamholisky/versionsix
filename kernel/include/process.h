@@ -137,6 +137,7 @@ pid_t process_get_current_proc_id( void );
 void process_setup_init( void );
 process_data* process_get_data_from_pid( pid_t pid );
 int avs_list_compare_pids( void *a, void *b );
+void process_set_status( pid_t pid, uint8_t status );
 
 void process_env_setup( void );
 void process_exit( int ret_code );

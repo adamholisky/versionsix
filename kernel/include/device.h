@@ -8,8 +8,8 @@ extern "C" {
 #include <vfs.h>
 
 typedef struct {
-	char major_id[7];
-	char minor_id[7];
+	char major_id[25];
+	char minor_id[25];
 
 	void (*close)( inode_id );
 	int (*open)( inode_id );

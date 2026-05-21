@@ -33,6 +33,7 @@
 #include <process.h>
 #include <avs_dev_api.h>
 #include <lib.h>
+#include <wait_queue.h>
 
 #include <spng.h>
 
@@ -78,6 +79,7 @@ void kernel_main( void ) {
 	rtc_initalize();
 	acpi_initalize();
 	interrupt_initalize();
+	serial_enable_interrupts();
 
 	__asm__ volatile( "cli" );
 	paging_setup_initial_structures();
@@ -115,9 +117,10 @@ void kernel_main( void ) {
 	system_information.version = 1;
 	memcpy( &system_information.kernel_info, &kernel_info, sizeof( kinfo ) );
 
-	keyboard_initalize();
+	//keyboard_initalize();
 	process_initalize();
 	process_setup_init();
+	wq_initalize();
 
 	// Libraries need manual loading, for now
 	

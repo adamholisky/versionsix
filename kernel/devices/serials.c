@@ -2,9 +2,24 @@
 #include <serial.h>
 #include <device.h>
 #include <devices/serial_devices.h>
+#include <kmemory.h>
+#include <wait_queue.h>
 
 device serial3;
 device serial4;
+
+wait_queue *wq_serial3;
+
+int serial3_buffer_w_index = 0;
+int serial3_buffer_r_index = 0;
+uint8_t serial3_buffer[50];
+
+typedef struct {
+	registers **context;
+	int fd;
+	char *buff;
+	size_t count;
+} serial3_wq_data;
 
 /*
  * /dev/serial3
@@ -22,6 +37,10 @@ void device_register_serial3( void ) {
 	serial3.write = serial3_write;
 	serial3.interrupt_handler = serial3_interrupt_handler;
 
+	debugf( "Registered.\n" );
+
+	wq_serial3 = wq_new( "serial3", serial3_wq_ready );
+
 	device_register( &serial3 );
 }
 
@@ -34,7 +53,26 @@ void serial3_open( inode_id id ) {
 }
 
 uint8_t serial3_read( inode_id id, uint8_t * buff, uint64_t count, uint64_t offset ) {	
-	return serial_read_port( COM3 );
+	//return serial_read_port( COM3 );
+	uint8_t c = 0;
+
+	if( serial3_buffer_r_index < serial3_buffer_w_index ) {
+		c = serial3_buffer[ serial3_buffer_r_index++ ];
+		
+		if( serial3_buffer_r_index == 50 ) {
+			serial3_buffer_r_index = 0;
+		}	
+	} else {
+		serial3_wq_data *wqd = kmalloc( sizeof(serial3_wq_data) );
+
+		wqd->fd = id;
+		wqd->buff = buff;
+		wqd->count = count;
+
+		wq_add( wq_serial3, process_get_current_proc_id(), wqd );
+	}
+
+	return c;
 }
 
 void serial3_write( inode_id id, void *buff, size_t count, size_t offset ) {
@@ -47,8 +85,35 @@ void serial3_write( inode_id id, void *buff, size_t count, size_t offset ) {
 	}
 }
 
-void serial3_interrupt_handler( void ) {
+void serial3_interrupt_handler( registers **reg ) {
+	serial3_buffer[ serial3_buffer_w_index++ ] = serial_read_port( COM3 );
 	
+	if( serial3_buffer_w_index == 50 ) {
+		serial3_buffer_w_index = 0;
+	}
+
+	wq_make_ready( wq_serial3 );
+	wq_call_next_ready( wq_serial3 );
+}
+
+uint8_t serial3_wq_ready( wait_queue *queue, pid_t pid, void *wq_data ) {
+	char c = ' ';
+	serial3_wq_data *wqd = (serial3_wq_data *)wq_data;
+
+	process_data *p = process_get_data_from_pid( pid );
+
+	c = serial3_buffer[ serial3_buffer_r_index++ ];
+		
+	if( serial3_buffer_r_index == 50 ) {
+		serial3_buffer_r_index = 0;
+	}	
+
+	*wqd->buff = c;
+	p->status = PROCESS_STATUS_INACTIVE;
+
+	klog( LOG_INFO, "Got a c: %c", c );
+
+	return c;
 }
 
 /*

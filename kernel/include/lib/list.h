@@ -41,6 +41,8 @@ void avs_list_empty( avs_list *list );
 
 avs_node* avs_list_find_data( avs_list *list, void *data_to_find, int (*comparison_callback)(void *, void *) );
 void avs_list_for_each( avs_list *list, void (*for_each_callback)(avs_node *) );
+avs_list* avs_list_enqueue( avs_list *list, void *data );
+void* avs_list_dequeue( avs_list *list );
 
 #ifdef __cplusplus
 }

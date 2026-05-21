@@ -218,7 +218,7 @@ int rfs_write( char *pathname, char *buff, off_t offset, size_t size ) {
 	// Copy over the data
 	memcpy( (f->data + (uint8_t)offset), buff, size );
 
-	klog( LOG_DEBUG, "Wrote pathname=%s size=%d offset=%d buff=%X data=\"%s\"", pathname, size, offset, buff, buff );
+	//klog( LOG_DEBUG, "Wrote pathname=%s size=%d offset=%d buff=%X data=\"%s\"", pathname, size, offset, buff, buff );
 
 	return size;
 }

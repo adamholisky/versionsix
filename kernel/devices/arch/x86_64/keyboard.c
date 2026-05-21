@@ -1,6 +1,7 @@
 #include <kernel_common.h>
 #include <interrupt.h>
 #include <keyboard.h>
+#include <devices/ps2_keyboard.h>
 
 keyboard_config main_keyboard;
 
@@ -105,17 +106,21 @@ void keyboard_interrupt_handler( registers **reg ) {
 	uint8_t status;
 	uint8_t scancode;
 
+	klog( LOG_DEBUG, "Also in it" );
+
 	#ifdef KDEBUG_KEYBOARD_INTERRUPT_HANDLER
 	log_entry_enter();
 	#endif
 
-	status = inportb(0x64);
+	// status = inportb(0x64);
 
-	if( status & 0x01 ) {
-		scancode = inportb(0x60);
+	// if( status & 0x01 ) {
+	// 	scancode = inportb(0x60);
 
-		keyboard_add_scancode_to_queue( scancode );
-	}
+	// 	keyboard_add_scancode_to_queue( scancode );
+	// }
+
+	ps2_keyboard_interrupt_handler( reg );
 
 	#ifdef KDEBUG_KEYBOARD_INTERRUPT_HANDLER
 	log_entry_exit();
@@ -286,6 +291,9 @@ uint8_t keyboard_get_scancode( void ) {
 		if( ret_value == 0 ) {
 			//task_set_task_status( task_get_current_task_id(), TASK_STATUS_WAIT );
 			//syscall( SYSCALL_SCHED_YIELD, 0, NULL );
+
+			// NOW: 
+			// wait_for_queue
 		}
 	} while( ret_value == 0 );
 

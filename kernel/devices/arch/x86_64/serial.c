@@ -5,6 +5,7 @@
 #include <device.h>
 #include <serial.h>
 #include <string.h>
+#include <devices/serial_devices.h>
 
 uint32_t default_port;
 uint32_t buffer_add_loc;
@@ -16,7 +17,8 @@ int32_t data_buffer_task;
 bool data_ready;
 bool serial_cr_recvd;
 
-
+void serial_enable_interrupts( void );
+extern void serial3_interrupt_handler( registers **reg );
 
 void serial_initalize(void)
 {
@@ -30,6 +32,9 @@ void serial_initalize(void)
 	serial_setup_port(COM1);
 	serial_setup_port(COM3);
 	serial_setup_port(COM4);
+
+	
+	
 
 	default_port = COM1;
 }
@@ -46,9 +51,11 @@ void serial_setup_port(uint32_t port)
 }
 
 void serial_enable_interrupts( void ) {
-	outportb(COM1 + 1, 0x01);
-	outportb(COM2 + 1, 0x01);
+	// outportb(COM1 + 1, 0x01);
+	// outportb(COM2 + 1, 0x01);
 	outportb(COM3 + 1, 0x01);
+
+	interrupt_add_irq_handler( 4, serial3_interrupt_handler );
 }
 
 void serial_set_default_port(uint32_t port)

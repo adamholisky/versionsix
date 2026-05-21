@@ -159,14 +159,15 @@ install_stage2: build/versionvi.bin
 run: install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING)
 
+# |& tee $(ROOT_DIR)/logs/console.log
 run-term:  install
-	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NONE) $(QEMU_DEBUG_LOGGING) |& tee $(ROOT_DIR)/logs/console.log
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NONE) $(QEMU_DEBUG_LOGGING) -device loader,addr=0x1337C0DE,data=0x23,data-len=1
 
 run-vnc:  install
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_VNC) $(QEMU_DEBUG_LOGGING)
 
 run-no-install:
-	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NORMAL) $(QEMU_DEBUG_LOGGING) 
+	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_NONE) $(QEMU_DEBUG_LOGGING) 
 
 run-term-no-install:
 	$(QEMU) $(QEMU_COMMON) $(QEMU_DISPLAY_CURSES) $(QEMU_DEBUG_LOGGING) 

@@ -78,8 +78,8 @@ void syscall_handler( registers **_context ) {
 	pid_t pid_caller = process_get_current_proc_id();
 	char *path_caller = process_get_current_path();
 
-	debugf( "In syscall. pid=%d (%s)  num=%d\n", pid_caller, path_caller, context->rax );
-	klog( LOG_DEBUG, "In syscall. pid=%d (%s)  num=%d", pid_caller, path_caller, context->rax );
+	//debugf( "In syscall. pid=%d (%s)  num=%d\n", pid_caller, path_caller, context->rax );
+	//klog( LOG_DEBUG, "In syscall. pid=%d (%s)  num=%d", pid_caller, path_caller, context->rax );
 
 	switch( context->rax ) {
 		case SYSCALL_FORK:
@@ -125,6 +125,12 @@ void syscall_handler( registers **_context ) {
 
 		default:
 			debugf( "Unhandled syscall number: %d\n", context->rax );
+	}
+
+	// If we're leaving with our process in wait status, that means we can, and should, switch to a new process.
+	process_data *p = process_get_current();
+	if( p->status == PROCESS_STATUS_WAITING ) {
+		process_sched_yield( _context );
 	}
 
 	// Because syscall handler is special

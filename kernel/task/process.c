@@ -274,9 +274,13 @@ int process_sched_yield( registers **context ) {
 		addr_space_to_copy = new_p;
 	} else {
 		// this is a thread, use its parent
-		debugf( "copying parent addr space\n" );
+		if( new_p != 0 ) {
+			process_data *p_parent = process_get_data_from_pid( new_p->pid_parent );
+			debugf( "copying parent (%d:%s) addr space for child (%d:%s)\n", p_parent->pid, p_parent->name, new_p->pid, new_p->name );
 
-		addr_space_to_copy = process_get_data_from_pid( new_p->pid_parent );
+			addr_space_to_copy = process_get_data_from_pid( new_p->pid_parent );
+		}
+		
 	}
 
 	// Leave the kernel out of this.

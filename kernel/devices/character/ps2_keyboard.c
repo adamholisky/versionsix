@@ -73,6 +73,7 @@ uint8_t ps2_keyboard_read( inode_id id, uint8_t * buff, uint64_t count, uint64_t
 	debugf( "herp\n" );
 
 	if( scancode_queue->size == 0 ) {
+		debugf( "Added wqd\n" );
 		ps2_keyboard_wq_data *wqd = kmalloc( sizeof(ps2_keyboard_wq_data) );
 
 		wqd->fd = id;
@@ -106,23 +107,36 @@ void ps2_keyboard_interrupt_handler( registers **reg ) {
 	status = inportb(0x64);
 
 	if( status & 0x01 ) {
+		debugf( "going ready\n" );
 		new_scancode = inportb(0x60);
 
 		scancode_queue_data *d = kmalloc( sizeof(scancode_queue_data) );
 		d->scancode = new_scancode;
 
-		avs_list_append( scancode_queue, d );
+		avs_list_enqueue( scancode_queue, d );
 		wq_make_ready( wq_ps2_keyboard );
+		wq_call_next_ready( wq_ps2_keyboard );
+	} else {
+		klog( LOG_DEBUG, "Status & 0x01 failed." );
 	}
 }
 
 uint8_t ps2_keyboard_wq_ready( wait_queue *queue, pid_t pid, void *wq_data ) {
+	debugf( "In ready\n" );
+
 	char c;
 	ps2_keyboard_wq_data *wqd = (ps2_keyboard_wq_data *)wq_data;
 
 	process_data *p = process_get_data_from_pid( pid );
 
+	scancode_queue_data *d = avs_list_dequeue( scancode_queue );
+
+	c = keyboard_scancode_to_char(d->scancode);
 	*wqd->buff = c;
+	p->status = PROCESS_STATUS_INACTIVE;
+	klog(LOG_INFO, "Got a c: %d", c);
+
+	kfree(d);
 
 	return c;
 }

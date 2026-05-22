@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include "syscall.h"
 #include "file.h"
-#include "serial.h"
+#include <devices/serial.h>
 #include <device.h>
 
 extern void main_console_putc( char c );

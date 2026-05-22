@@ -1,5 +1,5 @@
 #include <kernel_common.h>
-#include <serial.h>
+#include <devices/serial.h>
 #include <process.h>
 #include <lib/list.h>
 #include <keyboard.h>

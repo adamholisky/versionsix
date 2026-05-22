@@ -1,6 +1,6 @@
 #include <kernel_common.h>
 #include <avs_dev_api.h>
-#include <serial.h>
+#include <devices/serial.h>
 #include <stdlib.h>
 #include <kmemory.h>
 

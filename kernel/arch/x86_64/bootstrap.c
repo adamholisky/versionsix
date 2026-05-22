@@ -5,7 +5,7 @@
 #include <kernel_common.h>
 #include <ksymbols.h>
 #include <device.h>
-#include <serial.h>
+#include <devices/serial.h>
 #include <stdlib.h>
 
 bool profiling_ok = false;

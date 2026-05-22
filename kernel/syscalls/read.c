@@ -36,24 +36,8 @@ int read_syscall_handler( registers **context, int fd, void *buf, size_t count )
 	}
 
 	if( fd == STDIN_FILENO ) {
-		char *s = (char *)buf;
-
-		debugf( "huh?\n" );
-		// put proc into wait queue until scancode is available
-		// wait_queue_data = fd, buffer, num bytes
 		device *dev = device_get_major_minor_device( "stdin", "0" );
 		dev->read( fd, buf, count, 0 );
-
-		// uint8_t scancode = keyboard_get_scancode();
-		// char c = keyboard_scancode_to_char( scancode );
-
-		// s[i] = c;
-
-		// ret_val = i;
-
-		// if( c == '\n' ) {
-		// 	break;
-		// }
 	} else {
 		vfs_fd *v_fd = vfs_get_fd_data( global_proc_data.current_process->file_descriptors[fd].vfs_fd );
 

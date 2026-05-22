@@ -2,7 +2,7 @@
 #include <interrupt.h>
 #include <syscall.h>
 #include <process.h>
-#include <serial.h>
+#include <devices/serial.h>
 
 extern pid_t fork_syscall_handler( registers **context );
 

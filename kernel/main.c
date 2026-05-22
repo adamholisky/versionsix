@@ -1,7 +1,7 @@
 #include <kernel_common.h>
 #include <limine_bootstrap.h>
 #include <limine.h>
-#include <serial.h>
+#include <devices/serial.h>
 #include <acpi.h>
 #include <file.h>
 #include <interrupt.h>

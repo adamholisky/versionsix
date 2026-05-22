@@ -4,6 +4,7 @@
 #include <keyboard.h>
 
 device d_stdin;
+device *d_use_as_stdin;
 
 void device_register_stdin( void ) {
 	memset( &d_stdin, 0, sizeof(device) );
@@ -15,6 +16,12 @@ void device_register_stdin( void ) {
 	d_stdin.open = stdin_open;
 	d_stdin.read = stdin_read;
 	d_stdin.write = stdin_write;
+
+	#ifdef STDIO_SERIAL_3
+		d_use_as_stdin = device_get_major_minor_device( "serial", "3" );
+	#else
+		d_use_as_stdin = device_get_major_minor_device( "ps2keyboard", "0" );
+	#endif
 
 	device_register( &d_stdin );
 }
@@ -30,17 +37,10 @@ void stdin_open( inode_id id ) {
 uint8_t stdin_read( inode_id id, uint8_t * buff, uint64_t count, uint64_t offset ) {
 	uint8_t scancode = 0;
 	char c = 0;
-	
-	#ifdef STDIO_SERIAL_3
-		device *com3 = device_get_major_minor_device( "serial", "3" );
-		c = com3->read( id, buff, count, offset );
-		*buff = c;
-	#else 
-		device *ps2_kb = device_get_major_minor_device( "ps2keyboard", "0" );
-		c = ps2_kb->read( id, buff, count, offset );
 
-		*buff = c;
-	#endif
+	c = d_use_as_stdin->read( id, buff, count, offset );
+
+	*buff = c;
 
 	return c;
 }

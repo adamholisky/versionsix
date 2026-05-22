@@ -124,6 +124,11 @@ void ps2_keyboard_interrupt_handler( registers **reg ) {
 uint8_t ps2_keyboard_wq_ready( wait_queue *queue, pid_t pid, void *wq_data ) {
 	debugf( "In ready\n" );
 
+	if( wq_data == NULL ) {
+		klog( LOG_PANIC, "wq_data is null" );
+		return 0;
+	}
+
 	char c;
 	ps2_keyboard_wq_data *wqd = (ps2_keyboard_wq_data *)wq_data;
 
@@ -132,9 +137,10 @@ uint8_t ps2_keyboard_wq_ready( wait_queue *queue, pid_t pid, void *wq_data ) {
 	scancode_queue_data *d = avs_list_dequeue( scancode_queue );
 
 	c = keyboard_scancode_to_char(d->scancode);
+	klog( LOG_INFO, "wdq: %X", wqd );
 	*wqd->buff = c;
 	p->status = PROCESS_STATUS_INACTIVE;
-	klog(LOG_INFO, "Got a c: %d", c);
+	klog( LOG_INFO, "Got a c: %d", c );
 
 	kfree(d);
 

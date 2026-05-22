@@ -254,7 +254,10 @@ avs_node *avs_list_remove( avs_list *list, avs_node *node ) {
 
     avs_node *new_next_node = node->next;
     
-    if( node->prev == NULL ) {
+    if( node->prev == NULL && node->next == NULL ) {
+        list->head = NULL;
+        list->tail = NULL;
+    } else if( node->prev == NULL ) {
         // Removing the head of list
         list->head = new_next_node;
 

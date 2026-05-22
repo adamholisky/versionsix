@@ -63,9 +63,12 @@ void wq_make_ready( wait_queue *wq ) {
 }
 
 void wq_call_next_ready( wait_queue *wq ) {
-	if( wq->queue->tail != NULL ) {
+	if( wq->queue->size > 0 ) {
 		wait_queue_entry *wqe = avs_list_dequeue( wq->queue );
 
 		wq->ready_func( wq, wqe->pid, wqe->wqd );
+
+		kfree(wqe->wqd);
+		kfree(wqe);
 	}
 }

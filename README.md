@@ -1,6 +1,6 @@
-# Version 6
+# A Very Simple Operating System
 
-Version 6 is a hobbist operating system designed to let one mess with underlying tech that normally isn't used in day-to-day high level development. I've been playing with OS development since college, and this is the sixth iteration (over 20-years) of my hobbyist OS.
+A Very Simple Operating System is designed to be ... simple. It's a kernel and user-space that's engineered to let one mess with underlying tech that normally isn't used in day-to-day high level development. There's a fair bit implemented in AVSOS, depending on how you look at it. But none of it's really "done" in any sense of the word.
 
 All code is open sourced, written by Adam Holisky in his spare time unless otherwise noted.
 

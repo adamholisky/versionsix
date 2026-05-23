@@ -35,7 +35,7 @@ Version 6 is made up of a lot of different systems working together. They're all
 | Console | 🟢 | GUI and serial | 
 | Paging | 🟢 | Allocating and page maping with own page tables, it works more or less |
 | Memory Management | 🟢 | Implemented third party allocator, functions as expected |
-| Processes | 🟢 | Intit, relocation, elf loader, scheduler (yield), wait queues, fork, execve |
+| Processes | 🟢 | Init, relocation, elf loader, scheduler (yield), wait queues, fork, execve |
 | File System | 🟢 | VFS, home-brewed custom file system, works with linux/fuse, read/write/etc work as expected |
 | Interrupts | 🟢 | Handles most cases. Context manipulation mature enough to allow devices, debugging, and processes. |
 | Devices | 🟢 | /dev file system, r/w on devices, virtual and real devices, keyboard, timers, redirection, etc... |

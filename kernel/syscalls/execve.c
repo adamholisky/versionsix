@@ -60,10 +60,10 @@ int execve_syscall_handler( registers **_context, char *path, char *argv[], char
 	// Load ELF information
 	int loadelf_err = elf_loader_load( p, buff );
 
-		// Handle argc, argv setup
+	// Handle argc, argv setup
 	int argc = 0;
 
-	printf( "argv: 0x%016llX\n", argv );
+	//printf( "argv: 0x%016llX\n", argv );
 
 	if( argv != NULL ) {
 		for( bool keep_going = true; keep_going == true ; ) {
@@ -78,7 +78,7 @@ int execve_syscall_handler( registers **_context, char *path, char *argv[], char
 	}
 	
 
-	printf( "argc: %d\n", argc );
+	//printf( "argc: %d\n", argc );
 
 	// reconstruct argv, ensuring it's not located in unaccessible pages to the child process
 	char **argv_new = kmalloc( argc * sizeof(char *) );
@@ -87,7 +87,7 @@ int execve_syscall_handler( registers **_context, char *path, char *argv[], char
 		argv_new[i] = kmalloc( kstrlen(argv[i]) );
 		kstrcpy( argv_new[i], argv[i] );
 
-		printf( "argv_n[%d] = 0x%016llX, \"%s\"\n", i, argv_new[i], argv_new[i] );
+		//printf( "argv_n[%d] = 0x%016llX, \"%s\"\n", i, argv_new[i], argv_new[i] );
 	}
 
 	

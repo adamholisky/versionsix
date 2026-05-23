@@ -37,12 +37,6 @@ uint8_t stdout_read( inode_id id, uint8_t * buff, uint64_t count, uint64_t offse
 
 extern vui_console* main_console;
 void stdout_write( inode_id id, void *buff, size_t count, size_t offset ) {
-	#ifdef STDIO_SERIAL_3
-		device *com3 = device_get_major_minor_device( "serial", "3" );
-		com3->write( 0, buff, count, offset );
-	#else
-	#endif
-
 	if( d_use_as_stdout == NULL ) {
 		for( int i = 0; i < count; i++ ) {
 			char *c_ptr = (char *)buff;

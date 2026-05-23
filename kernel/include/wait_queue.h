@@ -14,7 +14,7 @@ extern "C"
 #include <interrupt.h>
 #include <process.h>
 
-typedef struct wait_queue wait_queue;
+typedef struct _wait_queue wait_queue;
 
 typedef int (*wq_func)(wait_queue *queue, pid_t pid, void *wait_queue_data );
 
@@ -23,7 +23,7 @@ typedef struct {
 	void *wqd;
 } wait_queue_entry;
 
-typedef struct wait_queue {
+struct _wait_queue {
 	avs_list *queue;
 	char name[50];
 	bool is_ready;

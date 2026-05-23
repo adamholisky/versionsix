@@ -13,12 +13,10 @@
 #include <ksymbols.h>
 #include <pci.h>
 #include <elf.h>
-#include <keyboard.h>
 #include <rtc.h>
 #include <ahci.h>
 #include <fs.h>
 #include <device.h>
-#include <tests.h>
 #include <sys_info.h>
 #include <process.h>
 #include <avs_dev_api.h>
@@ -27,8 +25,6 @@
 #include <avsos_ui.h>
 #include <avsos_networking.h>
 #include <profiling.h>
-
-#include <spng.h>
 
 #define AVSLOADER_USE_GUI 0x1
 #define AVSLOADER_USE_NETWORKING 0x2
@@ -73,6 +69,7 @@ void kernel_main( void ) {
 
 	page_map( 0x1337C0DE, 0x1337C0DE );
 	uint32_t *avsos_loader_config = 0x1337C0DE;
+
 	if( *avsos_loader_config & AVSLOADER_USE_GUI ) {
 		use_gui = true;
 	} else {
@@ -118,16 +115,12 @@ void kernel_main( void ) {
 	system_information.version = 1;
 	memcpy( &system_information.kernel_info, &kernel_info, sizeof( kinfo ) );
 
-	//keyboard_initalize();
 	process_initalize();
 	process_setup_init();
 	wq_initalize();
 
 	// Libraries need manual loading, for now
-	
-	printf( "loading libc\n" );
 	int register_result = lib_register( "/libc.so" );
-	printf( "done loading\n" );
 
 	// Printf is now okay
 	printf( "avsOS\n" );

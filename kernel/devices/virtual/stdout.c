@@ -2,8 +2,11 @@
 #include <device.h>
 #include <devices/stdout.h>
 #include <keyboard.h>
+#include <vui/vui.h>
+#include <vui/console.h>
 
 device d_stdout;
+device *d_use_as_stdout;
 
 void device_register_stdout( void ) {
 	memset( &d_stdout, 0, sizeof(device) );
@@ -17,6 +20,7 @@ void device_register_stdout( void ) {
 	d_stdout.write = stdout_write;
 
 	device_register( &d_stdout );
+	d_use_as_stdout = NULL;
 }
 
 void stdout_close( inode_id id ) {
@@ -28,25 +32,29 @@ void stdout_open( inode_id id ) {
 }
 
 uint8_t stdout_read( inode_id id, uint8_t * buff, uint64_t count, uint64_t offset ) {
-	uint8_t scancode = 0;
-	char c = 0;
-	
-	#ifdef STDIO_SERIAL_3
-		device *com3 = device_get_major_minor_device( "serial", "3" );
-		scancode = com3->read( id, buff, count, offset );
-		c= keyboard_scancode_to_char( scancode );
-	#else 
-		scancode = keyboard_get_scancode();
-		c = keyboard_scancode_to_char( scancode );	// this checks for scancode under 0x81, otherwise returns 0
-	#endif
-
-	return c;
+	return 0;
 }
 
+extern vui_console* main_console;
 void stdout_write( inode_id id, void *buff, size_t count, size_t offset ) {
 	#ifdef STDIO_SERIAL_3
 		device *com3 = device_get_major_minor_device( "serial", "3" );
 		com3->write( 0, buff, count, offset );
 	#else
 	#endif
+
+	if( d_use_as_stdout == NULL ) {
+		for( int i = 0; i < count; i++ ) {
+			char *c_ptr = (char *)buff;
+			char c = *c_ptr;
+			vui_console_put_char( main_console, c );
+		}
+	} else {
+		d_use_as_stdout->write( id, buff, count, offset );
+	}
+}
+
+void stdout_set_redirect( device *redirect_to ) {
+	klog( LOG_INFO, "stdout redirected to: %s:%s", redirect_to->major_id, redirect_to->minor_id );
+	d_use_as_stdout = redirect_to;
 }

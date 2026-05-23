@@ -13,11 +13,10 @@ typedef struct {
 	uint64_t	addr;
 	uint64_t	size;
 
-	#ifdef VIOS_ENABLE_PROFILING
+	// Basic profiling support
 	uint64_t	count;
 	uint64_t	start;
 	uint64_t	time;
-	#endif
 } symbol;
 
 typedef struct {
@@ -38,11 +37,9 @@ void kernel_symbols_initalize( void );
 symbol_collection *get_ksyms_object( void );
 char *kernel_symbols_get_function_name_at( uint64_t addr );
 
-#ifdef VIOS_ENABLE_PROFILING
 void kernel_symbols_inc_count( uint64_t addr );
 void kernel_symbols_set_start( uint64_t addr, uint64_t count );
 void kernel_symbols_set_time( uint64_t addr, uint64_t count );
-#endif
 
 #ifdef __cplusplus
 }

@@ -17,11 +17,8 @@ void device_register_stdin( void ) {
 	d_stdin.read = stdin_read;
 	d_stdin.write = stdin_write;
 
-	#ifdef STDIO_SERIAL_3
-		d_use_as_stdin = device_get_major_minor_device( "serial", "3" );
-	#else
-		d_use_as_stdin = device_get_major_minor_device( "ps2keyboard", "0" );
-	#endif
+	// d_use_as_stdin = device_get_major_minor_device( "serial", "3" );
+	d_use_as_stdin = device_get_major_minor_device( "ps2keyboard", "0" );
 
 	device_register( &d_stdin );
 }
@@ -47,4 +44,9 @@ uint8_t stdin_read( inode_id id, uint8_t * buff, uint64_t count, uint64_t offset
 
 void stdin_write( inode_id id, void *buff, size_t count, size_t offset ) {
 	// Intentionally blank
+}
+
+void stdin_set_redirect( device *redirect_to ) {
+	klog( LOG_INFO, "stdin redirected to: %s:%s", redirect_to->major_id, redirect_to->minor_id );
+	d_use_as_stdin = redirect_to;
 }

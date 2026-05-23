@@ -2,6 +2,8 @@
 #include <limine_bootstrap.h>
 #include <limine.h>
 #include <devices/serial.h>
+#include <devices/stdout.h>
+#include <devices/stdin.h>
 #include <acpi.h>
 #include <file.h>
 #include <interrupt.h>
@@ -10,53 +12,34 @@
 #include <kmemory.h>
 #include <ksymbols.h>
 #include <pci.h>
-#include <e1000.h>
 #include <elf.h>
-#include <net/arp.h>
-#include <net/ethernet.h>
-#include <net/dhcp.h>
-#include <net/network.h>
 #include <keyboard.h>
 #include <rtc.h>
 #include <ahci.h>
 #include <fs.h>
 #include <device.h>
-#include <vui/vui.h>
-#include <vui/console.h>
-#include <vui/desktop.h>
-#include <vui/font.h>
-#include <vui/label.h>
-#include <vui/window.h>
-#include <vui/menubar.h>
 #include <tests.h>
 #include <sys_info.h>
 #include <process.h>
 #include <avs_dev_api.h>
 #include <lib.h>
 #include <wait_queue.h>
+#include <avsos_ui.h>
+#include <avsos_networking.h>
+#include <profiling.h>
 
 #include <spng.h>
 
-#ifdef ENABLE_NETWORKING
-void enable_networking();
-#endif
-
-#ifdef ENABLE_GUI
-extern vui_core vui;
-vui_handle main_console_handle;
-vui_console* main_console;
-
-void enable_gui( void );
-void load_font_stuff( void );
-void load_gui_stuff( void );
-extern void tcp_test( void );
-
-// #define BG_FILE "/share/img/mac-9-wallpaper-1024-768.png"
-#endif
+#define AVSLOADER_USE_GUI 0x1
+#define AVSLOADER_USE_NETWORKING 0x2
+#define AVSLOADER_USE_PROFILING 0x4
 
 sys_info system_information;
 kinfo kernel_info;
-net_info networking_info;
+
+bool use_gui;
+bool use_networking;
+bool use_profiling;
 
 extern void* kernel_stack;
 
@@ -68,12 +51,6 @@ void kernel_main( void ) {
 	debugf( "avsOS Debug Out\n" );
 	debugf( "Build Number: %d\n", BUILD_NUM );
 	avs_dev_api_send_hello();
-
-	/* 	debugf( "Kernel stack top:                 0x%016llX\n", &kernel_stack );
-		uint64_t rbp_value;
-		__asm__ volatile ("mov %%rbp, %0" : "=r"(rbp_value));
-		debugf( "Kernel rbp at early exec:         0x%016llX\n", rbp_value ); */
-
 
 	load_limine_info();
 	rtc_initalize();
@@ -94,10 +71,30 @@ void kernel_main( void ) {
 	kernel_symbols_initalize();
 	paging_initalize_page_groups();
 
-#ifdef ENABLE_PROFILING
-	profiling_initalize();
-#endif
+	page_map( 0x1337C0DE, 0x1337C0DE );
+	uint32_t *avsos_loader_config = 0x1337C0DE;
+	if( *avsos_loader_config & AVSLOADER_USE_GUI ) {
+		use_gui = true;
+	} else {
+		use_gui = false;
+	}
 
+	if( *avsos_loader_config & AVSLOADER_USE_NETWORKING ) {
+		//use_networking = true;
+	} else {
+		use_networking = false;
+	}
+
+	if( *avsos_loader_config & AVSLOADER_USE_PROFILING ) {
+		//use_profiling = true;
+	} else {
+		use_profiling = false;
+	}
+
+	if( use_profiling ) {
+		profiling_initalize();
+	}
+	
 	pci_initalize();
 	ahci_initalize();
 
@@ -110,9 +107,13 @@ void kernel_main( void ) {
 	lib_initalize();
 
 	// GUI gets enabled here, or terminal redirects to.... ?
-#ifdef ENABLE_GUI
-	enable_gui();
-#endif
+	if( use_gui ) {
+		enable_gui();
+	} else {
+		device *d_com3 = device_get_major_minor_device( "serial", "3" );
+		stdout_set_redirect( d_com3 );
+		stdin_set_redirect( d_com3 );
+	}
 
 	system_information.version = 1;
 	memcpy( &system_information.kernel_info, &kernel_info, sizeof( kinfo ) );
@@ -132,25 +133,11 @@ void kernel_main( void ) {
 	printf( "avsOS\n" );
 	printf( "Build %d\n", BUILD_NUM );
 
-	
-
-	
-
-#ifdef ENABLE_NETWORKING
-	enable_networking();
-#endif
-
-
-
-
-	extern uint64_t kernel_heap_virtual_memory_next;
-	//printf( "kmalloc() heap at now:    0x%016llX\n", kernel_heap_virtual_memory_next );
-	extern uint64_t syscall_stack_top;
-	//printf( "syscall stack top:        0x%016llX\n", &syscall_stack_top );
+	if( use_networking ) {
+		enable_networking();
+	}
 
 	printf( "Startup done. Handing to init process.\n\n" );
-
-	
 
 	kernel_idle_loop();
 
@@ -159,92 +146,3 @@ void kernel_main( void ) {
 
 	do_immediate_shutdown();
 }
-
-#ifdef ENABLE_NETWORKING
-void enable_networking( void ) {
-	memset( &networking_info, 0, sizeof( net_info ) );
-	e1000_initalize();
-	dhcp_start();
-}
-#endif
-
-#ifdef ENABLE_GUI
-void enable_gui( void ) {
-	framebuffer_initalize();
-
-	vui_init( (uint32_t*)kernel_info.framebuffer_info.address, 1024, 768 );
-
-	load_font_stuff();
-	load_gui_stuff();
-}
-
-void load_gui_stuff( void ) {
-	vui_theme* theme = vui_get_active_theme();
-
-	vui_handle menubar = vui_menubar_create();
-	vui_handle_set_name( menubar, "main_menubar" );
-
-	vui_handle desktop = vui_desktop_create( 0, 25, vui.width, vui.height - 25, VUI_DESKTOP_FLAG_NONE );
-
-	char desktop_string[50];
-	memset( desktop_string, 0, 50 );
-	sprintf( desktop_string, "avsOS build %d", BUILD_NUM );
-	vui_handle smooth_text = vui_label_create( 5, 768 - 25, desktop_string, VUI_LABEL_FLAG_NONE, desktop );
-	vui_label_set_color( smooth_text, COLOR_RGB_WHITE, theme->desktop );
-	vui_handle_set_name( desktop, "desktop" );
-
-	vui_handle win = vui_window_create( 25, 40, 500, 400, VUI_WINDOW_FLAG_NONE );
-	vui_window_set_title( win, "avsOS Shell" );
-	vui_handle_set_name( win, "window_console" );
-	vui_window* win_s = vui_get_handle_data( win );
-	vui_window_set_background_color( win, 0x232323 );
-
-	main_console_handle = vui_console_create( win_s->inner_x, win_s->inner_y, win_s->inner_width, win_s->inner_height, win );
-	main_console = vui_get_handle_data( main_console_handle );
-	vui_add_to_parent( win, main_console_handle );
-
-	klog( LOG_INFO, "Drawing" );
-
-	vui_draw( menubar );
-	vui_draw( desktop );
-	vui_draw( win );
-}
-
-void load_font_stuff( void ) {
-	vui_font_initalize();
-	//vui_font_load( VUI_FONT_TYPE_PSF, "zap-light", "/usr/share/zap-light20.psf" );
-	vui_font_load( VUI_FONT_TYPE_PSF, "zap-vga", "/share/fonts/zap-ext-vga16.psf" );
-	/* 	vui_font_load( VUI_FONT_TYPE_TTF, "dejavu-sans", "/usr/share/fonts/DejaVuSans.ttf" );
-		vui_font_load( VUI_FONT_TYPE_TTF, "dejavu-sans-bold", "/usr/share/fonts/DejaVuSans-Bold.ttf" );
-		vui_font_load( VUI_FONT_TYPE_TTF, "dejavu-sans-italic", "/usr/share/fonts/DejaVuSans-Oblique.ttf" ); */
-	vui_font_load( VUI_FONT_TYPE_TTF, "noto-sans", "/share/fonts/NotoSans-Regular.ttf" );
-	vui_font_load( VUI_FONT_TYPE_TTF, "noto-sans-bold", "/share/fonts/NotoSans-SemiBold.ttf" );
-}
-
-void main_console_putc( uint8_t c ) {
-	vui_console_put_char( main_console, c );
-	//main_console->redraw_window = true;
-	//vui_console_draw_from_struct( main_console );
-}
-
-void main_console_set_cursor_visiblity( bool visible ) {
-	main_console->show_cursor = visible;
-}
-
-void main_console_blink_cursor( void ) {
-	//vui_console_blink_cursor( main_console );
-}
-
-#else
-void main_console_putc( uint8_t c ) {
-	serial_write_port( c, COM3 );
-}
-
-void main_console_set_cursor_visiblity( bool visible ) {
-	//main_console->show_cursor = visible;
-}
-
-void main_console_blink_cursor( void ) {
-	//vui_console_blink_cursor( main_console );
-}
-#endif

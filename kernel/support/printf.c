@@ -917,5 +917,5 @@ int fctprintf(void (*out)(char character, void* arg), void* arg, const char* for
 
 void _putchar(char c)
 {
-  kwrite( 1, &c, 1 ); 
+  write_syscall_handler( NULL, STDOUT_FILENO, &c, 1 ); 
 }

@@ -27,11 +27,14 @@ void write_syscall_handler( registers **context, int fd, void *buff, size_t coun
 	char *char_buff_end = (char *)buff + count;
 
 	if (fd == FD_STDOUT) {
-		while (char_buff != char_buff_end) {
-			klog( LOG_DEBUG, "wc: '%c'", *char_buff );
-			main_console_putc( *char_buff );
-			char_buff++;
-		}
+		device *d_stdout = device_get_major_minor_device( "stdout", "0" );
+		d_stdout->write( fd, buff, count, 0 );
+
+		// while (char_buff != char_buff_end) {
+		// 	klog( LOG_DEBUG, "wc: '%c'", *char_buff );
+		// 	main_console_putc( *char_buff );
+		// 	char_buff++;
+		// }
 	} else if (fd == FD_STDERR) {
 		if( stderr_dev == NULL ) {
 			if( devices_setup() ) {

@@ -19,6 +19,15 @@ static void setup_kernel_tls(void) {
     __asm__ volatile("wrmsr" :: "c"(0xC0000100U), "a"(lo), "d"(hi));
 }
 
+extern "C" uint8_t __eh_frame_start[];
+extern "C" void __register_frame_info(const void *begin, void *ob);
+static uint8_t _kernel_eh_frame_ob[128] __attribute__((aligned(8)));
+
+static void setup_exception_handling(void) {
+    __builtin_memset(_kernel_eh_frame_ob, 0, sizeof(_kernel_eh_frame_ob));
+    __register_frame_info(__eh_frame_start, _kernel_eh_frame_ob);
+}
+
 // Begin magic. Got help with this part... it's magic to me.
 
 namespace __cxxabiv1 {
@@ -113,9 +122,10 @@ extern "C" void do_cpp_tests( void ) {
 	printf( "In C++ tests.\n" );
 
 	setup_kernel_tls();
+	setup_exception_handling();
 
 	rtti_tests();
-	//exceptions_tests();
+	exceptions_tests();
 
 	printf( "Out C++ tests.\n" );
 }

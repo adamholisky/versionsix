@@ -45,6 +45,16 @@ SECTIONS
         *(.rodata .rodata.*)
     } :rodata
 
+    .eh_frame : {
+        __eh_frame_start = .;
+        KEEP(*(.eh_frame .eh_frame.*))
+        __eh_frame_end = .;
+    } :rodata
+
+    .gcc_except_table : {
+        *(.gcc_except_table .gcc_except_table.*)
+    } :rodata
+
     /* Move to the next memory page for .data */
     . += CONSTANT(MAXPAGESIZE);
 

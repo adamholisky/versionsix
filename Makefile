@@ -75,9 +75,7 @@ CPPFLAGS = $(DEFINES) \
 	-m64 \
 	-march=x86-64 \
 	-mabi=sysv \
-	-mcmodel=kernel \
-	-fno-exceptions
-
+	-mcmodel=kernel
 
 QEMU = /usr/bin/qemu-system-x86_64
 QEMU_COMMON = 	-readconfig ${ROOT_DIR}/build_support/qemu_configs/x86_64_primary.cfg \

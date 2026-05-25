@@ -2,7 +2,7 @@
 #include <elf.h>
 #include <kmemory.h>
 
-#define DEBUG_ELF_FILE_CONST
+#undef DEBUG_ELF_FILE_CONST
 void elf_file_initalize( elf_file *elf, uint64_t *file_start ) {
 	elf->file_base = file_start;
 

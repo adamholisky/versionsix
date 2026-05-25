@@ -137,7 +137,7 @@ int lib_load_symbols( lib_shared *lib, void *lib_data ) {
 	lib->num_symbols = lib->f_elf->num_symbols;
 	lib->lib_symbols = kmalloc( sizeof(lib_symbol) * lib->num_symbols );
 
-	debugf( "num syms: %d\n", lib->num_symbols );
+	//debugf( "num syms: %d\n", lib->num_symbols );
 
 	int lib_sym_count = 0;
 
@@ -152,7 +152,7 @@ int lib_load_symbols( lib_shared *lib, void *lib_data ) {
 		kstrcpy( lib->lib_symbols[lib_sym_count].name, lib->f_elf->dynsym_ents[i].name );
 		
 
-		debugf( "Symbol %s lives at 0x%016llX\n", lib->lib_symbols[lib_sym_count].name, lib->lib_symbols[lib_sym_count].addr );
+		//debugf( "Symbol %s lives at 0x%016llX\n", lib->lib_symbols[lib_sym_count].name, lib->lib_symbols[lib_sym_count].addr );
 
 		lib_sym_count++;
 	}

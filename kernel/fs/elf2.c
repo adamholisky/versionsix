@@ -20,10 +20,10 @@ int elf2_new_initalize_file( elf2_file *f_elf, void *data ) {
 	f_elf->header = (Elf64_Ehdr *)f_elf->file_base;
 	f_elf->section_headers = (Elf64_Shdr *)((uint8_t *)f_elf->file_base + f_elf->header->e_shoff);
 
-	printf( "f_elf->file_base: %016llX\n", f_elf->file_base );
-	printf( "f_elf->header: %016llX\n", f_elf->header );
-	printf( "f_elf->e_shoff: %016llX\n", f_elf->header->e_shoff );
-	printf( "f_elf->section_headers: %016llX\n", f_elf->section_headers );
+	// printf( "f_elf->file_base: %016llX\n", f_elf->file_base );
+	// printf( "f_elf->header: %016llX\n", f_elf->header );
+	// printf( "f_elf->e_shoff: %016llX\n", f_elf->header->e_shoff );
+	// printf( "f_elf->section_headers: %016llX\n", f_elf->section_headers );
 
 	// Get the section name table
 	Elf64_Shdr *sh_section_name_tbl = elf2_new_get_section_header_by_index( f_elf, f_elf->header->e_shstrndx + 1 );
@@ -51,7 +51,7 @@ int elf2_new_initalize_file( elf2_file *f_elf, void *data ) {
 
 				if( phdr->p_type == PT_LOAD ) { f_elf->program_headers_num_loads++; }
 
-				printf( "Added PH: %d \t %d \t phys 0x%016llX \t offset 0x%0X \t %X \t virt 0x%016llX \t %X RWX: %d %d %d\n", i, f_elf->program_headers[i].type, f_elf->program_headers[i].phys_addr, f_elf->program_headers[i].phys_offset, f_elf->program_headers[i].phys_size, f_elf->program_headers[i].virt_addr, f_elf->program_headers[i].virt_size, f_elf->program_headers[i].read, f_elf->program_headers[i].write, f_elf->program_headers[i].execute );
+				//printf( "Added PH: %d \t %d \t phys 0x%016llX \t offset 0x%0X \t %X \t virt 0x%016llX \t %X RWX: %d %d %d\n", i, f_elf->program_headers[i].type, f_elf->program_headers[i].phys_addr, f_elf->program_headers[i].phys_offset, f_elf->program_headers[i].phys_size, f_elf->program_headers[i].virt_addr, f_elf->program_headers[i].virt_size, f_elf->program_headers[i].read, f_elf->program_headers[i].write, f_elf->program_headers[i].execute );
 			}
 		}
 	}

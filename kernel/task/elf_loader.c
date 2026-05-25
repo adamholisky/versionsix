@@ -32,7 +32,7 @@ int elf_loader_load( process_data* p, uint8_t* data ) {
 				return KERR_ELF_INAVLID;
 			}
 
-			symbols_diagnostic( elf_f->symbols );
+			//symbols_diagnostic( elf_f->symbols );
 
 			elf_loader_load_binary( p, data );
 
@@ -234,7 +234,6 @@ int elf_loader_load_binary( process_data* p, uint8_t* data ) {
 		do_immediate_shutdown();
 	}
 
-	debugf( "\n" );
 	int num_of_rel_plt_entries = ( rel_plt->sh_size / ( sizeof( Elf64_Rela ) ) );
 	debugf( "running symbol resolution %d times\n\n", num_of_rel_plt_entries );
 

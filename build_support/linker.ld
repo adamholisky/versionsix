@@ -43,15 +43,10 @@ SECTIONS
 
     .rodata : {
         *(.rodata .rodata.*)
-    } :rodata
-
-    .eh_frame : {
         __eh_frame_start = .;
         KEEP(*(.eh_frame .eh_frame.*))
+        LONG(0)  /* terminator for last .eh_frame chunk */
         __eh_frame_end = .;
-    } :rodata
-
-    .gcc_except_table : {
         *(.gcc_except_table .gcc_except_table.*)
     } :rodata
 

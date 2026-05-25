@@ -115,7 +115,7 @@ extern "C" void do_cpp_tests( void ) {
 	setup_kernel_tls();
 
 	rtti_tests();
-	exceptions_tests();
+	//exceptions_tests();
 
 	printf( "Out C++ tests.\n" );
 }

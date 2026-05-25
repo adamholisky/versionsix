@@ -27,10 +27,11 @@ DEFINES += -DBUILD_NUM=$(BUILD_NUMBER)
 
 
 # Toolchain
-CC = /usr/local/osdev/bin/x86_64-elf-gcc
-ASM = /usr/local/osdev/bin/x86_64-elf-as
-LD = /usr/local/osdev/bin/x86_64-elf-ld
-OBJDUMP = /usr/local/osdev/bin/x86_64-elf-objdump
+CC = /usr/local/osdev/bin/x86_64-elf-avsos-gcc
+GPP = /usr/local/osdev/bin/x86_64-elf-avsos-g++
+ASM = /usr/local/osdev/bin/x86_64-elf-avsos-as
+LD = /usr/local/osdev/bin/x86_64-elf-avsos-ld
+OBJDUMP = /usr/local/osdev/bin/x86_64-elf-avsos-objdump
 
 PORT_GDB = 58001
 
@@ -58,6 +59,26 @@ CFLAGS = $(DEFINES) -Wno-write-strings \
 CFLAGS_END = -nostdlib -lgcc
 AFLAGS = $(CFLAGS)
 
+CPPFLAGS = $(DEFINES) \
+	-I$(ROOT_DIR)/kernel/include \
+	-I$(ROOT_DIR)/avs-klibc-static/include \
+	-I$(ROOT_DIR)/liblua-static/include \
+	-I/usr/local/osdev/include/c++/15.2.0 \
+	-ffreestanding \
+	-fno-omit-frame-pointer \
+	-fno-lto \
+	-fno-stack-protector \
+	-fno-stack-check \
+	-mno-red-zone \
+	-O0 \
+	-g \
+	-m64 \
+	-march=x86-64 \
+	-mabi=sysv \
+	-mcmodel=kernel \
+	-fno-exceptions
+
+
 QEMU = /usr/bin/qemu-system-x86_64
 QEMU_COMMON = 	-readconfig ${ROOT_DIR}/build_support/qemu_configs/x86_64_primary.cfg \
 				\
@@ -77,20 +98,27 @@ QEMU_DEBUG_LOGGING = -d int,cpu_reset -D $(ROOT_DIR)/logs/qemu_debug_log.txt
 
 
 SOURCES_C = $(shell ls kernel/**/*.c)
+SOURCES_CPP = $(shell ls kernel/**/*.cpp)
 SOURCES_ASMS = $(shell ls kernel/**/*.S)
 OBJECTS_C = $(patsubst %.c, build/%.o, $(shell ls kernel/**/*.c | xargs -n 1 basename))
+OBJECTS_CPP = $(patsubst %.cpp, build/%.o, $(shell ls kernel/**/*.cpp | xargs -n 1 basename))
 OBJECTS_ASMS = $(patsubst %.S, build/%.o, $(shell ls kernel/**/*.S | xargs -n 1 basename))
 
 all: install
 
-build/versionvi.bin: increment_build_number $(OBJECTS_C) $(OBJECTS_ASMS)
-	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/linker.ld -o build/versionvi.bin avs-klibc-static/avs-klibc.o liblua-static/avs-lua.o $(OBJECTS_C) $(OBJECTS_ASMS)
+build/versionvi.bin: increment_build_number $(OBJECTS_C) $(OBJECTS_CPP) $(OBJECTS_ASMS)
+	$(LD) -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -T build_support/linker.ld -o build/versionvi.bin avs-klibc-static/avs-klibc.o liblua-static/avs-lua.o $(OBJECTS_C) $(OBJECTS_CPP) $(OBJECTS_ASMS) /usr/local/osdev/lib/libsupc++.a /usr/local/osdev/lib/gcc/x86_64-elf-avsos/15.2.0/libgcc.a
 	@>&2 $(call echo_tag_green,Build, Done making version $(BUILD_NUMBER))
 
 build/%.o: %.c
 	@>&2 $(call echo_tag_green,Build, $<)
 	$(eval OBJNAME := $(shell basename $@))
 	$(CC) $(CFLAGS) $(CFLAGS_END) -std=c11 -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
+
+build/%.o: %.cpp
+	@>&2 $(call echo_tag_green,Build, $<)
+	$(eval OBJNAME := $(shell basename $@))
+	$(GPP) $(CPPFLAGS) -c $< -o build/$(OBJNAME) >> $(BUILD_LOG)
 
 build/%.o: %.S
 	@>&2 $(call echo_tag_green,Build, $<)

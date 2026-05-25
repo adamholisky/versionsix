@@ -38,6 +38,7 @@ bool use_networking;
 bool use_profiling;
 
 extern void* kernel_stack;
+extern void do_cpp_tests( void );
 
 char fxsave_region[512] __attribute__( ( aligned( 16 ) ) );
 
@@ -129,6 +130,8 @@ void kernel_main( void ) {
 	if( use_networking ) {
 		enable_networking();
 	}
+
+	do_cpp_tests();
 
 	printf( "Startup done. Handing to init process.\n\n" );
 

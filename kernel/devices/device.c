@@ -14,14 +14,14 @@ avs_list *device_list;
 void device_initalize( void ) {
 	device_list = avs_list_init();
 
-	// Find all symbols that start wtih "kshell_app_add_command" and call them each
+	// Find all symbols that start wtih "device_register_" and call them each
 	symbol_collection *ksym = get_ksyms_object();
 	symbol *symbol_array = symbols_get_symbol_array( ksym );
 	uint64_t max_symbols = symbols_get_total_symbols( ksym );
 
 	for( int i = 0; i < max_symbols; i++ ) {
 		if( strncmp( symbol_array[i].name, device_registerfunc_ident, sizeof(device_registerfunc_ident) - 1 ) == 0 ) {
-			debugf( "found: %s\n", symbol_array[i].name );
+			debugf( "Calling device registration: %s\n", symbol_array[i].name );
 			void (*func)(void) = (void(*)(void))symbol_array[i].addr;
 			func();
 		}

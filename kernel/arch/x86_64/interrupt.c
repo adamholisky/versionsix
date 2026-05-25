@@ -165,6 +165,9 @@ void interrupt_handler_stage_2( registers **_reg ) {
 		if( current_pid == 0 ) {
 			debugf_raw( "\nKernel task generated exception. Kbugs then halting.\n" );
 
+			kbugs_data_crash_addr = reg->rip;
+			kbugs_data_crash_context = reg;
+
 			kbugs_main();
 
 			while( 1 ) {

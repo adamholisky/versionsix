@@ -16,7 +16,6 @@ size_t read( int fd, void *buf, size_t count ) {
 	return syscall( SYSCALL_READ, 3, &args );
 }
 
-
 int read_syscall_handler( registers **context, int fd, void *buf, size_t count ) {
 	int ret_val = 0;
 

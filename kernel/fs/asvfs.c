@@ -301,7 +301,7 @@ int asvfs_read( char *pathname, char *buf, size_t size, off_t offset ) {
 
 	if( block_id == 0 ) {
 		asvfs_log( "read failed. Couldn't find block_id from pathname: %s\n", pathname );
-		return 0;
+		return -1;
 	}
 
 	uint32_t drive_offset = (block_id * asvfs_instance_data.header->block_size) + offset;

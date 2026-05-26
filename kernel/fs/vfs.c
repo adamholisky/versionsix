@@ -248,6 +248,19 @@ int vfs_write_device_meta( char *pathname, char *major_id, char *minor_id ) {
 	return mp->fs->op.write( pathname, &device_data, 0, sizeof(vfs_device_data) );
 }
 
+/**
+ * @brief Reads the given file
+ * 
+ * @param pathname 
+ * @param buff 
+ * @param size 
+ * @param offset 
+ * @return int 
+ * 
+ * return check:
+ *   on error = yes
+ *   otherwise = yes, as implemented in fs->op.read
+ */
 int vfs_read( const char *pathname, char *buff, size_t size, off_t offset ) {
 	vfs_mount_point *mp = vfs_get_mount_point_from_path( pathname );
 

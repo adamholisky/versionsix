@@ -303,3 +303,69 @@ void vui_sort_list_by_priority( vui_handle_list *list ) {
 		//vdf( "   %d -> %08X\n", hl->H, vc->priority );
 	}
 }
+
+#define AVSOS_MOUSE_SIZE_HEIGHT 20
+#define AVSOS_MOUSE_SIZE_WIDTH 10
+
+uint16_t mouse_saved_x;
+uint16_t mouse_saved_y;
+uint32_t mousebg[10*20];
+uint16_t mouse_x;
+uint16_t mouse_y;
+
+void vui_draw_mouse_save_buffer( uint16_t x, uint16_t y ) {
+	uint32_t offset_x = x;
+	uint32_t offset_y = y * vui.pitch/4;
+
+	for( int i = 0; i < AVSOS_MOUSE_SIZE_HEIGHT; i++ ) {
+		for( int j = 0; j < AVSOS_MOUSE_SIZE_WIDTH; j++ ) {
+			*(vui.fb + offset_y + offset_x + j) = *(mousebg + (i*10) + j);
+		}
+
+		offset_y = offset_y + vui.pitch/4;
+	}
+}
+
+void vui_draw_mouse_at( uint16_t x, uint16_t y ) {
+	uint32_t offset_x = x;
+	uint32_t offset_y = y * vui.pitch/4;
+
+	for( int i = 0; i < AVSOS_MOUSE_SIZE_HEIGHT; i++ ) {
+		for( int j = 0; j < AVSOS_MOUSE_SIZE_WIDTH; j++ ) {
+			*(mousebg + (i*10) + j) = *(vui.fb + offset_y + offset_x + j);
+			*(vui.fb + offset_y + offset_x + j) = 0x747474;
+		}
+
+		offset_y = offset_y + vui.pitch/4;
+	}
+}
+
+void vui_handle_mouse_move( uint16_t x_displacement, uint16_t y_displacement ) {
+	uint16_t old_x = mouse_x;
+	uint16_t old_y = mouse_y;
+
+	mouse_x = mouse_x + x_displacement;
+	mouse_y = mouse_y + y_displacement;
+
+	if( mouse_x > vui.width ) {
+		mouse_x = vui.width;
+	}
+
+	if( mouse_y > vui.height ) {
+		mouse_y = vui.height;
+	}
+
+	if( mouse_x < 0 ) {
+		mouse_x = 0;
+	}
+
+	if( mouse_y < 0 ) {
+		mouse_y = 0;
+	}
+
+	vui_draw_mouse_save_buffer( mouse_saved_x, mouse_saved_y );
+	vui_draw_mouse_at( mouse_x, mouse_y );
+
+	mouse_saved_x = old_x;
+	mouse_saved_y = old_y;
+}

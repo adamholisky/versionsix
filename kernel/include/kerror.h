@@ -14,6 +14,12 @@ extern "C" {
 #define KERR_ELF_INAVLID -4
 
 
+#define EBADF -200
+#define EINVAL -201
+#define EIO -202
+#define EISDIR -203
+
+
 static const char *error_strings[] = {
 	"None",
 	"Unknown",

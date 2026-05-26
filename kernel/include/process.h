@@ -81,6 +81,7 @@ typedef struct {
 	bool first_run;
 	pid_t wait_for_pid;
 	int type;
+	int errno;
 
 	fd_process file_descriptors[25];
 

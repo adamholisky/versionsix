@@ -202,6 +202,11 @@ void vui_draw_char( uint16_t char_num, uint16_t x, uint16_t y, uint32_t fg, uint
 void vui_draw_char_ttf( uint32_t char_num, uint16_t x, uint16_t y, uint32_t fg, uint32_t bg, vui_font *font, uint64_t flags );
 void vui_move_rect( uint32_t dest_x, uint32_t dest_y, uint32_t dest_w, uint32_t dest_h, uint32_t src_x, uint32_t src_y, uint32_t src_w, uint32_t src_h );
 
+
+void vui_draw_mouse_at( uint16_t x, uint16_t y );
+void vui_handle_mouse_move( uint16_t x_displacement, uint16_t y_displacement );
+void vui_draw_mouse_save_buffer( uint16_t x, uint16_t y );
+
 #ifdef __cplusplus
 }
 #endif

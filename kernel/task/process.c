@@ -424,3 +424,15 @@ void process_set_status( pid_t pid, uint8_t status ) {
 
 	p->status = status;
 }
+
+int process_get_errno( pid_t pid ) {
+	process_data *p = process_get_data_from_pid(pid);
+
+	return p->errno;
+}
+
+void process_set_errno( pid_t pid, int err ) {
+	process_data *p = process_get_data_from_pid(pid);
+
+	p->errno = err;
+}

@@ -6,6 +6,14 @@
 
 extern kernel_proc_data global_proc_data;
 
+/**
+ * @brief Reads from fd into buf for count bytes.
+ * 
+ * @param fd 
+ * @param buf 
+ * @param count 
+ * @return size_t 0 = eof. -1 = error. anything else = number of bytes read
+ */
 size_t read( int fd, void *buf, size_t count ) {
 	syscall_args args = {
 		.arg_1 = fd,
@@ -16,6 +24,18 @@ size_t read( int fd, void *buf, size_t count ) {
 	return syscall( SYSCALL_READ, 3, &args );
 }
 
+/**
+ * @brief Handles the read syscall
+ * 
+ * @param context 
+ * @param fd 
+ * @param buf 
+ * @param count 
+ * @return int 
+ * 
+ * Return checks:
+ *  - size read: yes, up until vfs_read
+ */
 int read_syscall_handler( registers **context, int fd, void *buf, size_t count ) {
 	int ret_val = 0;
 
@@ -36,7 +56,7 @@ int read_syscall_handler( registers **context, int fd, void *buf, size_t count )
 
 	if( fd == STDIN_FILENO ) {
 		device *dev = device_get_major_minor_device( "stdin", "0" );
-		dev->read( fd, buf, count, 0 );
+		ret_val = dev->read( fd, buf, count, 0 );
 	} else {
 		vfs_fd *v_fd = vfs_get_fd_data( global_proc_data.current_process->file_descriptors[fd].vfs_fd );
 

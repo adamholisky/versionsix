@@ -189,7 +189,7 @@ void interrupt_handler_stage_2( registers **_reg ) {
 	} else {
 		if( irq_handlers[reg->interrupt_no - 0x20].in_use == true ) {
 			if( reg->interrupt_no - 0x20 != 0 ) {
-				klog( LOG_DEBUG, "found handler for %d", reg->interrupt_no - 0x20 );
+				//klog( LOG_DEBUG, "found handler for %d", reg->interrupt_no - 0x20 );
 			}
 
 			irq_handler_func handler_func = (irq_handler_func)(irq_handlers[reg->interrupt_no - 0x20].handler);

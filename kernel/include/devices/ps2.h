@@ -30,6 +30,8 @@ extern "C"
 #define PS2_CMD_DISABLE_PORT1 0xAD
 #define PS2_CMD_ENABLE_PORT1 0xAE
 #define PS2_CMD_SEND_TO_SECOND_PORT 0xD4
+#define PS2_CMD_ENABLE_MOUSE 0xF4
+#define PS2_CMD_MOUSE_USE_DEFAULT_SETTINGS 0xF6
 
 #define PS2_CFG_IRQ_PORT1 0x01
 #define PS2_CFG_IRQ_PORT2 0x02
@@ -49,6 +51,9 @@ typedef struct {
 	size_t count;
 } ps2_keyboard_wq_data;
 
+void ps2_wait_for_input_buffer( void );
+void ps2_wait_for_output_buffer( void );
+
 void device_register_ps2_keyboard( void );
 void ps2_keyboard_close( inode_id id );
 void ps2_keyboard_open( inode_id id );
@@ -57,11 +62,11 @@ void ps2_keyboard_write( inode_id id, void* buff, size_t count, size_t offset );
 uint8_t ps2_keyboard_wq_ready( wait_queue* queue, pid_t pid, void *wq_data );
 void ps2_keyboard_interrupt_handler( registers **reg );
 
-void ps2_wait_for_input_buffer( void );
-void ps2_wait_for_output_buffer( void );
-void ps2_send_command( uint8_t command, uint8_t param );
-uint8_t ps2_send_command_get_reply( uint8_t command );
-
+void ps2_mouse_close( inode_id id );
+void ps2_mouse_open( inode_id id );
+uint8_t ps2_mouse_read( inode_id id, uint8_t * buff, uint64_t count, uint64_t offset );
+void ps2_mouse_write( inode_id id, void *buff, size_t count, size_t offset );
+void ps2_mouse_interrupt_handler( registers **reg );
 
 #ifdef __cplusplus
 }

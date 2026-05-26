@@ -1,7 +1,7 @@
 #include <kernel_common.h>
 #include <interrupt.h>
 #include <keyboard.h>
-#include <devices/ps2_keyboard.h>
+#include <devices/ps2.h>
 
 keyboard_config main_keyboard;
 

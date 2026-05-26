@@ -80,7 +80,7 @@ CPPFLAGS = $(DEFINES) \
 QEMU = /usr/bin/qemu-system-x86_64
 QEMU_COMMON = 	-readconfig ${ROOT_DIR}/build_support/qemu_configs/x86_64_primary.cfg \
 				\
-				-device loader,addr=0x1337C0DE,data=0x0,data-len=1 \
+				-device loader,addr=0x1337C0DE,data=0x1,data-len=1 \
 				\
 				-m 8G \
 				\

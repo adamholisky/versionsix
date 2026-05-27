@@ -1,5 +1,7 @@
 # A Very Simple Operating System
 
+<img width="1021" height="321" alt="Screenshot_20260526_194156" src="https://github.com/user-attachments/assets/251f9f16-abb5-4a4e-9d6e-3556756f5625" />
+
 A Very Simple Operating System is designed to be ... simple. It's a kernel and user-space that's engineered to let one mess with underlying tech that normally isn't used in day-to-day high level development. There's a fair bit implemented in AVSOS, depending on how you look at it. But none of it's really "done" in any sense of the word.
 
 All code is open sourced, written by Adam Holisky in his spare time unless otherwise noted.

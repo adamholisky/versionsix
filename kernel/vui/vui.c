@@ -11,8 +11,8 @@
 
 vui_core vui;
 
-#define AVSOS_MOUSE_SIZE_HEIGHT 20
-#define AVSOS_MOUSE_SIZE_WIDTH 10
+#define AVSOS_MOUSE_SIZE_HEIGHT 7
+#define AVSOS_MOUSE_SIZE_WIDTH 14
 
 uint16_t mouse_saved_x;
 uint16_t mouse_saved_y;
@@ -342,14 +342,34 @@ void vui_draw_mouse_save_buffer( uint16_t x, uint16_t y ) {
 	}
 }
 
+static unsigned long avsos_curor_bitmap[] = {
+	0x8000,
+	0xC000,
+	0xE000,
+	0xF000,
+	0xF800,
+	0xFC00,
+	0xFE00,
+	0xFF00,
+	0xFE00,
+	0xFC00,
+	0xDE00,
+	0x8E00,
+	0x0E00,
+	0x0000,
+};
+
 void vui_draw_mouse_at( uint16_t x, uint16_t y ) {
 	uint32_t offset_x = x;
 	uint32_t offset_y = y * vui.pitch/4;
 
 	for( int i = 0; i < AVSOS_MOUSE_SIZE_HEIGHT; i++ ) {
-		for( int j = 0; j < AVSOS_MOUSE_SIZE_WIDTH; j++ ) {
+		for( int j = AVSOS_MOUSE_SIZE_WIDTH; j > -1; j-- ) {
 			*(mousebg + (i*10) + j) = *(vui.fb + offset_y + offset_x + j);
-			*(vui.fb + offset_y + offset_x + j) = 0x747474;
+
+			if( test_bit(avsos_curor_bitmap[i], j) ) {
+				//*(vui.fb + offset_y + offset_x + j) = 0x00000000;
+			}
 		}
 
 		offset_y = offset_y + vui.pitch/4;

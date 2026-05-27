@@ -11,6 +11,15 @@
 
 vui_core vui;
 
+#define AVSOS_MOUSE_SIZE_HEIGHT 20
+#define AVSOS_MOUSE_SIZE_WIDTH 10
+
+uint16_t mouse_saved_x;
+uint16_t mouse_saved_y;
+uint32_t mousebg[10*20];
+uint16_t mouse_x;
+uint16_t mouse_y;
+
 /**
  * @brief Initalize the VUI GUI system
  * 
@@ -42,6 +51,9 @@ void vui_init( uint32_t *fb_addr, uint16_t width, uint16_t height ) {
 	vui.active_theme.button_active = 0x003476;
 	vui.active_theme.menubar_background = 0xD9D9D9;
 	vui.active_theme.menubar_foreground = 0x363636;
+
+	mouse_x = 0;
+	mouse_y = 0;
 }
 
 /**
@@ -304,14 +316,18 @@ void vui_sort_list_by_priority( vui_handle_list *list ) {
 	}
 }
 
-#define AVSOS_MOUSE_SIZE_HEIGHT 20
-#define AVSOS_MOUSE_SIZE_WIDTH 10
+void vui_mouse_save_area( uint16_t x, uint16_t y ) {
+	uint32_t offset_x = x;
+	uint32_t offset_y = y * vui.pitch/4;
 
-uint16_t mouse_saved_x;
-uint16_t mouse_saved_y;
-uint32_t mousebg[10*20];
-uint16_t mouse_x;
-uint16_t mouse_y;
+	for( int i = 0; i < AVSOS_MOUSE_SIZE_HEIGHT; i++ ) {
+		for( int j = 0; j < AVSOS_MOUSE_SIZE_WIDTH; j++ ) {
+			*(mousebg + (i*10) + j) = *(vui.fb + offset_y + offset_x + j);
+		}
+
+		offset_y = offset_y + vui.pitch/4;
+	}
+}
 
 void vui_draw_mouse_save_buffer( uint16_t x, uint16_t y ) {
 	uint32_t offset_x = x;
@@ -340,32 +356,34 @@ void vui_draw_mouse_at( uint16_t x, uint16_t y ) {
 	}
 }
 
-void vui_handle_mouse_move( uint16_t x_displacement, uint16_t y_displacement ) {
-	uint16_t old_x = mouse_x;
-	uint16_t old_y = mouse_y;
+void vui_handle_mouse_move( int x_displacement, int y_displacement ) {
+	int old_x = mouse_x;
+	int old_y = mouse_y;
+	int new_mouse_x = mouse_x + x_displacement;
+	int new_mouse_y = mouse_y + y_displacement;
 
-	mouse_x = mouse_x + x_displacement;
-	mouse_y = mouse_y + y_displacement;
-
-	if( mouse_x > vui.width ) {
-		mouse_x = vui.width;
+	if( new_mouse_x > vui.width ) {
+		new_mouse_x = vui.width;
 	}
 
-	if( mouse_y > vui.height ) {
-		mouse_y = vui.height;
+	if( new_mouse_y > vui.height ) {
+		new_mouse_y = vui.height;
 	}
 
-	if( mouse_x < 0 ) {
-		mouse_x = 0;
+	if( new_mouse_x < 0 ) {
+		new_mouse_x = 0;
 	}
 
-	if( mouse_y < 0 ) {
-		mouse_y = 0;
+	if( new_mouse_y < 0 ) {
+		new_mouse_y = 0;
 	}
 
-	vui_draw_mouse_save_buffer( mouse_saved_x, mouse_saved_y );
-	vui_draw_mouse_at( mouse_x, mouse_y );
+	printf( "(%d, %d) -> (%d, %d)\n", x_displacement, y_displacement, new_mouse_x, new_mouse_y );
 
-	mouse_saved_x = old_x;
-	mouse_saved_y = old_y;
+	vui_draw_mouse_save_buffer( old_x, old_y );
+	vui_mouse_save_area( new_mouse_x, new_mouse_y );
+	vui_draw_mouse_at( new_mouse_x, new_mouse_y );
+
+	mouse_x = new_mouse_x;
+	mouse_y = new_mouse_y;
 }

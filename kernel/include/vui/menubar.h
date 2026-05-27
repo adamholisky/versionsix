@@ -17,6 +17,7 @@ vui_handle vui_menubar_create( void );
 void vui_menubar_draw( vui_handle H );
 void vui_menubar_draw_from_struct( vui_menubar *menubar );
 void vui_menubar_add( vui_menubar *menubar, vui_menu *menu );
+void vui_menubar_update_clock( void );
 
 #ifdef __cplusplus
 }

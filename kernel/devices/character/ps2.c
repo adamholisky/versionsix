@@ -303,7 +303,7 @@ void ps2_mouse_interrupt_handler( registers **reg ) {
 			debugf( "At 3: (%d, %d) with M: %d, R: %d, L: %d\n", move_x, move_y, middle_button, right_button, left_button );
 		}
 
-		printf( "(%d, %d) ", move_x, move_y );
+		//printf( "(%d, %d) ", move_x, move_y );
 
 		vui_handle_mouse_move( move_x, move_y * -1 );
 	}

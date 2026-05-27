@@ -53,6 +53,9 @@ void load_gui_stuff( void ) {
 	vui_draw( menubar );
 	vui_draw( desktop );
 	vui_draw( win );
+
+	vui_mouse_save_area(0,0);
+	vui_draw_mouse_at(0,0);
 }
 
 void load_font_stuff( void ) {

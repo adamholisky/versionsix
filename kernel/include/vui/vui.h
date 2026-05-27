@@ -204,8 +204,9 @@ void vui_move_rect( uint32_t dest_x, uint32_t dest_y, uint32_t dest_w, uint32_t 
 
 
 void vui_draw_mouse_at( uint16_t x, uint16_t y );
-void vui_handle_mouse_move( uint16_t x_displacement, uint16_t y_displacement );
+void vui_handle_mouse_move( int x_displacement, int y_displacement );
 void vui_draw_mouse_save_buffer( uint16_t x, uint16_t y );
+void vui_mouse_save_area( uint16_t x, uint16_t y );
 
 #ifdef __cplusplus
 }

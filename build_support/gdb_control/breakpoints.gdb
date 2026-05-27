@@ -2,5 +2,5 @@
 # To load this file, run `source <path-to-this-file>` in GDB
 
 # break process.c:334
-# break vui.c:179
-# break vui.c:241
+# break vui.c:191
+# break vui.c:253

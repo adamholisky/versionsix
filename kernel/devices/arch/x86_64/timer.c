@@ -1,6 +1,7 @@
 #include "kernel_common.h"
 #include "interrupt.h"
 #include "timer.h"
+#include <vui/menubar.h>
 
 uint32_t timer_counter;
 uint64_t system_count;
@@ -31,6 +32,10 @@ void timer_handler( registers **context ) {
 
     if( timer_counter < 100 ) { 
         timer_counter++;
+        
+        if( timer_counter % 2 ) {
+            vui_menubar_update_clock();
+        }
     } else {
         timer_counter = 0;
     }

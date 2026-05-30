@@ -407,3 +407,16 @@ void vui_handle_mouse_move( int x_displacement, int y_displacement ) {
 	mouse_x = new_mouse_x;
 	mouse_y = new_mouse_y;
 }
+
+void vui_copy_buffer_mem_to( uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t *buff ) {
+	uint32_t offset_x = x;
+	uint32_t offset_y = y * vui.pitch/4;
+
+	for( int i = 0; i < h; i++ ) {
+		for( int j = w; j > -1; j-- ) {
+			*(vui.fb + offset_y + offset_x + j) = *(buff + (i * w) + j);
+		}
+
+		offset_y = offset_y + vui.pitch/4;
+	}
+}

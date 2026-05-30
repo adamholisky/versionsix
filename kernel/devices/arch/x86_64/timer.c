@@ -4,18 +4,19 @@
 #include <vui/menubar.h>
 
 uint32_t timer_counter;
-uint64_t system_count;
+uint32_t system_count;
 bool done_waiting;
 
 void timer_initalize( void ) {
     irq_handler_func timer_func = timer_handler;
     interrupt_add_irq_handler( 0, timer_func );
 
-    uint16_t divisor = 1193180 / 100;      // Calculate our divisor, default 65535 --> 1193180/hz
+    uint16_t divisor = 1193180 / 1000;  // Calculate our divisor, default 65535 --> 1193180/hz
     outportb( 0x43, 0x36 );             // Set our command byte 0x36
     outportb( 0x40, divisor & 0xFF );   // Set low byte of divisor
     outportb( 0x40, divisor >> 8 );     // Set high byte of divisor
 
+    system_count = 0;
     timer_counter = 0;
     done_waiting = false;
 }
@@ -57,4 +58,8 @@ void timer_wait( uint8_t n ) {
             //dfv( wait_count );
         }
     }
+}
+
+uint32_t timer_get_system_counter( void ) {
+    return system_count;
 }

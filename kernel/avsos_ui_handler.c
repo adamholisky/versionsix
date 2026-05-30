@@ -20,7 +20,7 @@ void enable_gui( void ) {
 	vui_init( (uint32_t*)kernel_info.framebuffer_info.address, 1024, 768 );
 
 	load_font_stuff();
-	load_gui_stuff();
+	//load_gui_stuff();
 }
 
 void load_gui_stuff( void ) {
